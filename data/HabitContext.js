@@ -17,7 +17,7 @@ const HabitsProvider = ({ children }) => {
     const addHabit = async(habit) => {
 
         const habitID = await addNewHabit(habit)
-        const newHabit = { ...habit, id: habitID };
+        const newHabit = { ...habit, habitID: habitID };
 
         console.log("Habitude bien ajoutée avec comme identifiant : " + habitID)
         return newHabit
@@ -26,6 +26,14 @@ const HabitsProvider = ({ children }) => {
 
     const handleAddHabit = (newHabit) => {
         setHabits((prevHabits) => [...prevHabits, JSON.parse(JSON.stringify(newHabit))])
+
+        console.log("HABIT : ", newHabit)
+
+        const newIndex = Habits.findIndex((habit) => {
+          return habit.habitID === newHabit.habitID;
+        });
+
+        return newIndex;
     }
 
     useEffect(() => {

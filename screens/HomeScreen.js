@@ -16,7 +16,7 @@ import { useSharedValue } from 'react-native-reanimated';
 import HomeCalendarCustomWeek from '../components/Calendars/HomeCalendarCustomWeek';
 import cardStyle from '../styles/StyledCard';
 import viewStyle from '../styles/StyledView';
-import { BackgroundView, MainView, TopScreenView } from '../components/View/Views';
+import { BackgroundView, MainView, TopScreenView, UsualScreen } from '../components/View/Views';
 import { SimpleButton } from '../components/Buttons/UsualButton';
 
 import { setDoc, doc, addDoc, collection } from 'firebase/firestore';
@@ -24,6 +24,7 @@ import { db } from '../firebase/InitialisationFirebase';
 import { addHabit, addHabits, getAllOwnHabits } from '../firebase/FirestorePrimitives';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
+import VerticalAnimatedFlatList from '../components/FlatList/VerticalAnimatedFlatList';
 
 const HomeScreen = () => {
 
@@ -71,61 +72,51 @@ const HomeScreen = () => {
     fetchHabitudes();
   }, []);*/
 
+  
 
   return (
-   <MainView>
-          <TopScreenView>
-                <View style={
-                  [
-                    styles.ProfilContainer,
-                  ]
-                  }>
-                    <View style={{display:"flex", flexDirection: "column", justifyContent: "center"}}>
-                      <HugeText text={currentDateDayMonth}/>  
-                      <SubTitleGrayText text="2023"/>  
-                    </View> 
+      <UsualScreen>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <View style={styles.ProfilContainer}>
 
-                    <View style={{alignItems: "center", justifyContent:"center", display:"flex"}}>
-                      <ProfilButton onPress={handleOpenProfilDetails} profil={Friends[0]}/>
-                    </View>
+                <View style={{display:"flex", flexDirection: "column", justifyContent: "center"}}>
+                    <HugeText text={currentDateDayMonth}/>  
+                    <SubTitleGrayText text="2023"/>  
+                </View> 
 
-              </View>
+                <View style={{alignItems: "center", justifyContent:"center", display:"flex"}}>
+                    <ProfilButton onPress={handleOpenProfilDetails} profil={Friends[0]}/>
+                </View>
 
-              <View style={{paddingVertical:0}}>
+            </View>
+
+            <View style={{paddingVertical:0}}>
                 <HomeCalendarCustomWeek selectedDate={currentDate} setSelectedDate={setCurrentDate}/>
-              </View>
-              
-              {/*<View style={{display: "flex", alignItems: "center", justifyContent: "center", margin: 20}}>
-                <SimpleButton onClick={handleTestFireStore}>
-                  <NormalText text="testFirestore"/>
-                </SimpleButton>
-              </View>*/}
-            </TopScreenView>
+            </View>
+          </View>
+        
+                        
+          <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginVertical: 10}}>
+              <SubTitleText text={"Plan du jour :"}/>
+          </View>
 
-            
-            <BackgroundView>
-                
-              <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginVertical: 10}}>
-                <SubTitleText text={"Plan du jour :"}/>
-              </View>
+          <View style={styles.habitsContainer}>
+            <VerticalAnimatedFlatList data={Habits}/>
+          </View>
 
 
-            <FlatList 
-
-
-            renderItem={({item, index}) => {
-
-              return <HabitudeListItem index={index}/>}
-            }
+          {/* <FlatList showsVerticalScrollIndicator={false}
+            data={Habits}
 
             contentContainerStyle={{paddingBottom: 20}}
-            showsVerticalScrollIndicator={false}
-            style={styles.HabitsList} key={numColumns}
-            data={Habits} numColumns={numColumns}
-            keyExtractor={(item) => item.habitID}/>
+            style={styles.HabitsList} 
+            numColumns={numColumns}
+            key={numColumns}
+            keyExtractor={(item) => item.habitID}/> */}
+        </View>
 
-          </BackgroundView>
-    </MainView>
+    </UsualScreen>
   );
 };
 
@@ -181,12 +172,26 @@ const styles = StyleSheet.create({
   }, 
 
   container: {
-    padding: 30,
+    padding: 0,
     paddingBottom: 0,
     flex:1,
-    gap: 0,
+    gap: 20,
     display: "flex", 
   },
+
+  header: {
+
+  },
+
+  habitsContainer: {
+    flex:1,
+    flexGrow: 1,
+    display: "flex",
+    margin: -15,
+    marginLeft: -45,
+    marginTop: 0,
+    marginBottom: 0
+  }
 });
 
 export default HomeScreen;

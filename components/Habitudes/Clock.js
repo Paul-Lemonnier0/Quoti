@@ -32,6 +32,7 @@ const Clock = ({minutes, isFinished}) => {
 export const CustomDurationIndicator = ({duration, isFinished}) => {
 
     const font = useThemeColor({}, "Font")
+    const fontGray = useThemeColor({}, "FontGray")
 
     const hours = Math.floor(duration / 60)
     const remainingMinutes = duration % 60
@@ -43,7 +44,8 @@ export const CustomDurationIndicator = ({duration, isFinished}) => {
 
     return (
         <View style={styles.clockContainer}>
-            <NormalGrayText text={formatedDuration} />
+            <Feather name="clock" size={30} color={font} />
+            <NormalText text={formatedDuration} />
         </View>
     )
 }

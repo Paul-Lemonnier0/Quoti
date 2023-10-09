@@ -8,7 +8,7 @@ export default BottomMenuStyle = () => {
     return StyleSheet.create(
         {
             bottomMenuStyle: {
-                backgroundColor: secondary,
+                backgroundColor: "#151315",
                 marginHorizontal: 25,
                 position: "absolute", 
                 bottom: 35, 

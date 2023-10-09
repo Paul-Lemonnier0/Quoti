@@ -14,7 +14,7 @@ export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
 
                 Array.from({ length: totalSteps }).map((item, index) => {
                     return(
-                        <View key={item}
+                        <View key={index}
                         style={[styles.singleBar, 
                             {
                                 backgroundColor: index < currentStep ? highlightColor : secondary

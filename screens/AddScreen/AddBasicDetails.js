@@ -8,11 +8,12 @@ import { StyleSheet } from "react-native"
 import { TextInput } from "react-native-gesture-handler"
 import { TextInputCustom } from "../../components/TextFields/TextInput"
 import { ScrollView } from "react-native"
-import { AddStepCustomCarousel, CustomCarousel } from "../../components/Carousel/CustomCarousel"
+import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
 import AddStepBottomScreen from "../BottomScreens/AddStepBottomScreen"
 import { useMemo } from "react"
 import { useRef } from "react"
 import { useCallback } from "react"
+import {RenderAddStepCarouselItem} from '../../components/Habitudes/Step/StepCarouselItem'
 import { useNavigation, useRoute } from "@react-navigation/native"
 
 export const AddBasicDetails = () => {
@@ -67,7 +68,8 @@ export const AddBasicDetails = () => {
             const habit = {
                 titre: title,
                 description: description,
-                steps: steps.filter((step) => step.addStepItem !== true), //to filter at the end
+                steps: steps.length === 1 ? [{title: title, description: description, duration: 0}] : steps.filter((step) => step.addStepItem !== true), //to filter at the end
+                doneSteps: 0
             }
 
             navigation.navigate("CreateHabitDetails", {habit})
@@ -108,8 +110,21 @@ export const AddBasicDetails = () => {
                     <View style={[styles.groupContainer, {flex:1, marginBottom: 15, gap: 15}]}>
                         <SubTitleText text="Etapes :"/>
 
-                        <View style={{flex: 1, marginBottom: 30}}>
-                            <AddStepCustomCarousel data={steps} setData={setSteps} handleOpenAddStep={handleOpenAddStep}/>                        
+                        <View style={{flex: 1}}>
+                            <CustomCarousel 
+                                data={steps}
+                                renderItem={({item, index}) => {
+                                    return(
+                                        <RenderAddStepCarouselItem 
+                                            item={item} 
+                                            index={index}
+                                            data={steps} 
+                                            setData={setSteps} 
+                                            handleOpenAddStep={handleOpenAddStep}
+                                        />
+                                    )
+                                }}
+                            />                        
                         </View>
                     </View>
                 </View>

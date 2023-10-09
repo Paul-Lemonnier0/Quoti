@@ -137,7 +137,7 @@ const styles = StyleSheet.create(
             borderRadius: 50,
             display: "flex",
             padding: 15,
-            borderWidth: 2, aspectRatio: 1
+            borderWidth: 2,
         },
     }
 )

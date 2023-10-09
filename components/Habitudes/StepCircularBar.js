@@ -33,7 +33,7 @@ export const StepCircularBar = ({ habit, isFinished, tall, otherImage, secondary
     setIsLoading(false);
   };
 
-  const radius = isGiant ? 40 : 28; // Rayon du cercle
+  const radius = isGiant ? 35 : 28; // Rayon du cercle
   const angleTotal = 2 * Math.PI * (radius + 2.5); // Angle total en radians
 
   const circumference = totalSteps === 1 ? angleTotal : angleTotal - angleTotal * 0.025 * totalSteps;

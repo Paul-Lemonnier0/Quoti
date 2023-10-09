@@ -12,6 +12,7 @@ import Clock, { CustomDurationIndicator } from "./Clock"
 import { useContext } from "react"
 import { HabitsContext } from "../../data/HabitContext"
 import { CircleSimpleRadioButton } from "../RadioButtons/RadioButton"
+import Separator from "../Other/Separator"
 
 export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habitID}) => { //a re-factoriser genre les styles et tout ça peut être simplifié je pense
 
@@ -91,7 +92,6 @@ export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habi
 
 export const AddEtapeItem = ({handleOpenAddStep}) => {
 
-
     const cardStyles = cardStyle()
     const popup = useThemeColor({}, "Popup")
     const font = useThemeColor({}, "Font")
@@ -99,12 +99,20 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
 
     return(
         <View style={[cardStyles.shadow, styles.addStepContainer, {backgroundColor: popup}]}>
+            
+            <View style={{width: "80%", gap: 10}}>
+                <TitleText text="Ajoutez une étape" />
 
-            <SubTitleText text="Ajoutez une étape" />
+                <View style={{}}>
+                    <NormalText text="Décomposer votre habitude en une ou plusieurs étapes !" />
+                </View>
+            </View>
 
-            <BigCircleBorderButton onPress={handleOpenAddStep} borderColor={contrast}>
-                <Feather name="plus" size={24} color={font} />
-            </BigCircleBorderButton>
+            <View style={{flex: 1, justifyContent: "flex-end", alignItems: "flex-end"}}>
+                <BigCircleBorderButton onPress={handleOpenAddStep} borderColor={contrast}>
+                    <Feather name="plus" size={24} color={font} />
+                </BigCircleBorderButton>
+            </View>
 
         </View>
     )
@@ -117,22 +125,25 @@ export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) 
     const cardStyles = cardStyle()
     const secondary = useThemeColor({}, "Secondary")
     const fontGray = useThemeColor({}, "FontGray")
+    const font = useThemeColor({}, "Font")
 
     return(
         <TouchableOpacity style={[cardStyles.shadow, styles.addedContainer, {backgroundColor: secondary}]}>
 
-            <View>
-                <SubTitleText text={step.title}/>
-                <SubText text={step.description} />
+            <View style={{display: "flex", flexDirection: "column", gap: 15}}>
+                    <TitleText text={step.title}/>
+                    <NormalText text={step.description}/>
             </View>
 
             <View style={styles.addedFooterContainer}>
                 
                 <CustomDurationIndicator duration={step.duration} />
 
-                <CircleBorderButton onPress={handleDelete}>
-                    <Feather name="trash-2" size={20} color={fontGray} />
-                </CircleBorderButton>
+                <View style={{flex: 1, justifyContent: "flex-end", alignItems: "flex-end"}}>
+                    <BigCircleBorderButton onPress={() => {}}>
+                        <Feather name="trash-2" size={24} color={font} />
+                    </BigCircleBorderButton>
+                </View>
             </View>
         </TouchableOpacity>
     )
@@ -151,19 +162,15 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 10, 
         flex: 1, 
-        justifyContent: "space-around", 
-        alignItems: "center",
         borderRadius: 25, 
         padding:30, 
-        paddingVertical: 25, 
     },
 
     addedContainer: {
+        gap: 10, 
         flex: 1, 
         borderRadius: 25, 
         padding:30, 
-        paddingVertical: 25, 
-        gap: 5,
         justifyContent: "space-between", 
         display: "flex", 
         flexDirection: "column"
@@ -173,7 +180,7 @@ const styles = StyleSheet.create({
         display: "flex", 
         flexDirection:"row", 
         justifyContent:"space-between", 
-        alignItems: "center", 
+        alignItems: "flex-end", 
         gap: 20
     }
 })

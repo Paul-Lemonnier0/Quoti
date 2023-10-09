@@ -1,7 +1,7 @@
 import { View } from "react-native"
 import { CircleBorderButton, GoBackButton, GoNextButton } from "../../components/Buttons/UsualButton"
-import { BackgroundView, MainView, TopScreenView } from "../../components/View/Views"
-import { SubText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { BackgroundView, MainView, TopScreenView, UsualScreen } from "../../components/View/Views"
+import { HugeText, SubText, SubTitleText, TitleText } from "../../styles/StyledText"
 import { Image } from "react-native"
 import HabitIcons from "../../data/HabitIcons"
 import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
@@ -15,10 +15,12 @@ import { Feather } from "@expo/vector-icons"
 import AddingHabitScreen from "./ValidationScreenHabit"
 import { addNewHabit } from "../../firebase/FirestorePrimitives"
 import { HabitsContext } from "../../data/HabitContext"
+import StepIndicator from '../../components/Other/StepIndicator.js'
+
 
 export const ChooseIconScreen = () => {
 
-    const {addHabit, handleAddHabit} = useContext(HabitsContext)
+    const {addHabit, handleAddHabit, Habits} = useContext(HabitsContext)
 
     const route= useRoute()
     const primary = useThemeColor({}, "Primary")
@@ -51,14 +53,16 @@ export const ChooseIconScreen = () => {
         return chunkedArray;
     };
 
-    const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 16);
+    const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 12);
 
     const handleValidation = async() => {
         
         const newHabit = await addHabit(finalHabit)
-        handleAddHabit(newHabit)
+        console.log(newHabit)
+        const indexHabit = handleAddHabit(newHabit)
+        console.log("INDEX : ", indexHabit)
 
-        navigation.navigate("ValidationScreenHabit", {finalHabit})
+        navigation.navigate("ValidationScreenHabit", {habit: newHabit})
     }
 
 
@@ -78,12 +82,12 @@ export const ChooseIconScreen = () => {
 
     const renderIconSelectorItem = ({item, index}) => {
         return(
-            <View style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", flex: 1, marginBottom: -40}}>
+            <View style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", flex: 1}}>
                 <FlatList
                     data={item}
                     keyExtractor={(itm) => itm.id}
                     renderItem={renderItem}
-                    numColumns={4}
+                    numColumns={3} key={1}
                     contentContainerStyle={styles.gridContainer}
                 />
             </View>
@@ -91,53 +95,42 @@ export const ChooseIconScreen = () => {
     }
 
     return(
-        <MainView>
-            <TopScreenView>
+        <UsualScreen>
 
-                <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginBottom: 15, marginTop: -10}}>
+            <View style={styles.container}>
 
-                    <GoBackButton/>
+                <View style={styles.header}>
 
-                    <View style={{flex: 1, alignItems: "center", justifyContent: "center", display: "flex", flexDirection: "column", gap: 0, marginHorizontal: 20}}>
-                        <SubTitleText text={colorHabit.titre} style={{textAlign: "center"}}/>
-                        <SubText text={colorHabit.description} style={{textAlign: "center"}}/>
+                    <View style={{width: "80%"}}>
+                        <HugeText text="Choisissez une icône"/>
                     </View>
 
-                    <CircleBorderButton onPress={handleValidation}>
-                        <Feather name="check" size={20} color={font} />
-                    </CircleBorderButton>
+                    <GoNextButton handleGoNext={handleValidation}/>
 
                 </View>
 
-                <View style={{marginVertical: 10}}>
-                    <TitleText text={"Séléctionnez une icône"} style={{textAlign: "center"}}/>
-                </View>
+                <StepIndicator totalSteps={5} currentStep={4}/>
 
-                <View style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10}}>
-                    <View style={{backgroundColor: primary, borderRadius: 50, padding: 20, borderColor: colorHabit.color, borderWidth: 2}}>
-                        <Image style={{width: 30, height: 30}} source={HabitIcons[selectedIcon]}/>
+
+
+                <View style={styles.body}>
+                    <View style={{flex: 1, marginBottom:30}}>
+                        <CustomCarousel
+                            data={splitHabitsIconsData}
+                            renderItem={renderIconSelectorItem}
+                        />
                     </View>
                 </View>
 
-            </TopScreenView>
-
-            <BackgroundView>
-
-                <View style={{flex: 1, marginBottom: 40}}>
-                    <CustomCarousel
-                        data={splitHabitsIconsData}
-                        renderItem={renderIconSelectorItem}
-                        customWidth={30}
-                    />
-                </View>
-
-            </BackgroundView>
-        </MainView>
+            </View>
+        </UsualScreen>
     )
 }
 
 const styles = StyleSheet.create({
     gridContainer: {
+        flex: 1,
+        justifyContent: "center"
       },
 
     gridItem: {
@@ -157,4 +150,31 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
       },
+
+      container: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 30, 
+        flex: 1, 
+        marginBottom: 0
+    },
+
+    header: {
+        display: "flex", 
+        flexDirection: "row", 
+        alignItems:"center", 
+        justifyContent: "space-between"
+    },
+    
+    body: {
+        flex: 1, 
+        gap: 30,
+    },
+
+    groupContainer: {
+        display: 'flex', 
+        flexDirection: "column",
+        justifyContent: "center", 
+        gap: 20
+    },
 })

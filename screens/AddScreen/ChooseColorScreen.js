@@ -1,7 +1,7 @@
 import { View } from "react-native"
 import { CircleBorderButton, GoBackButton, GoNextButton } from "../../components/Buttons/UsualButton"
-import { BackgroundView, MainView, TopScreenView } from "../../components/View/Views"
-import { SubText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { BackgroundView, MainView, TopScreenView, UsualScreen } from "../../components/View/Views"
+import { HugeText, SubText, SubTitleText, TitleText } from "../../styles/StyledText"
 import { Image } from "react-native"
 import HabitIcons from "../../data/HabitIcons"
 import { useNavigation, useRoute } from "@react-navigation/native"
@@ -14,6 +14,7 @@ import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
 import { Feather } from "@expo/vector-icons"
 import AddingHabitScreen from "./ValidationScreenHabit"
 import { ColorsList } from "../../data/ColorsList"
+import StepIndicator from '../../components/Other/StepIndicator.js'
 
 export const ChooseColorScreen = () => {
 
@@ -36,8 +37,8 @@ export const ChooseColorScreen = () => {
 
     const chunkedColors = [];
 
-    for (let i = 0; i < ColorsList.length; i += 16) {
-      chunkedColors.push(ColorsList.slice(i, i + 16));
+    for (let i = 0; i < ColorsList.length; i += 12) {
+      chunkedColors.push(ColorsList.slice(i, i + 12));
     }
 
     const handleGoNext = () => {
@@ -51,24 +52,22 @@ export const ChooseColorScreen = () => {
 
         return (
           <TouchableOpacity style={styles.gridItem} onPress={() => setSelectedColor(item)} key={item}>
-                <View style={{backgroundColor: secondary, borderWidth: 2, borderColor: isSelected ? contrast : secondary, borderRadius: 50, padding: 20}}>
-                    <View style={{padding: 10,backgroundColor: item, borderRadius: 50}}/>
+                <View style={{backgroundColor: secondary, borderWidth: 2, borderColor: isSelected ? contrast : secondary, borderRadius: 50, padding: 20,}}>
+                    <View style={{padding: 15,backgroundColor: item, borderRadius: 50}}/>
                 </View>
           </TouchableOpacity>
-
-          
         );
 
     };
 
     const renderIconSelectorItem = ({item, index}) => {
         return(
-            <View style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", flex: 1, marginBottom: -40}}>
+            <View style={{display: "flex", justifyContent: "center", alignContent: "center", flex:1}}>
                 <FlatList
                     data={item}
                     keyExtractor={(itm) => itm}
-                    renderItem={renderItem}
-                    numColumns={4}
+                    renderItem={renderItem} key={1}
+                    numColumns={3}
                     contentContainerStyle={styles.gridContainer}
                 />
             </View>
@@ -76,50 +75,42 @@ export const ChooseColorScreen = () => {
     }
 
     return(
-        <MainView>
-            <TopScreenView>
+        <UsualScreen>
 
-                <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginBottom: 15, marginTop: -10}}>
+            <View style={styles.container}>
 
-                    <GoBackButton/>
+                <View style={styles.header}>
 
-                    <View style={{flex: 1, alignItems: "center", justifyContent: "center", display: "flex", flexDirection: "column", gap: 0, marginHorizontal: 20}}>
-                        <SubTitleText text={detailledHabit.titre} style={{textAlign: "center"}}/>
-                        <SubText text={detailledHabit.description} style={{textAlign: "center"}}/>
+                    <View style={{width: "80%"}}>
+                        <HugeText text="Choisissez une couleur"/>
                     </View>
 
                     <GoNextButton handleGoNext={handleGoNext}/>
 
                 </View>
 
-                <View style={{marginVertical: 10}}>
-                    <TitleText text={"Séléctionnez une couleur"} style={{textAlign: "center"}}/>
-                </View>
+                <StepIndicator totalSteps={5} currentStep={3}/>
 
-                <View style={{display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", marginVertical: 10}}>
-                    <View style={{backgroundColor: primary, borderRadius: 50, padding: 20}}>
-                        <View style={{padding: 10,backgroundColor: selectedColor, borderRadius: 50}}/>
+
+
+                <View style={styles.body}>
+                    <View style={{flex: 1, marginBottom:30}}>
+                        <CustomCarousel
+                            data={chunkedColors}
+                            renderItem={renderIconSelectorItem}
+                        />
                     </View>
                 </View>
 
-            </TopScreenView>
-
-            <BackgroundView>
-                <View style={{flex: 1, marginBottom: 40}}>
-                    <CustomCarousel
-                        data={chunkedColors}
-                        renderItem={renderIconSelectorItem}
-                        customWidth={30}
-                    />
-                </View>
-
-            </BackgroundView>
-        </MainView>
+            </View>
+        </UsualScreen>
     )
 }
 
 const styles = StyleSheet.create({
     gridContainer: {
+        flex: 1,
+        justifyContent: "center"
       },
 
     gridItem: {
@@ -139,4 +130,31 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center',
       },
+
+      container: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 30, 
+        flex: 1, 
+        marginBottom: 0
+    },
+
+    header: {
+        display: "flex", 
+        flexDirection: "row", 
+        alignItems:"center", 
+        justifyContent: "space-between"
+    },
+    
+    body: {
+        flex: 1, 
+        gap: 30,
+    },
+
+    groupContainer: {
+        display: 'flex', 
+        flexDirection: "column",
+        justifyContent: "center", 
+        gap: 20
+    },
 })

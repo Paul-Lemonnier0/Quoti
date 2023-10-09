@@ -11,7 +11,7 @@ const addNewHabit = async(habit) => {
 
     await addSteps(habit.steps, habitID)
 
-    return newHabit
+    return habitID
 }
 
 const addHabitToFireStore = async(habit) => {

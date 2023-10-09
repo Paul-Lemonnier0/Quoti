@@ -1,44 +1,32 @@
 import { View, SafeAreaView, StyleSheet, FlatList, Image, Text } from "react-native"
 import { HugeText, NormalText, SubTitleText, TitleText } from "../styles/StyledText"
 import { useThemeColor } from "../components/Themed"
-import React, { Fragment } from "react";
-import { SimpleIconButton } from "../components/Buttons/IconButton";
+import React from "react";
 
-import { AntDesign, Feather, Ionicons } from '@expo/vector-icons'; 
+import { Feather } from '@expo/vector-icons'; 
 
 import cardStyle from "../styles/StyledCard";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { useState, useRef, useCallback, useMemo } from "react";
 
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-
-import ContributorsHabitsScreen from "./BottomScreens/ContributorsHabitsScreen";
 import { StepCircularBar } from "../components/Habitudes/StepCircularBar";
 import { BackgroundView, MainView, TopScreenView } from "../components/View/Views";
 
-import AchievementsScreen from "./BottomScreens/AchievementsScreen";
 import Achievements from "../data/Achievements";
 import { SubText } from "../styles/StyledText";
 import AchievementBox from "../components/Achievements/AchievementBox";
 import generateRandomFeeling from "../data/Feelings";
 import { FeelingDay } from "../components/Calendars/FeelingDay";
-import { CircleBorderButton, GoBackButton, RoundBorderButton, SimpleButton, SimpleButtonBackground, SimpleSquareButtonBackground } from "../components/Buttons/UsualButton";
+import { CircleBorderButton, GoBackButton, SimpleButton } from "../components/Buttons/UsualButton";
 
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { EtapeItem } from "../components/Habitudes/EtapeItem";
 
 import { Dimensions } from "react-native";
-import { ContributorsHabits } from "../data/habitudes";
-import { AddCircularBarProfil, CircularBarProfil } from "../components/Profil/CircularBarProfil";
-import { AddProfilCircularButton, StepCircularBarProfil } from "../components/Habitudes/StepCircularBarProfil";
-
-import Swiper from "react-native-swiper";
-import { ShareAndFriendsBottomScreen } from "./BottomScreens/ShareAndFriendsBottomScreen";
 import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
 import { CustomCarousel } from "../components/Carousel/CustomCarousel";
-import Carousel from "react-native-reanimated-carousel";
+import {RenderStepCarouselItem} from '../components/Habitudes/Step/StepCarouselItem'
 
 const HabitudeScreen = () => {
 
@@ -205,7 +193,7 @@ const HabitudeScreen = () => {
                         </View>
 
                         <View style={{flex: 1, marginBottom: 30}}>
-                            <CustomCarousel data={steps}/>
+                            <CustomCarousel data={steps} renderItem={RenderStepCarouselItem}/>
                         </View>
                         
                         <View style={styles.achievementsView}>
@@ -224,8 +212,7 @@ const HabitudeScreen = () => {
                                 style={styles.succesList} key={2}
                                 data={Achievements} 
                                 showsHorizontalScrollIndicator={false}
-                                contentContainerStyle={{gap: 10, paddingHorizontal: 20
-                                }}
+                                contentContainerStyle={{gap: 10, paddingHorizontal: 20}}
                             />
 
                         </View>

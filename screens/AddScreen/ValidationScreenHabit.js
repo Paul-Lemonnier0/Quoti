@@ -21,8 +21,10 @@ import { StackActions, useNavigation, useRoute, CommonActions } from "@react-nav
 import { UsualScreen } from "../../components/View/Views"
 import { StepCircularBar } from "../../components/Habitudes/StepCircularBar"
 import { InviteFriendListItem } from "../../components/Profil/InviteFriendListItem"
+import { HabitudeListItem } from "../../components/Habitudes/HabitudeListItem"
+import StepIndicator from "../../components/Other/StepIndicator"
 
-const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints, habit}) => {
+const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints}) => {
 
     const font = useThemeColor({}, "Font")
     const popupColor = useThemeColor({}, "Popup")
@@ -33,7 +35,8 @@ const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints, habit}) => {
 
     const route = useRoute()
 
-    const {finalHabit} = route.params
+    const {habit} = route.params
+    console.log("ICI : ", habit)
 
     const navigation = useNavigation()
 
@@ -48,6 +51,8 @@ const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints, habit}) => {
             }))
     }
 
+    console.log(habit)
+
     const handleShare = () => {
         
     }
@@ -55,58 +60,50 @@ const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints, habit}) => {
     // renders
     return (
         <UsualScreen>
+            
+            <View style={styles.container}>
 
-            <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                <View style={styles.header}>
 
-                <CircleBorderButton onPress={handleClose}>
-                    <Feather name="x" size={20} color={font}/> 
-                </CircleBorderButton>
-
-                <View style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center", marginTop: -10}}>
-                    <TitleText text="Bravo !" style={{textAlign: "center"}}/>                            
-                </View>
-
-                <CircleBorderButton onPress={handleShare}>
-                    <Feather name="share" size={20} color={font}/> 
-                </CircleBorderButton>
-
-            </View>
-
-            <View style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 30, marginVertical: 30}}>
-
-                <View style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                    <HugeText text="Nouvelle habitude"/>
-                    <SubTitleText text="Continuez comme ça !"/>
-                </View>
-
-                <View style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10}}>
-
-                    <StepCircularBar habit={finalHabit} tall={true}/>
-
-                    <View style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
-                        <TitleText text={finalHabit.titre}/>
-                        <SubText text={finalHabit.description}/>
+                    <View style={{width: "80%"}}>
+                        <HugeText text="Et voilà !"/>
+                        <SubTitleText text="Nouvelle habitude ajoutée"/>
                     </View>
 
-                </View>
-            </View>
-
-            <View style={styles.groupContainer}>
-
-                <View style={styles.subTitleHeaderContainer}>
-                    <SubTitleText text="Invitez vos amis :"/>
+                    <CircleBorderButton onPress={() => {}}>
+                        <Feather name="share-2" size={20} color={font}/> 
+                    </CircleBorderButton>
                 </View>
 
-                <FlatList
-                    data={Friends}
-                    style={{marginTop: 20}}
-                    showsVerticalScrollIndicator={false}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({item}) => {
-                    return <InviteFriendListItem friend={item}/>}}
-                    contentContainerStyle={{gap: 20, paddingBottom: 40}}                            
-                />
+                <StepIndicator totalSteps={5} currentStep={5}/>
 
+
+                <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 20, margin: 20}}>
+
+                    <StepCircularBar habit={{...habit, doneSteps: habit.steps.length, totalSteps: habit.steps.length}} tall={true}/>
+                    <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10}}>
+                        <TitleText text={habit.titre}/>                
+                        <NormalText text={habit.description}/>                
+                    </View>
+                </View>
+
+                <View style={styles.groupContainer}>
+
+                    <View style={styles.subTitleHeaderContainer}>
+                        <SubTitleText text="Invitez vos amis :"/>
+                    </View>
+
+                    <FlatList
+                        data={Friends}
+                        style={{marginTop: 20}}
+                        showsVerticalScrollIndicator={false}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({item}) => {
+                        return <InviteFriendListItem friend={item}/>}}
+                        contentContainerStyle={{gap: 10, paddingBottom: 40}}                            
+                    />
+
+                </View>
             </View>
 
 
@@ -122,17 +119,39 @@ const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints, habit}) => {
         flex: 1
     },
 
-    groupContainer: {
-        display: 'flex', 
-        flexDirection: "column", flex: 1
-    },
-
     listContainer: {
         display: "flex",
         flexDirection: "row", 
         width: "100%", 
         justifyContent: "space-between",
         gap: 10,
+    },
+
+    container: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 30, 
+        flex: 1, 
+        marginBottom: 0
+    },
+
+    header: {
+        display: "flex", 
+        flexDirection: "row", 
+        alignItems:"center", 
+        justifyContent: "space-between"
+    },
+    
+    body: {
+        flex: 1, 
+        gap: 30,
+    },
+
+    groupContainer: {
+        display: 'flex', 
+        flexDirection: "column",
+        justifyContent: "center", 
+        gap: 20, flex: 1
     },
   });
   

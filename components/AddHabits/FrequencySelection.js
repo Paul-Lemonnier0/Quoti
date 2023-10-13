@@ -8,6 +8,7 @@ const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSe
 
     const secondary = useThemeColor({}, "Secondary") 
     const contrast = useThemeColor({}, "Contrast") 
+    const font = useThemeColor({}, "Font") 
 
     const weekDays = [
         "Lundi",
@@ -55,7 +56,7 @@ const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSe
                 <TouchableOpacity onPress={handleSelectAllDay}                         
                     style={[styles.selectAllItem, 
                     {        
-                        borderColor: isAllDaySelected ? contrast : secondary,
+                        borderColor: isAllDaySelected ? font : secondary,
                         backgroundColor: secondary,         
                     }]}>
 
@@ -70,6 +71,7 @@ const WeekSelection = ({reccurence, setReccurence}) => {
 
     const secondary = useThemeColor({}, "Secondary") 
     const contrast = useThemeColor({}, "Contrast") 
+    const font = useThemeColor({}, "Font") 
 
     const handleEveryWeekPress = () => {
         setReccurence(1)
@@ -98,7 +100,7 @@ const WeekSelection = ({reccurence, setReccurence}) => {
                 <TouchableOpacity onPress={handleEveryWeekPress}                         
                     style={[styles.selectAllItem, 
                     {        
-                        borderColor: isEveryWeek ? contrast : secondary,
+                        borderColor: isEveryWeek ? font : secondary,
                         backgroundColor: secondary,         
                     }]}>
 
@@ -113,6 +115,8 @@ const MonthSelection = ({reccurence, setReccurence}) => {
 
     const secondary = useThemeColor({}, "Secondary") 
     const contrast = useThemeColor({}, "Contrast") 
+    const font = useThemeColor({}, "Font") 
+
     
     const handleEveryMonthPress = () => {
         setReccurence(1)
@@ -141,7 +145,7 @@ const MonthSelection = ({reccurence, setReccurence}) => {
                 <TouchableOpacity onPress={handleEveryMonthPress}                         
                     style={[styles.selectAllItem, 
                     {        
-                        borderColor: isEveryMonth ? contrast : secondary,
+                        borderColor: isEveryMonth ? font : secondary,
                         backgroundColor: secondary,         
                     }]}>
 

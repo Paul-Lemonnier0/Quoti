@@ -11,17 +11,12 @@ import { Habitudes, Friends } from '../data/habitudes';
 import { ProfilButton } from '../components/Profil/ProfilButton';
 
 import { useNavigation } from "@react-navigation/native";
-import { HabitudeListItem } from '../components/Habitudes/HabitudeListItem';
-import { useSharedValue } from 'react-native-reanimated';
 import HomeCalendarCustomWeek from '../components/Calendars/HomeCalendarCustomWeek';
 import cardStyle from '../styles/StyledCard';
 import viewStyle from '../styles/StyledView';
-import { BackgroundView, MainView, TopScreenView, UsualScreen } from '../components/View/Views';
-import { SimpleButton } from '../components/Buttons/UsualButton';
+import { UsualScreen } from '../components/View/Views';
 
-import { setDoc, doc, addDoc, collection } from 'firebase/firestore';
-import { db } from '../firebase/InitialisationFirebase';
-import { addHabit, addHabits, getAllOwnHabits } from '../firebase/FirestorePrimitives';
+
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
 import VerticalAnimatedFlatList from '../components/FlatList/VerticalAnimatedFlatList';
@@ -39,7 +34,7 @@ const HomeScreen = () => {
   }, []);
 
 
-  const numColumns = 1;
+const numColumns = 1;
 
   const sortedHabits = Habitudes.sort((a, b) => {
     if (a.doneSteps >= a.totalSteps) 
@@ -96,24 +91,18 @@ const HomeScreen = () => {
             </View>
           </View>
         
+          <View style={{display: "flex", flexDirection: "column", gap: 10, flex: 1}}>
                         
-          <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginVertical: 10}}>
-              <SubTitleText text={"Plan du jour :"}/>
+            <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between"}}>
+                <SubTitleText text={"Plan du jour :"}/>
+            </View>
+
+            <View style={styles.habitsContainer}>
+              <VerticalAnimatedFlatList data={Habits}/>
+            </View>
+
           </View>
 
-          <View style={styles.habitsContainer}>
-            <VerticalAnimatedFlatList data={Habits}/>
-          </View>
-
-
-          {/* <FlatList showsVerticalScrollIndicator={false}
-            data={Habits}
-
-            contentContainerStyle={{paddingBottom: 20}}
-            style={styles.HabitsList} 
-            numColumns={numColumns}
-            key={numColumns}
-            keyExtractor={(item) => item.habitID}/> */}
         </View>
 
     </UsualScreen>
@@ -175,7 +164,7 @@ const styles = StyleSheet.create({
     padding: 0,
     paddingBottom: 0,
     flex:1,
-    gap: 20,
+    gap: 30,
     display: "flex", 
   },
 
@@ -186,11 +175,10 @@ const styles = StyleSheet.create({
   habitsContainer: {
     flex:1,
     flexGrow: 1,
-    display: "flex",
     margin: -15,
     marginLeft: -45,
     marginTop: 0,
-    marginBottom: 0
+    marginBottom: -150
   }
 });
 

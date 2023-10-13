@@ -1,7 +1,7 @@
 import { useThemeColor } from "../Themed";
-import { View, StyleSheet, SafeAreaView, TouchableWithoutFeedback } from "react-native";
+import { View, StyleSheet, SafeAreaView } from "react-native";
 import { Fragment } from "react";
-import { Keyboard } from "react-native";
+import { LinearGradient } from 'expo-linear-gradient';
 
 export const MainView = (props) => {
     const primary = useThemeColor({}, "Primary")
@@ -11,9 +11,9 @@ export const MainView = (props) => {
         <Fragment>
             <SafeAreaView style={[styles.container, { flex: 0, backgroundColor: secondary }]}/>
             <SafeAreaView style={{ flex: 1, backgroundColor: primary }}>
-                    <View style={[styles.container]}>
+                <View style={[styles.container]}>
                     {props.children}
-                    </View>
+                </View>
             </SafeAreaView>
         </Fragment>
     );
@@ -36,13 +36,19 @@ export const TopScreenView = (props) => {
 export const UsualScreen = (props) => {
 
     const primary = useThemeColor({}, "Primary")
+    const linearGradientOpacity = useThemeColor({}, "LinearGradientOpacity")
 
     return(
+        <View style={{flex: 1}}>
         <SafeAreaView style={{ flex: 1, backgroundColor: primary }}>
-            <View style={[styles.container, {paddingBottom: 90}]}>
+            <View style={[styles.container, {paddingBottom: 120}]}>
                 {props.children}
             </View>
         </SafeAreaView>
+
+        <LinearGradient colors={linearGradientOpacity} style={styles.linearGradient}/>
+
+        </View>
     )
 }
 
@@ -98,10 +104,18 @@ const styles = StyleSheet.create({
     },
 
     container: {
-        padding: 30, 
+        padding: 30,
         paddingBottom: 0,
         flex:1,
         gap: 0,
         display: "flex",           
     },
+
+    linearGradient: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: 0,
+        height: 150,
+      },
 })

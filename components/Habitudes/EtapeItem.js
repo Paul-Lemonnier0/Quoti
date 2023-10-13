@@ -53,7 +53,7 @@ export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habi
         <View style={[cardStyles.shadow, styles.container, {backgroundColor: secondary}]}>
             <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems:"center"}}>
                 <View style={{display: "flex", flexDirection: "column"}}>
-                    <TitleText text={step.titre}/>
+                    <TitleText text={step.title}/>
                 </View>
             </View>
 
@@ -96,9 +96,11 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
     const popup = useThemeColor({}, "Popup")
     const font = useThemeColor({}, "Font")
     const contrast = useThemeColor({}, "Contrast")
+    const secondary = useThemeColor({}, "Secondary")
+
 
     return(
-        <View style={[cardStyles.shadow, styles.addStepContainer, {backgroundColor: popup}]}>
+        <View style={[cardStyles.shadow, styles.addStepContainer, {backgroundColor: secondary}]}>
             
             <View style={{width: "80%", gap: 10}}>
                 <TitleText text="Ajoutez une étape" />
@@ -109,7 +111,7 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
             </View>
 
             <View style={{flex: 1, justifyContent: "flex-end", alignItems: "flex-end"}}>
-                <BigCircleBorderButton onPress={handleOpenAddStep} borderColor={contrast}>
+                <BigCircleBorderButton onPress={handleOpenAddStep} borderColor={font}>
                     <Feather name="plus" size={24} color={font} />
                 </BigCircleBorderButton>
             </View>

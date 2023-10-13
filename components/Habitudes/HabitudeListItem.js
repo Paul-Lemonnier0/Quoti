@@ -1,7 +1,8 @@
-import { View, StyleSheet, TouchableOpacity, TouchableOpacityBase} from "react-native";
+import { View, StyleSheet, TouchableOpacity, TouchableOpacityBase, useWindowDimensions} from "react-native";
 import { NormalText, SubText, SubTitleGrayText, SubTitleText} from "../../styles/StyledText";
 import { useThemeColor } from "../Themed";
 import { useContext, useState } from "react";
+import { Feather } from '@expo/vector-icons'; 
 
 import { useNavigation } from "@react-navigation/native";
 import { StepCircularBar } from "./StepCircularBar";
@@ -9,17 +10,19 @@ import { StepCircularBar } from "./StepCircularBar";
 import cardStyle from "../../styles/StyledCard";
 import { HabitsContext } from "../../data/HabitContext";
 
-import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
+import Animated, { interpolate, useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
+import Swipeable from "react-native-gesture-handler/Swipeable";
+import { SimpleButtonBackground } from "../Buttons/UsualButton";
 
-export const HabitudeListItem = ({id, viewableItems, habitude}) => {
+export const HabitudeListItem = ({id, index, viewableItems, listVisibility, scrollY, habitude}) => {
 
     const {Habits} = useContext(HabitsContext)
 
-    const index = Habits.findIndex((hab) => {
+    const indexHabit = Habits.findIndex((hab) => {
         return hab.habitID === id
     })
 
-    const habit = habitude ? habitude : Habits[index]
+    const habit = habitude ? habitude : Habits[indexHabit]
 
     const navigation = useNavigation();
     const stylesCard = cardStyle()
@@ -28,52 +31,47 @@ export const HabitudeListItem = ({id, viewableItems, habitude}) => {
 
     const handlePress = () =>
     {
-        navigation.navigate("HabitudeScreen", {habitIndex: index});
-    }
-
-    // console.log("VALUE : ", viewableItems.value)
-
-    const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
+        navigation.navigate("HabitudeScreen", {habitIndex: indexHabit});
+    }      
 
 
     const rStyle = useAnimatedStyle(() => {
-        console.log("###############################")
+
         const isVisible = viewableItems.value.some((viewableItem) => {
                 return viewableItem.item.habitID === id
             })
 
-        if(isVisible) console.log(habit.titre)
 
         return {
-            opacity: withTiming(isVisible ? 1  : 0),
+            opacity: withTiming(isVisible ? 1 : 0),
             transform: [{
-                scale: withTiming(isVisible ? 1 : 0.6)
+                scale: withTiming(isVisible ? 1 : 0.6),
             }]
         };
     }, [])
-
+    
     return(
+        <TouchableOpacity onPress={handlePress}>
+            <Animated.View style={[rStyle, stylesCard.card, styles.habit]}>
+                <View style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                    <StepCircularBar habit={habit} isFinished={isFinished}/>
+                </View>
 
-                <TouchableOpacity onPress={handlePress}>
-                    <Animated.View style={[rStyle, stylesCard.card, styles.habit]}>
-                        <View style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                            <StepCircularBar habit={habit} isFinished={isFinished}/>
-                        </View>
+                <View style={styles.habitTitleStateContainer}>
+                    {isFinished ? <SubTitleGrayText text={habit.titre}/> : <SubTitleText text={habit.titre}/>}
+                    <SubText text={habit.description}/>
+                </View>
+            </Animated.View>
 
-                        <View style={styles.habitTitleStateContainer}>
-                            {isFinished ? <SubTitleGrayText text={habit.titre}/> : <SubTitleText text={habit.titre}/>}
-                            <SubText text={habit.description}/>
-                        </View>
-                    </Animated.View>
-
-                </TouchableOpacity>
-)};
+        </TouchableOpacity>
+    )};
 
 const styles = StyleSheet.create(
     {    
         habit: {
             flex: 1,
-            margin: 10, marginLeft: 40,
+            margin: 10, 
+            marginLeft: 40,
             gap: 20,
             display: "flex",
             flexDirection: "row",

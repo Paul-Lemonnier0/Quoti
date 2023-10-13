@@ -7,6 +7,7 @@ export const ProfilButton = ({profil, onPress}) => {
 
     const primary = useThemeColor({}, "Primary")
     const contrast = useThemeColor({}, "Contrast")
+    const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
 
     const stylesShadow = cardStyle()
@@ -25,7 +26,7 @@ export const ProfilButton = ({profil, onPress}) => {
 
                 </Image>    
 
-                <Badge fillColor={contrast} bgColor={secondary}/>
+                <Badge fillColor={font} bgColor={secondary}/>
 
             </View>
           </TouchableOpacity>

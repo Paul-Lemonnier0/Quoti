@@ -12,9 +12,11 @@ export default {
     Secondary: "#ffffff",
     Tertiary: "#69738c",
 
-    Popup: "#232333",
+    Popup: "#f6f6f9",
 
     Error: "#CF6679",
+
+    LinearGradientOpacity: ['rgba(256,256,256,0)', 'rgba(256,256,256,1)']
   },
 
   dark: {
@@ -24,7 +26,7 @@ export default {
 
     Contrast: "#6B46CA",
 
-    Primary: "#000000",
+    Primary: "#0A0A0A",
     Secondary: "#141414",
     Tertiary: "#69738c",
 
@@ -33,5 +35,6 @@ export default {
     Popup: "#0E0E0E",
 
     Error: "#851405",
+    LinearGradientOpacity: ['rgba(0,0,0,0)', 'rgba(0,0,0,1)']
   },
 };

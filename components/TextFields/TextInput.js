@@ -9,6 +9,7 @@ export const TextInputCustom = ({ onFocus, onBlur, isWrong, ...props }) => {
     const secondary = useThemeColor({}, "Secondary") 
     const contrast = useThemeColor({}, "Contrast") 
     const font = useThemeColor({}, "Font") 
+    const fontGray = useThemeColor({}, "FontGray") 
     const errorColor = useThemeColor({}, "Error") 
 
     return(
@@ -23,6 +24,9 @@ export const TextInputCustom = ({ onFocus, onBlur, isWrong, ...props }) => {
 
             <TextInput 
                 {...props}
+                placeholderTextColor={fontGray}
+                selectionColor={font}
+                
                 onFocus={() => {
                     setIsFieldFocus(true);
                     onFocus && onFocus(); // Call the parent onFocus event if provided
@@ -33,7 +37,7 @@ export const TextInputCustom = ({ onFocus, onBlur, isWrong, ...props }) => {
                 }}
                 style={{
                     borderWidth: 2,
-                    borderColor: isFieldFocus ? contrast : (isWrong ? errorColor : secondary),
+                    borderColor: isFieldFocus ? font : (isWrong ? errorColor : secondary),
                     backgroundColor: secondary, 
                     fontFamily: "poppinsLight", 
                     borderRadius: 10, 

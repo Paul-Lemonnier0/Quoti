@@ -52,7 +52,7 @@ export const ChooseColorScreen = () => {
 
         return (
           <TouchableOpacity style={styles.gridItem} onPress={() => setSelectedColor(item)} key={item}>
-                <View style={{backgroundColor: secondary, borderWidth: 2, borderColor: isSelected ? contrast : secondary, borderRadius: 50, padding: 20,}}>
+                <View style={{backgroundColor: secondary, borderWidth: 3, borderColor: isSelected ? font : secondary, borderRadius: 50, padding: 20,}}>
                     <View style={{padding: 15,backgroundColor: item, borderRadius: 50}}/>
                 </View>
           </TouchableOpacity>

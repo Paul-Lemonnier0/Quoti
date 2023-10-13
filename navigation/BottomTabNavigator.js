@@ -24,6 +24,8 @@ import { ChooseColorScreen } from "../screens/AddScreen/ChooseColorScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { PreAddScreen } from "../screens/AddScreen/PreAddScreen";
 import BottomMenuStyle from "../styles/StyledBottomMenu";
+import { NormalText } from "../styles/StyledText";
+import { Text } from "react-native";
 
 const BottomTab = createBottomTabNavigator();
 
@@ -32,6 +34,7 @@ export default function BottomTabNavigator() {
   const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
 
   const font = useThemeColor({}, "Font")
+  const fontGray = useThemeColor({}, "FontGray")
   const contrast = useThemeColor({}, "Contrast")
 
   const navigation = useNavigation()
@@ -45,9 +48,9 @@ export default function BottomTabNavigator() {
     <BottomTab.Navigator
       initialRouteName="HomeScreen"
       screenOptions={{
-        tabBarInactiveTintColor: font,
+        tabBarInactiveTintColor: fontGray,
         
-        tabBarActiveTintColor: contrast,
+        tabBarActiveTintColor: "white",
         headerShown: false,
         tabBarStyle: bottomMenuStyle,
         // Use the getTabBarVisible function here within the screenOptions
@@ -62,10 +65,14 @@ export default function BottomTabNavigator() {
 
             options={({ route }) => ({
               headerShown: false,
+              tabBarLabel: () => {},
               tabBarIcon: ({ color, focused }) => (
-                <AntDesignIcon name="user" color={color} focused={focused} />
+                <View style={{display: "flex", flexDirection: "column", gap: 5, justifyContent: "center", alignItems: "center"}}>
+                  <AntDesign size={24} name="user" color={color} focused={focused} />
+                  
+                </View>
               ),
-              tabBarLabel: () => null,
+              
               tabBarStyle: ((route) => {
                 const routeName = getFocusedRouteNameFromRoute(route) ?? "HomeScreen"
 
@@ -117,8 +124,9 @@ function MaterialIcon(props) {
 
 function AntDesignIcon(props) {
   return (
-    <View style={{}}>
+    <View style={{backgroundColor: "red"}}>
       <AntDesign size={24} {...props} />
+      
     </View>)
 }
 

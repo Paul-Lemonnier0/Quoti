@@ -12,25 +12,25 @@ const cardStyle = () => {
       backgroundColor: secondary,
       padding: 20,
 
-      shadowColor: "#0f0f13",
+      shadowColor: "#000000",
       shadowOffset: {
         width: 0,
-        height: 5,
+        height: 0,
       },
-      shadowOpacity:  0.23,
-      shadowRadius: 11.78,
-      elevation: 15
+      shadowOpacity:  0.08,
+      shadowRadius: 8,
+      elevation: 3
     },
 
     shadow : {
-      shadowColor: "#0f0f13",
+      shadowColor: "#000000",
       shadowOffset: {
         width: 0,
-        height: 5,
+        height: 0,
       },
-      shadowOpacity:  0.23,
-      shadowRadius: 11.78,
-      elevation: 15
+      shadowOpacity:  0.08,
+      shadowRadius: 8,
+      elevation: 3
     },
   });
 };

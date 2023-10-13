@@ -88,12 +88,15 @@ while (cancelDate.length < 16) {
     const primary = useThemeColor({}, 'Primary');
     const secondary = useThemeColor({}, 'Secondary');
     const font = useThemeColor({}, 'Font');
+    const fontGray = useThemeColor({}, 'FontGray');
     const contrast = useThemeColor({}, 'Contrast');
+
     const dayName = date.toLocaleDateString("fr", { weekday: 'long' }).substring(0,1)       
+    const monthName = date.toLocaleDateString("fr", { month: 'short' }).substring(0,3)
     const dayNumber = date.getDate() 
 
     const backgroundColor = isSelected ? contrast :  "transparent"
-    const borderColor = isSelected ? contrast :  (isToday ? font : "transparent")
+    const borderColor = isSelected ? font :  (isToday ? fontGray : "transparent")
 
     const stateDayColor = isSuccessDate
     ? "#39BF5C"
@@ -102,9 +105,9 @@ while (cancelDate.length < 16) {
     : isCancel
     ? "#bc3b40"
     : isSelected
-    ? contrast
-    : isToday
     ? font
+    : isToday
+    ? fontGray
     : "transparent";
 
     const ctx = useCalendarContext();
@@ -129,9 +132,9 @@ while (cancelDate.length < 16) {
               styles.dayStyle,
             ]
           }>
-              {isSelected ? <SubText text={dayName} style={{fontFamily: "poppinsSemiBold", color: "white"}}/> :  <SubText text={dayName} style={{fontFamily: "poppinsSemiBold"}}/>}
               <NormalText text={dayNumber} style={{fontFamily: "poppinsSemiBold"}}/>
-              <View style={{ backgroundColor: stateDayColor, height: 5, width:"100%", borderRadius: 10}}/>
+              <SubText text={dayName} style={{fontFamily: "poppinsSemiBold", color: font}}/>
+              <View style={{ backgroundColor: stateDayColor, height: 3, width:"80%", borderRadius: 10}}/>
           </View>
 
       </TouchableOpacity>

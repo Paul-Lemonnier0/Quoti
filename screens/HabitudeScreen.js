@@ -79,16 +79,10 @@ const HabitudeScreen = () => {
         bottomSheetModalRefAchievement.current?.present();
     }, []);
 
-    const steps = []
-
-    for(let i = 0; i<7; ++i)
-    {
-        steps.push(habit)
-    }
-
+    const steps = habit.steps
     const renderFeelingDate = ({item}) => {
 
-        const date = new Date(item.date); // Convert the date string to a Date object
+        const date = new Date(item.date);
         
         return(
             <FeelingDay feelingDay={item} onPress={() => handleClickOnDate(date)}/>

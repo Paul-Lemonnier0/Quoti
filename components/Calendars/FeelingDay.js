@@ -19,7 +19,8 @@ export const FeelingDay = ({feelingDay, onPress}) => {
 
     const dayNumber = feelingDay.date.getDate() + " " + feelingDay.date.toLocaleString("fr", {month: "short"})
     const secondary = useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
+    const font = useThemeColor({}, "Font")
+    const fontGray = useThemeColor({}, "FontGray")
 
     console.log(feelingDay.id)
 
@@ -33,7 +34,7 @@ export const FeelingDay = ({feelingDay, onPress}) => {
                 <StepCircularBar habit={{...habit, color: isDone === 0 ? habit.color : habit.color}} otherImage={feelingDay.image} secondaryInactiveColor={true}/>
                 <Image/>
 
-                <SubText text={dayNumber} style={{fontFamily: "poppinsSemiBold"}}/>
+                <SubText text={dayNumber} style={{fontFamily: "poppinsSemiBold", color: isToday ? font : fontGray}}/>
 
         </TouchableOpacity>
     )
@@ -47,7 +48,6 @@ const styles = StyleSheet.create({
         alignItems: "center", 
         gap: 5, 
         borderRadius: 32, 
-        borderWidth: 2, 
         paddingHorizontal: 7.5,
         paddingTop: 10,
     }

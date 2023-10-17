@@ -7,6 +7,14 @@ const cardStyle = () => {
   const secondary = useThemeColor({}, "Secondary")
 
   return StyleSheet.create({
+
+
+    noShadowCard: {
+      borderRadius: 25,
+      backgroundColor: secondary,
+      padding: 20,
+    },
+
     card: {
       borderRadius: 25,
       backgroundColor: secondary,

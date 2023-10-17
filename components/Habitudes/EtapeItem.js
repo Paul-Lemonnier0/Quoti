@@ -16,7 +16,11 @@ import Separator from "../Other/Separator"
 
 export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habitID}) => { //a re-factoriser genre les styles et tout ça peut être simplifié je pense
 
-    const {handleCheckStep} = useContext(HabitsContext)
+    const {handleCheckStep, Habits} = useContext(HabitsContext)
+
+    console.log(Habits)
+    const nbSteps = Habits.filter(hab => hab.habitID === habitID)
+    console.log(nbSteps)
 
     const cardStyles = cardStyle()
     const secondary = useThemeColor({}, "Secondary")
@@ -50,21 +54,21 @@ export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habi
     }
 
     return(
-        <View style={[cardStyles.shadow, styles.container, {backgroundColor: secondary}]}>
-            <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems:"center"}}>
-                <View style={{display: "flex", flexDirection: "column"}}>
+        <View style={[cardStyles.shadow, styles.container, {backgroundColor: secondary,}]}>
+            <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems:"center", marginRight: 5}}>
+                <View style={{display: "flex", flexDirection: "column", gap: 0}}>
                     <TitleText text={step.title}/>
+                    <SubText text={step.description} />
                 </View>
+
+                <SubText text={(index+1) + "/" + 5}/>
             </View>
 
-            <View style={{flex: 1}}>
-                <SubText text={step.description} />
-            </View>
 
             <View style={{display: "flex", flexDirection:"row", justifyContent:"space-between", alignItems: "flex-end", gap: 20}}>
                 
                 <CircleBorderButton>
-                    <MaterialCommunityIcons name="message-text-outline" size={20} color={fontGray} />
+                    <MaterialCommunityIcons name="message-text-outline" size={20} color={font} />
                 </CircleBorderButton>
 
                 <View style={{display: "flex", flexDirection:"row", justifyContent:"flex-end", flex: 1,  gap: 30, paddingHorizontal: 0}}>
@@ -156,7 +160,8 @@ const styles = StyleSheet.create({
         borderRadius: 25, 
         padding:30, 
         paddingVertical: 25, 
-        gap: 5, flex: 1
+        gap: 5, flex: 1,
+        justifyContent: "space-between"
     },
 
     addStepContainer: {

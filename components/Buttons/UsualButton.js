@@ -30,7 +30,7 @@ export const GoBackButton = ({isCloseButton, additionalMethod}) =>
     const fontGray = useThemeColor({}, "FontGray")
 
     return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: fontGray}]}
+        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: font}]}
         onPress={handleBack}>
             <Feather name={isClosingButton ? "x" : "chevron-left"} size={20} color={font} />                
         </TouchableOpacity>);
@@ -83,9 +83,10 @@ export const RoundBorderButton = (props) =>
 export const CircleBorderButton = (props) =>
 {
     const fontGray = useThemeColor({}, "FontGray")
+    const font = useThemeColor({}, "Font")
 
     return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: fontGray}]}
+        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: font}]}
         onPress={props.onPress}>
                 {props.children}
         </TouchableOpacity>);
@@ -94,8 +95,9 @@ export const CircleBorderButton = (props) =>
 export const BigCircleBorderButton = (props) =>
 {
     const fontGray = useThemeColor({}, "FontGray")
+    const font = useThemeColor({}, "Font")
 
-    const borderColor = props.borderColor ? props.borderColor : fontGray
+    const borderColor = props.borderColor ? props.borderColor : font
 
     return(
         <TouchableOpacity style={[styles.circleBorderButton, {borderColor: borderColor, padding: 20}]}

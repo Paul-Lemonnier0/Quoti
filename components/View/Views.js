@@ -41,12 +41,12 @@ export const UsualScreen = (props) => {
     return(
         <View style={{flex: 1}}>
         <SafeAreaView style={{ flex: 1, backgroundColor: primary }}>
-            <View style={[styles.container, {paddingBottom: 120}]}>
+            <View style={[styles.container, {paddingBottom: props.hideMenu ? 20 : 120}]}>
                 {props.children}
             </View>
         </SafeAreaView>
 
-        <LinearGradient colors={linearGradientOpacity} style={styles.linearGradient}/>
+        {!props.hideMenu && <LinearGradient colors={linearGradientOpacity} style={styles.linearGradient}/>}
 
         </View>
     )

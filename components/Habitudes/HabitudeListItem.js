@@ -13,10 +13,12 @@ import { HabitsContext } from "../../data/HabitContext";
 import Animated, { interpolate, useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SimpleButtonBackground } from "../Buttons/UsualButton";
+import { IconButton, SimpleIconButton } from "../Buttons/IconButton";
 
 export const HabitudeListItem = ({id, index, viewableItems, listVisibility, scrollY, habitude}) => {
 
     const {Habits} = useContext(HabitsContext)
+    const fontGray = useThemeColor({}, "FontGray")
 
     const indexHabit = Habits.findIndex((hab) => {
         return hab.habitID === id
@@ -60,6 +62,10 @@ export const HabitudeListItem = ({id, index, viewableItems, listVisibility, scro
                 <View style={styles.habitTitleStateContainer}>
                     {isFinished ? <SubTitleGrayText text={habit.titre}/> : <SubTitleText text={habit.titre}/>}
                     <SubText text={habit.description}/>
+                </View>
+
+                <View style={{display: "flex", justifyContent: "center"}}>
+                    <Feather name="chevron-right" size={22} color={fontGray}/>
                 </View>
             </Animated.View>
 

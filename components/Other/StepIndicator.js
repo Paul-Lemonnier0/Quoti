@@ -4,6 +4,7 @@ import { useThemeColor } from "../Themed"
 export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
 
     const font = useThemeColor({}, "Font")
+    const fontGray = useThemeColor({}, "FontGray")
     const secondary = useThemeColor({}, "Secondary")
 
     const highlightColor = color ? color : font
@@ -17,7 +18,7 @@ export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
                         <View key={index}
                         style={[styles.singleBar, 
                             {
-                                backgroundColor: index < currentStep ? highlightColor : secondary
+                                backgroundColor: index < currentStep ? highlightColor : "#bfbfbf"
                             }
                         ]}/>
                     )

@@ -20,7 +20,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
     const font = useThemeColor({}, "Font")
     const popupColor = useThemeColor({}, "Popup")
 
-    const [title, setTitle] = useState("")
+    const [titre, setTitre] = useState("")
     const [isTitleWrong, setIsTitleWrong] = useState(false)
 
     const [description, setDescription] = useState("")
@@ -31,7 +31,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
 
 
     const clearAll = () => {
-        setTitle("")
+        setTitre("")
         setIsTitleWrong(false)
         setDescription("")
         setIsDescriptionWrong(false)
@@ -43,7 +43,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
 
         let canClose = true
 
-        if(title.length === 0) 
+        if(titre.length === 0) 
         {
             setIsTitleWrong(true)
             canClose = false;
@@ -62,7 +62,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
         if(canClose)
         {
             const newStep = {
-                title: title,
+                titre: titre,
                 description: description,
                 duration: hourDuration * 60 + minutesDuration //in minutes
             }
@@ -72,6 +72,8 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
                 const beforeLastIndex = previousSteps.length - 1;
                 const newSteps = [...previousSteps];
                 newSteps.splice(beforeLastIndex, 0, newStep);
+
+                console.log(newSteps)
 
                 return newSteps
             })
@@ -101,7 +103,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
                             <View style={styles.groupContainer}>
 
                                 <SubTitleText text="Titre :"/>
-                                <TextInputCustom placeholder={"Entrez un titre"} value={title} onChangeText={setTitle} isWrong={isTitleWrong}/>
+                                <TextInputCustom placeholder={"Entrez un titre"} value={titre} onChangeText={setTitre} isWrong={isTitleWrong}/>
 
                             </View>
 

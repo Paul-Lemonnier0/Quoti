@@ -40,7 +40,7 @@ const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSe
                         <TouchableOpacity onPress={() => handleSelectDay(index)} key={weekDay} 
                             style={[styles.selectItem, 
                             {        
-                                borderColor: isHighlight ? contrast : secondary,
+                                borderColor: isHighlight ? font : secondary,
                                 backgroundColor: secondary,         
                             }]}>
 

@@ -4,6 +4,7 @@ import { HabitudeListItem } from "../Habitudes/HabitudeListItem"
 import { useRef } from "react"
 import { useCallback } from "react"
 import {Animated} from 'react-native'
+import { HabitudeBlock } from "../Habitudes/HabitudeBlock"
 
 export default VerticalAnimatedFlatList = ({data, renderItem}) => {
 
@@ -18,10 +19,18 @@ export default VerticalAnimatedFlatList = ({data, renderItem}) => {
         { onViewableItemsChanged },
     ]);
 
+    const numCols = 2;
+
       const renderHabits = ({item, index}) => {
-        return (<HabitudeListItem id={item.habitID} index={index}
-            scrollY={scrollY} listVisibility={listVisibility}
-            viewableItems={viewableItems}/>)
+        // return (<HabitudeListItem id={item.habitID} index={index}
+        //     scrollY={scrollY} listVisibility={listVisibility}
+        //     viewableItems={viewableItems}/>)
+
+        return (
+            <HabitudeBlock habitID={item.habitID} index={index}
+                scrollY={scrollY} listVisibility={listVisibility}
+                viewableItems={viewableItems}/>
+        )
     }
 
     return(
@@ -29,11 +38,13 @@ export default VerticalAnimatedFlatList = ({data, renderItem}) => {
             data={data} 
             renderItem={renderHabits}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 120}}
+            contentContainerStyle={{paddingBottom: 120, marginLeft: 30}} //30 + 10 dans le habitudeBlock
             viewabilityConfig={{itemVisiblePercentThreshold: 100}}
             viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-            key={2}
-            numColumns={1}
+            key={numCols}
+            keyExtractor={(item) => item.habitID}
+            
+            numColumns={numCols}
             onScroll={Animated.event(
                 [{nativeEvent: {contentOffset: {y: scrollY}}}],
                 {useNativeDriver: true}

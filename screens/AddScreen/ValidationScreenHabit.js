@@ -1,47 +1,26 @@
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { View, StyleSheet, FlatList, SafeAreaView } from "react-native"
-
-import { IconButton } from "../../components/Buttons/IconButton"
-import { TitleText, NormalText, SubTitleText, HugeText, SubText } from "../../styles/StyledText"
-import { useRef, useMemo, useCallback, useState } from "react"
+import { View, StyleSheet, FlatList } from "react-native"
+import { TitleText, NormalText, SubTitleText, HugeText } from "../../styles/StyledText"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../../components/Themed"
-import { CircularBarProfil, AddCircularBarProfil } from "../../components/Profil/CircularBarProfil"
-import { ContributorsHabits, Friends } from "../../data/habitudes"
-import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet"
-import { TextInputCustom } from "../../components/TextFields/TextInput"
-import { IncrementHours, IncrementMinutes } from "../../components/Buttons/IncrementButtons"
-import { BigCircleBorderButton, CircleBorderButton, GoBackButton } from "../../components/Buttons/UsualButton"
-import { Keyboard } from "react-native"
-import { TouchableWithoutFeedback } from "react-native"
-import { Image } from "react-native"
-import HabitIcons from "../../data/HabitIcons"
-import { StackActions, useNavigation, useRoute, CommonActions } from "@react-navigation/native"
-
+import { Friends } from "../../data/habitudes"
+import { CircleBorderButton } from "../../components/Buttons/UsualButton"
+import { useNavigation, useRoute, CommonActions } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
 import { StepCircularBar } from "../../components/Habitudes/StepCircularBar"
 import { InviteFriendListItem } from "../../components/Profil/InviteFriendListItem"
-import { HabitudeListItem } from "../../components/Habitudes/HabitudeListItem"
 import StepIndicator from "../../components/Other/StepIndicator"
+import { Image } from "react-native"
 
-const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints}) => {
+const ValidationScreenHabit = () => {
 
     const font = useThemeColor({}, "Font")
-    const popupColor = useThemeColor({}, "Popup")
-    const primary = useThemeColor({}, "Primary")
-
-    const handleValidate = () => {
-    }
-
     const route = useRoute()
 
     const {habit} = route.params
-    console.log("ICI : ", habit)
 
     const navigation = useNavigation()
 
     const handleClose = () => {
-
         navigation.dispatch(
             CommonActions.reset({
               index: 1,
@@ -51,11 +30,7 @@ const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints}) => {
             }))
     }
 
-    console.log(habit)
-
-    const handleShare = () => {
-        
-    }
+    const handleShare = () => {}
   
     // renders
     return (
@@ -77,9 +52,7 @@ const ValidationScreenHabit = ({bottomSheetModalRef, snapPoints}) => {
 
                 <StepIndicator totalSteps={5} currentStep={5}/>
 
-
                 <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 20, margin: 20}}>
-
                     <StepCircularBar habit={{...habit, doneSteps: habit.steps.length, totalSteps: habit.steps.length}} tall={true}/>
                     <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10}}>
                         <TitleText text={habit.titre}/>                

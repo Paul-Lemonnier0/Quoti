@@ -14,18 +14,15 @@ import { HabitsContext } from "../../data/HabitContext"
 import { CircleSimpleRadioButton } from "../RadioButtons/RadioButton"
 import Separator from "../Other/Separator"
 
-export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habitID}) => { //a re-factoriser genre les styles et tout ça peut être simplifié je pense
+export const EtapeItem = ({step,index}) => { //a re-factoriser genre les styles et tout ça peut être simplifié je pense
 
     const {handleCheckStep, Habits} = useContext(HabitsContext)
+    const habit = Habits[step.habitID]
 
-    console.log(Habits)
-    const nbSteps = Habits.filter(hab => hab.habitID === habitID)
-    console.log(nbSteps)
+    const nbSteps = Object.values(habit.steps).length
 
     const cardStyles = cardStyle()
     const secondary = useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
-    const fontGray = useThemeColor({}, "FontGray")
     const font = useThemeColor({}, "Font")
 
     const [isPassSelected, setIsPassSelected] = useState(false)
@@ -35,13 +32,13 @@ export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habi
 
         if(!isValidateSelected) {
             setIsPassSelected(false)
-            handleCheckStep(index, habitID, false) // false => isUnCheck
+            handleCheckStep(index, step.habitID, false) // false => isUnCheck
 
             //handleOpenBottomValidation => message attention, si vous cocher une étape, vous ne pouvez plus la décocher ensuite.
         }
 
         else {
-            handleCheckStep(index, habitID, true) // true => isUnCheck
+            handleCheckStep(index, step.habitID, true) // true => isUnCheck
         }
 
         setIsValidateSelected(true)
@@ -57,11 +54,11 @@ export const EtapeItem = ({step, handleValidateStep, handlePassStep, index, habi
         <View style={[cardStyles.shadow, styles.container, {backgroundColor: secondary,}]}>
             <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems:"center", marginRight: 5}}>
                 <View style={{display: "flex", flexDirection: "column", gap: 0}}>
-                    <TitleText text={step.title}/>
+                    <TitleText text={step.titre}/>
                     <SubText text={step.description} />
                 </View>
 
-                <SubText text={(index+1) + "/" + 5}/>
+                <SubText text={(step.numero+1) + "/" + nbSteps}/>
             </View>
 
 
@@ -136,8 +133,8 @@ export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) 
     return(
         <TouchableOpacity style={[cardStyles.shadow, styles.addedContainer, {backgroundColor: secondary}]}>
 
-            <View style={{display: "flex", flexDirection: "column", gap: 15}}>
-                    <TitleText text={step.title}/>
+            <View style={{display: "flex", flexDirection: "column", gap: 10}}>
+                    <TitleText text={step.titre}/>
                     <NormalText text={step.description}/>
             </View>
 

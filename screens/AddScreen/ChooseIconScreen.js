@@ -56,13 +56,14 @@ export const ChooseIconScreen = () => {
     const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 12);
 
     const handleValidation = async() => {
-        
-        const newHabit = await addHabit(finalHabit)
-        console.log(newHabit)
-        const indexHabit = handleAddHabit(newHabit)
-        console.log("INDEX : ", indexHabit)
+        try{
+            const newHabitID = await addHabit(finalHabit)
+            navigation.navigate("ValidationScreenHabit", {habit: finalHabit})
+        }
 
-        navigation.navigate("ValidationScreenHabit", {habit: newHabit})
+        catch (e){
+            console.log("erreur dans l'ajout : ", e)
+        }
     }
 
 
@@ -110,8 +111,6 @@ export const ChooseIconScreen = () => {
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={4}/>
-
-
 
                 <View style={styles.body}>
                     <View style={{flex: 1, marginBottom:30}}>

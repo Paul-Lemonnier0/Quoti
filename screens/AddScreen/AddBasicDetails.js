@@ -19,15 +19,21 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 export const AddBasicDetails = () => {
 
     const navigation = useNavigation();
-
-    const [selectedItem, setSelectedItem] = useState("Hab")
-    const [isForCreate, setIsForCreate] = useState(true)
     const [steps, setSteps] = useState([{addStepItem: true}])
 
-    const [title, setTitle] = useState("")
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+
+    const handleChangeTitle = useCallback((text) => {
+        setTitle(text);
+    }, []);
+
+    const handleChangeDescription = useCallback((text) => {
+        setDescription(text);
+    }, []);
+
     const [isTitleWrong, setIsTitleWrong] = useState(false)
 
-    const [description, setDescription] = useState("")
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
     const bottomSheetModalRefAddStep = useRef(null);
@@ -63,18 +69,34 @@ export const AddBasicDetails = () => {
 
         else setIsDescriptionWrong(false)
 
+        console.log(title)
+
         if(canGoNext) 
         {
+            let stepsFinal
+            if(steps.length === 1)
+                stepsFinal = [{title: title, description: description, duration: 0, numero: 0}]
+            
+            else{
+                stepsFinal = steps.filter((step) => step.addStepItem !== true)
+                stepsFinal = steps.map((step, index) =>  { return {...step, numero: index} })
+            }
+
+            stepsFinal.pop()
+            
             const habit = {
                 titre: title,
                 description: description,
-                steps: steps.length === 1 ? [{title: title, description: description, duration: 0}] : steps.filter((step) => step.addStepItem !== true), //to filter at the end
+                steps: stepsFinal, //Pour virer le add steps item
                 doneSteps: 0
             }
 
             navigation.navigate("CreateHabitDetails", {habit})
         }
     }
+
+    let testValue = "";
+
 
     return(
         <UsualScreen>
@@ -98,12 +120,12 @@ export const AddBasicDetails = () => {
 
                     <View style={styles.groupContainer}>
 
-                        <TextInputCustom placeholder={"Entrez un titre"} value={title} onChangeText={setTitle} isWrong={isTitleWrong}/>
+                        <TextInputCustom onChangeText={setTitle} value={title} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
 
                     </View>
 
                     <View style={styles.groupContainer}>
-                        <TextInputCustom placeholder={"Entrez une courte description"} value={description} onChangeText={setDescription} isWrong={isDescriptionWrong}/>
+                        <TextInputCustom onChangeText={setDescription} value={description} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
 
                     </View>
 

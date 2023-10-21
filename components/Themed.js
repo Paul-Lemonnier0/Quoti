@@ -15,7 +15,7 @@ export function useThemeColor(props, colorName) {
   if (colorFromProps) {
     return colorFromProps;
   } else {
-    return Colors[theme][colorName];
+    return Colors['light'][colorName];
   }
 }
 

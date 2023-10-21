@@ -10,9 +10,12 @@ import HabitIcons from "../../data/HabitIcons";
 export const StepCircularBar = ({ habit, isFinished, tall, otherImage, secondaryInactiveColor }) => {
 
 
-  const { color, doneSteps } = habit;
+  const { color } = habit;
 
-  const totalSteps = habit.steps.length
+  const steps = Object.values(habit.steps)
+  const doneSteps = 2
+
+  const totalSteps = steps.length
 
   const imageToDisplay = otherImage ? otherImage : HabitIcons[habit.icon]
 

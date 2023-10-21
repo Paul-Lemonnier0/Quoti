@@ -4,7 +4,7 @@ import {SafeAreaView, StyleSheet, View} from 'react-native';
 import { useThemeColor } from '../components/Themed';
 
 import { FlatList } from 'react-native';
-import { SubTitleText, HugeText, SubTitleGrayText, NormalText } from '../styles/StyledText';
+import { SubTitleText, HugeText, SubTitleGrayText, NormalText, TitleText } from '../styles/StyledText';
 import { Habitudes, Friends } from '../data/habitudes';
 
 
@@ -20,54 +20,24 @@ import { UsualScreen } from '../components/View/Views';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
 import VerticalAnimatedFlatList from '../components/FlatList/VerticalAnimatedFlatList';
+import { Image } from 'react-native';
+import { Dimensions } from 'react-native';
 
 const HomeScreen = () => {
 
   const { Habits } = useContext(HabitsContext);
-
-  const primary = useThemeColor({}, "Primary")
-  const secondary = useThemeColor({}, "Secondary")
 
   const navigation = useNavigation()
   const handleOpenProfilDetails = useCallback(() => {
     navigation.navigate("ProfilDetailsScreen");
   }, []);
 
-
-const numColumns = 1;
-
-  const sortedHabits = Habitudes.sort((a, b) => {
-    if (a.doneSteps >= a.totalSteps) 
-    {
-      return 1; 
-    } 
-    else {
-      return -1; 
-    }
-  });
-
-  const [currentEndDate, setCurrentEndDate] = useState(new Date())
-
   const [currentDate, setCurrentDate] = useState(new Date())
-  const currentDateMonth = currentDate.toLocaleDateString("fr", {month: "long"})
   const currentDateDayMonth = currentDate.getDate() + " " + currentDate.toLocaleDateString("fr", {month: "short"})
-  const stylesCard = cardStyle()
-  const stylesView = viewStyle()
 
-  const [habitudes, setHabitudes] = useState([]);
-
-  /*useEffect(() => {
-
-    const fetchHabitudes = async () => {
-      const habitsData = await getHabitudes();
-      setHabitudes(habitsData);
-      console.log(habitudes, "habitudes")
-    };
-
-    fetchHabitudes();
-  }, []);*/
-
-  
+  const habitsArray = Object.values(Habits)
+  console.log(habitsArray)
+  const isHabitsEmpty = habitsArray.length === 0
 
   return (
       <UsualScreen>
@@ -97,8 +67,24 @@ const numColumns = 1;
                 <SubTitleText text={"Plan du jour :"}/>
             </View>
 
-            <View style={styles.habitsContainer}>
-              <VerticalAnimatedFlatList data={Habits}/>
+            <View style={styles.dayPlanContainer}>
+              {
+                isHabitsEmpty ? 
+                
+                <View style={{flex: 1, justifyContent: "space-between", alignItems: "center", gap: 20, marginTop: 20}}>
+                  <Image style={{resizeMode: 'contain', aspectRatio: 1, width: "75%", maxHeight: "75%"}} source={require('../img/Illustration/Light_theme/Workout_Break.png')}/>
+                  <View style={{justifyContent: "space-evenly", alignItems: "center", gap: 0}}>
+                    <SubTitleText text="Rien de prévu ce jour"/>
+                    <NormalText text="Profitez en pour vous reposer !"/>
+                  </View>
+                </View> 
+                
+                :
+                
+                <View style={styles.habitsContainer}>
+                  <VerticalAnimatedFlatList data={habitsArray}/>
+                </View>
+              }
             </View>
 
           </View>
@@ -179,6 +165,11 @@ const styles = StyleSheet.create({
     marginLeft: -45,
     marginTop: 0,
     marginBottom: -150
+  },
+
+  dayPlanContainer: {
+    flex:1,
+    flexGrow: 1,
   }
 });
 

@@ -11,23 +11,16 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState, useRef, useCallback, useMemo } from "react";
 
 import { StepCircularBar } from "../components/Habitudes/StepCircularBar";
-import { BackgroundView, MainView, TopScreenView, UsualScreen } from "../components/View/Views";
+import { UsualScreen } from "../components/View/Views";
 
-import Achievements from "../data/Achievements";
 import { SubText } from "../styles/StyledText";
-import AchievementBox from "../components/Achievements/AchievementBox";
 import generateRandomFeeling from "../data/Feelings";
 import { FeelingDay } from "../components/Calendars/FeelingDay";
 import { CircleBorderButton, GoBackButton, SimpleButton } from "../components/Buttons/UsualButton";
-
-import { EtapeItem } from "../components/Habitudes/EtapeItem";
-
-import { Dimensions } from "react-native";
 import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
 import { CustomCarousel } from "../components/Carousel/CustomCarousel";
 import {RenderStepCarouselItem} from '../components/Habitudes/Step/StepCarouselItem'
-import { DetailStepCircularBar } from "../components/Habitudes/DetailStepCircularBar";
 
 const HabitudeScreen = () => {
 
@@ -38,18 +31,19 @@ const HabitudeScreen = () => {
     const fontGray = useThemeColor({}, "FontGray")
     const secondary = useThemeColor({}, "Secondary")
 
-    const {habitIndex} = route.params;
+    const {habitID} = route.params;
 
-    const habit = Habits[habitIndex]
+    const habit = Habits[habitID]
 
     const navigation = useNavigation()
 
+    const randomFeeling = generateRandomFeeling(habit, 10)
 
     const handleClickOnDate = (date) => {
         navigation.navigate("DayDetailScreen", {date: date, habitude: habit});
     }
 
-    const steps = habit.steps
+    const steps =  habit.steps
     const renderFeelingDate = ({item}) => {
 
         const date = new Date(item.date);
@@ -60,9 +54,6 @@ const HabitudeScreen = () => {
     }
 
     const styleCard = cardStyle();
-
-    const randomFeeling = generateRandomFeeling(habit, 10)
-
     return(
         <UsualScreen hideMenu={true}>
             <View style={[styles.container, {}]}>
@@ -94,17 +85,17 @@ const HabitudeScreen = () => {
                     <View style={styles.detailPanel}>
                         <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: fontGray, backgroundColor: secondary}]}>
                             <Feather name="users" size={24} color={font}/>
-                            <TitleText text="2"/>
+                            <SubTitleText text="2"/>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: fontGray, backgroundColor: secondary}]}>
                             <Octicons name="flame" size={24} color={font}/>
-                            <TitleText text="50"/>
+                            <SubTitleText text="50"/>
                         </TouchableOpacity>
 
                         <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: fontGray, backgroundColor: secondary}]}>
                             <Feather name="award" size={24} color={font}/>
-                            <TitleText text="7"/>
+                            <SubTitleText text="7"/>
                         </TouchableOpacity>
 
                     </View>
@@ -112,7 +103,7 @@ const HabitudeScreen = () => {
 
                     <View style={{flex: 1, marginBottom: 0}}>
                         <SubTitleText text="Etapes :"/>
-                        <CustomCarousel data={steps} renderItem={RenderStepCarouselItem} pagination={false}/>
+                        <CustomCarousel data={Object.values(steps)} renderItem={RenderStepCarouselItem} pagination={false}/>
                     </View>
                     
                     <View>
@@ -132,10 +123,7 @@ const HabitudeScreen = () => {
                             showsHorizontalScrollIndicator={false}
                             contentContainerStyle={{gap: 15, paddingHorizontal: 20}}
                         />
-                    </View>
-
-                    
-                                    
+                    </View>           
                 </View>
             </View>
         </UsualScreen>
@@ -156,7 +144,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
-        gap: 20
+        gap: 20,
     },
 
     detailPanelItem: {
@@ -168,7 +156,9 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         justifyContent: "center", 
         alignItems: "center", 
-        gap: 5
+        gap: 10,
+        aspectRatio: 1
+
     },
 
     header: {

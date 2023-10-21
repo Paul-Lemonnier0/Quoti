@@ -7,7 +7,7 @@ import Pagination from "./Pagination"
 
 export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagination = true}) => {
 
-    const SLIDER_WIDTH = Dimensions.get('window').width 
+    const SLIDER_WIDTH = Dimensions.get('window').width
     const [currentIndex, setCurrentIndex] = useState(doneSteps ? doneSteps : (defaultIndex ? defaultIndex : 0))
 
     return(
@@ -34,7 +34,7 @@ export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagin
 
 const styles= StyleSheet.create({
     container: {
-        marginHorizontal: -60, 
+        marginHorizontal: -40, 
         paddingHorizontal: 30, 
         flex: 1,
         display: "flex",

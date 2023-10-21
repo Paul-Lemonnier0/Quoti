@@ -22,8 +22,6 @@ export const FeelingDay = ({feelingDay, onPress}) => {
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
 
-    console.log(feelingDay.id)
-
     const isDone = Math.floor(Math.random() * 2);
     console.log(isDone)
     habit.color = isDone === 0 ? secondary : habit.color

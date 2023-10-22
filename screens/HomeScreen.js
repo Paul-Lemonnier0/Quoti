@@ -22,22 +22,112 @@ import { useContext } from 'react';
 import VerticalAnimatedFlatList from '../components/FlatList/VerticalAnimatedFlatList';
 import { Image } from 'react-native';
 import { Dimensions } from 'react-native';
+import { RadioButton } from '../components/RadioButtons/RadioButton';
+import { ContrastButton, IconButton } from '../components/Buttons/IconButton';
 
+import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { isHabitPlannedThisMonth, numberOfWeekBetweenDates, weekNumber } from '../primitives/HabitudesReccurence';
 const HomeScreen = () => {
+
+  const navigation = useNavigation()
 
   const { Habits } = useContext(HabitsContext);
 
-  const navigation = useNavigation()
-  const handleOpenProfilDetails = useCallback(() => {
-    navigation.navigate("ProfilDetailsScreen");
-  }, []);
+  const quotidien = {}
+  const hebdomadaire = {}
+  const mensuel = {}
+  const [selectedPeriode, setSelectedPeriode] = useState("Quotidien")
+  const [displayedHabits, setDisplayedHabits] = useState({})
+  const [FrequencyFilteredHabits, setFrequencyFilteredHabits] = useState({Quotidien: {}, Hebdo: {}, Mensuel: {}});
+
+
+  useEffect(() => {
+    // Assurez-vous que Habits a été récupéré
+    if (Object.keys(Habits).length > 0) {
+
+      const sortHabits = async() => {
+        console.log("HELLLLLOOOOOOOO")
+        const filteredHabits = await filterHabitsByFrequency();
+        console.log("BISSSSSSSSSSSSSs")
+        setFrequencyFilteredHabits(filteredHabits);
+        setDisplayedHabits(Object.values(filteredHabits[selectedPeriode]))
+      }
+
+      sortHabits()
+    }
+  }, [Habits]);
+
+  // Fonction de filtrage par fréquence
+  const filterHabitsByFrequency = async() => {
+    const quotidien = {};
+    const hebdomadaire = {};
+    const mensuel = {};
+
+    for (const habitID in Habits) {
+      const habit = Habits[habitID];
+
+      switch (habit.frequency) {
+        case 'Quotidien':
+          quotidien[habitID] = habit;
+          break;
+
+        case 'Hebdo':
+          hebdomadaire[habitID] = habit;
+          break;
+
+        case 'Mensuel':
+          mensuel[habitID] = habit;
+          break;
+      }
+    }
+
+    return { Quotidien: quotidien, Hebdo: hebdomadaire, Mensuel: mensuel };
+  };
+
+  // console.log("FILTERED : ", FrequencyFilteredHabits.Quotidien)
+
+  const periodes = useMemo(() => ["Calendar", {frequency: "Quotidien", displayedText: "Jour", nbElement: Object.values(FrequencyFilteredHabits.Quotidien).length}, 
+                                              {frequency: "Hebdo", displayedText: "Semaine", nbElement: Object.values(FrequencyFilteredHabits.Hebdo).length}, 
+                                              {frequency: "Mensuel", displayedText: "Mois", nbElement: Object.values(FrequencyFilteredHabits.Mensuel).length}], 
+                                  [FrequencyFilteredHabits])
+
+  const handleChangeSelectedPeriode = (newPeriode) => {
+    setSelectedPeriode(newPeriode.frequency)
+    setDisplayedHabits(Object.values(FrequencyFilteredHabits[newPeriode.frequency]))
+  }
 
   const [currentDate, setCurrentDate] = useState(new Date())
   const currentDateDayMonth = currentDate.getDate() + " " + currentDate.toLocaleDateString("fr", {month: "short"})
 
-  const habitsArray = Object.values(Habits)
-  console.log(habitsArray)
-  const isHabitsEmpty = habitsArray.length === 0
+  const isHabitsEmpty = displayedHabits.length === 0
+
+
+
+  const renderPeriode = ({item, index}) => {
+
+      if(item === "Calendar") {
+        return(              
+          <ContrastButton>
+            <MaterialCommunityIcons name="calendar-range-outline" size={24} color="black" />
+          </ContrastButton>
+        )
+      }
+
+      const isSelected = item.frequency === selectedPeriode
+
+      return(
+        <RadioButton key={index} isHighlight={isSelected} handleOnClick={() => handleChangeSelectedPeriode(item)}>
+          <View style={{display: "flex", flexDirection: "row", gap: 10}}>
+            <SubTitleText text={item.displayedText} style={{color: isSelected ? "white": null}}/>
+            <SubTitleGrayText text={item.nbElement}/>
+          </View>
+        </RadioButton>
+      )
+  }
+
+  const handleOpenProfilDetails = useCallback(() => {
+    navigation.navigate("ProfilDetailsScreen");
+  }, []);
 
   return (
       <UsualScreen>
@@ -56,9 +146,19 @@ const HomeScreen = () => {
 
             </View>
 
-            <View style={{paddingVertical:0}}>
+            <View style={{display: "flex", flexDirection: "column", gap: 0}}>
+
+              <FlatList horizontal={true} showsHorizontalScrollIndicator={false}
+                        renderItem={renderPeriode}
+                        data={periodes}
+                        style={{marginHorizontal: -30}}
+                        contentContainerStyle={{gap: 15, paddingHorizontal: 30}}/>
+              {/* <View style={{paddingVertical:0}}>
                 <HomeCalendarCustomWeek selectedDate={currentDate} setSelectedDate={setCurrentDate}/>
+            </View> */}
             </View>
+
+
           </View>
         
           <View style={{display: "flex", flexDirection: "column", gap: 10, flex: 1}}>
@@ -71,7 +171,7 @@ const HomeScreen = () => {
               {
                 isHabitsEmpty ? 
                 
-                <View style={{flex: 1, justifyContent: "space-between", alignItems: "center", gap: 20, marginTop: 20}}>
+                <View style={{flex: 1, flexGrow: 1, justifyContent: "space-between", alignItems: "center", gap: 20, marginTop: 20}}>
                   <Image style={{resizeMode: 'contain', aspectRatio: 1, width: "75%", maxHeight: "75%"}} source={require('../img/Illustration/Light_theme/Workout_Break.png')}/>
                   <View style={{justifyContent: "space-evenly", alignItems: "center", gap: 0}}>
                     <SubTitleText text="Rien de prévu ce jour"/>
@@ -82,7 +182,7 @@ const HomeScreen = () => {
                 :
                 
                 <View style={styles.habitsContainer}>
-                  <VerticalAnimatedFlatList data={habitsArray}/>
+                  <VerticalAnimatedFlatList data={displayedHabits}/>
                 </View>
               }
             </View>
@@ -155,7 +255,7 @@ const styles = StyleSheet.create({
   },
 
   header: {
-
+    gap: 20
   },
 
   habitsContainer: {

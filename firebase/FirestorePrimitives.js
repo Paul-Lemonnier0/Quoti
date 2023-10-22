@@ -7,6 +7,8 @@ const userID = "Paul"
 
 const addHabitToFireStore = async(habit) => {
 
+    console.log("adding habit to firestore...")
+
     const steps = habit.steps;
     delete habit.steps
 

@@ -5,6 +5,8 @@ const collectionName = "HabitSteps"
 
 async function addStep(step, habit){
 
+    console.log("adding step...")
+
     const stepRef = await addDoc(collection(habit, collectionName), {
         titre: step.titre,
         description: step.description,
@@ -15,11 +17,12 @@ async function addStep(step, habit){
 
     const stepID = stepRef.id;
 
-    console.log("Step bien ajoutée avec comme identifiant : ", stepID)
+    console.log("step well added with id : ", stepID)
     return stepID;
 }
 
 async function addSteps(steps, habit){
+
     const stepsWithID = await Promise.all(
         steps.map(async (step) => {
             const stepID = addStep(step, habit)

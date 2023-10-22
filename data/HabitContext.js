@@ -17,7 +17,7 @@ const HabitsProvider = ({ children }) => {
     useEffect(() => {
         const fetchData = async () => {
           await fetchAllHabits();
-          console.log("Habits fetched : ", Habits)
+          console.log("Habits fetched")
         };
 
         fetchData();
@@ -26,6 +26,8 @@ const HabitsProvider = ({ children }) => {
 
     const addHabit = async(habit) => {
 
+        console.log("adding habit...")
+
         const habitFull = await addHabitToFireStore(habit)
         
         setHabits((prevHabits) => ({
@@ -33,9 +35,10 @@ const HabitsProvider = ({ children }) => {
           [habitFull.habitID]: habitFull
         }));
 
+        console.log("habit well added")
+
         return habitFull.habitID
     }
-
 
     const handleCheckStep = (stepIndex, habitID, isUnCheck) => {
 

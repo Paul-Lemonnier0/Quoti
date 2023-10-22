@@ -44,6 +44,8 @@ export const ChooseIconScreen = () => {
         icon: HabitIcons[key],
         title: key,
     }));
+
+    console.log("DEF : ", finalHabit)
       
     const splitArrayIntoChunks = (arr, chunkSize) => {
         const chunkedArray = [];
@@ -57,8 +59,12 @@ export const ChooseIconScreen = () => {
 
     const handleValidation = async() => {
         try{
+            const steps = finalHabit.steps
             const newHabitID = await addHabit(finalHabit)
-            navigation.navigate("ValidationScreenHabit", {habit: finalHabit})
+        
+            console.log("DEF 2 : ", finalHabit)
+
+            navigation.navigate("ValidationScreenHabit", {habit: {...finalHabit, steps}})
         }
 
         catch (e){

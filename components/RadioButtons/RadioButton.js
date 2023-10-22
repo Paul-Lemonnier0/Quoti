@@ -5,15 +5,15 @@ export const RadioButton = ({isHighlight, handleOnClick, isColorReverse, childre
    
     const secondary = useThemeColor({}, "Secondary")
     const primary = useThemeColor({}, "Primary")
-    const contrast = useThemeColor({}, "Contrast")
+    const font = useThemeColor({}, "Font")
    
     return(
         <TouchableOpacity 
             onPress={handleOnClick} 
             style={[styles.radioButton, 
                     {        
-                        borderColor: isHighlight ? contrast : (isColorReverse ? primary : secondary),
-                        backgroundColor: (isColorReverse ? primary : secondary),         
+                        borderColor: isHighlight ? font : (isColorReverse ? primary : secondary),
+                        backgroundColor: isHighlight ? font : (isColorReverse ? primary : secondary),
                     }]}>
 
             {children}
@@ -41,8 +41,8 @@ export const CircleSimpleRadioButton = ({isSelected, handleOnPress, children}) =
 
 const styles = StyleSheet.create({
     radioButton: {
-        padding: 10, 
-        borderRadius: 10, 
+        padding: 15, 
+        borderRadius: 15, 
         flex: 1, 
         borderWidth: 2, 
         justifyContent: "center", 

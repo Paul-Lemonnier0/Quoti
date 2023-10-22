@@ -26,18 +26,20 @@ export const SimpleIconButton = (props) =>
     </TouchableOpacity>);
 }
 
-export const ContrastRoundButton = (props) =>
+export const ContrastButton = (props) =>
 {
-    const contrast = useThemeColor({}, "Contrast")
+    const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
 
     return(
     <TouchableOpacity onPress={props.onClick}
     style={[
         {
-            backgroundColor: contrast,
+            backgroundColor: secondary,
+            borderWidth: 2,
+            borderColor: font
         }, 
-        styles.ContrastRoundButton]}>
+        styles.contrastButton]}>
         {props.children}
     </TouchableOpacity>);
 }
@@ -64,6 +66,15 @@ const styles = StyleSheet.create(
         BottomNavigationButtonAdd: {
             position: "absolute",
             bottom: 0,
+        },
+
+        contrastButton: {
+            borderRadius: 15,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 0,
+            aspectRatio: 1
         }
         
     }

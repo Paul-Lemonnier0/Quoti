@@ -34,8 +34,8 @@ export function SubTitleText(props) {
 
   const mergedStyles = StyleSheet.flatten([
     styles.subTitleText,
-    props.style,
     { color: fontColor },
+    props.style,
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;

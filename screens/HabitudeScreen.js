@@ -35,6 +35,7 @@ const HabitudeScreen = () => {
 
     const habit = Habits[habitID]
 
+    console.log(habit)
     const navigation = useNavigation()
 
     const randomFeeling = generateRandomFeeling(habit, 10)

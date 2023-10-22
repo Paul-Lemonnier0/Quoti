@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { SimpleButtonBackground, RoundBorderButton, SimpleSquareButtonBackground, CircleBorderButton, BigCircleBorderButton } from "../Buttons/UsualButton"
 import cardStyle from "../../styles/StyledCard"
-import { SubTitleText, SubText, NormalText, TitleText, SubTitleGrayText } from "../../styles/StyledText"
+import { SubTitleText, SubText, NormalText, TitleText, SubTitleGrayText, HugeText } from "../../styles/StyledText"
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons"
 import { useThemeColor } from "../Themed"
 import { CheckBox } from "react-native-elements"
@@ -53,10 +53,7 @@ export const EtapeItem = ({step,index}) => { //a re-factoriser genre les styles 
     return(
         <View style={[cardStyles.shadow, styles.container, {backgroundColor: secondary,}]}>
             <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems:"center", marginRight: 5}}>
-                <View style={{display: "flex", flexDirection: "column", gap: 0}}>
-                    <TitleText text={step.titre}/>
-                    <SubText text={step.description} />
-                </View>
+                <HugeText text={step.numero+1}/>
 
                 <SubText text={(step.numero+1) + "/" + nbSteps}/>
             </View>
@@ -64,14 +61,19 @@ export const EtapeItem = ({step,index}) => { //a re-factoriser genre les styles 
 
             <View style={{display: "flex", flexDirection:"row", justifyContent:"space-between", alignItems: "flex-end", gap: 20}}>
                 
-                <CircleBorderButton>
+                {/* <CircleBorderButton>
                     <MaterialCommunityIcons name="message-text-outline" size={20} color={font} />
-                </CircleBorderButton>
+                </CircleBorderButton> */}
+
+                <View style={{display: "flex", flexDirection: "column", gap: 0}}>
+                    <TitleText text={step.titre}/>
+                    <SubText text={step.description} />
+                </View> 
 
                 <View style={{display: "flex", flexDirection:"row", justifyContent:"flex-end", flex: 1,  gap: 30, paddingHorizontal: 0}}>
 
                     <View style={{display: "flex", flexDirection: "column", gap: 10, justifyContent: "center", alignItems: "center"}}>
-                        <NormalText text="Passer"/>
+                        {/* <NormalText text="Passer"/> */}
                         <CircleSimpleRadioButton handleOnPress={handleSetPassState} isSelected={isPassSelected}>
                             <Feather name="x" size={24} color={font} />
                         </CircleSimpleRadioButton>
@@ -79,7 +81,7 @@ export const EtapeItem = ({step,index}) => { //a re-factoriser genre les styles 
 
 
                     <View style={{display: "flex", flexDirection: "column", gap: 10, justifyContent: "center", alignItems: "center"}}>
-                        <NormalText text="Valider"/>
+                        {/* <NormalText text="Valider"/> */}
                         <CircleSimpleRadioButton handleOnPress={handleSetValidateState} isSelected={isValidateSelected}>
                             <Feather name="check" size={24} color={font} />
                         </CircleSimpleRadioButton>

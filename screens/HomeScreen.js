@@ -37,7 +37,7 @@ const HomeScreen = () => {
   const hebdomadaire = {}
   const mensuel = {}
   const [selectedPeriode, setSelectedPeriode] = useState("Quotidien")
-  const [displayedHabits, setDisplayedHabits] = useState({})
+  const [displayedHabits, setDisplayedHabits] = useState([])
   const [FrequencyFilteredHabits, setFrequencyFilteredHabits] = useState({Quotidien: {}, Hebdo: {}, Mensuel: {}});
 
 
@@ -51,6 +51,7 @@ const HomeScreen = () => {
         console.log("BISSSSSSSSSSSSSs")
         setFrequencyFilteredHabits(filteredHabits);
         setDisplayedHabits(Object.values(filteredHabits[selectedPeriode]))
+        console.log("???")
       }
 
       sortHabits()

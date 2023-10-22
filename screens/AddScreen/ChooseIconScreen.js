@@ -60,11 +60,11 @@ export const ChooseIconScreen = () => {
     const handleValidation = async() => {
         try{
             const steps = finalHabit.steps
-            const newHabitID = await addHabit(finalHabit)
+            const fullHabit = await addHabit(finalHabit)
         
-            console.log("DEF 2 : ", finalHabit)
+            console.log("DEF 2 : ", fullHabit)
 
-            navigation.navigate("ValidationScreenHabit", {habit: {...finalHabit, steps}})
+            navigation.navigate("ValidationScreenHabit", {habit: {...fullHabit}})
         }
 
         catch (e){

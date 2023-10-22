@@ -2,6 +2,7 @@ import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 import { Habitudes } from "../data/habitudes"
 import { db } from "./InitialisationFirebase"
 import { addSteps, getAllStepsFromHabit } from "./Firestore_Step_Primitives"
+import { listKeyIDfromArray } from "../primitives/BasicsMethods"
 
 const userID = "Paul"
 
@@ -9,18 +10,33 @@ const addHabitToFireStore = async(habit) => {
 
     console.log("adding habit to firestore...")
 
-    const steps = habit.steps;
-    delete habit.steps
-
     const habitRef = await addDoc(collection(db, "Habits"), {
         ...habit, 
         userID: userID
     })
 
-    const habitSteps = await addSteps(steps, habitRef)
-    const habitComplete = {...habit, habitID: habitRef.id, steps: habitSteps}
+    const habitID = habitRef.id
 
+    let steps = {}
+    if(habit.steps.length === 0)
+        {
+            const defaultStep = {
+                titre: habit.titre, 
+                description: habit.description, 
+                duration: 30, 
+                numero: 0, 
+                habitID,
+                stepID: habitID
+            }
+
+            steps = { [defaultStep.stepID]: defaultStep };        
+        }
+
+    else steps = listKeyIDfromArray(habit.steps, "stepID", habitID)
+      
+    const habitComplete = {...habit, habitID, steps}
     console.log("Habit well added to firestore.")
+    console.log("HABIT ADDED : ", habitComplete)
     return habitComplete
 }
 
@@ -32,24 +48,27 @@ const getAllOwnHabits = async() => {
     const habitArray = await Promise.all(
         querySnapshot.docs.map(async (habit) => {
         const habitID = habit.id;
-        const stepsFromFirebase = await getAllStepsFromHabit(habit);
 
         const data = habit.data();
-        let steps = stepsFromFirebase 
-        if(Object.values(stepsFromFirebase).length === 0)
+        let steps = {}
+ 
+        if(data.steps.length === 0)
         {
             const defaultStep = {
                 titre: data.titre, 
                 description: data.description, 
                 duration: 30, 
                 numero: 0, 
-                habitID
+                habitID,
+                stepID: habitID
             }
 
-            steps = {defaultStep} 
+            steps = { [defaultStep.stepID]: defaultStep };        
         }
 
-        return {habitID: habitID, steps: steps, ...data };
+        else steps = listKeyIDfromArray(data.steps, "stepID", habitID)
+
+        return  {habitID: habitID, ...data, steps };
     }));
 
     return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});

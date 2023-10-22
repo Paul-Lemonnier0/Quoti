@@ -30,6 +30,8 @@ const ValidationScreenHabit = () => {
             }))
     }
 
+    const stepsHabit = Object.values(habit.steps)
+
     const handleShare = () => {}
   
     // renders
@@ -53,7 +55,7 @@ const ValidationScreenHabit = () => {
                 <StepIndicator totalSteps={5} currentStep={5}/>
 
                 <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 20, margin: 20}}>
-                    <StepCircularBar habit={{...habit, doneSteps: habit.steps.length, totalSteps: habit.steps.length}} tall={true}/>
+                    <StepCircularBar habit={{...habit, doneSteps: stepsHabit.length}} tall={true}/>
                     <View style={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", gap: 10}}>
                         <TitleText text={habit.titre}/>                
                         <NormalText text={habit.description}/>                

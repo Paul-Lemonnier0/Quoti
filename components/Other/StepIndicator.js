@@ -1,11 +1,11 @@
 import { StyleSheet, View } from "react-native"
 import { useThemeColor } from "../Themed"
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
+import { useEffect } from "react"
 
 export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
 
     const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
-    const secondary = useThemeColor({}, "Secondary")
 
     const highlightColor = color ? color : font
 
@@ -15,12 +15,16 @@ export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
 
                 Array.from({ length: totalSteps }).map((item, index) => {
                     return(
-                        <View key={index}
-                        style={[styles.singleBar, 
-                            {
-                                backgroundColor: index < currentStep ? highlightColor : "#bfbfbf"
-                            }
-                        ]}/>
+                        <View
+                            key={index}
+                            style={[
+                                styles.singleBar,
+                                {
+                                    backgroundColor: index < currentStep ? highlightColor : "#bfbfbf",
+                                },
+                            ]}
+                        />
+
                     )
                 })
 
@@ -39,7 +43,7 @@ const styles = StyleSheet.create({
 
     singleBar: {
         height: 5,
-        flex: 1, 
         borderRadius: 5,
+        flex: 1
     }
 })

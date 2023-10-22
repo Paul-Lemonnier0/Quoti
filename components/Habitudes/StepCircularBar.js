@@ -13,7 +13,7 @@ export const StepCircularBar = ({ habit, isFinished, tall, otherImage, secondary
   const { color } = habit;
 
   const steps = Object.values(habit.steps)
-  const doneSteps = 2
+  const doneSteps = habit.doneSteps
 
   const totalSteps = steps.length
 

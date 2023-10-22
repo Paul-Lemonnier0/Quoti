@@ -64,7 +64,7 @@ export const PreAddScreen = () => {
 
                 </View>
 
-                <StepIndicator totalSteps={5} currentStep={1}/>
+                <StepIndicator totalSteps={isForCreate ? 5 : 2} currentStep={1}/>
 
 
                 

@@ -15,6 +15,7 @@ import { useRef } from "react"
 import { useCallback } from "react"
 import {RenderAddStepCarouselItem} from '../../components/Habitudes/Step/StepCarouselItem'
 import { useNavigation, useRoute } from "@react-navigation/native"
+import { generateUniqueID } from "../../primitives/BasicsMethods"
 
 export const AddBasicDetails = () => {
 
@@ -73,14 +74,8 @@ export const AddBasicDetails = () => {
 
         if(canGoNext) 
         {
-            let stepsFinal
-            if(steps.length === 1)
-                stepsFinal = [{title: title, description: description, duration: 0, numero: 0}]
-            
-            else{
-                stepsFinal = steps.filter((step) => step.addStepItem !== true)
-                stepsFinal = steps.map((step, index) =>  { return {...step, numero: index} })
-            }
+            let stepsFinal = steps.filter((step) => step.addStepItem !== true)
+            stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
 
             stepsFinal.pop()
             
@@ -94,9 +89,6 @@ export const AddBasicDetails = () => {
             navigation.navigate("CreateHabitDetails", {habit})
         }
     }
-
-    let testValue = "";
-
 
     return(
         <UsualScreen>

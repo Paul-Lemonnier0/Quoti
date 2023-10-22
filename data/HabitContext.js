@@ -35,9 +35,9 @@ const HabitsProvider = ({ children }) => {
           [habitFull.habitID]: habitFull
         }));
 
-        console.log("habit well added")
+        console.log("habit well added", habitFull)
 
-        return habitFull.habitID
+        return habitFull
     }
 
     const handleCheckStep = (stepIndex, habitID, isUnCheck) => {

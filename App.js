@@ -40,14 +40,14 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>
-      <HabitsProvider>
           <BottomSheetModalProvider>
               <SafeAreaProvider onLayout={handleOnLayout}>
-                <Navigation colorScheme={colorScheme} />
-                <StatusBar />
+                <HabitsProvider>
+                  <Navigation colorScheme={colorScheme} />
+                  <StatusBar />
+                </HabitsProvider>
               </SafeAreaProvider>
           </BottomSheetModalProvider>
-      </HabitsProvider>
     </GestureHandlerRootView>
     );
 }

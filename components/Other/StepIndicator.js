@@ -6,6 +6,7 @@ import { useEffect } from "react"
 export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
 
     const font = useThemeColor({}, "Font")
+    const tertiary = useThemeColor({}, "Tertiary")
 
     const highlightColor = color ? color : font
 
@@ -20,7 +21,7 @@ export default StepIndicator = ({totalSteps, currentStep, color, animated}) => {
                             style={[
                                 styles.singleBar,
                                 {
-                                    backgroundColor: index < currentStep ? highlightColor : "#bfbfbf",
+                                    backgroundColor: index < currentStep ? highlightColor : tertiary,
                                 },
                             ]}
                         />

@@ -14,7 +14,7 @@ export const SimpleButton = (props) =>
         </TouchableOpacity>);
 }
 
-export const GoBackButton = ({isCloseButton, additionalMethod}) =>
+export const GoBackButton = ({isCloseButton, additionalMethod, borderHidden}) =>
 {
     const isClosingButton = isCloseButton
 
@@ -30,7 +30,7 @@ export const GoBackButton = ({isCloseButton, additionalMethod}) =>
     const fontGray = useThemeColor({}, "FontGray")
 
     return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: font}]}
+        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: borderHidden ? 'transparent' : font, paddingLeft: borderHidden ? 0 : 15}]}
         onPress={handleBack}>
             <Feather name={isClosingButton ? "x" : "chevron-left"} size={20} color={font} />                
         </TouchableOpacity>);

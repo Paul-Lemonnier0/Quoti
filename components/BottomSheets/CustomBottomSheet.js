@@ -27,7 +27,7 @@ const CustomBottomSheet = (props) => {
         <BottomSheetModal
             ref={bottomSheetModalRef}
             style={{flex: 1}}
-            backgroundStyle={{backgroundColor: popupColor, borderRadius: 50}}
+            backgroundStyle={{backgroundColor: popupColor, borderRadius: 40}}
             handleIndicatorStyle={{backgroundColor: fontGray}}
             index={0}
             enablePanDownToClose={true}

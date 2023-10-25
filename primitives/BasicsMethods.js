@@ -12,4 +12,17 @@ const listKeyIDfromArray = (array, idName, habitID = null) => {
   }, {});
 }
 
-export {generateUniqueID, listKeyIDfromArray}
+const durationToTimeString = (duration) => {
+
+  const hours = Math.floor(duration / 60)
+  const remainingMinutes = duration % 60
+
+  const isHourNull = hours === 0
+  const isMinutesNull = remainingMinutes === 0
+
+  const formatedDuration = isHourNull ? remainingMinutes + "min" : (hours + "h" + (isMinutesNull ? "" : remainingMinutes))
+
+  return formatedDuration
+}
+
+export {generateUniqueID, listKeyIDfromArray, durationToTimeString}

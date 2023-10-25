@@ -7,7 +7,7 @@ import cardStyle from "../../styles/StyledCard";
 import { HabitsContext } from "../../data/HabitContext";
 import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated";
 
-export const HabitudeBlock = ({habitID, viewableItems, habitude}) => {
+export const HabitudeBlock = ({habitID, viewableItems, habitude, currentDateString}) => {
 
     const {Habits} = useContext(HabitsContext)
 
@@ -20,7 +20,7 @@ export const HabitudeBlock = ({habitID, viewableItems, habitude}) => {
 
     const handlePress = () =>
     {
-        navigation.navigate("HabitudeScreen", {habitID: habitID});
+        navigation.navigate("HabitudeScreen", {habitID, currentDateString});
     }      
 
 
@@ -38,6 +38,9 @@ export const HabitudeBlock = ({habitID, viewableItems, habitude}) => {
             }]
         };
     }, [])
+
+    const steps = Object.values(habit.steps)
+    const habitDoneSteps = steps.filter(step => step.isChecked).length
     
     return(
         <TouchableOpacity onPress={handlePress} style={{flex: 1}}>
@@ -50,7 +53,7 @@ export const HabitudeBlock = ({habitID, viewableItems, habitude}) => {
 
                 <View style={{display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexDirection: "row"}}>
                     <SubText text="1/2"/>
-                    <StepCircularBar habit={habit} isFinished={isFinished}/>
+                    <StepCircularBar habit={habit} habitDoneSteps={habitDoneSteps} isFinished={isFinished}/>
 
                 </View>
             </Animated.View>

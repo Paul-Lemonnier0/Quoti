@@ -6,7 +6,7 @@ import { useCallback } from "react"
 import {Animated} from 'react-native'
 import { HabitudeBlock } from "../Habitudes/HabitudeBlock"
 
-export default VerticalAnimatedFlatList = ({data, renderItem}) => {
+export default VerticalAnimatedFlatList = ({data, currentDateString}) => {
 
     const viewableItems = useSharedValue([]);
     const listVisibility = useSharedValue(1);
@@ -22,13 +22,11 @@ export default VerticalAnimatedFlatList = ({data, renderItem}) => {
     const numCols = 2;
 
       const renderHabits = ({item, index}) => {
-        // return (<HabitudeListItem id={item.habitID} index={index}
-        //     scrollY={scrollY} listVisibility={listVisibility}
-        //     viewableItems={viewableItems}/>)
-
         return (
             <HabitudeBlock habitID={item.habitID} index={index}
-                scrollY={scrollY} listVisibility={listVisibility}
+                currentDateString={currentDateString}
+                scrollY={scrollY} 
+                listVisibility={listVisibility}
                 viewableItems={viewableItems}/>
         )
     }

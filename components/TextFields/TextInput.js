@@ -2,7 +2,7 @@ import { useState } from "react"
 import { useThemeColor } from "../Themed"
 import { TextInput, View } from "react-native"
 
-export const TextInputCustom = ({ onFocus, onBlur, isWrong, ...props }) => {
+export const TextInputCustom = ({ setValue, startingValue, onFocus, onBlur, isWrong, ...props }) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState(false)
     const secondary = useThemeColor({}, "Secondary") 
@@ -10,6 +10,14 @@ export const TextInputCustom = ({ onFocus, onBlur, isWrong, ...props }) => {
     const font = useThemeColor({}, "Font") 
     const fontGray = useThemeColor({}, "FontGray") 
     const errorColor = useThemeColor({}, "Error") 
+
+    const [temp_value, temp_setValue] = useState(startingValue ? startingValue : "");
+
+    const handleSetValue = (text) => {
+        temp_setValue(text)
+        setValue(text)
+        console.log(text)
+    }
 
     return(
         <View style={
@@ -25,7 +33,10 @@ export const TextInputCustom = ({ onFocus, onBlur, isWrong, ...props }) => {
                 {...props}
                 placeholderTextColor={fontGray}
                 selectionColor={font}
-                keyboardType="default"
+                keyboardType="visible-password"
+                value={temp_value}
+                autoCorrect={false}
+                onChangeText={text => handleSetValue(text)}
 
                 onFocus={() => {
                     setIsFieldFocus(true);

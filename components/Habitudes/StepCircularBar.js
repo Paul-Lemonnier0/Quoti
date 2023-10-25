@@ -7,13 +7,13 @@ import { NormalText } from "../../styles/StyledText";
 import { Feather } from "@expo/vector-icons";
 import HabitIcons from "../../data/HabitIcons";
 
-export const StepCircularBar = ({ habit, isFinished, tall, otherImage, secondaryInactiveColor }) => {
+export const StepCircularBar = ({ habit, habitDoneSteps, isFinished, tall, otherImage, secondaryInactiveColor }) => {
 
 
   const { color } = habit;
 
   const steps = Object.values(habit.steps)
-  const doneSteps = habit.doneSteps
+  const doneSteps = habitDoneSteps ? habitDoneSteps : 0
 
   const totalSteps = steps.length
 
@@ -27,8 +27,9 @@ export const StepCircularBar = ({ habit, isFinished, tall, otherImage, secondary
 
   const primary = useThemeColor({}, "Primary");
   const secondary = useThemeColor({}, "Secondary");
+  const tertiary = useThemeColor({}, "Tertiary");
 
-  const inActiveColor = secondaryInactiveColor ? secondary : primary 
+  const inActiveColor = secondaryInactiveColor ? tertiary : tertiary 
 
   const [isLoading, setIsLoading] = useState(true);
 

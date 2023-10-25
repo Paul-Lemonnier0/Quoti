@@ -12,27 +12,13 @@ export const IncrementButtons = ({value, setValue}) => {
     const secondary = useThemeColor({}, "Secondary")
     const primary = useThemeColor({}, "Primary")
 
-    const handleIncrement = () => {
-        if(value < 99)
-            setValue(++value)
-    }
+    const handleIncrement = () => { if(value < 99) setValue(++value) }
 
-    const handleDecrement = () => {
-        if(value > 1)
-            setValue(--value)
-    }
+    const handleDecrement = () => { if(value > 1) setValue(--value) }
 
-    const handleChangeValue = (text) => {
+    const handleChangeValue = (text) => { setValue(text); }
 
-        setValue(text);
-
-    }
-
-    const handleSetValueToDefault = () => {
-        
-        if(isNaN(parseInt(value)))
-            setValue(1)
-    }
+    const handleSetValueToDefault = () => { if(isNaN(parseInt(value))) setValue(1) }
 
     return(
         <View style={[styles.container, {backgroundColor: secondary}]}>
@@ -41,14 +27,12 @@ export const IncrementButtons = ({value, setValue}) => {
                 <Feather name="minus" size={20} color={font}/>
             </TouchableOpacity>
 
-
             <TextInput style={[{backgroundColor: primary, color: font}, styles.valueContainer]} 
             inputMode="numeric"
             onBlur={handleSetValueToDefault}
             maxLength={2}
             onChangeText={handleChangeValue}
             value={value.toString() ?? ""}/>
-
 
             <TouchableOpacity onPress={handleIncrement} style={styles.buttons}>
                 <Feather name="plus" size={20} color={font}/>
@@ -58,81 +42,32 @@ export const IncrementButtons = ({value, setValue}) => {
     )
 }
 
-export const IncrementMinutes = ({value, setValue, isDisabled, customBackgroundColor}) => {
+export const IncrementTime = ({value, setValue, isDisabled, isMinutes}) => {
 
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
     const secondary = useThemeColor({}, "Secondary")
-    const primary = useThemeColor({}, "Primary")
 
-    const backgroundColor = customBackgroundColor ? customBackgroundColor : primary
+    const suffixe = isMinutes ? " min": " h"
 
     const handleIncrement = () => {
-
-        const newValue = (value + 5) % 60
-
-        setValue(newValue)
+        isMinutes ? setValue((value + 5) % 60) : setValue((value + 1) % 24)
     }
 
     const handleDecrement = () => {
-        const newValue = (value - 5) < 0 ? 55 : (value - 5)
-
-        setValue(newValue)
+        isMinutes ? setValue((value - 5) < 0 ? 55 : (value - 5)) : setValue(value-1 < 0 ? 23 : value-1)
     }
 
     return(
-        <View style={[styles.minutesContainer, {backgroundColor: secondary}]}>
+        <View style={[styles.timeSelectorContainer, {backgroundColor: secondary, borderColor: font}]}>
             
             <TouchableOpacity onPress={handleDecrement} style={styles.buttons} disabled={isDisabled}>
                 <Feather name="minus" size={20} color={isDisabled ? fontGray : font}/>
             </TouchableOpacity>
 
-
-            <View style={[{backgroundColor: backgroundColor}, styles.valueContainer]}>
-                {isDisabled ? <NormalGrayText text={value + " min"}/> : <NormalText text={value + " min"}/>}
+            <View style={[styles.valueContainer]}>
+                {isDisabled ? <NormalGrayText text={value + suffixe}/> : <NormalText text={value + suffixe}/>}
             </View>
-
-
-            <TouchableOpacity onPress={handleIncrement} style={styles.buttons} disabled={isDisabled}>
-                <Feather name="plus" size={20} color={isDisabled ? fontGray : font}/>
-            </TouchableOpacity>
-
-        </View>
-    )
-}
-
-export const IncrementHours = ({value, setValue, isDisabled, customBackgroundColor}) => {
-
-    const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
-
-    const secondary = useThemeColor({}, "Secondary")
-    const primary = useThemeColor({}, "Primary")
-
-    const backgroundColor = customBackgroundColor ? customBackgroundColor : primary
-
-    const handleIncrement = () => {
-        setValue(value += 1 % 24)
-    }
-
-    const handleDecrement = () => {
-
-        const newValue = value-1 < 0 ? 23 : value-1
-        setValue(newValue)
-    }
-
-    return(
-        <View style={[styles.minutesContainer, {backgroundColor: secondary}]}>
-            
-            <TouchableOpacity onPress={handleDecrement} style={styles.buttons} disabled={isDisabled}>
-                <Feather name="minus" size={20} color={isDisabled ? fontGray : font}/>
-            </TouchableOpacity>
-
-
-            <View style={[{backgroundColor: backgroundColor}, styles.valueContainer]}>
-                {isDisabled ? <NormalGrayText text={value + " h"}/> : <NormalText text={value + " h"}/>}
-            </View>
-
 
             <TouchableOpacity onPress={handleIncrement} style={styles.buttons} disabled={isDisabled}>
                 <Feather name="plus" size={20} color={isDisabled ? fontGray : font}/>
@@ -175,7 +110,7 @@ const styles = StyleSheet.create({
         width: 165
     },
 
-    minutesContainer: {
+    timeSelectorContainer: {
         display: "flex", 
         flexDirection: "row", 
         alignItems:"center", 
@@ -183,6 +118,7 @@ const styles = StyleSheet.create({
         gap: 15, 
         borderRadius: 10, 
         padding: 10,
+        borderWidth: 2,
         flex: 1
     }
 })

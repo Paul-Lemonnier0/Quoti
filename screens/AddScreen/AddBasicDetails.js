@@ -1,40 +1,30 @@
 import { View } from "react-native"
-import { BackgroundView, MainView, TopScreenView, UsualScreen } from "../../components/View/Views"
-import { GoBackButton, GoNextButton } from "../../components/Buttons/UsualButton"
-import { HugeText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { RadioButton } from "../../components/RadioButtons/RadioButton"
+import { UsualScreen } from "../../components/View/Views"
+import { GoNextButton } from "../../components/Buttons/UsualButton"
+import { HugeText, SubTitleText } from "../../styles/StyledText"
 import { useState } from "react"
 import { StyleSheet } from "react-native"
-import { TextInput } from "react-native-gesture-handler"
 import { TextInputCustom } from "../../components/TextFields/TextInput"
-import { ScrollView } from "react-native"
 import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
-import AddStepBottomScreen from "../BottomScreens/AddStepBottomScreen"
 import { useMemo } from "react"
 import { useRef } from "react"
 import { useCallback } from "react"
-import {RenderAddStepCarouselItem} from '../../components/Habitudes/Step/StepCarouselItem'
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { RenderAddStepCarouselItem } from '../../components/Habitudes/Step/StepCarouselItem'
+import { useNavigation } from "@react-navigation/native"
 import { generateUniqueID } from "../../primitives/BasicsMethods"
+import AddStepBottomScreen from "../BottomScreens/AddStepBottomScreen"
 
 export const AddBasicDetails = () => {
 
     const navigation = useNavigation();
     const [steps, setSteps] = useState([{addStepItem: true}])
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-
-    const handleChangeTitle = useCallback((text) => {
-        setTitle(text);
-    }, []);
-
-    const handleChangeDescription = useCallback((text) => {
-        setDescription(text);
-    }, []);
+    let titre = "";
+    let description = "";
+    const handleSetTitre = (text) => titre = text
+    const handleSetDescription = (text) => description = text
 
     const [isTitleWrong, setIsTitleWrong] = useState(false)
-
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
     const bottomSheetModalRefAddStep = useRef(null);
@@ -44,33 +34,18 @@ export const AddBasicDetails = () => {
         bottomSheetModalRefAddStep.current?.present();
       }, []);
 
-    const clearAll = () => {
-        setSelectedItem("Hab")
-        setIsForCreate(true)
-        setSteps([{addStepItem: true}])
-    }
-
     const handleGoNext = () => {
 
         let canGoNext = true
 
-        if(title.length <= 0) 
+        if(titre.length <= 0 || description.length <= 0) 
         {
+            console.log(titre)
+            description.length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
+            titre.length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
+
             canGoNext = false
-            setIsTitleWrong(true)
         }
-
-        else setIsTitleWrong(false)
-
-        if(description.length <= 0) 
-        {
-            canGoNext = false
-            setIsDescriptionWrong(true)
-        }
-
-        else setIsDescriptionWrong(false)
-
-        console.log(title)
 
         if(canGoNext) 
         {
@@ -80,14 +55,26 @@ export const AddBasicDetails = () => {
             stepsFinal.pop()
             
             const habit = {
-                titre: title,
+                titre: titre,
                 description: description,
-                steps: stepsFinal, //Pour virer le add steps item
+                steps: stepsFinal,
                 doneSteps: 0
             }
 
             navigation.navigate("CreateHabitDetails", {habit})
         }
+    }
+
+    const renderAddSteps = ({item, index}) => {
+        return(
+            <RenderAddStepCarouselItem 
+                item={item} 
+                index={index}
+                data={steps} 
+                setData={setSteps} 
+                handleOpenAddStep={handleOpenAddStep}
+            />
+        )
     }
 
     return(
@@ -106,39 +93,21 @@ export const AddBasicDetails = () => {
 
                 <StepIndicator totalSteps={5} currentStep={2}/>
 
-
-
                 <View style={styles.body}>
 
                     <View style={styles.groupContainer}>
-
-                        <TextInputCustom onChangeText={setTitle} value={title} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
-
+                        <TextInputCustom setValue={handleSetTitre} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
                     </View>
 
                     <View style={styles.groupContainer}>
-                        <TextInputCustom onChangeText={setDescription} value={description} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
-
+                        <TextInputCustom setValue={handleSetDescription} placeholder={"Entrez un titre"} isWrong={isDescriptionWrong}/>
                     </View>
 
-                    <View style={[styles.groupContainer, {flex:1, marginBottom: 15, gap: 15}]}>
+                    <View style={[styles.groupContainer, styles.carouselContainer]}>
                         <SubTitleText text="Etapes :"/>
 
                         <View style={{flex: 1}}>
-                            <CustomCarousel 
-                                data={steps}
-                                renderItem={({item, index}) => {
-                                    return(
-                                        <RenderAddStepCarouselItem 
-                                            item={item} 
-                                            index={index}
-                                            data={steps} 
-                                            setData={setSteps} 
-                                            handleOpenAddStep={handleOpenAddStep}
-                                        />
-                                    )
-                                }}
-                            />                        
+                            <CustomCarousel data={steps} renderItem={renderAddSteps}/>                        
                         </View>
                     </View>
                 </View>
@@ -183,4 +152,10 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         gap: 5
     },
+
+    carouselContainer: {
+        flex:1, 
+        marginBottom: 15, 
+        gap: 15
+    }
 })

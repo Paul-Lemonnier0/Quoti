@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
 
     container: {
         padding: 30,
+        paddingTop: 10,
         paddingBottom: 0,
         flex:1,
         gap: 0,

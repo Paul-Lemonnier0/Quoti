@@ -1,182 +1,127 @@
-import { useState, useRef, useCallback, useMemo } from "react";
-
-  import {
-    Text,
-    View,
-    StyleSheet,
-    TouchableOpacity,
-  } from 'react-native';
-
-  import { LittleNormalText, NormalText, SubText, TitleText } from '../../styles/StyledText';
-  import { useSharedValue } from "react-native-reanimated"
-  import Calendar, { useCalendarContext, onPageChange  } from 'react-native-swipe-calendar';
-  import { differenceInCalendarMonths, format, addMonths } from 'date-fns'
+import { useRef, useState} from "react";
+import {View, StyleSheet, TouchableOpacity,} from 'react-native';
+import { LittleNormalText, NormalText, SubText, TitleText } from '../../styles/StyledText';
+import { useSharedValue } from "react-native-reanimated"
+import Calendar, { useCalendarContext  } from 'react-native-swipe-calendar';
+import { addMonths } from 'date-fns'
 import { useThemeColor } from '../Themed';
-
-import { useNavigation } from "@react-navigation/native";
-
-  const successDate = [
-    new Date(2023, 6, 7),
-    new Date(2023, 6, 2),
-    new Date(2023, 6, 8),
-    new Date(2023, 6, 9),
-    new Date(2023, 6, 10),
-    new Date(2023, 6, 14),
-    new Date(2023, 6, 19),
-    new Date(2023, 6, 25),
-    new Date(2023, 6, 30),
-  ]
-
-  
-  const LittleSuccess = [
-    new Date(2023, 6, 3),
-    new Date(2023, 6, 4),
-    new Date(2023, 6, 6),
-    new Date(2023, 6, 9),
-    new Date(2023, 6, 13),
-    new Date(2023, 6, 8),
-    new Date(2023, 6, 15),
-    new Date(2023, 6, 17),
-    new Date(2023, 6, 23),
-    new Date(2023, 6, 39),
-  ]
+import { SimpleButton } from "../Buttons/UsualButton";
+import { Feather } from '@expo/vector-icons';
     
-  const DayComponentWrapper = (color, habitude) => ({ date, isInDisplayedMonth, isToday, isSelected }) => {
+const DayComponentWrapper = (selectedDate, setSelectedDate) => ({ date, isInDisplayedMonth, isToday, isSelected }) => {
 
-    const navigation = useNavigation();
+  const fontGray = useThemeColor({}, "FontGray")
+  const font = useThemeColor({}, "Font")
 
-    const givenDate = new Date(date);
-    const isSuccessDate = successDate.some((d) => {
-      return (
-        d.getFullYear() === givenDate.getFullYear() &&
-        d.getMonth() === givenDate.getMonth() &&
-        d.getDate() === givenDate.getDate()
-      );
-    });
-  
-    const fontGray = useThemeColor({}, 'FontGray');
-    const secondary = useThemeColor({}, 'Secondary');
-  
-    let isLittleSuccess = false;
-  
-    if (!isSuccessDate) {
-      isLittleSuccess = LittleSuccess.some((d) => {
-        return (
-          d.getFullYear() === givenDate.getFullYear() &&
-          d.getMonth() === givenDate.getMonth() &&
-          d.getDate() === givenDate.getDate()
-        );
-      });
-    }
-  
-    let colorTile;
-  
-    if (isSuccessDate || isLittleSuccess) colorTile = color;
-    else colorTile = secondary;
-  
-    const ctx = useCalendarContext();
-    return (
-      <TouchableOpacity
-        onPress={() => 
-          {
-            navigation.navigate("DayDetailScreen", {date: date, habitude: habitude});
-            ctx.onDateSelect?.(date, { isSelected }); 
-          }}
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          flex: 1,
-          padding: 5,
-          opacity: 1,
-        }}>
-
-          <View
-            style={{
-              aspectRatio: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 5,
-              borderRadius: 5,
-              backgroundColor: colorTile,
-              opacity: isLittleSuccess ? 1 / 3 : 1,
-            }}>
-
-              <Text style={{ color: colorTile }}>{date.getDate()}</Text>
-
-          </View>
-
-      </TouchableOpacity>
-    );
-  };
-
-
-
-  const HeaderComponent = (date) => {
-
-    const {endDate} = date
-    const monthName = endDate.toLocaleString('fr', { month: 'long' })
-    const yearNumber = endDate.getFullYear()
-
-    const stylesHeader = StyleSheet.create({
-        headerContainer: {
-          padding: 10,
-          justifyContent: "center",
-        },
-      });
-
-      return (
-
-        <View style={stylesHeader.headerContainer}>
-            <TitleText text={monthName}/>
-            <SubText text={yearNumber}/>
-        </View>
-    );
-  };
-
-  const DayLabelComponent  = ({date}) => {
-    const dayName = date.toLocaleString('fr', { weekday: 'short' }).substring(0, 3);
-
-    return(
-        <View style={{alignItems:'center', justifyContent:'center', flex:1}}>
-            <LittleNormalText text={dayName}/>
-        </View>
-    )
+  const ctx = useCalendarContext();
+  const handleClickOnDay = () => {
+      ctx.onDateSelect?.(date, { isSelected });
   }
 
-  export default function CalendarCustom({colorHabit, habitude}) {
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const startDate = addMonths(currentDate, -2)
-    const endDate = addMonths(currentDate, 2)
-    const [selectedDate, setSelectDate] = useState(new Date());
-    const monthAnimCallbackNode = useSharedValue(0);
+  const borderColor = isSelected ? font : (isToday ? fontGray : 'transparent')
 
-  
-    const primary = useThemeColor({}, "Primary");
-  
-    return (
-      <View style={[styles.container, { backgroundColor: primary }]}>
+  return (
+    <TouchableOpacity onPress={handleClickOnDay} style={styles.dayContainer}>
+        <View style={[styles.daySubContainer, {borderColor: borderColor, borderWidth: 2, borderRadius: 12}]}>
+            <NormalText text={date.getDate()} style={{color: isInDisplayedMonth ? font : fontGray}}/>
+        </View>
+    </TouchableOpacity>
+  );
+};
+
+const HeaderComponent = (calendarRef) => (date) => {
+
+  const {endDate} = date
+  const monthName = endDate.toLocaleString('fr', { month: 'long' })
+  const yearNumber = endDate.getFullYear()
+
+  const font = useThemeColor({}, "Font")
+
+  return (
+    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+      <View style={styles.headerContainer}>
+          <TitleText text={monthName}/>
+          <SubText text={yearNumber}/>
+      </View>
+
+      <View style={{display: "flex", flexDirection: "row", alignItems: "center", gap: 20, marginRight: 5}}>
+          <SimpleButton onClick={() => calendarRef.current?.decrementPage()}>
+              <Feather name="chevron-left" size={24} color={font}/>
+          </SimpleButton>
+          <SimpleButton onClick={() => calendarRef.current?.incrementPage()}>
+              <Feather name="chevron-right" size={24} color={font}/>
+          </SimpleButton>
+      </View>
+    </View>
+  );
+};
+
+const DayLabelComponent  = ({date}) => {
+  const dayName = date.toLocaleString('fr', { weekday: 'short' }).substring(0, 3);
+
+  return(
+      <View style={styles.dayLabelContainer}>
+          <LittleNormalText text={dayName}/>
+      </View>
+  )
+}
+
+export default function CalendarCustom({selectedDate, setSelectedDate}) {
+
+  const calendarRef = useRef(null);
+
+  const monthAnimCallbackNode = useSharedValue(0);
+
+  return (
+    <View style={[styles.container]}>
         <Calendar
-    
-            minDate={startDate}
-            maxDate={endDate}
+          ref={calendarRef}
           pageInterval="month"
           theme={{ inactiveOpacity: 0 }}
-          currentDate={currentDate}
-
-          HeaderComponent={HeaderComponent}
+          currentDate={selectedDate}
+          HeaderComponent={HeaderComponent(calendarRef)}
           DayLabelComponent ={DayLabelComponent }
-          DayComponent={DayComponentWrapper(colorHabit, habitude)}
+          DayComponent={DayComponentWrapper(selectedDate, setSelectedDate)}
           selectedDate={selectedDate}
-          pageBuffer={1}
+          onDateSelect={(date, options) => {
+            setSelectedDate(date);
+          }}
           monthAnimCallbackNode={monthAnimCallbackNode}
-
+          pageBuffer={2}
         />
-      </View>
-    );
-  }
+    </View>
+  );
+}
   
   
   const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: { flex: 1,marginTop: -10},
+    dayContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      flex: 1,
+      padding: 5,
+      opacity: 1,
+    },
+
+    daySubContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: 40, width: 40,
+      borderRadius: 5,
+      opacity: 1, margin: 0
+    },
+
+    headerContainer: {
+      paddingVertical: 10,
+      justifyContent: "center",
+      marginHorizontal: 10
+    },
+
+    dayLabelContainer: {
+      alignItems:'center', 
+      justifyContent:'center', 
+      flex:1
+    }
   });
   

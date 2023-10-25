@@ -45,8 +45,8 @@ const CreateHabitDetails = () => {
 
         const daysOfWeek = []
 
-        if(selectedDays[7])
-            daysOfWeek.push(0,1,2,3,4,5,6)
+        if(isAllDaySelected)
+            daysOfWeek.push(7)
         
         else {
             selectedDays.map((isSelectedDay, index) => {
@@ -86,14 +86,13 @@ const CreateHabitDetails = () => {
 
     const handleSelectAllDay = () => {
         setSelectedDays(new Array(7).fill(false));    
-        setAllDaySelected(!isAllDaySelected)
+        setAllDaySelected(true)
     }
 
     const handleChangeFrequency = (frequency) => {
         setSelectedFrequency(frequency)
     }
 
-    const allDaySelected = selectedDays.filter((day) => day === true).length === 7
 
     const frequencies = [
         "Quotidien",

@@ -1,19 +1,7 @@
 import { View } from "react-native";
-import { AddEtapeItem, AddedEtapeItem, EtapeItem } from "../EtapeItem";
+import { AddEtapeItem, AddedEtapeItem } from "../EtapeItem";
 
-export const RenderStepCarouselItem = ({item, index}) => {
-
-    const handleValidateStep = (index) => {
-    }
-
-    return (
-        <View style={{flex: 1, padding: 30, paddingVertical: 15}}>
-            <EtapeItem step={item} index={index} handleValidateStep= {handleValidateStep}/>
-        </View>
-    )
-}
-
-export const RenderAddStepCarouselItem = ({item, index, data, setData, handleOpenAddStep}) => {
+export const RenderAddStepCarouselItem = ({item, index, setData, handleOpenAddStep}) => {
 
     const handleDelete = () => {
         setData((prevData) => {

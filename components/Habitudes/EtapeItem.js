@@ -1,106 +1,17 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { SimpleButtonBackground, RoundBorderButton, SimpleSquareButtonBackground, CircleBorderButton, BigCircleBorderButton } from "../Buttons/UsualButton"
-import cardStyle from "../../styles/StyledCard"
-import { SubTitleText, SubText, NormalText, TitleText, SubTitleGrayText, HugeText } from "../../styles/StyledText"
-import { Feather, MaterialCommunityIcons } from "@expo/vector-icons"
+import { BigCircleBorderButton } from "../Buttons/UsualButton"
+import { SubTitleText, SubText, NormalText, TitleText } from "../../styles/StyledText"
+import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../Themed"
-import { CheckBox } from "react-native-elements"
-import { StepCircularBar } from "./StepCircularBar"
-import { IconButton } from "../Buttons/IconButton"
-import { useRef, useState } from "react"
-import Clock, { CustomDurationIndicator } from "./Clock"
-import { useContext } from "react"
-import { HabitsContext } from "../../data/HabitContext"
-import { CircleSimpleRadioButton } from "../RadioButtons/RadioButton"
-import Separator from "../Other/Separator"
-
-export const EtapeItem = ({step,index}) => { //a re-factoriser genre les styles et tout ça peut être simplifié je pense
-
-    const {handleCheckStep, Habits} = useContext(HabitsContext)
-    const habit = Habits[step.habitID]
-
-    const nbSteps = Object.values(habit.steps).length
-
-    const cardStyles = cardStyle()
-    const secondary = useThemeColor({}, "Secondary")
-    const font = useThemeColor({}, "Font")
-
-    const [isPassSelected, setIsPassSelected] = useState(false)
-    const [isValidateSelected, setIsValidateSelected] = useState(false)
-
-    const handleSetValidateState = () => {
-
-        if(!isValidateSelected) {
-            setIsPassSelected(false)
-            handleCheckStep(index, step.habitID, false) // false => isUnCheck
-
-            //handleOpenBottomValidation => message attention, si vous cocher une étape, vous ne pouvez plus la décocher ensuite.
-        }
-
-        else {
-            handleCheckStep(index, step.habitID, true) // true => isUnCheck
-        }
-
-        setIsValidateSelected(true)
-    }
-
-    const handleSetPassState = () => {
-
-        if(!isPassSelected) setIsValidateSelected(false)
-        setIsPassSelected(!isPassSelected)
-    }
-
-    return(
-        <View style={[cardStyles.shadow, styles.container, {backgroundColor: secondary,}]}>
-            <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems:"center", marginRight: 5}}>
-                <HugeText text={step.numero+1}/>
-
-                <SubText text={(step.numero+1) + "/" + nbSteps}/>
-            </View>
-
-
-            <View style={{display: "flex", flexDirection:"row", justifyContent:"space-between", alignItems: "flex-end", gap: 20}}>
-                
-                {/* <CircleBorderButton>
-                    <MaterialCommunityIcons name="message-text-outline" size={20} color={font} />
-                </CircleBorderButton> */}
-
-                <View style={{display: "flex", flexDirection: "column", gap: 0}}>
-                    <TitleText text={step.titre}/>
-                    <SubText text={step.description} />
-                </View> 
-
-                <View style={{display: "flex", flexDirection:"row", justifyContent:"flex-end", flex: 1,  gap: 30, paddingHorizontal: 0}}>
-
-                    <View style={{display: "flex", flexDirection: "column", gap: 10, justifyContent: "center", alignItems: "center"}}>
-                        {/* <NormalText text="Passer"/> */}
-                        <CircleSimpleRadioButton handleOnPress={handleSetPassState} isSelected={isPassSelected}>
-                            <Feather name="x" size={24} color={font} />
-                        </CircleSimpleRadioButton>
-                    </View>
-
-
-                    <View style={{display: "flex", flexDirection: "column", gap: 10, justifyContent: "center", alignItems: "center"}}>
-                        {/* <NormalText text="Valider"/> */}
-                        <CircleSimpleRadioButton handleOnPress={handleSetValidateState} isSelected={isValidateSelected}>
-                            <Feather name="check" size={24} color={font} />
-                        </CircleSimpleRadioButton>
-                    </View>
-
-                </View>
-            </View>
-        </View>
-    )
-}
+import { CustomDurationIndicator } from "./Clock"
+import { durationToTimeString } from "../../primitives/BasicsMethods"
+import cardStyle from "../../styles/StyledCard"
 
 export const AddEtapeItem = ({handleOpenAddStep}) => {
 
     const cardStyles = cardStyle()
-    const popup = useThemeColor({}, "Popup")
     const font = useThemeColor({}, "Font")
-    const contrast = useThemeColor({}, "Contrast")
     const secondary = useThemeColor({}, "Secondary")
-
 
     return(
         <View style={[cardStyles.shadow, styles.addStepContainer, {backgroundColor: secondary}]}>
@@ -123,9 +34,7 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
     )
 }
 
-
 export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) => {
-
 
     const cardStyles = cardStyle()
     const secondary = useThemeColor({}, "Secondary")
@@ -153,6 +62,38 @@ export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) 
         </TouchableOpacity>
     )
 }
+
+export const RenderStep = ({habit, steps, step, index, onPress, imageSize, paddingImage }) => {
+
+    const secondary = useThemeColor({}, "Secondary")
+
+    let isNextToBeChecked = false
+    if(index === 0 && step.isChecked === false) isNextToBeChecked = true
+    else if (index != 0 && step.isChecked === false && steps[index-1].isChecked) isNextToBeChecked = true
+
+    return(
+        <View style={{display: "flex", flexDirection: "row", gap: 20, height: imageSize+paddingImage}}>
+
+            <View style={{width: 65, alignItems: "center", justifyContent: "center"}}>
+                <SubText text={durationToTimeString(step.duration)}/>
+            </View>
+
+            <TouchableOpacity onPress={onPress}
+            style={[styles.stepCheckBox,
+                { 
+                    borderColor: habit.color, backgroundColor: secondary, 
+                    borderWidth: step.isChecked || isNextToBeChecked ? 2 : 0
+                }]}>
+                {step.isChecked ? <Feather name="check" size={20} color={habit.color}/> :  <SubTitleText text={index+1}/>}
+            </TouchableOpacity>
+
+            <View style={styles.titreEtDescriptionContainer}>
+                <SubTitleText text={step.titre}/>
+                <SubText text={step.description}/>
+            </View>
+        </View>)
+}
+
 
 const styles = StyleSheet.create({
     container: {
@@ -188,5 +129,12 @@ const styles = StyleSheet.create({
         justifyContent:"space-between", 
         alignItems: "flex-end", 
         gap: 20
+    },
+
+    stepCheckBox: {
+        borderRadius: 15,
+        aspectRatio: 1/1,
+        alignItems:"center", 
+        justifyContent: "center",
     }
 })

@@ -1,4 +1,4 @@
-import { View, SafeAreaView, StyleSheet, FlatList, Image, Text, TouchableOpacity } from "react-native"
+import { View, StyleSheet, FlatList, Image, Text, TouchableOpacity } from "react-native"
 import { HugeText, NormalText, SubTitleText, TitleText } from "../styles/StyledText"
 import { useThemeColor } from "../components/Themed"
 import React from "react";
@@ -9,122 +9,130 @@ import cardStyle from "../styles/StyledCard";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { useState, useRef, useCallback, useMemo } from "react";
-
-import { StepCircularBar } from "../components/Habitudes/StepCircularBar";
 import { UsualScreen } from "../components/View/Views";
 
 import { SubText } from "../styles/StyledText";
 import generateRandomFeeling from "../data/Feelings";
 import { FeelingDay } from "../components/Calendars/FeelingDay";
-import { CircleBorderButton, GoBackButton, SimpleButton } from "../components/Buttons/UsualButton";
+import { GoBackButton, SimpleButton } from "../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
-import { CustomCarousel } from "../components/Carousel/CustomCarousel";
-import {RenderStepCarouselItem} from '../components/Habitudes/Step/StepCarouselItem'
+import HabitIcons from "../data/HabitIcons";
+
+import { RenderStep } from "../components/Habitudes/EtapeItem";
 
 const HabitudeScreen = () => {
 
-    const {Habits} = useContext(HabitsContext)
+    const {Habits, handleCheckStep} = useContext(HabitsContext)
+
     const route = useRoute()
-
-    const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
-    const secondary = useThemeColor({}, "Secondary")
-
-    const {habitID} = route.params;
-
+    const {habitID, currentDateString} = route.params;
+    const currentDate = new Date(currentDateString)
     const habit = Habits[habitID]
 
-    console.log(habit)
-    const navigation = useNavigation()
+    const steps = Object.values(habit.steps)
 
-    const randomFeeling = generateRandomFeeling(habit, 10)
+    const font = useThemeColor({}, "Font")
+    const tertiary = useThemeColor({}, "Tertiary")
 
-    const handleClickOnDate = (date) => {
-        navigation.navigate("DayDetailScreen", {date: date, habitude: habit});
+    const [displayedSteps, setDisplayedSteps] = useState(steps)
+
+    const imageSize = 35
+    const paddingImage = 15
+    const barWidth = 3
+
+    const isDone = steps.filter(step => step.isChecked).length === steps.length
+
+    const handleCheckingStep = (step, index) => {
+        const isStepChecked = !step.isChecked
+        steps[index] = {...step, isChecked: isStepChecked}
+
+        console.log("StepID first : ", step)
+
+        handleCheckStep(habitID, step.stepID, index, currentDate, isStepChecked)
+        setDisplayedSteps([...steps])
     }
 
-    const steps =  habit.steps
-    const renderFeelingDate = ({item}) => {
-
-        const date = new Date(item.date);
-        
-        return(
-            <FeelingDay feelingDay={item} onPress={() => handleClickOnDate(date)}/>
-        )
-    }
-
-    const styleCard = cardStyle();
+    const styleCard = cardStyle()
     return(
         <UsualScreen hideMenu={true}>
-            <View style={[styles.container, {}]}>
+            <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <GoBackButton/>
-                        
-                        <StepCircularBar habit={habit} tall={true}/>
-
+                        <GoBackButton borderHidden={true}/>
+                    
                         <View style={{display: "flex", flexDirection: "row", gap: 10}}>
 
-                            <CircleBorderButton onPress={() => handleOpenShareBottomSheet()}>
+                            <SimpleButton onPress={() => handleOpenShareBottomSheet()}>
                                 <Feather name="settings" size={20} color={font} />                                
-                            </CircleBorderButton>
+                            </SimpleButton>
 
                         </View>
-                    </View>
-
-                    <View style={{display: "flex", flexDirection: "column", alignItems:"center", justifyContent: "center"}}>
-                        <TitleText text={habit.titre}/>
-                        <SubText text={habit.description}/>
                     </View>
                 </View>
 
                 
                 <View style={styles.body}>
 
+                    
+                    <View style={{display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexDirection: "row", gap: 5}}>
+                        <HugeText text="Progression"/>
+                    </View>
 
-                    <View style={styles.detailPanel}>
-                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: fontGray, backgroundColor: secondary}]}>
+
+                    <View style={{display: "flex", flexDirection: "row", gap: 20}}>
+                        <View style={{borderRadius: 20, borderColor: isDone ? habit.color : font, borderWidth: 2, padding: 15}}>
+                            <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
+                        </View>
+
+                        <View style={styles.titreEtDescriptionContainer}>
+                            <SubText text={habit.description}/>
+                            <TitleText text={habit.titre}/>
+                        </View>
+                    </View>
+
+                    <View style={{display: "flex", flexDirection: "column"}}>
+                        {
+                            displayedSteps.map((step, index) => {
+
+                                return(
+                                <View key={index} style={{display: "flex", flexDirection: "column"}}>
+                                    <RenderStep habit={habit} steps={steps} step={step} index={index} onPress={() => handleCheckingStep(step, index)}
+                                        imageSize={imageSize} paddingImage={paddingImage}/>
+
+                                    {index != steps.length-1 && <View style={{
+                                        marginVertical: 15, 
+                                        backgroundColor: tertiary, 
+                                        borderRadius: 50, 
+                                        height: 30, 
+                                        width: barWidth, 
+                                        marginLeft: (paddingImage*2 + imageSize)+20 + (paddingImage + imageSize)/2 - barWidth/2}}/>}
+                                </View>
+                                )
+                            })
+                        }
+                    </View>
+
+
+
+                    {/* <View style={styles.detailPanel}>
+                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
                             <Feather name="users" size={24} color={font}/>
                             <SubTitleText text="2"/>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: fontGray, backgroundColor: secondary}]}>
+                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
                             <Octicons name="flame" size={24} color={font}/>
                             <SubTitleText text="50"/>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: fontGray, backgroundColor: secondary}]}>
+                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
                             <Feather name="award" size={24} color={font}/>
                             <SubTitleText text="7"/>
                         </TouchableOpacity>
 
-                    </View>
-
-
-                    <View style={{flex: 1, marginBottom: 0}}>
-                        <SubTitleText text="Etapes :"/>
-                        <CustomCarousel data={Object.values(steps)} renderItem={RenderStepCarouselItem} pagination={false}/>
-                    </View>
-                    
-                    <View>
-
-                        <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                            <SubTitleText text="Historique :"/>
-                            <SimpleButton>
-                                <SubText text="Tout voir"/>
-                            </SimpleButton>
-                        </View>
-
-                        <FlatList 
-                            horizontal={true} inverted={true}
-                            renderItem={renderFeelingDate} key={1}
-                            style={styles.FeelingList}
-                            data={randomFeeling} 
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={{gap: 15, paddingHorizontal: 20}}
-                        />
-                    </View>           
+                    </View> */}
+                         
                 </View>
             </View>
         </UsualScreen>
@@ -135,7 +143,7 @@ const styles = StyleSheet.create({
     container: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 30, 
+        gap: 10, 
         flex: 1, 
         marginBottom: 0    
     },
@@ -153,6 +161,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 30, 
         paddingVertical: 15, 
         flex: 1,
+        borderWidth: 2,
         borderRadius: 15, 
         flexDirection: "column", 
         justifyContent: "center", 
@@ -177,8 +186,7 @@ const styles = StyleSheet.create({
 
     body: {
         flex: 1, 
-        gap: 20,
-        justifyContent: "center"
+        gap: 30,
     },
 
     subBodyContainer: {
@@ -192,6 +200,12 @@ const styles = StyleSheet.create({
     FeelingList: {
         marginHorizontal: -30,
         marginTop: 15, 
+    },
+
+    titreEtDescriptionContainer:{
+        display: "flex", 
+        flexDirection: "column", 
+        justifyContent: "center"
     }
 })
 

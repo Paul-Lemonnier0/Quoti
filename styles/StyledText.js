@@ -69,9 +69,9 @@ export function NormalText(props) {
   const fontColor = useThemeColor({}, "Font");
 
   const mergedStyles = StyleSheet.flatten([
-    styles.normalText,
-    props.style,
     { color: fontColor },
+    props.style,
+    styles.normalText,
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;

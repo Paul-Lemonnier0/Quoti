@@ -10,7 +10,7 @@ export default {
 
     Primary: "#f6f6f9",
     Secondary: "#ffffff",
-    Tertiary: "#69738c",
+    Tertiary: "#bfbfbf",
 
     Popup: "#f6f6f9",
 

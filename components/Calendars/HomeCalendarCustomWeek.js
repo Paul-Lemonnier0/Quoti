@@ -154,24 +154,23 @@ while (cancelDate.length < 16) {
   export default function HomeCalendarCustomWeek({ selectedDate, setSelectedDate }) {
     
     // Appeler la fonction de rappel avec la nouvelle valeur de currentEndDate
-
-
+    
     const monthAnimCallbackNode = useSharedValue(0);
-
+    console.log(selectedDate.toLocaleDateString())
     return (
       <View style={[styles.container]}>
         <Calendar
+          selectedDate={selectedDate}
+          currentDate={selectedDate}
           pageInterval="week"
           theme={{ inactiveOpacity: 0 }}
           DayComponent={DayComponentWrapper}
           HeaderComponent={HeaderComponent}
           DayLabelComponent ={DayLabelComponent}
-          selectedDate={selectedDate}
           onDateSelect={(date, options) => {
             setSelectedDate(date);
           }}
           
-          pageBuffer={1} 
           weekStartsOn={1}
           
           monthAnimCallbackNode={monthAnimCallbackNode}

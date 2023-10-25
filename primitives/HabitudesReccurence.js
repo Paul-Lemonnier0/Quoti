@@ -1,9 +1,10 @@
 const startingDate = new Date()
 
 function calculReccurenceHabitude(habit, currentDate) {
+    if(habit.startingDate > currentDate) return false
     switch (habit.frequency){
         case "Quotidien":
-            return isHabitPlannedThisDay(habit.startingDate, currentDate, habit.reccurence)
+            return isHabitPlannedThisDay(habit.daysOfWeek, currentDate)
 
         case "Hebdo":
             return isHabitPlannedThisWeek(habit.startingDate, currentDate, habit.reccurence)
@@ -11,11 +12,6 @@ function calculReccurenceHabitude(habit, currentDate) {
         case "Mensuel":
             return isHabitPlannedThisMonth(habit.startingDate, currentDate, habit.reccurence)
     }
-}
-
-
-const isHabitPlannedThisDay = (date, currentDate, reccurence) => {
-    return numberOfWeekBetweenDates(date, currentDate) % reccurence === 0
 }
 
 const isHabitPlannedThisWeek = (date, currentDate, reccurence) => {
@@ -36,8 +32,12 @@ const weekNumber = (date) => {
  
     var weekNumber = Math.ceil(days / 7);
     
-    console.log("Week number of " + date +
-        " is :   " + weekNumber);
+    console.log("Week number of " + date + " is :   " + weekNumber);
+}
+
+const isHabitPlannedThisDay = (daysOfActivity, date) => {
+    const dateNumberInWeek = (date.getDay() + 1) % 7
+    return daysOfActivity.includes(dateNumberInWeek) || daysOfActivity.includes(7)
 }
 
 const numberOfDayBetweenDates = (date1, date2) => {
@@ -52,6 +52,7 @@ const numberOfWeekBetweenDates = (date1, date2) => {
 }   
 
 const numberOfMonthBetweenDates = (date1, date2) => {
+    console.log(date1)
     return Math.abs(date2.getFullYear() - date1.getFullYear()) * 12 + Math.abs(date2.getMonth() - date1.getMonth());    
 }
 

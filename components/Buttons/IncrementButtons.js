@@ -6,33 +6,24 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import { StyleSheet } from "react-native"
 import { TextInput } from "react-native"
 
-export const IncrementButtons = ({value, setValue}) => {
+export const IncrementButtons = ({value, setValue, isBorderHidden}) => {
 
     const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
-    const primary = useThemeColor({}, "Primary")
 
     const handleIncrement = () => { if(value < 99) setValue(++value) }
-
     const handleDecrement = () => { if(value > 1) setValue(--value) }
 
-    const handleChangeValue = (text) => { setValue(text); }
-
-    const handleSetValueToDefault = () => { if(isNaN(parseInt(value))) setValue(1) }
-
     return(
-        <View style={[styles.container, {backgroundColor: secondary}]}>
+        <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
             
             <TouchableOpacity onPress={handleDecrement} style={styles.buttons}>
                 <Feather name="minus" size={20} color={font}/>
             </TouchableOpacity>
 
-            <TextInput style={[{backgroundColor: primary, color: font}, styles.valueContainer]} 
-            inputMode="numeric"
-            onBlur={handleSetValueToDefault}
-            maxLength={2}
-            onChangeText={handleChangeValue}
-            value={value.toString() ?? ""}/>
+            <View style={[styles.valueContainer]}>
+                <NormalText text={value}/>
+            </View>
 
             <TouchableOpacity onPress={handleIncrement} style={styles.buttons}>
                 <Feather name="plus" size={20} color={font}/>
@@ -59,7 +50,7 @@ export const IncrementTime = ({value, setValue, isDisabled, isMinutes}) => {
     }
 
     return(
-        <View style={[styles.timeSelectorContainer, {backgroundColor: secondary, borderColor: font}]}>
+        <View style={[styles.container, {backgroundColor: secondary, borderColor: font}]}>
             
             <TouchableOpacity onPress={handleDecrement} style={styles.buttons} disabled={isDisabled}>
                 <Feather name="minus" size={20} color={isDisabled ? fontGray : font}/>
@@ -80,7 +71,6 @@ export const IncrementTime = ({value, setValue, isDisabled, isMinutes}) => {
 const styles = StyleSheet.create({
     buttons: {
         paddingHorizontal: 5,
-        flex: 1, 
         justifyContent: "center", 
         alignItems: "center"
     },
@@ -88,13 +78,8 @@ const styles = StyleSheet.create({
     valueContainer: {
         margin: -5, 
         padding: 10, 
-        justifyContent: "center", 
-        alignItems: "center", 
-        display: "flex",
-        flexDirection: 'row',
         paddingHorizontal: 0,
         borderRadius: 10, 
-        flex: 1,
         textAlign: "center"
     },
 
@@ -102,23 +87,12 @@ const styles = StyleSheet.create({
         display: "flex", 
         flexDirection: "row", 
         alignItems:"center", 
-        justifyContent: "center", 
-        gap: 15, 
-        borderRadius: 10, 
-        padding: 10,
-        maxWidth: 165,
-        width: 165
-    },
-
-    timeSelectorContainer: {
-        display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "center", 
+        justifyContent: "space-between", 
         gap: 15, 
         borderRadius: 10, 
         padding: 10,
         borderWidth: 2,
         flex: 1
-    }
+    },
+
 })

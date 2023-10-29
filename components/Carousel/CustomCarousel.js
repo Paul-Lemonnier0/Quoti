@@ -1,9 +1,7 @@
-import Carousel from "react-native-reanimated-carousel"
 import { StyleSheet, Dimensions, View } from "react-native"
 import { useState } from "react"
-import { createRef } from "react"
-import { AddEtapeItem, AddedEtapeItem } from "../Habitudes/EtapeItem"
 import Pagination from "./Pagination"
+import Carousel from "react-native-reanimated-carousel"
 
 export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagination = true}) => {
 
@@ -12,20 +10,13 @@ export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagin
 
     return(
         <View style={styles.container}>
-
-
-                <Carousel
-                    data={data} 
-                    loop={false}
-                    scrollAnimationDuration={500}
-                    renderItem={renderItem}
-                    width={SLIDER_WIDTH}
-
-                    onProgressChange={(_, absoluteProgress) => {
-                        setCurrentIndex(Math.round(absoluteProgress));
-                    }}
-                />
-
+            <Carousel
+                data={data} 
+                loop={false}
+                scrollAnimationDuration={500}
+                renderItem={renderItem}
+                width={SLIDER_WIDTH}
+                onProgressChange={(_, absoluteProgress) => setCurrentIndex(Math.round(absoluteProgress))}/>
 
             {pagination && <Pagination length={data.length} currentIndex={currentIndex}/>}
         </View>
@@ -36,6 +27,7 @@ const styles= StyleSheet.create({
     container: {
         marginHorizontal: -40, 
         paddingHorizontal: 30, 
+        gap: 10,
         flex: 1,
         display: "flex",
         flexDirection: "column",

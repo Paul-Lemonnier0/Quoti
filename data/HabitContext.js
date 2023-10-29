@@ -1,13 +1,8 @@
-import { createContext, useState, useContext } from "react";
-import { addHabitToFireStore, addNewHabit, getAllOwnHabits, updateStepInFireStore } from "../firebase/FirestorePrimitives";
-import { useEffect } from "react";
-import { addSteps, changeStepState, fetchStepLogs } from "../firebase/Firestore_Step_Primitives";
-import { calculReccurenceHabitude } from "../primitives/HabitudesReccurence";
-import { listKeyIDfromArray } from "../primitives/BasicsMethods";
-import { NormalText } from "../styles/StyledText";
-import { View } from "react-native";
-import { AnimatedBasicSpinner, AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
-import Animated from "react-native-reanimated";
+import { createContext, useState, useEffect } from "react";
+import { addHabitToFireStore, getAllOwnHabits } from "../firebase/FirestorePrimitives";
+import { changeStepState, fetchStepLogs } from "../firebase/Firestore_Step_Primitives";
+import { isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
+import { AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
 
 const HabitsContext = createContext();
 
@@ -33,25 +28,26 @@ const HabitsProvider = ({ children }) => {
       return new Promise((resolve, reject) => {
     
         const habitsFiltered = []
-        const habitsID = []
+        const allStepsID = []
+        const habitsNotInOldVersion = []
+        const habitsInOldVersion = []
 
         const oldFilteredHabitsID = [...Object.keys(filteredHabitsByDate.Quotidien), ...Object.keys(filteredHabitsByDate.Hebdo), ...Object.keys(filteredHabitsByDate.Mensuel)]
-        console.log("old : ", oldFilteredHabitsID)
+
         for (const habitID in habits) {
-          if(calculReccurenceHabitude(habits[habitID], currentDate)){
-            habitsFiltered.push(habits[habitID]); 
-            habitsID.push(habitID) 
+          if(isHabitScheduledForDate(habits[habitID], currentDate)){
+
+            habitsFiltered.push(habits[habitID]);
+
+            if(!oldFilteredHabitsID.includes(habitID)){
+              habitsNotInOldVersion.push(habitID)
+              stepsID = Object.keys((habits[habitID].steps))
+              allStepsID.push(stepsID)
+            }
+
+            else habitsInOldVersion.push(habitID)
           }
         }
-
-        console.log("habits: ", habitsID)
-
-        const habitsNotInOldVersion  = habitsID.filter(habitID => !oldFilteredHabitsID.includes(habitID))
-        const habitsInOldVersion = habitsID.filter(habitID => oldFilteredHabitsID.includes(habitID))
-
-        console.log("habitsNotInOldVersion: ", habitsNotInOldVersion)
-        console.log("habitsInOldVersion: ", habitsInOldVersion)
-
 
         const newFilteredHabitsByDate = { Quotidien: {}, Hebdo: {}, Mensuel: {} }
 
@@ -61,9 +57,7 @@ const HabitsProvider = ({ children }) => {
               const stepsUpdated = habit.steps;
     
               for(const stepID in habit.steps){
-    
                 let isChecked = false;
-                console.log("step id : ", stepID)
     
                 if(stepLogs.hasOwnProperty(stepID)) 
                   isChecked = stepLogs[stepID]
@@ -89,7 +83,7 @@ const HabitsProvider = ({ children }) => {
         }
 
         else {
-          habitsID.map(habitID => {
+          habitsInOldVersion.map(habitID => {
             const habit = habits[habitID]
             newFilteredHabitsByDate[habit.frequency][habit.habitID] = habit
           })
@@ -98,7 +92,6 @@ const HabitsProvider = ({ children }) => {
         }
       })
     };
-
 
     const changeDate = async(date) => {
       try{
@@ -116,19 +109,13 @@ const HabitsProvider = ({ children }) => {
         const fetchData = async () => {
           try{
             const habits = await fetchAllHabits()
-            console.log("habits fetched : ", habits)
+            console.log("habits successfully fetched.")
 
             const filteredHabits = await filterHabits(habits, new Date())
-            console.log("habits filtered : ", filteredHabits)
+            console.log("habits successfully filtered.")
 
             setFilteredHabitsByDate(filteredHabits)
-
-            // setTimeout(() => {
-            //   console.log("Test spinner");
-
-            // }, 10000);
             setIsFetched(true)
-
           }
 
           catch(e) { 
@@ -148,8 +135,7 @@ const HabitsProvider = ({ children }) => {
       const stepsFireStore = Object.values(habit.steps);
       stepsFireStore[stepIndex].isChecked = isChecked
 
-      console.log("stepID: ", stepID)
-      changeStepState(date, stepID, habitID, isChecked)
+      changeStepState(date, stepID, isChecked)
     
       setHabits((prevHabits) => ({
         ...prevHabits,

@@ -1,5 +1,3 @@
-//Default class: "Autre" (pas besoin de la spécifier)
-
 export default Achievements = [
     {
         nom: "Série de 5",

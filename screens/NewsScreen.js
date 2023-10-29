@@ -1,6 +1,7 @@
 import {FlatList, StyleSheet, Image, View} from 'react-native';
 import {StoriesProfil} from '../components/Profil/StoriesProfil'
-import {Habitudes, Friends} from '../data/habitudes';
+import { UsualScreen } from '../components/View/Views';
+import { HugeText } from '../styles/StyledText';
 
 
 const NewsScreen = () => {
@@ -14,22 +15,14 @@ const NewsScreen = () => {
       }
 
     return(
-        <View style={[styles.storiesContainer]}>
-
-              <FlatList
-              data={Friends}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              renderItem={renderStoriesProfil}/>
-
-          </View>
+        <UsualScreen style={[styles.storiesContainer]}>
+          <HugeText text="NewsScreen"/>
+        </UsualScreen>
     )
 }
 
 const styles = StyleSheet.create({  
     storiesContainer: {
-      borderTopColor: "#69738c",
-      borderTopWidth: 0,
       justifyContent: "center",
       alignItems: "center",
       display: "flex",

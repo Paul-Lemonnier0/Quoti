@@ -2,7 +2,6 @@ import { View } from "react-native"
 import AnimatedDotsCarousel from 'react-native-animated-dots-carousel';
 import { useThemeColor } from "../Themed"
 
-
 export default Pagination = ({length, currentIndex, maxIndicator = 3}) => {
     
     const fontGray = useThemeColor({}, "FontGray")
@@ -38,9 +37,7 @@ export default Pagination = ({length, currentIndex, maxIndicator = 3}) => {
                         opacity: 0.5,
                         size: 6 
                     },
-                    
                     quantity: 1,
-
                     config: { 
                         color: 'white', 
                         margin: 5, 
@@ -49,7 +46,7 @@ export default Pagination = ({length, currentIndex, maxIndicator = 3}) => {
                     },
                     
                     quantity: 1,
-                },
+                }
                 ]}
             />
         </View>

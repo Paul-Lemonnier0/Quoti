@@ -14,22 +14,17 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
     const secondary = useThemeColor({}, "Secondary")
 
     return(
-        <View style={[cardStyles.shadow, styles.addStepContainer, {backgroundColor: secondary}]}>
-            
-            <View style={{width: "80%", gap: 10}}>
+        <View style={[cardStyles.shadow, styles.addStepContainer, { backgroundColor: secondary }]}>
+            <View style={styles.addMoreStepTextContainer}>
                 <TitleText text="Ajoutez une étape" />
-
-                <View style={{}}>
-                    <NormalText text="Décomposer votre habitude en une ou plusieurs étapes !" />
-                </View>
+                <NormalText text="Décomposer votre habitude en quelques étapes !" />
             </View>
 
-            <View style={{flex: 1, justifyContent: "flex-end", alignItems: "flex-end"}}>
+            <View style={styles.fullFlexEndContainer}>
                 <BigCircleBorderButton onPress={handleOpenAddStep} borderColor={font}>
-                    <Feather name="plus" size={24} color={font} />
+                    <Feather name="plus" size={20} color={font} />
                 </BigCircleBorderButton>
             </View>
-
         </View>
     )
 }
@@ -44,18 +39,17 @@ export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) 
     return(
         <TouchableOpacity style={[cardStyles.shadow, styles.addedContainer, {backgroundColor: secondary}]}>
 
-            <View style={{display: "flex", flexDirection: "column", gap: 10}}>
-                    <TitleText text={step.titre}/>
-                    <NormalText text={step.description}/>
+            <View style={styles.addedTextContainer}>
+                <TitleText text={step.titre}/>
+                <NormalText text={step.description}/>
             </View>
 
             <View style={styles.addedFooterContainer}>
-                
                 <CustomDurationIndicator duration={step.duration} />
 
-                <View style={{flex: 1, justifyContent: "flex-end", alignItems: "flex-end"}}>
+                <View style={styles.fullFlexEndContainer}>
                     <BigCircleBorderButton onPress={() => {}}>
-                        <Feather name="trash-2" size={24} color={font} />
+                        <Feather name="trash-2" size={20} color={font} />
                     </BigCircleBorderButton>
                 </View>
             </View>
@@ -72,15 +66,15 @@ export const RenderStep = ({habit, steps, step, index, onPress, imageSize, paddi
     else if (index != 0 && step.isChecked === false && steps[index-1].isChecked) isNextToBeChecked = true
 
     return(
-        <View style={{display: "flex", flexDirection: "row", gap: 20, height: imageSize+paddingImage}}>
-
-            <View style={{width: 65, alignItems: "center", justifyContent: "center"}}>
+        <View style={[styles.renderStepContainer, {minHeight: imageSize+paddingImage}]}>
+            <View style={styles.stepDurationContainer}>
                 <SubText text={durationToTimeString(step.duration)}/>
             </View>
 
             <TouchableOpacity onPress={onPress}
-            style={[styles.stepCheckBox,
+                style={[styles.stepCheckBox,
                 { 
+                    height: imageSize+paddingImage,
                     borderColor: habit.color, backgroundColor: secondary, 
                     borderWidth: step.isChecked || isNextToBeChecked ? 2 : 0
                 }]}>
@@ -91,9 +85,9 @@ export const RenderStep = ({habit, steps, step, index, onPress, imageSize, paddi
                 <SubTitleText text={step.titre}/>
                 <SubText text={step.description}/>
             </View>
-        </View>)
+        </View>
+    )
 }
-
 
 const styles = StyleSheet.create({
     container: {
@@ -123,6 +117,12 @@ const styles = StyleSheet.create({
         flexDirection: "column"
     },
 
+    addedTextContainer: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 10
+    },
+
     addedFooterContainer: {
         display: "flex", 
         flexDirection:"row", 
@@ -136,5 +136,36 @@ const styles = StyleSheet.create({
         aspectRatio: 1/1,
         alignItems:"center", 
         justifyContent: "center",
+    },
+
+    fullFlexEndContainer: {
+        flex: 1, 
+        justifyContent: "flex-end", 
+        alignItems: "flex-end"
+    },
+
+    addMoreStepTextContainer: {
+        width: "80%", 
+        gap: 10
+    },
+
+    stepDurationContainer: {
+        width: 65, 
+        alignItems: "center", 
+        justifyContent: "center"
+    },
+
+    titreEtDescriptionContainer:{
+        display: "flex", flex: 1,
+        flexDirection: "column", 
+        justifyContent: "center",
+    },
+
+    renderStepContainer: {
+        display: "flex", 
+        flexDirection: "row", 
+        justifyContent: "center", 
+        alignItems: "center", 
+        gap: 20,
     }
 })

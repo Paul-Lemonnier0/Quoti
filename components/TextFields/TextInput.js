@@ -1,64 +1,58 @@
-import { useState } from "react"
+import { forwardRef, useImperativeHandle, useState } from "react"
 import { useThemeColor } from "../Themed"
 import { TextInput, View } from "react-native"
+import { StyleSheet } from "react-native";
+import { NormalText, SubTitleText } from "../../styles/StyledText";
 
-export const TextInputCustom = ({ setValue, startingValue, onFocus, onBlur, isWrong, ...props }) => {
+export const TextInputCustom = forwardRef(({ startingValue, labelName, onFocus, onBlur, isWrong, ...props }, ref) => {
+
+    const [value, setValue] = useState(startingValue ? startingValue : "");
+
+    useImperativeHandle(ref, () => ({
+        getValue: () => value,
+    }));
 
     const [isFieldFocus, setIsFieldFocus] = useState(false)
     const secondary = useThemeColor({}, "Secondary") 
-    const contrast = useThemeColor({}, "Contrast") 
     const font = useThemeColor({}, "Font") 
     const fontGray = useThemeColor({}, "FontGray") 
     const errorColor = useThemeColor({}, "Error") 
 
-    const [temp_value, temp_setValue] = useState(startingValue ? startingValue : "");
-
-    const handleSetValue = (text) => {
-        temp_setValue(text)
-        setValue(text)
-        console.log(text)
-    }
 
     return(
-        <View style={
-            {        
-            display: 'flex', 
-            flexDirection: "column", 
-            gap: 20,
-            marginVertical: 10, 
-            }
-        }>
+        <View style={styles.container}>
+            <SubTitleText text={labelName}/>
+            <TextInput {...props} placeholderTextColor={fontGray} selectionColor={font}
+                value={value} onChangeText={setValue} autoCorrect={false}
+                
+                onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
+                onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
 
-            <TextInput 
-                {...props}
-                placeholderTextColor={fontGray}
-                selectionColor={font}
-                keyboardType="visible-password"
-                value={temp_value}
-                autoCorrect={false}
-                onChangeText={text => handleSetValue(text)}
-
-                onFocus={() => {
-                    setIsFieldFocus(true);
-                    onFocus && onFocus(); // Call the parent onFocus event if provided
-                }}
-                onBlur={() => {
-                    setIsFieldFocus(false);
-                    onBlur && onBlur(); // Call the parent onBlur event if provided
-                }}
-                style={{
-                    borderWidth: 2,
-                    borderColor: isFieldFocus ? font : (isWrong ? errorColor : secondary),
-                    backgroundColor: secondary, 
-                    fontFamily: "poppinsLight", 
-                    borderRadius: 10, 
-                    color: font, 
-                    fontSize: 14, 
-                    padding: 12, 
-                    paddingHorizontal: 15
-                }}
+                style={[styles.textInput, {
+                            borderColor: isFieldFocus ? font : (isWrong ? errorColor : secondary),
+                            backgroundColor: secondary, 
+                            color: font, 
+                        }
+                    ]}
             />
-
         </View>
     )
-}
+})
+
+const styles = StyleSheet.create({
+    container: {    
+        display: 'flex', 
+        flexDirection: "column", 
+        gap: 10,
+        marginVertical: 10,   
+    },
+
+    textInput: {
+        borderWidth: 2,
+        fontFamily: "poppinsLight", 
+        borderRadius: 10, 
+        fontSize: 14, 
+        padding: 12, 
+        paddingHorizontal: 15
+    }
+})

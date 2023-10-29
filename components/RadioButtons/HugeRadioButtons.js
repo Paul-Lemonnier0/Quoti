@@ -5,9 +5,7 @@ export const HugeRadioButton = ({isHighlight, handleOnClick, isColorReverse, chi
    
     const secondary = useThemeColor({}, "Secondary")
     const primary = useThemeColor({}, "Primary")
-    const contrast = useThemeColor({}, "Contrast")
     const font = useThemeColor({}, "Font") 
-
    
     return(
         <TouchableOpacity 

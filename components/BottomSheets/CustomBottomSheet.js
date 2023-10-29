@@ -40,11 +40,10 @@ const CustomBottomSheet = (props) => {
                 </View>
 
       </BottomSheetModal>
-    );
-  };
+  );
+};
 
-  const styles = StyleSheet.create({
-
+const styles = StyleSheet.create({
     container: { 
       marginTop: 20, 
       gap: 20, 
@@ -52,8 +51,7 @@ const CustomBottomSheet = (props) => {
       paddingHorizontal:30, 
       flex:1, 
       display:"flex",
-    },
-
+    }
 });
   
   export default CustomBottomSheet;

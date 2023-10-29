@@ -1,15 +1,18 @@
-const startingDate = new Date()
+import { isFirstDayOfMonth, startOfWeek } from "date-fns"
 
-function calculReccurenceHabitude(habit, currentDate) {
-    if(habit.startingDate > currentDate) return false
+function isHabitScheduledForDate(habit, currentDate) {
+
     switch (habit.frequency){
         case "Quotidien":
+            if(habit.startingDate > currentDate) return false
             return isHabitPlannedThisDay(habit.daysOfWeek, currentDate)
 
         case "Hebdo":
+            if(startOfWeek(habit.startingDate, {weekStartsOn: 1}) > currentDate) return false
             return isHabitPlannedThisWeek(habit.startingDate, currentDate, habit.reccurence)
 
         case "Mensuel":
+            if(isFirstDayOfMonth(habit.startingDate) > currentDate) return false
             return isHabitPlannedThisMonth(habit.startingDate, currentDate, habit.reccurence)
     }
 }
@@ -36,8 +39,10 @@ const weekNumber = (date) => {
 }
 
 const isHabitPlannedThisDay = (daysOfActivity, date) => {
-    const dateNumberInWeek = (date.getDay() + 1) % 7
-    return daysOfActivity.includes(dateNumberInWeek) || daysOfActivity.includes(7)
+
+    let dayNumberInWeek = date.getDay() === 0 ? 6 : date.getDay() - 1
+
+    return daysOfActivity.includes(dayNumberInWeek) || daysOfActivity.includes(7)
 }
 
 const numberOfDayBetweenDates = (date1, date2) => {
@@ -52,10 +57,9 @@ const numberOfWeekBetweenDates = (date1, date2) => {
 }   
 
 const numberOfMonthBetweenDates = (date1, date2) => {
-    console.log(date1)
     return Math.abs(date2.getFullYear() - date1.getFullYear()) * 12 + Math.abs(date2.getMonth() - date1.getMonth());    
 }
 
 
 
-export {weekNumber, numberOfWeekBetweenDates, isHabitPlannedThisMonth, calculReccurenceHabitude}
+export {weekNumber, numberOfWeekBetweenDates, isHabitPlannedThisMonth, isHabitScheduledForDate}

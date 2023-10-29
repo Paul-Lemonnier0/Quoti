@@ -1,47 +1,51 @@
-import { addDoc, collection, doc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, getDocs, query, where } from "firebase/firestore";
 import { db } from "./InitialisationFirebase";
 
-async function changeStepState(date, stepID, habitID, isChecked) {
+const collectionName = "StepsDone"
+
+async function changeStepState(date, stepID, isChecked) {
 
     const dateString = date.toDateString()
-    console.log(dateString)
-    console.log(stepID)
-    console.log(habitID)
+    console.log("step concerned at date : ", stepID, " | ", dateString)
 
-    const qry = query(collection(db, "StepLogs"), where('date', '==', dateString), where('stepID', '==', stepID), where("habitID", "==", habitID))
+    const qry = query(collection(db, collectionName), where('date', '==', dateString), where('stepID', '==', stepID))
 
     getDocs(qry)
         .then(querySnapShot => {
             if(!querySnapShot.empty){
-                setDoc(collection(db, "StepLogs"), {isChecked: isChecked}, {merge: true})
-                    .then(updatedStepLogRef => console.log("Log updated with ref : ", updatedStepLogRef.path))
-                    .catch(e => console.log("Error while updating log : ", e))
+                querySnapShot.forEach(stepLog => {
+                    if(!isChecked){
+                        deleteDoc(stepLog.ref)
+                            .then(() => console.log("Step ", stepID, " marked as not done for the date : ", date))
+                            .catch(() => console.log("Error while deleting stepLog : ", e))
+                    }  
+                })
             }
         
             else {
-                const newStepLog = {date: dateString, stepID, habitID, isChecked}
+                const newStepLog = {date: dateString, stepID}
         
-                addDoc(collection(db, "StepLogs"), newStepLog)
-                    .then(stepLogRef => console.log("Log added with ref : ", stepLogRef.path))
+                addDoc(collection(db, collectionName), newStepLog)
+                    .then(stepLogRef => console.log("Step marked as done with ref : ", stepLogRef.path))
                     .catch(e => console.log("Error while adding log : ", e))
             }
         })
         .catch(e => console.log("Error while fetching log : ", e))
 }
 
-async function fetchStepLogs(date, habitsID) {
+async function fetchStepLogs(date, allStepsID) {
     const stepsLogs = {};
 
     try {
-        const qry = query(collection(db, "StepLogs"), where("date", "==", date.toDateString()), where("habitID", "in", habitsID));
+        const qry = query(collection(db, collectionName), where("date", "==", date.toDateString()), where("stepID", "in", allStepsID));
         const querySnapShot = await getDocs(qry);
 
         querySnapShot.forEach(stepLogDoc => {
-        const isChecked = stepLogDoc.get('isChecked');
-        const stepID = stepLogDoc.get('stepID');
-        stepsLogs[stepID] = { stepID, isChecked };
+            const stepID = stepLogDoc.get('stepID');
+            stepsLogs[stepID] = { stepID, isChecked: true };
         });
-    } catch (e) {
+    } 
+    catch (e) {
         console.log("Error while fetching stepLogs: ", e);
     }
 

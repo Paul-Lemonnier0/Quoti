@@ -7,29 +7,16 @@ import { useState } from "react"
 const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSelectAllDay}) => {
 
     const secondary = useThemeColor({}, "Secondary") 
-    const contrast = useThemeColor({}, "Contrast") 
     const font = useThemeColor({}, "Font") 
 
-    const weekDays = [
-        "Lundi",
-        "Mardi",
-        "Mercredi",
-        "Jeudi",
-        "Vendredi",
-        "Samedi",
-        "Dimanche"
-    ]
+    const weekDays = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
 
     const allDaySelected = selectedDays.filter((day) => day === true).length === 7
 
     return(
         <View style={styles.container}>
 
-            {/* <View style={styles.header}>
-                <LittleNormalText text="Tous les : "/>
-            </View> */}
-
-            <View style={[styles.selectorItemContainer, {justifyContent:"space-between"}]}>
+            <View style={[styles.selectorItemContainer]}>
 
                 {weekDays.map((weekDay, index) => {
 
@@ -38,14 +25,9 @@ const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSe
 
                     return(
                         <TouchableOpacity onPress={() => handleSelectDay(index)} key={weekDay} 
-                            style={[styles.selectItem, 
-                            {        
-                                borderColor: isHighlight ? font : secondary,
-                                backgroundColor: secondary,         
-                            }]}>
+                            style={[styles.selectItem, {borderColor: isHighlight ? font : secondary, backgroundColor: secondary}]}>
 
                             <NormalText text={weekDay.substring(0, 1)}/>
-                                    
                         </TouchableOpacity>
                     )
                 })}
@@ -70,14 +52,19 @@ const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSe
 const WeekSelection = ({reccurence, setReccurence}) => {
 
     const secondary = useThemeColor({}, "Secondary") 
-    const contrast = useThemeColor({}, "Contrast") 
     const font = useThemeColor({}, "Font") 
+
+    const [isEveryWeek, setIsEveryWeek] = useState(reccurence === 1)
 
     const handleEveryWeekPress = () => {
         setReccurence(1)
+        setIsEveryWeek(true)
     }
 
-    const isEveryWeek = reccurence === 1
+    const handlePressIncrementButtons = (val) => {
+        setReccurence(val)
+        setIsEveryWeek(val === 1)
+    }
 
     return(
         <View style={styles.container}>
@@ -88,7 +75,7 @@ const WeekSelection = ({reccurence, setReccurence}) => {
                     <NormalText text="Toutes les"/>
                 </View>
 
-                <IncrementButtons value={reccurence} setValue={setReccurence}/>
+                <IncrementButtons value={reccurence} setValue={handlePressIncrementButtons} isBorderHidden={isEveryWeek}/>
 
                 <View style={styles.textFrequencyContainer}>
                     <NormalText text="semaines"/>
@@ -98,11 +85,7 @@ const WeekSelection = ({reccurence, setReccurence}) => {
 
             <View style={[styles.selectorItemContainer]}>
                 <TouchableOpacity onPress={handleEveryWeekPress}                         
-                    style={[styles.selectAllItem, 
-                    {        
-                        borderColor: isEveryWeek ? font : secondary,
-                        backgroundColor: secondary,         
-                    }]}>
+                    style={[styles.selectAllItem, {borderColor: isEveryWeek ? font : secondary, backgroundColor: secondary}]}>
 
                     <NormalText text="Toutes les semaines"/>
                 </TouchableOpacity>
@@ -114,16 +97,19 @@ const WeekSelection = ({reccurence, setReccurence}) => {
 const MonthSelection = ({reccurence, setReccurence}) => {
 
     const secondary = useThemeColor({}, "Secondary") 
-    const contrast = useThemeColor({}, "Contrast") 
     const font = useThemeColor({}, "Font") 
 
+    const [isEveryMonth, setIsEveryMonth] = useState(reccurence === 1)
     
     const handleEveryMonthPress = () => {
         setReccurence(1)
+        setIsEveryMonth(true)
     }
 
-    const isEveryMonth = reccurence === 1
-
+    const handlePressIncrementButtons = (val) => {
+        setReccurence(val)
+        setIsEveryMonth(val === 1)
+    }
     return(
         <View style={styles.container}>
 
@@ -133,7 +119,7 @@ const MonthSelection = ({reccurence, setReccurence}) => {
                     <NormalText text="Tous les"/>
                 </View>
 
-                <IncrementButtons value={reccurence} setValue={setReccurence}/>
+                <IncrementButtons value={reccurence} setValue={handlePressIncrementButtons} isBorderHidden={isEveryMonth}/>
 
                 <View style={styles.textFrequencyContainer}>
                     <NormalText text="mois"/>
@@ -143,12 +129,7 @@ const MonthSelection = ({reccurence, setReccurence}) => {
 
             <View style={[styles.selectorItemContainer]}>
                 <TouchableOpacity onPress={handleEveryMonthPress}                         
-                    style={[styles.selectAllItem, 
-                    {        
-                        borderColor: isEveryMonth ? font : secondary,
-                        backgroundColor: secondary,         
-                    }]}>
-
+                    style={[styles.selectAllItem, {borderColor: isEveryMonth ? font : secondary, backgroundColor: secondary}]}>
                     <NormalText text="Tous les mois"/>
                 </TouchableOpacity>
             </View>
@@ -160,7 +141,8 @@ const MonthSelection = ({reccurence, setReccurence}) => {
 
 const styles = StyleSheet.create({
     selectItem: {
-        padding: 10, 
+        marginVertical: 5,
+        paddingVertical: 10, 
         borderRadius: 10, 
         flex: 1, 
         borderWidth: 2, 

@@ -1,85 +1,58 @@
 import { View } from "react-native"
-import { CircleBorderButton, GoBackButton, GoNextButton } from "../../components/Buttons/UsualButton"
-import { BackgroundView, MainView, TopScreenView, UsualScreen } from "../../components/View/Views"
-import { HugeText, SubText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { GoNextButton } from "../../components/Buttons/UsualButton"
+import { UsualScreen } from "../../components/View/Views"
+import { HugeText } from "../../styles/StyledText"
 import { Image } from "react-native"
-import HabitIcons from "../../data/HabitIcons"
-import { StackActions, useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import { useThemeColor } from "../../components/Themed"
 import { FlatList } from "react-native-gesture-handler"
-import { useCallback, useContext, useMemo, useRef, useState } from "react"
+import { useContext, useState } from "react"
 import { StyleSheet } from "react-native"
 import { TouchableOpacity } from "react-native"
 import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
-import { Feather } from "@expo/vector-icons"
-import AddingHabitScreen from "./ValidationScreenHabit"
-import { addNewHabit } from "../../firebase/FirestorePrimitives"
 import { HabitsContext } from "../../data/HabitContext"
+import { splitArrayIntoChunks } from "../../primitives/BasicsMethods"
 import StepIndicator from '../../components/Other/StepIndicator.js'
+import HabitIcons from "../../data/HabitIcons"
 
 
 export const ChooseIconScreen = () => {
 
-    const {addHabit, handleAddHabit, Habits} = useContext(HabitsContext)
-
-    const route= useRoute()
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
-    const font = useThemeColor({}, "Font")
-
-    const [selectedIcon, setSelectedIcon] = useState("ball")
-
     const navigation = useNavigation()
-
+    const route= useRoute()
     const {colorHabit} = route.params
 
-    const finalHabit = {
-        ...colorHabit,
-        icon: selectedIcon,
-    }
+    const [selectedIcon, setSelectedIcon] = useState("ball")
+    const finalHabit = {...colorHabit, icon: selectedIcon}
+    const habitsIconsData = Object.keys(HabitIcons).map((key) => ({id: key, icon: HabitIcons[key], title: key}));
 
-    const habitsIconsData = Object.keys(HabitIcons).map((key) => ({
-        id: key,
-        icon: HabitIcons[key],
-        title: key,
-    }));
+    const {addHabit} = useContext(HabitsContext)
 
-    console.log("DEF : ", finalHabit)
+    const secondary = useThemeColor({}, "Secondary")
+    const font = useThemeColor({}, "Font")
       
-    const splitArrayIntoChunks = (arr, chunkSize) => {
-        const chunkedArray = [];
-        for (let i = 0; i < arr.length; i += chunkSize) {
-          chunkedArray.push(arr.slice(i, i + chunkSize));
-        }
-        return chunkedArray;
-    };
-
-    const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 12);
+    const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 20);
 
     const handleValidation = async() => {
         try{
-            const steps = finalHabit.steps
             const fullHabit = await addHabit(finalHabit)
         
-            console.log("DEF 2 : ", fullHabit)
-
-            navigation.navigate("ValidationScreenHabit", {habit: {...fullHabit}})
+            const startingDateToString = fullHabit.startingDate.toDateString() //pour éviter le warning non-seriazable values
+            navigation.navigate("ValidationScreenHabit", {habit: {...fullHabit, startingDate: startingDateToString}})
         }
 
         catch (e){
-            console.log("erreur dans l'ajout : ", e)
+            console.log("erreur dans l'ajout de l'habitude : ", e)
         }
     }
-
 
     const renderItem = ({ item }) => {
 
         const isSelected = item.id == selectedIcon
 
         return (
-          <TouchableOpacity style={styles.gridItem} onPress={() => setSelectedIcon(item.id)}>
-                <View style={{backgroundColor: secondary, borderWidth: 3, borderColor: isSelected ? font : secondary, borderRadius: 50, padding: 20}}>
+          <TouchableOpacity style={styles.iconContainer} onPress={() => setSelectedIcon(item.id)}>
+                <View style={{backgroundColor: secondary, justifyContent: "center", alignItems: "center", borderWidth: 2, borderColor: isSelected ? font : secondary, borderRadius: 20, width: "100%", aspectRatio: 1}}>
                     <Image style={{width: 30, height: 30}} source={item.icon}/>
                 </View>
           </TouchableOpacity>
@@ -87,81 +60,55 @@ export const ChooseIconScreen = () => {
 
     };
 
-    const renderIconSelectorItem = ({item, index}) => {
+    const renderIconSelectorItem = ({item}) => {
         return(
-            <View style={{display: "flex", flexDirection: "row", justifyContent: "center", alignItems: "center", flex: 1}}>
+            <View style={styles.centerFullContent}>
                 <FlatList
-                    data={item}
-                    keyExtractor={(itm) => itm.id}
-                    renderItem={renderItem}
-                    numColumns={3} key={1}
-                    contentContainerStyle={styles.gridContainer}
-                />
+                    data={item} renderItem={renderItem}
+                    numColumns={4} key={1} keyExtractor={(itm) => itm.id}
+                    contentContainerStyle={styles.iconListContainer}/>
             </View>
         )
     }
 
     return(
         <UsualScreen>
-
             <View style={styles.container}>
 
                 <View style={styles.header}>
-
                     <View style={{width: "80%"}}>
                         <HugeText text="Choisissez une icône"/>
                     </View>
 
                     <GoNextButton handleGoNext={handleValidation}/>
-
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={4}/>
 
                 <View style={styles.body}>
-                    <View style={{flex: 1, marginBottom:30}}>
+                    <View style={{flex: 1}}>
                         <CustomCarousel
                             data={splitHabitsIconsData}
-                            renderItem={renderIconSelectorItem}
-                        />
+                            renderItem={renderIconSelectorItem}/>
                     </View>
                 </View>
-
             </View>
         </UsualScreen>
     )
 }
 
 const styles = StyleSheet.create({
-    gridContainer: {
-        flex: 1,
-        justifyContent: "center"
-      },
-
-    gridItem: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 16,
-        padding:10
-      },
-
-    icon: {
-        width: 48,
-        height: 48,
-        marginBottom: 8,
-      },
-
-    title: {
-        textAlign: 'center',
-      },
-
-      container: {
+    container: {
         display: "flex", 
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
         marginBottom: 0
+    },
+
+    body: {
+        flex: 1, 
+        gap: 30,
     },
 
     header: {
@@ -171,15 +118,23 @@ const styles = StyleSheet.create({
         justifyContent: "space-between"
     },
     
-    body: {
-        flex: 1, 
-        gap: 30,
+    iconListContainer: {
+        flex: 1,
+        justifyContent: "center",
+        marginHorizontal: 20
+      },
+
+    iconContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding:10,
     },
 
-    groupContainer: {
-        display: 'flex', 
-        flexDirection: "column",
+    centerFullContent: {
+        display: "flex", 
         justifyContent: "center", 
-        gap: 20
-    },
+        alignContent: "center", 
+        flex:1
+    }
 })

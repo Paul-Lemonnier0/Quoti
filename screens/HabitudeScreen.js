@@ -1,86 +1,66 @@
-import { View, StyleSheet, FlatList, Image, Text, TouchableOpacity } from "react-native"
-import { HugeText, NormalText, SubTitleText, TitleText } from "../styles/StyledText"
-import { useThemeColor } from "../components/Themed"
 import React from "react";
-
-import { Feather, Octicons } from '@expo/vector-icons'; 
-
-import cardStyle from "../styles/StyledCard";
-import { useNavigation, useRoute } from "@react-navigation/native";
-
-import { useState, useRef, useCallback, useMemo } from "react";
+import { View, StyleSheet, Image } from "react-native"
+import { HugeText, TitleText } from "../styles/StyledText"
+import { useThemeColor } from "../components/Themed"
+import { Feather } from '@expo/vector-icons'; 
+import { useRoute } from "@react-navigation/native";
+import { useState} from "react";
 import { UsualScreen } from "../components/View/Views";
-
 import { SubText } from "../styles/StyledText";
-import generateRandomFeeling from "../data/Feelings";
-import { FeelingDay } from "../components/Calendars/FeelingDay";
 import { GoBackButton, SimpleButton } from "../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
+import { RenderStep } from "../components/Habitudes/EtapeItem";
 import HabitIcons from "../data/HabitIcons";
 
-import { RenderStep } from "../components/Habitudes/EtapeItem";
-
 const HabitudeScreen = () => {
+
+    const font = useThemeColor({}, "Font")
+    const tertiary = useThemeColor({}, "Tertiary")
 
     const {Habits, handleCheckStep} = useContext(HabitsContext)
 
     const route = useRoute()
     const {habitID, currentDateString} = route.params;
     const currentDate = new Date(currentDateString)
+
     const habit = Habits[habitID]
-
     const steps = Object.values(habit.steps)
-
-    const font = useThemeColor({}, "Font")
-    const tertiary = useThemeColor({}, "Tertiary")
-
     const [displayedSteps, setDisplayedSteps] = useState(steps)
-
-    const imageSize = 35
-    const paddingImage = 15
-    const barWidth = 3
-
     const isDone = steps.filter(step => step.isChecked).length === steps.length
 
     const handleCheckingStep = (step, index) => {
         const isStepChecked = !step.isChecked
         steps[index] = {...step, isChecked: isStepChecked}
 
-        console.log("StepID first : ", step)
-
         handleCheckStep(habitID, step.stepID, index, currentDate, isStepChecked)
         setDisplayedSteps([...steps])
     }
 
-    const styleCard = cardStyle()
+    const imageSize = 35
+    const paddingImage = 15
+    const barWidth = 3
+
     return(
         <UsualScreen hideMenu={true}>
             <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <GoBackButton borderHidden={true}/>
-                    
-                        <View style={{display: "flex", flexDirection: "row", gap: 10}}>
-
+                        <View>
                             <SimpleButton onPress={() => handleOpenShareBottomSheet()}>
                                 <Feather name="settings" size={20} color={font} />                                
                             </SimpleButton>
-
                         </View>
                     </View>
                 </View>
 
-                
-                <View style={styles.body}>
-
-                    
-                    <View style={{display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexDirection: "row", gap: 5}}>
+                <View style={styles.body}>                 
+                    <View>
                         <HugeText text="Progression"/>
                     </View>
 
-
-                    <View style={{display: "flex", flexDirection: "row", gap: 20}}>
+                    <View style={[styles.displayRow, {gap: 20}]}>
                         <View style={{borderRadius: 20, borderColor: isDone ? habit.color : font, borderWidth: 2, padding: 15}}>
                             <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
                         </View>
@@ -91,12 +71,12 @@ const HabitudeScreen = () => {
                         </View>
                     </View>
 
-                    <View style={{display: "flex", flexDirection: "column"}}>
+                    <View style={styles.displayColumn}>
                         {
                             displayedSteps.map((step, index) => {
 
                                 return(
-                                <View key={index} style={{display: "flex", flexDirection: "column"}}>
+                                <View key={index} style={styles.displayColumn}>
                                     <RenderStep habit={habit} steps={steps} step={step} index={index} onPress={() => handleCheckingStep(step, index)}
                                         imageSize={imageSize} paddingImage={paddingImage}/>
 
@@ -112,8 +92,6 @@ const HabitudeScreen = () => {
                             })
                         }
                     </View>
-
-
 
                     {/* <View style={styles.detailPanel}>
                         <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
@@ -189,23 +167,22 @@ const styles = StyleSheet.create({
         gap: 30,
     },
 
-    subBodyContainer: {
-        display: 'flex', 
-        flexDirection: "column",
-        justifyContent: "center",
-        gap: 5
-    },
-
-
-    FeelingList: {
-        marginHorizontal: -30,
-        marginTop: 15, 
-    },
-
     titreEtDescriptionContainer:{
-        display: "flex", 
+        display: "flex", flex: 1,
         flexDirection: "column", 
-        justifyContent: "center"
+        justifyContent: "center",
+    },
+
+    displayColumn: {
+        display: "flex",
+        flexDirection: "column",
+    },
+
+    displayRow: {
+        display: "flex", 
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center"
     }
 })
 

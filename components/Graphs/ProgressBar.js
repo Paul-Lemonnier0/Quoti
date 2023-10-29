@@ -8,23 +8,13 @@ export function ProgressBar(props)
     const pourcentage = props.pourcentage + "%"
 
     return (
-        <View style={
-            [
-                props.style,
-                styles.progressBar,
-                {
-                    backgroundColor: primaryColor
-                }
-            ]}>
-
+        <View style={[props.style, styles.progressBar, {backgroundColor: primaryColor}]}>
             <Animated.View style={[StyleSheet.absoluteFill, {backgroundColor: props.couleur, width: pourcentage, borderRadius: 20}]}/>
-
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-
     progressBar: {
         width: "100%",
         height: 4,

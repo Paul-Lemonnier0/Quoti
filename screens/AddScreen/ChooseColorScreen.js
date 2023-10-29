@@ -1,142 +1,127 @@
-import { View } from "react-native"
-import { CircleBorderButton, GoBackButton, GoNextButton } from "../../components/Buttons/UsualButton"
-import { BackgroundView, MainView, TopScreenView, UsualScreen } from "../../components/View/Views"
-import { HugeText, SubText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { Image } from "react-native"
-import HabitIcons from "../../data/HabitIcons"
+import { useState, useRef, useMemo, useCallback } from "react"
+import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native"
+import { GoNextButton } from "../../components/Buttons/UsualButton"
+import { UsualScreen } from "../../components/View/Views"
+import { HugeText, SubTitleText } from "../../styles/StyledText"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useThemeColor } from "../../components/Themed"
-import { FlatList } from "react-native-gesture-handler"
-import { useCallback, useMemo, useRef, useState } from "react"
-import { StyleSheet } from "react-native"
-import { TouchableOpacity } from "react-native"
-import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
-import { Feather } from "@expo/vector-icons"
-import AddingHabitScreen from "./ValidationScreenHabit"
 import { ColorsList } from "../../data/ColorsList"
 import StepIndicator from '../../components/Other/StepIndicator.js'
+import CustomColorBottomScreen from "../BottomScreens/CustomColorBottomScreen"
 
 export const ChooseColorScreen = () => {
 
-    const route= useRoute()
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
     const font = useThemeColor({}, "Font")
 
-    const [selectedColor, setSelectedColor] = useState(ColorsList[0])
-
     const navigation = useNavigation()
-
+    const route= useRoute()
     const {detailledHabit} = route.params
 
-    const colorHabit = {
-        ...detailledHabit,
-        color: selectedColor,
-    }
+    const [selectedColor, setSelectedColor] = useState(ColorsList[0])
+    const colorHabit = {...detailledHabit, color: selectedColor,}
 
-    const chunkedColors = [];
+    const handleGoNext = () =>  navigation.navigate("ChooseIconScreen", {colorHabit})
 
-    for (let i = 0; i < ColorsList.length; i += 12) {
-      chunkedColors.push(ColorsList.slice(i, i + 12));
-    }
-
-    const handleGoNext = () => {
-        navigation.navigate("ChooseIconScreen", {colorHabit})
-    }
-
-
-    const renderItem = ({ item }) => {
-
-        const isSelected = item == selectedColor
+    const renderItem = ({ item: color }) => {
+        const isSelected = color === selectedColor
 
         return (
-          <TouchableOpacity style={styles.gridItem} onPress={() => setSelectedColor(item)} key={item}>
-                <View style={{backgroundColor: secondary, borderWidth: 3, borderColor: isSelected ? font : secondary, borderRadius: 50, padding: 20,}}>
-                    <View style={{padding: 15,backgroundColor: item, borderRadius: 50}}/>
-                </View>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.colorContainer} onPress={() => setSelectedColor(color)} key={color}>
+                    <View style={{backgroundColor: color, borderRadius: 15, width: "100%", borderWidth: 2, borderColor: isSelected ? font : color, aspectRatio: 1}}/>
+            </TouchableOpacity>
         );
 
     };
 
-    const renderIconSelectorItem = ({item, index}) => {
-        return(
-            <View style={{display: "flex", justifyContent: "center", alignContent: "center", flex:1}}>
-                <FlatList
-                    data={item}
-                    keyExtractor={(itm) => itm}
-                    renderItem={renderItem} key={1}
-                    numColumns={3}
-                    contentContainerStyle={styles.gridContainer}
-                />
-            </View>
-        )
-    }
+    const bottomSheetModalRef_CustomColor = useRef(null);
+    const snapPoints_CustomColor = useMemo(() => ['65%'], []);
+  
+    const handleOpenCustomColor = useCallback(() => {
+        bottomSheetModalRef_CustomColor.current?.present();
+      }, []);
+  
+    const handleSheetChangesCustomColor = useCallback((index) => {
+        console.log("handleSheetChange", index)
+    }, []);
+  
 
     return(
         <UsualScreen>
-
             <View style={styles.container}>
-
                 <View style={styles.header}>
-
                     <View style={{width: "80%"}}>
                         <HugeText text="Choisissez une couleur"/>
                     </View>
 
                     <GoNextButton handleGoNext={handleGoNext}/>
-
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={3}/>
 
-
-
                 <View style={styles.body}>
-                    <View style={{flex: 1, marginBottom:30}}>
-                        <CustomCarousel
-                            data={chunkedColors}
-                            renderItem={renderIconSelectorItem}
-                        />
+                    <View style={styles.centerFullContent}>
+
+                        <FlatList
+                            scrollEnabled={false}
+                            data={ColorsList} renderItem={renderItem} 
+                            keyExtractor={(itm) => itm} key={4} numColumns={5}
+                            contentContainerStyle={styles.colorListContainer}/>
+                    </View>
+
+                    <View style={styles.centered}>
+                        <View style={styles.customColorContainer}>
+                            <TouchableOpacity onPress={() => handleOpenCustomColor()} style={[styles.selectedColor, {borderColor: font}]}>
+                                <SubTitleText text="Aa"/>
+                            </TouchableOpacity>
+
+                            <View style={[styles.selectedColor, {borderColor: font, backgroundColor: selectedColor}]}/>
+                        </View>
                     </View>
                 </View>
-
             </View>
+
+            <CustomColorBottomScreen 
+                bottomSheetModalRef={bottomSheetModalRef_CustomColor} 
+                snapPoints={snapPoints_CustomColor} 
+                handleSheetChanges={handleSheetChangesCustomColor}
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}/>
         </UsualScreen>
     )
 }
 
 const styles = StyleSheet.create({
-    gridContainer: {
-        flex: 1,
-        justifyContent: "center"
-      },
-
-    gridItem: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 16,
-        padding:10
-      },
-
-    icon: {
-        width: 48,
-        height: 48,
-        marginBottom: 8,
-      },
-
-    title: {
-        textAlign: 'center',
-      },
-
-      container: {
+    container: {
         display: "flex", 
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
         marginBottom: 0
+    },
+
+    centered: {
+        justifyContent: "center", 
+        display: "flex", 
+        alignItems: "center"
+    },
+
+    customColorContainer: {
+        display: "flex", 
+        flexDirection: "row", 
+        gap: 10
+    },
+
+    selectedColor: {
+        height: 60, 
+        width: 60, 
+        borderWidth: 2, 
+        borderRadius: 15,
+        justifyContent: "center", display: "flex", alignItems: "center"
+    },
+
+    body: {
+        flex: 1, 
+        gap: 0,
     },
 
     header: {
@@ -145,16 +130,30 @@ const styles = StyleSheet.create({
         alignItems:"center", 
         justifyContent: "space-between"
     },
-    
-    body: {
-        flex: 1, 
-        gap: 30,
+
+    colorListContainer: {
+        flex: 1,
+        justifyContent: "center",
+        marginHorizontal: -8,
     },
 
-    groupContainer: {
-        display: 'flex', 
-        flexDirection: "column",
-        justifyContent: "center", 
-        gap: 20
+    colorContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding:8,
     },
+
+    colorSubContainer: {
+        borderWidth: 2,
+        borderRadius: 20, 
+        padding: 5
+    },
+
+    centerFullContent: {
+        display: "flex", 
+        justifyContent: "center", 
+        alignContent: "center", 
+        flex:1
+    }
 })

@@ -2,13 +2,15 @@ import { SafeAreaView } from "react-native"
 import { useThemeColor } from "../../components/Themed"
 import { StyleSheet, View } from "react-native";
 import cardStyle from "../../styles/StyledCard";
-import { Habitudes } from "../../data/habitudes";
 import { TouchableOpacity } from "react-native";
 import { GoBackButton } from "../../components/Buttons/UsualButton";
 import { TopScreenView } from "../../components/View/Views";
 import { SubTitleText } from "../../styles/StyledText";
 
 export const ActivityBlock = (props) => {
+
+    const Habitudes = []
+
     const Dot = ({color, isDone}) => {
 
         let backgroundColor

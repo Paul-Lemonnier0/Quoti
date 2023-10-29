@@ -1,7 +1,5 @@
-import { addDoc, collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore"
-import { Habitudes } from "../data/habitudes"
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
-import { addSteps, getAllStepsFromHabit } from "./Firestore_Step_Primitives"
 import { listKeyIDfromArray } from "../primitives/BasicsMethods"
 
 const userID = "Paul"
@@ -10,12 +8,11 @@ const addHabitToFireStore = async(habit) => {
 
     const todayDate = new Date()
     const todayDateString = todayDate.toDateString()
-    const habitWithDate = {...habit, startingDate: todayDateString}
 
     console.log("adding habit to firestore...")
     let isStepsEmpty = false
-    if(habitWithDate.steps.length === 0){
-        habitWithDate.steps.push({
+    if(habit.steps.length === 0){
+        habit.steps.push({
             numero: -1,
         })
 
@@ -23,7 +20,8 @@ const addHabitToFireStore = async(habit) => {
     }
 
     const habitRef = await addDoc(collection(db, "Habits"), {
-        ...habitWithDate, 
+        ...habit,
+        startingDate: todayDateString,
         userID: userID
     })
 
@@ -32,20 +30,19 @@ const addHabitToFireStore = async(habit) => {
     let steps = {}
     if(isStepsEmpty)
     {
-        habitWithDate.steps[0] = {
-            ...habitWithDate.steps[0],
-            titre: habitWithDate.titre, 
-            description: habitWithDate.description, 
+        habit.steps[0] = {
+            ...habit.steps[0],
+            titre: habit.titre, 
+            description: habit.description, 
             duration: 30, 
             habitID,
         }
     }
 
-    else steps = listKeyIDfromArray(habitWithDate.steps, "stepID", habitID)
+    else steps = listKeyIDfromArray(habit.steps, "stepID", habitID)
       
-    const habitComplete = {...habitWithDate, habitID, steps}
+    const habitComplete = {...habit, startingDate: todayDate, habitID, steps}
     console.log("Habit well added to firestore.")
-    console.log("HABIT ADDED : ", habitComplete)
     return habitComplete
 }
 
@@ -63,7 +60,6 @@ const getAllOwnHabits = async() => {
  
         if(data.steps[0].numero === -1)
         {
-            console.log("Pas de step définie ici")
             steps[habitID] = {
                 ...data.steps[0],
                 numero: 0,
@@ -83,18 +79,5 @@ const getAllOwnHabits = async() => {
     return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});
 }
 
-const updateStepInFireStore = async(habitID, stepID, newData) => {
-    const habitRef = doc(db, "Habits", habitID);
 
-    console.log(newData)
-
-    await updateDoc(habitRef, newData)
-        .then(newHabitRef => console.log('Step successfully updated.'))
-        .catch((error) => console.error('Error while updating the step :', stepID, " with  error : ", error));    
-}
-
-const fetchAllStepsLogsFromDate = (steps, date) => {
-     
-}
-
-export {addHabitToFireStore, getAllOwnHabits, updateStepInFireStore}
+export {addHabitToFireStore, getAllOwnHabits}

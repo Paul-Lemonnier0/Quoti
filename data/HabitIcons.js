@@ -48,5 +48,4 @@ export default HabitIcons = {
     "Wrench": require("../img/HabitsIcons/Wrench.png"),
     "Yarn": require("../img/HabitsIcons/Yarn.png"),
     "Zzz": require("../img/HabitsIcons/Zzz.png"),
-
 }

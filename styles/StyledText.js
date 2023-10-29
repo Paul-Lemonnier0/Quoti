@@ -1,5 +1,6 @@
-import { Platform, StyleSheet } from "react-native";
-import { useThemeColor, Text } from "../components/Themed";
+import { StyleSheet } from "react-native";
+import { Text } from "react-native";
+import { useThemeColor } from "../components/Themed";
 
 export function SubText(props) {
   const fontGray = useThemeColor({}, "FontGray");

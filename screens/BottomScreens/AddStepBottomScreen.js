@@ -9,14 +9,16 @@ import { IncrementTime } from "../../components/Buttons/IncrementButtons"
 import { BigCircleBorderButton } from "../../components/Buttons/UsualButton"
 import { Keyboard } from "react-native"
 import { TouchableWithoutFeedback } from "react-native"
+import { useRef } from "react"
 
 const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
 
     const font = useThemeColor({}, "Font")
     const popupColor = useThemeColor({}, "Popup")
 
-    let titre = "";
-    let description = "";
+    let titreRef = useRef(null)
+    let descriptionRef = useRef(null)
+
     const handleSetTitre = (text) => titre = text
     const handleSetDescription = (text) => description = text
 
@@ -40,14 +42,13 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
 
         let canClose = true
 
-        console.log(titre)
-        console.log(description)
+        let titre = titreRef.current?.getValue();
+        let description = descriptionRef.current?.getValue();
 
-        if(titre.length <= 0 || description.length <= 0) 
+        if(titre.trim().length <= 0 || description.trim().length <= 0) 
         {
-            console.log(titre)
-            description.length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-            titre.length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
+            description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
+            titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
 
             canClose = false
         }
@@ -87,13 +88,11 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
                         <View style={styles.body}>
 
                             <View style={styles.subBodyContainer}>
-                                <SubTitleText text="Titre :"/>
-                                <TextInputCustom setValue={handleSetTitre} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
+                                <TextInputCustom ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
                             </View>
 
                             <View style={styles.subBodyContainer}>
-                                <SubTitleText text="Description :"/>
-                                <TextInputCustom setValue={handleSetDescription} placeholder={"Entrez un titre"} isWrong={isDescriptionWrong}/>
+                                <TextInputCustom ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
                             </View>
 
                             <View style={[styles.subBodyContainer, {gap: 15}]}>

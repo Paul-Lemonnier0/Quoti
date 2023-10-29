@@ -8,7 +8,7 @@ import { useThemeColor } from '../Themed';
 import { SimpleButton } from "../Buttons/UsualButton";
 import { Feather } from '@expo/vector-icons';
     
-const DayComponentWrapper = (selectedDate, setSelectedDate) => ({ date, isInDisplayedMonth, isToday, isSelected }) => {
+const DayComponentWrapper = ({ date, isInDisplayedMonth, isToday, isSelected }) => {
 
   const fontGray = useThemeColor({}, "FontGray")
   const font = useThemeColor({}, "Font")
@@ -38,13 +38,13 @@ const HeaderComponent = (calendarRef) => (date) => {
   const font = useThemeColor({}, "Font")
 
   return (
-    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-      <View style={styles.headerContainer}>
+    <View style={styles.headerContainer}>
+      <View style={styles.monthNameContainer}>
           <TitleText text={monthName}/>
           <SubText text={yearNumber}/>
       </View>
 
-      <View style={{display: "flex", flexDirection: "row", alignItems: "center", gap: 20, marginRight: 5}}>
+      <View style={styles.incrementDecrementContainer}>
           <SimpleButton onClick={() => calendarRef.current?.decrementPage()}>
               <Feather name="chevron-left" size={24} color={font}/>
           </SimpleButton>
@@ -69,59 +69,77 @@ const DayLabelComponent  = ({date}) => {
 export default function CalendarCustom({selectedDate, setSelectedDate}) {
 
   const calendarRef = useRef(null);
-
   const monthAnimCallbackNode = useSharedValue(0);
+
+  const minDate=new Date(2023, 0, 1)
+  const maxDate=new Date(2026, 11, 31)
 
   return (
     <View style={[styles.container]}>
         <Calendar
           ref={calendarRef}
           pageInterval="month"
+          minDate={minDate}
+          maxDate={maxDate}
+          
           theme={{ inactiveOpacity: 0 }}
           currentDate={selectedDate}
           HeaderComponent={HeaderComponent(calendarRef)}
           DayLabelComponent ={DayLabelComponent }
-          DayComponent={DayComponentWrapper(selectedDate, setSelectedDate)}
+          DayComponent={DayComponentWrapper}
           selectedDate={selectedDate}
-          onDateSelect={(date, options) => {
-            setSelectedDate(date);
-          }}
+          onDateSelect={(date) => { setSelectedDate(date)}}
           monthAnimCallbackNode={monthAnimCallbackNode}
-          pageBuffer={2}
+          pageBuffer={1}
         />
     </View>
   );
-}
+} 
   
-  
-  const styles = StyleSheet.create({
-    container: { flex: 1,marginTop: -10},
-    dayContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      flex: 1,
-      padding: 5,
-      opacity: 1,
-    },
+const styles = StyleSheet.create({
+  container: { flex: 1, marginTop: -10},
 
-    daySubContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: 40, width: 40,
-      borderRadius: 5,
-      opacity: 1, margin: 0
-    },
+  dayContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    padding: 5,
+    opacity: 1,
+  },
 
-    headerContainer: {
-      paddingVertical: 10,
-      justifyContent: "center",
-      marginHorizontal: 10
-    },
+  daySubContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 40, width: 40,
+    borderRadius: 5,
+    opacity: 1, margin: 0
+  },
 
-    dayLabelContainer: {
-      alignItems:'center', 
-      justifyContent:'center', 
-      flex:1
-    }
-  });
+  dayLabelContainer: {
+    alignItems:'center', 
+    justifyContent:'center', 
+    flex:1
+  },
+
+  incrementDecrementContainer: {
+    display: "flex", 
+    flexDirection: "row", 
+    alignItems: "center", 
+    gap: 20, 
+    marginRight: 5
+  },
+
+  headerContainer: {
+    display: "flex", 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    alignItems: "center"
+  },
+
+  monthNameContainer: {
+    paddingVertical: 10,
+    justifyContent: "center",
+    marginHorizontal: 10
+  }
+});
   

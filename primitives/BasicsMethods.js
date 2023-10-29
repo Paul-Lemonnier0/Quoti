@@ -25,4 +25,12 @@ const durationToTimeString = (duration) => {
   return formatedDuration
 }
 
-export {generateUniqueID, listKeyIDfromArray, durationToTimeString}
+const splitArrayIntoChunks = (arr, chunkSize) => {
+  const chunkedArray = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    chunkedArray.push(arr.slice(i, i + chunkSize));
+  }
+  return chunkedArray;
+};
+
+export {generateUniqueID, listKeyIDfromArray, durationToTimeString, splitArrayIntoChunks}

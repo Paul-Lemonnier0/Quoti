@@ -1,35 +1,10 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Feather } from '@expo/vector-icons'
-import { LittleNormalText, NormalGrayText, NormalText, SubText, SubTitleText, TitleText } from '../../styles/StyledText'
+import { NormalText } from '../../styles/StyledText'
 import { useThemeColor } from '../Themed'
 
-const Clock = ({minutes, isFinished}) => {
-
-    const fontGray = useThemeColor({}, "FontGray")
-
-    if(isFinished)
-    {
-        return (
-            <View style={styles.clockContainer}>
-                <Feather name="clock" size={24} color={fontGray} />
-                <SubText text={minutes + "min"} />
-            </View>
-        )
-    }
-
-    else
-    {
-        return (
-            <View style={styles.clockContainer}>
-                <Feather name="clock" size={24} color={"white"} />
-                <LittleNormalText text={minutes} />
-            </View>
-        )
-    }
-}
-
-export const CustomDurationIndicator = ({duration, isFinished}) => {
+export const CustomDurationIndicator = ({duration}) => {
 
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
@@ -44,7 +19,7 @@ export const CustomDurationIndicator = ({duration, isFinished}) => {
 
     return (
         <View style={styles.clockContainer}>
-            <Feather name="clock" size={30} color={font} />
+            <Feather name="clock" size={24} color={font} />
             <NormalText text={formatedDuration} />
         </View>
     )
@@ -58,5 +33,3 @@ const styles = StyleSheet.create({
         gap: 5
     }
 })
-
-export default Clock

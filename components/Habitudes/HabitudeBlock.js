@@ -10,26 +10,18 @@ import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
 export const HabitudeBlock = ({habitID, viewableItems, habitude, currentDateString}) => {
 
     const {Habits} = useContext(HabitsContext)
-
-    const habit = habitude ? habitude : Habits[habitID]
-
     const navigation = useNavigation();
     const stylesCard = cardStyle()
 
+    const habit = habitude ? habitude : Habits[habitID]
     const isFinished = habit.doneSteps >= habit.totalSteps
 
-    const handlePress = () =>
-    {
-        navigation.navigate("HabitudeScreen", {habitID, currentDateString});
-    }      
-
+    const handlePress = () => navigation.navigate("HabitudeScreen", {habitID, currentDateString})    
 
     const rStyle = useAnimatedStyle(() => {
-
         const isVisible = viewableItems.value.some((viewableItem) => {
                 return viewableItem.item.habitID === habitID
-            })
-
+        })
 
         return {
             opacity: withTiming(isVisible ? 1 : 0),
@@ -51,10 +43,9 @@ export const HabitudeBlock = ({habitID, viewableItems, habitude, currentDateStri
                     <SubText numberOfLines={1} text={habit.description}/>
                 </View>
 
-                <View style={{display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexDirection: "row"}}>
+                <View style={styles.footerHabit}>
                     <SubText text="1/2"/>
                     <StepCircularBar habit={habit} habitDoneSteps={habitDoneSteps} isFinished={isFinished}/>
-
                 </View>
             </Animated.View>
 
@@ -70,6 +61,13 @@ const styles = StyleSheet.create(
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+        },
+
+        footerHabit: {
+            display: "flex", 
+            justifyContent: "space-between", 
+            alignItems: "flex-end", 
+            flexDirection: "row"
         },
 
         timeContainer: {

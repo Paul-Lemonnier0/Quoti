@@ -35,8 +35,7 @@ const SearchBar = ({clicked, searchPhrase, setSearchPhrase, setClicked}) => {
             <AntDesign name="close" size={20} color={fontGray} style={{ padding: 1 }} onPress={() => {
                 setSearchPhrase("")
             }}/>
-        </View>
-        
+        </View>      
       </View>
     );
   };

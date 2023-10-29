@@ -1,23 +1,18 @@
-import { View, StyleSheet, FlatList, Image } from "react-native"
-
-import { TitleText, NormalText, SubTitleText, SubText } from "../../styles/StyledText"
+import { View, StyleSheet, FlatList } from "react-native"
+import { TitleText, SubTitleText, SubText } from "../../styles/StyledText"
 import { useRef, useMemo, useCallback, useState } from "react"
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons"
+import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../../components/Themed"
-import { CircularBarProfil, AddCircularBarProfil } from "../../components/Profil/CircularBarProfil"
-import { ContributorsHabits, Friends, Habitudes, colors } from "../../data/habitudes"
-import Achievements from "../../data/Achievements"
-import { SafeAreaView } from "react-native"
-
-import AchievementsScreen from "../BottomScreens/AchievementsScreen"
 import { useNavigation } from "@react-navigation/native"
-import { CircleBorderButton, GoBackButton, SimpleButton, SimpleButtonBackground } from "../../components/Buttons/UsualButton"
-import cardStyle from "../../styles/StyledCard"
+import { CircleBorderButton, GoBackButton, SimpleButton } from "../../components/Buttons/UsualButton"
 import { TouchableOpacity } from "react-native-gesture-handler"
-import { BackgroundView, MainView, TopScreenView } from "../../components/View/Views"
+import { MainView, TopScreenView } from "../../components/View/Views"
 import { UserProfil } from "../../components/Profil/UserProfil"
 import { ActivityBlock } from "../../components/Activity/ActivityBlock"
 import AchievementBox from "../../components/Achievements/AchievementBox"
+import AchievementsScreen from "../BottomScreens/AchievementsScreen"
+import Achievements from "../../data/Achievements"
+
 const ProfilDetailsScreen = () => {
 
     const [clickedAchievement, setClickedAchievement] = useState({})
@@ -92,7 +87,7 @@ const ProfilDetailsScreen = () => {
 
 
                           <View style={{alignItems: "center", marginBottom: 0}}>
-                            <UserProfil profil={Friends[0]}/>
+                            {/* <UserProfil profil={Friends[0]}/> */}
                           </View>                               
 
                           <View style={{alignItems: "center", marginBottom: 0}}>
@@ -112,7 +107,7 @@ const ProfilDetailsScreen = () => {
                               </TouchableOpacity>
 
                               <TouchableOpacity style={{alignItems:"center"}}>
-                                <SubTitleText text={Habitudes.length}/>
+                                <SubTitleText text="12"/>
                                 <SubText text="Habitudes"/>
                               </TouchableOpacity>
                               

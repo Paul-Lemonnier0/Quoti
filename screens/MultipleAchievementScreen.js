@@ -1,39 +1,24 @@
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { View, StyleSheet, FlatList, Image } from "react-native"
-
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
+import { View, StyleSheet } from "react-native"
 import { useRef, useMemo, useCallback, useState } from "react"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../components/Themed"
-import { CircularBarProfil, AddCircularBarProfil } from "../components/Profil/CircularBarProfil"
-import { ContributorsHabits } from "../data/habitudes"
-import Achievements from "../data/Achievements"
-import { AchievementBox } from "../components/Achievements/AchievementBox"
-import { SafeAreaView } from "react-native"
-
-import { SimpleIconButton } from "../components/Buttons/IconButton"
-import AchievementsScreen from "./BottomScreens/AchievementsScreen"
 import { useNavigation } from "@react-navigation/native"
 import { CircleBorderButton, GoBackButton } from "../components/Buttons/UsualButton"
 import { TitleText } from "../styles/StyledText"
 import { BackgroundView, MainView, TopScreenView } from "../components/View/Views"
-import GroupedAchievements from "../components/Achievements/GroupedAchievements"
 import { ScrollView } from "react-native-gesture-handler"
- 
+import GroupedAchievements from "../components/Achievements/GroupedAchievements"
+import Achievements from "../data/Achievements"
+import AchievementsScreen from "./BottomScreens/AchievementsScreen"
 
 const MultipleAchievementScreen = () => {
 
-    const fontGray = useThemeColor({}, "FontGray")
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
     const font = useThemeColor({}, "Font")
 
     const [clickedAchievement, setClickedAchievement] = useState({})
 
     const navigation = useNavigation()
-
-    const handleBack = () => {
-      navigation.goBack()
-    }
 
     const bottomSheetModalRef = useRef(null);
     const snapPoints = useMemo(() => ['50%'], []);
@@ -82,9 +67,7 @@ const MultipleAchievementScreen = () => {
           <BackgroundView>
                 <ScrollView style={{marginHorizontal: -15, padding: 15}}>
                   <View style={{ gap: 20, flex:1, display: "flex", flexDirection: "column" }}>
-
                     {
-
                       Object.entries(groupedAchievements).map(([className, achievements]) => {
                         
                         return(
@@ -94,10 +77,8 @@ const MultipleAchievementScreen = () => {
                             handleOpenAchievements={handleOpenAchievements} 
                             setClickedAchievement={setClickedAchievement}/>
                         )
-
                       })
                     }
-
                   </View>
                 </ScrollView>
 

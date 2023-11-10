@@ -10,8 +10,9 @@ import { BigCircleBorderButton } from "../../components/Buttons/UsualButton"
 import { Keyboard } from "react-native"
 import { TouchableWithoutFeedback } from "react-native"
 import { useRef } from "react"
+import { CircleBorderIconButton } from "../../components/Buttons/IconButtons"
 
-const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
+const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackdrop}) => {
 
     const font = useThemeColor({}, "Font")
     const popupColor = useThemeColor({}, "Popup")
@@ -77,7 +78,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
     }
   
     return (
-            <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} handleSheetChanges={() => {}}>
+            <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} handleSheetChanges={() => {}} noBackdrop={noBackdrop}>
                 <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
 
                     <View style={styles.contentContainer}>
@@ -105,9 +106,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
                             </View>
 
                             <View style={styles.validationButtonContainer}>
-                                <BigCircleBorderButton onPress={handleValidate}>
-                                    <Feather name="check" size={24} color={font} />
-                                </BigCircleBorderButton>
+                                <CircleBorderIconButton onPress={handleValidate} provider={"Feather"} name={"check"}/>
                             </View>
                         </View>
 
@@ -151,8 +150,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps}) => {
     listContainer: {
         display: "flex",
         flexDirection: "row", 
-        width: "100%", 
-        justifyContent: "space-between",
+
         gap: 10,
     },
 

@@ -12,6 +12,7 @@ export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagin
         <View style={styles.container}>
             <Carousel
                 data={data} 
+                style={{display: "flex"}}
                 loop={false}
                 scrollAnimationDuration={500}
                 renderItem={renderItem}
@@ -26,12 +27,10 @@ export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagin
 const styles= StyleSheet.create({
     container: {
         marginHorizontal: -40, 
-        paddingHorizontal: 30, 
-        gap: 10,
+        gap: 5,
         flex: 1,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "center",
         alignItems: "center"
     }
 })

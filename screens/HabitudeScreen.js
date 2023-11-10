@@ -7,11 +7,12 @@ import { useRoute } from "@react-navigation/native";
 import { useState} from "react";
 import { UsualScreen } from "../components/View/Views";
 import { SubText } from "../styles/StyledText";
-import { GoBackButton, SimpleButton } from "../components/Buttons/UsualButton";
+import { SimpleButton } from "../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
 import { RenderStep } from "../components/Habitudes/EtapeItem";
 import HabitIcons from "../data/HabitIcons";
+import { NavigationButton } from "../components/Buttons/IconButtons";
 
 const HabitudeScreen = () => {
 
@@ -46,11 +47,9 @@ const HabitudeScreen = () => {
             <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <GoBackButton borderHidden={true}/>
+                        <NavigationButton action={"goBack"}/>
                         <View>
-                            <SimpleButton onPress={() => handleOpenShareBottomSheet()}>
-                                <Feather name="settings" size={20} color={font} />                                
-                            </SimpleButton>
+
                         </View>
                     </View>
                 </View>

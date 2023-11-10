@@ -19,7 +19,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const colorScheme = useColorScheme();
+  // const colorScheme = useColorScheme();
+  const colorScheme = 'light'
 
   const [isLoaded] = useFonts({
     "poppinsLight": require("./assets/fonts/Poppins-Light.ttf"),

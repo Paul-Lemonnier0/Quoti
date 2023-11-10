@@ -1,138 +1,21 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native"
-import { LittleNormalText, NormalText } from "../../styles/StyledText"
-import { useThemeColor } from "../Themed"
+import { View, StyleSheet } from "react-native"
+import { NormalText, SubText, SubTitleText } from "../../styles/StyledText"
 import { IncrementButtons } from "../Buttons/IncrementButtons"
 import { useState } from "react"
+import { BorderRadioButton } from "../RadioButtons/RadioButton"
 
-const DaySelection = ({selectedDays, handleSelectDay, isAllDaySelected, handleSelectAllDay}) => {
-
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
+export const SelectWeekDays = ({selectedDays, handleSelectDay}) => {
 
     const weekDays = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
 
-    const allDaySelected = selectedDays.filter((day) => day === true).length === 7
-
     return(
-        <View style={styles.container}>
+        <View style={styles.selectorDayContainer}>           
+            {weekDays.map((weekDay, index) => {
 
-            <View style={[styles.selectorItemContainer]}>
+                const isSelected = selectedDays.includes(index)
 
-                {weekDays.map((weekDay, index) => {
-
-                    const isSelected = selectedDays[index]
-                    const isHighlight = isSelected && ! allDaySelected
-
-                    return(
-                        <TouchableOpacity onPress={() => handleSelectDay(index)} key={weekDay} 
-                            style={[styles.selectItem, {borderColor: isHighlight ? font : secondary, backgroundColor: secondary}]}>
-
-                            <NormalText text={weekDay.substring(0, 1)}/>
-                        </TouchableOpacity>
-                    )
-                })}
-
-            </View>
-
-            <View style={[styles.selectorItemContainer]}>
-                <TouchableOpacity onPress={handleSelectAllDay}                         
-                    style={[styles.selectAllItem, 
-                    {        
-                        borderColor: isAllDaySelected ? font : secondary,
-                        backgroundColor: secondary,         
-                    }]}>
-
-                    <NormalText text="Tous les jours"/>
-                </TouchableOpacity>
-            </View>
-        </View>
-    )
-}
-
-const WeekSelection = ({reccurence, setReccurence}) => {
-
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
-
-    const [isEveryWeek, setIsEveryWeek] = useState(reccurence === 1)
-
-    const handleEveryWeekPress = () => {
-        setReccurence(1)
-        setIsEveryWeek(true)
-    }
-
-    const handlePressIncrementButtons = (val) => {
-        setReccurence(val)
-        setIsEveryWeek(val === 1)
-    }
-
-    return(
-        <View style={styles.container}>
-
-            <View style={[styles.selectorItemContainer, {justifyContent:"space-around"}]}>
-
-                <View style={styles.textFrequencyContainer}>
-                    <NormalText text="Toutes les"/>
-                </View>
-
-                <IncrementButtons value={reccurence} setValue={handlePressIncrementButtons} isBorderHidden={isEveryWeek}/>
-
-                <View style={styles.textFrequencyContainer}>
-                    <NormalText text="semaines"/>
-                </View>
-
-            </View>
-
-            <View style={[styles.selectorItemContainer]}>
-                <TouchableOpacity onPress={handleEveryWeekPress}                         
-                    style={[styles.selectAllItem, {borderColor: isEveryWeek ? font : secondary, backgroundColor: secondary}]}>
-
-                    <NormalText text="Toutes les semaines"/>
-                </TouchableOpacity>
-            </View>
-        </View>
-    )
-}
-
-const MonthSelection = ({reccurence, setReccurence}) => {
-
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
-
-    const [isEveryMonth, setIsEveryMonth] = useState(reccurence === 1)
-    
-    const handleEveryMonthPress = () => {
-        setReccurence(1)
-        setIsEveryMonth(true)
-    }
-
-    const handlePressIncrementButtons = (val) => {
-        setReccurence(val)
-        setIsEveryMonth(val === 1)
-    }
-    return(
-        <View style={styles.container}>
-
-            <View style={[styles.selectorItemContainer, {justifyContent:"space-around"}]}>
-
-                <View style={styles.textFrequencyContainer}>
-                    <NormalText text="Tous les"/>
-                </View>
-
-                <IncrementButtons value={reccurence} setValue={handlePressIncrementButtons} isBorderHidden={isEveryMonth}/>
-
-                <View style={styles.textFrequencyContainer}>
-                    <NormalText text="mois"/>
-                </View>
-
-            </View>
-
-            <View style={[styles.selectorItemContainer]}>
-                <TouchableOpacity onPress={handleEveryMonthPress}                         
-                    style={[styles.selectAllItem, {borderColor: isEveryMonth ? font : secondary, backgroundColor: secondary}]}>
-                    <NormalText text="Tous les mois"/>
-                </TouchableOpacity>
-            </View>
+                return <BorderRadioButton small extend hideInactiveBorder text={weekDay.substring(0, 1)} isHighlight={isSelected} handleOnClick={() => handleSelectDay(index)} key={index}/>
+            })}
         </View>
     )
 }
@@ -140,53 +23,10 @@ const MonthSelection = ({reccurence, setReccurence}) => {
 
 
 const styles = StyleSheet.create({
-    selectItem: {
-        marginVertical: 5,
-        paddingVertical: 10, 
-        borderRadius: 10, 
-        flex: 1, 
-        borderWidth: 2, 
-        justifyContent: "center", 
-        alignItems: "center",
-    },
-
-    selectAllItem: {
-
-        width: "100%",
-        padding: 15, 
-        borderRadius: 20, 
-        borderWidth: 2, 
-        justifyContent: "center", 
-        alignItems: "center"
-    },
-
-    selectorItemContainer: {
+    selectorDayContainer: {
         display: "flex",
         flexDirection: "row", 
-        width: "100%", 
-        gap: 10,
-    },
-
-    header: {
-        width: "100%",
-        display: "flex", 
-        flexDirection: "row", 
-        alignItems: "center", 
-        justifyContent: "space-around", 
-        gap: 15
-    },
-
-    container: {
-        display: "flex", 
-        flexDirection: "column", 
-        gap: 20
-    },
-
-    textFrequencyContainer: {
-        flex: 1, 
-        justifyContent: "center", 
-        alignItems: "center"
+        gap: 5,
+        marginVertical: 3
     }
 })
-
-export {DaySelection, WeekSelection, MonthSelection}

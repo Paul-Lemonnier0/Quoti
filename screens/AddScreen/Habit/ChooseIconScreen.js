@@ -1,19 +1,20 @@
 import { View } from "react-native"
-import { GoNextButton } from "../../components/Buttons/UsualButton"
-import { UsualScreen } from "../../components/View/Views"
-import { HugeText } from "../../styles/StyledText"
+import { GoNextButton } from "../../../components/Buttons/UsualButton"
+import { UsualScreen } from "../../../components/View/Views"
+import { HugeText } from "../../../styles/StyledText"
 import { Image } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
-import { useThemeColor } from "../../components/Themed"
+import { useThemeColor } from "../../../components/Themed"
 import { FlatList } from "react-native-gesture-handler"
 import { useContext, useState } from "react"
 import { StyleSheet } from "react-native"
 import { TouchableOpacity } from "react-native"
-import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
-import { HabitsContext } from "../../data/HabitContext"
-import { splitArrayIntoChunks } from "../../primitives/BasicsMethods"
-import StepIndicator from '../../components/Other/StepIndicator.js'
-import HabitIcons from "../../data/HabitIcons"
+import { CustomCarousel } from "../../../components/Carousel/CustomCarousel"
+import { HabitsContext } from "../../../data/HabitContext"
+import { splitArrayIntoChunks } from "../../../primitives/BasicsMethods"
+import StepIndicator from '../../../components/Other/StepIndicator.js'
+import HabitIcons from "../../../data/HabitIcons"
+import { NavigationButton } from "../../../components/Buttons/IconButtons.js"
 
 
 export const ChooseIconScreen = () => {
@@ -22,16 +23,18 @@ export const ChooseIconScreen = () => {
     const route= useRoute()
     const {colorHabit} = route.params
 
-    const [selectedIcon, setSelectedIcon] = useState("ball")
-    const finalHabit = {...colorHabit, icon: selectedIcon}
+
     const habitsIconsData = Object.keys(HabitIcons).map((key) => ({id: key, icon: HabitIcons[key], title: key}));
+
+    const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 20);
+    const [selectedIcon, setSelectedIcon] = useState(splitHabitsIconsData[0][0].id)
+    const finalHabit = {...colorHabit, icon: selectedIcon}
 
     const {addHabit} = useContext(HabitsContext)
 
     const secondary = useThemeColor({}, "Secondary")
     const font = useThemeColor({}, "Font")
       
-    const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 20);
 
     const handleValidation = async() => {
         try{
@@ -80,10 +83,10 @@ export const ChooseIconScreen = () => {
                         <HugeText text="Choisissez une icône"/>
                     </View>
 
-                    <GoNextButton handleGoNext={handleValidation}/>
+                    <NavigationButton action={"validation"} methode={handleValidation}/>
                 </View>
 
-                <StepIndicator totalSteps={5} currentStep={4}/>
+                <StepIndicator totalSteps={5} currentStep={5}/>
 
                 <View style={styles.body}>
                     <View style={{flex: 1}}>

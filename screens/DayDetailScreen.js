@@ -2,8 +2,6 @@ import React from "react";
 import { View, SafeAreaView } from "react-native"
 import { HugeText } from "../styles/StyledText"
 import { useThemeColor } from "../components/Themed"
-import { SimpleIconButton } from "../components/Buttons/IconButton";
-import { Feather } from '@expo/vector-icons'; 
 import { useNavigation } from "@react-navigation/native";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 
@@ -26,10 +24,6 @@ const DayDetailScreen = ({route}) => {
         <SafeAreaView style={{flex: 1}}>
             <View style={{backgroundColor: primary, display:"flex", flex:1, padding: 15}}>
                 <View style={{display: "flex", flexDirection: "row", alignItems:"center"}}>
-
-                    <SimpleIconButton onClick={() => handleBack()}>
-                        <Feather name="chevron-left" size={20} color={fontGray} />                
-                    </SimpleIconButton>
 
                     <View style={{flex:1, padding: 5, display: "flex", flexDirection: "row", justifyContent: "center", borderRadius: 20 }}>
                     </View>

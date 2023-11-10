@@ -1,22 +1,28 @@
 import { View } from "react-native"
 import { UsualScreen } from "../../components/View/Views"
-import { GoNextButton } from "../../components/Buttons/UsualButton"
-import { HugeText, NormalText } from "../../styles/StyledText"
+import { HugeText } from "../../styles/StyledText"
 import { useState } from "react"
 import { StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
-import { HugeRadioButton } from "../../components/RadioButtons/HugeRadioButtons"
 import Separator from "../../components/Other/Separator"
 import StepIndicator from "../../components/Other/StepIndicator"
+import { NavigationButton } from "../../components/Buttons/IconButtons"
+import { BorderRadioButton } from "../../components/RadioButtons/RadioButton"
 
 export const PreAddScreen = () => {
 
     const navigation = useNavigation();
 
-    const [selectedItem, setSelectedItem] = useState("Hab")
+    const [selectedItem, setSelectedItem] = useState("AddBasicDetails")
     const [isForCreate, setIsForCreate] = useState(true)
 
-    const handleGoNext = () => navigation.navigate("AddBasicDetails")
+    const radios = [
+        {key: "AddBasicDetails", text: "Habitude" },
+        {key: "AddBasicDetailsObjectif", text: "Objectif"},
+        {key: "AddBasicDetailsDefi", text: "Défi"},
+      ];
+
+    const handleGoNext = () => navigation.navigate(selectedItem)
 
     return(
         <UsualScreen>
@@ -26,36 +32,25 @@ export const PreAddScreen = () => {
                         <HugeText text="Que voulez vous faire ?"/>
                     </View>                    
                     
-                    <GoNextButton handleGoNext={handleGoNext}/>
+                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
                 </View>
 
                 <StepIndicator totalSteps={isForCreate ? 5 : 2} currentStep={1}/>
                 
                 <View style={styles.body}>
                     <View style={styles.groupContainer}>
-                        <HugeRadioButton handleOnClick={() => setIsForCreate(true)} isHighlight={isForCreate}>
-                            <NormalText text="Créer"/>
-                        </HugeRadioButton>
-
-                        <HugeRadioButton handleOnClick={() => setIsForCreate(false)} isHighlight={!isForCreate}>
-                            <NormalText text="Importer"/>
-                        </HugeRadioButton>
+                        <BorderRadioButton hideInactiveBorder text="Créer" handleOnClick={() => setIsForCreate(true)} isHighlight={isForCreate}/>
+                        <BorderRadioButton hideInactiveBorder text="Importer" handleOnClick={() => setIsForCreate(false)} isHighlight={!isForCreate}/>
                     </View>
 
                     <Separator/>
 
                     <View style={styles.groupContainer}>
-                        <HugeRadioButton handleOnClick={() => setSelectedItem("Hab")} isHighlight={selectedItem === "Hab"}>
-                            <NormalText text="Habitude"/>
-                        </HugeRadioButton>
-
-                        <HugeRadioButton handleOnClick={() => setSelectedItem("Obj")} isHighlight={selectedItem === "Obj"}>
-                            <NormalText text="Objectif"/>
-                        </HugeRadioButton>
-
-                        <HugeRadioButton handleOnClick={() => setSelectedItem("Defi")} isHighlight={selectedItem === "Defi"}>
-                            <NormalText text="Défi"/>
-                        </HugeRadioButton>
+                        {radios.map((radio) => (
+                            <BorderRadioButton hideInactiveBorder key={radio.key} text={radio.text}
+                                handleOnClick={() => setSelectedItem(radio.key)}
+                                isHighlight={selectedItem === radio.key}/>
+                        ))}
                     </View>
                 </View>
             </View>
@@ -82,14 +77,14 @@ const styles = StyleSheet.create({
     
     body: {
         flex: 1, 
-        gap: 30,
-        justifyContent: "center"
+        justifyContent: "space-between"
     },
 
     groupContainer: {
         display: 'flex', 
         flexDirection: "column",
         justifyContent: "center",
-        gap: 25
+        gap: 25,
+        flex: 1
     },
 })

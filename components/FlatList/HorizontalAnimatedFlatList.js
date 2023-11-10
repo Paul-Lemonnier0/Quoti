@@ -30,8 +30,9 @@ export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
         <Animated.FlatList 
             data={data} 
             renderItem={renderHabits}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 120, marginLeft: 30}} //30 + 10 dans le habitudeBlock
+            showsHorizontalScrollIndicator={false}
+            style={{marginHorizontal: -30}}
+            contentContainerStyle={{paddingHorizontal: 30}} //30 + 10 dans le habitudeBlock
             viewabilityConfig={{itemVisiblePercentThreshold: 100}}
             viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
             keyExtractor={(item) => item.habitID}

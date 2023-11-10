@@ -1,25 +1,31 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react';
 import { StyleSheet, View} from 'react-native';
 import { FlatList } from 'react-native';
-import { SubTitleText, HugeText, SubTitleGrayText, NormalText } from '../styles/StyledText';
+import { SubTitleText, HugeText, SubTitleGrayText, NormalText, TitleText } from '../styles/StyledText';
 import { ProfilButton } from '../components/Profil/ProfilButton';
 import { useNavigation } from "@react-navigation/native";
 import { UsualScreen } from '../components/View/Views';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
 import { Image } from 'react-native';
-import { RadioButton } from '../components/RadioButtons/RadioButton';
-import { ContrastButton } from '../components/Buttons/IconButton';
+import { BackgroundRadioButton } from '../components/RadioButtons/RadioButton';
+import { BackgroundIconButton, BorderButton, BorderIconButton, NavigationButton } from '../components/Buttons/IconButtons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { AnimatedBasicSpinnerView } from '../components/Spinners/AnimatedSpinner';
 import { endOfWeek, startOfWeek } from 'date-fns';
 import SelectDateBottomScreen from './BottomScreens/SelectDateBottomScreen';
 import VerticalAnimatedFlatList from '../components/FlatList/VerticalAnimatedFlatList';
 import HomeCalendarCustomWeek from '../components/Calendars/HomeCalendarCustomWeek';
+import { ScrollView } from 'react-native';
+import HorizontalAnimatedFlatList from '../components/FlatList/HorizontalAnimatedFlatList';
+import { useThemeColor } from '../components/Themed';
+import { BackgroundTextButton, BorderTextButton } from '../components/Buttons/UsualButton';
 
 const HomeScreen = () => {
 
   //IMPORTS
+
+  const font = useThemeColor({}, "Font")
 
   const navigation = useNavigation()
   const { changeDate, filteredHabitsByDate, isFetchingHabit, isFetched } = useContext(HabitsContext);
@@ -93,11 +99,11 @@ const HomeScreen = () => {
   const getStatementSentence = () => {
     switch (selectedPeriode) {
       case 'Quotidien':
-        return 'À faire aujourd\'hui:';
+        return 'À faire ce jour :';
       case 'Hebdo':
-        return 'À faire cette semaine:';
+        return 'À faire cette semaine :';
       case 'Mensuel':
-        return 'À faire ce mois ci:';
+        return 'À faire ce mois ci :';
       default:
         return 'À faire aujourd\'hui:';
     }
@@ -124,25 +130,17 @@ const HomeScreen = () => {
 
   const isHabitsEmpty = displayedHabits.length === 0
 
-  const renderPeriode = ({item, index}) => {
+  const renderPeriode = ({item}) => {
 
       if(item === "Calendar") {
-        return(              
-          <ContrastButton onClick={handleOpenCalendar}>
-            <MaterialCommunityIcons name="calendar-range-outline" size={24} color="black" />
-          </ContrastButton>
-        )
+        return <BorderIconButton onPress={handleOpenCalendar} name="calendar-range-outline" provider="MaterialCommunityIcons"/>
       }
 
       const isSelected = item.frequency === selectedPeriode
 
       return(
-        <RadioButton key={index} isHighlight={isSelected} handleOnClick={() => handleChangeSelectedPeriode(item)}>
-          <View style={[styles.displayRow, {gap: 10}]}>
-            <SubTitleText text={item.displayedText} style={{color: isSelected ? "white": null}}/>
-            <SubTitleGrayText text={item.nbElement}/>
-          </View>
-        </RadioButton>
+        <BackgroundRadioButton bold isHighlight={isSelected} text={item.displayedText} number={item.nbElement}
+              handleOnClick={() => handleChangeSelectedPeriode(item)}/>
       )
   }
 
@@ -159,9 +157,11 @@ const HomeScreen = () => {
 
   const NotEmptyHabitsScreen = () => {
     return(
-      <View style={styles.habitsContainer}>
+      <View style={{flex: 1, marginTop: 15, display: "flex", flexDirection: "column", gap: 30}}>
+
         <VerticalAnimatedFlatList data={displayedHabits} currentDateString={selectedDate.toDateString()}/>
-    </View>)
+
+      </View>)
   }
 
   const handleOpenProfilDetails = useCallback(() => {
@@ -183,26 +183,42 @@ const HomeScreen = () => {
                 </View>
             </View>
 
-            <View style={styles.displayColumn}>
+            <View style={[styles.displayColumn, {gap: 0}]}>
               <FlatList horizontal={true} showsHorizontalScrollIndicator={false}
                         renderItem={renderPeriode}
                         data={periodes}
                         style={{marginHorizontal: -30}}
                         contentContainerStyle={{gap: 15, paddingHorizontal: 30}}/>
-              <View>
-                <HomeCalendarCustomWeek selectedDate={selectedDate} setSelectedDate={handleChangeSelectedDate}/>
-              </View>
+                        
+                {/* <HomeCalendarCustomWeek selectedDate={selectedDate} setSelectedDate={handleChangeSelectedDate}/> */}
             </View>
           </View>
         
           <View style={[styles.displayColumn, {gap: 10, flex: 1}]}>                  
             <View>
-                <SubTitleText text={statementSentence}/>
+                <TitleText text={statementSentence}/>
             </View>
+            {
+              isFetchingHabit ? 
+              <View style={styles.loadingAndEmptyScreenContainer}>
+                <AnimatedBasicSpinnerView/>
+              </View>
+              :
 
-            <View style={styles.dayPlanContainer}>
-              {(isFetchingHabit ? <AnimatedBasicSpinnerView/> : (isHabitsEmpty ? <EmptyHabitsScreen/> : <NotEmptyHabitsScreen/>))}
-            </View>
+              isHabitsEmpty ?
+
+              <View style={styles.loadingAndEmptyScreenContainer}>
+                <EmptyHabitsScreen/>
+              </View>
+
+              :
+
+              <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
+                   <NotEmptyHabitsScreen/>
+              </View>
+
+
+            }
           </View>
         </View>
 
@@ -222,7 +238,7 @@ const styles = StyleSheet.create({
     padding: 0,
     paddingBottom: 0,
     flex:1,
-    gap: 30,
+    gap: 20,
     display: "flex", 
   },
 
@@ -237,17 +253,21 @@ const styles = StyleSheet.create({
   },
 
   habitsContainer: {
+    margin: -15,
+    marginTop: 0,
+  },
+
+  loadingAndEmptyScreenContainer: {
     flex:1,
     flexGrow: 1,
-    margin: -15,
-    marginLeft: -45,
-    marginTop: 0,
-    marginBottom: -150
   },
 
   dayPlanContainer: {
     flex:1,
     flexGrow: 1,
+    marginHorizontal: -30,
+    paddingHorizontal: 30,
+    marginBottom: -150,
   },
 
   center:{

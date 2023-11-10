@@ -1,25 +1,16 @@
 import { View, StyleSheet, FlatList } from "react-native"
-import { TitleText, NormalText, SubTitleText, HugeText } from "../../styles/StyledText"
+import { TitleText, NormalText, SubTitleText, HugeText } from "../../../styles/StyledText"
 import { Feather } from "@expo/vector-icons"
-import { useThemeColor } from "../../components/Themed"
-import { CircleBorderButton } from "../../components/Buttons/UsualButton"
+import { useThemeColor } from "../../../components/Themed"
 import { useRoute } from "@react-navigation/native"
-import { UsualScreen } from "../../components/View/Views"
-import { StepCircularBar } from "../../components/Habitudes/StepCircularBar"
-import StepIndicator from "../../components/Other/StepIndicator"
+import { UsualScreen } from "../../../components/View/Views"
+import { StepCircularBar } from "../../../components/Habitudes/StepCircularBar"
+import StepIndicator from "../../../components/Other/StepIndicator"
 import { Image } from "react-native"
-import HabitIcons from "../../data/HabitIcons"
+import HabitIcons from "../../../data/HabitIcons"
+import { CircleBorderIconButton } from "../../../components/Buttons/IconButtons"
 
 const ValidationScreenHabit = () => {
-
-    const route = useRoute()
-    const {habit} = route.params
-    const stepsHabit = Object.values(habit.steps)
-
-    const secondary = useThemeColor({}, "Secondary")
-    const font = useThemeColor({}, "Font")
-
-    const icon = HabitIcons[habit.icon]
 
     return (
         <UsualScreen>   
@@ -30,16 +21,14 @@ const ValidationScreenHabit = () => {
                         <SubTitleText text="Nouvelle habitude ajoutée"/>
                     </View>
 
-                    <CircleBorderButton onPress={() => {}}>
-                        <Feather name="share-2" size={20} color={font}/> 
-                    </CircleBorderButton>
+                    <CircleBorderIconButton onPress={() => {}} provider={"Feather"} name={"share-2"}/>
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={5}/>
                 <View style={{flex: 1, flexGrow: 1}}>
                     <View style={styles.emptySreenContainer}>
                     
-                        <Image style={styles.emptyScreenImageContainer} source={require('../../img/Illustration/Light_theme/Idea.png')}/>
+                        <Image style={styles.emptyScreenImageContainer} source={require('../../../img/Illustration/Light_theme/Idea.png')}/>
 
                         <View style={styles.emptyScreenSubContainer}>
                             <NormalText text={"Continuez comme ça! "}/>
@@ -108,22 +97,17 @@ const ValidationScreenHabit = () => {
         justifyContent: "center",
         gap: 20, 
 
-      },
+    },
     
-      emptyScreenImageContainer: {
+    emptyScreenImageContainer: {
         resizeMode: 'contain', 
         width: "90%", 
         maxHeight: "60%",
-      },
-      emptyScreenSubContainer: {
+    },
+
+    emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
         alignItems: "center"
-      },
-
-      iconContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding:10, marginBottom: 10
     },
   });
   

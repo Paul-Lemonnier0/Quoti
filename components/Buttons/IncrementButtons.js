@@ -5,35 +5,32 @@ import { NormalGrayText, NormalText } from "../../styles/StyledText"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { StyleSheet } from "react-native"
 import { TextInput } from "react-native"
+import { IconButton } from "./IconButtons"
 
-export const IncrementButtons = ({value, setValue, isBorderHidden}) => {
+export const IncrementButtons = ({value, setValue, isBorderHidden, suffixe}) => {
 
     const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
+
+    const displayedValue = suffixe ? value + " " + suffixe : value
 
     const handleIncrement = () => { if(value < 99) setValue(++value) }
     const handleDecrement = () => { if(value > 1) setValue(--value) }
 
     return(
         <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
-            
-            <TouchableOpacity onPress={handleDecrement} style={styles.buttons}>
-                <Feather name="minus" size={20} color={font}/>
-            </TouchableOpacity>
+            <IconButton noPadding onPress={handleDecrement} provider={"Feather"} name={"minus"} size={24}/>
 
             <View style={[styles.valueContainer]}>
-                <NormalText text={value}/>
+                <NormalText text={displayedValue}/>
             </View>
 
-            <TouchableOpacity onPress={handleIncrement} style={styles.buttons}>
-                <Feather name="plus" size={20} color={font}/>
-            </TouchableOpacity>
-
+            <IconButton noPadding onPress={handleIncrement} provider={"Feather"} name={"plus"} size={24}/>
         </View>
     )
 }
 
-export const IncrementTime = ({value, setValue, isDisabled, isMinutes}) => {
+export const IncrementTime = ({value, setValue, isDisabled, isMinutes, isBorderHidden}) => {
 
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
@@ -50,37 +47,22 @@ export const IncrementTime = ({value, setValue, isDisabled, isMinutes}) => {
     }
 
     return(
-        <View style={[styles.container, {backgroundColor: secondary, borderColor: font}]}>
-            
-            <TouchableOpacity onPress={handleDecrement} style={styles.buttons} disabled={isDisabled}>
-                <Feather name="minus" size={20} color={isDisabled ? fontGray : font}/>
-            </TouchableOpacity>
+        <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
+            <IconButton noPadding onPress={handleDecrement} provider={"Feather"} name={"minus"} size={20}/>
 
             <View style={[styles.valueContainer]}>
                 {isDisabled ? <NormalGrayText text={value + suffixe}/> : <NormalText text={value + suffixe}/>}
             </View>
 
-            <TouchableOpacity onPress={handleIncrement} style={styles.buttons} disabled={isDisabled}>
-                <Feather name="plus" size={20} color={isDisabled ? fontGray : font}/>
-            </TouchableOpacity>
-
+            <IconButton noPadding onPress={handleIncrement} provider={"Feather"} name={"plus"} size={20}/>
         </View>
     )
 }
 
 const styles = StyleSheet.create({
-    buttons: {
-        paddingHorizontal: 5,
-        justifyContent: "center", 
-        alignItems: "center"
-    },
-
     valueContainer: {
-        margin: -5, 
-        padding: 10, 
-        paddingHorizontal: 0,
-        borderRadius: 10, 
-        textAlign: "center"
+        textAlign: "center",
+        paddingVertical: 15
     },
 
     container: {
@@ -88,9 +70,9 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         alignItems:"center", 
         justifyContent: "space-between", 
-        gap: 15, 
-        borderRadius: 10, 
-        padding: 10,
+        gap: 10, 
+        paddingHorizontal: 15,
+        borderRadius: 15, 
         borderWidth: 2,
         flex: 1
     },

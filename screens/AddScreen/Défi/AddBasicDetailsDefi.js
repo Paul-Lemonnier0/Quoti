@@ -1,20 +1,17 @@
 import { View } from "react-native"
-import { UsualScreen } from "../../components/View/Views"
-import { GoNextButton } from "../../components/Buttons/UsualButton"
-import { HugeText, SubTitleText } from "../../styles/StyledText"
+import { UsualScreen } from "../../../components/View/Views"
+import { GoNextButton } from "../../../components/Buttons/UsualButton"
+import { HugeText } from "../../../styles/StyledText"
 import { useState } from "react"
 import { StyleSheet } from "react-native"
-import { TextInputCustom } from "../../components/TextFields/TextInput"
-import { CustomCarousel } from "../../components/Carousel/CustomCarousel"
-import { useMemo } from "react"
+import { TextInputCustom } from "../../../components/TextFields/TextInput"
 import { useRef } from "react"
-import { useCallback } from "react"
-import { RenderAddStepCarouselItem } from '../../components/Habitudes/Step/StepCarouselItem'
+import { RenderAddStepCarouselItem } from '../../../components/Habitudes/Step/StepCarouselItem'
 import { useNavigation } from "@react-navigation/native"
-import { generateUniqueID } from "../../primitives/BasicsMethods"
-import AddStepBottomScreen from "../BottomScreens/AddStepBottomScreen"
+import { generateUniqueID } from "../../../primitives/BasicsMethods"
+import { NavigationButton } from "../../../components/Buttons/IconButtons"
 
-export const AddBasicDetails = () => {
+export default AddBasicDetailsDefi = () => {
 
     const navigation = useNavigation();
 
@@ -25,13 +22,6 @@ export const AddBasicDetails = () => {
 
     const [isTitleWrong, setIsTitleWrong] = useState(false)
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
-
-    const bottomSheetModalRefAddStep = useRef(null);
-    const snapPointsAddStep = useMemo(() => ['80%'], [])
-
-    const handleOpenAddStep = useCallback(() => {
-        bottomSheetModalRefAddStep.current?.present();
-      }, []);
 
     const handleGoNext = () => {
 
@@ -74,10 +64,10 @@ export const AddBasicDetails = () => {
 
                 <View style={styles.header}>
                     <View style={{width: "80%"}}>
-                        <HugeText text="Dites-nous en un peu plus !"/>
+                        <HugeText text="Dites-nous en un peu plus sur ce défi !"/>
                     </View>
 
-                    <GoNextButton handleGoNext={handleGoNext}/>
+                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={2}/>
@@ -88,19 +78,8 @@ export const AddBasicDetails = () => {
 
                     <TextInputCustom ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
 
-                    <View style={styles.carouselContainer}>
-                        <SubTitleText text="Etapes :"/>
-
-                        <CustomCarousel data={steps} renderItem={renderAddSteps}/>                        
-                    </View>
-
                 </View>
             </View>
-
-            <AddStepBottomScreen
-                snapPoints={snapPointsAddStep}
-                bottomSheetModalRef={bottomSheetModalRefAddStep}
-                setSteps={setSteps}/>
 
         </UsualScreen>
     )

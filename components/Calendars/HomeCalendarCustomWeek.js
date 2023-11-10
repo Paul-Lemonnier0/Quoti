@@ -5,6 +5,7 @@ import { NormalText, SubText } from "../../styles/StyledText";
 import Calendar, { useCalendarContext } from 'react-native-swipe-calendar';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import { addDays } from 'date-fns';
 
 const DayComponentWrapper  = ({ date, isToday, isSelected }) => {
 
@@ -38,9 +39,14 @@ const DayLabelComponent  = () => { return };
 export default function HomeCalendarCustomWeek({ selectedDate, setSelectedDate }) {
     
   const monthAnimCallbackNode = useSharedValue(0);
-
+  const today = new Date()
+  
   useEffect(() => {
-    cRef.current?.setPage(selectedDate)
+    if(today < selectedDate) {
+      cRef.current?.setPage(addDays(selectedDate, 7))
+    }
+
+    else cRef.current?.setPage(selectedDate)
   }, [selectedDate])
 
   const cRef = useRef(null)

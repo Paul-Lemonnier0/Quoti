@@ -1,13 +1,15 @@
 import { useState, useRef, useMemo, useCallback } from "react"
 import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native"
-import { GoNextButton } from "../../components/Buttons/UsualButton"
-import { UsualScreen } from "../../components/View/Views"
-import { HugeText, SubTitleText } from "../../styles/StyledText"
+import { BorderTextButton, GoNextButton } from "../../../components/Buttons/UsualButton"
+import { UsualScreen } from "../../../components/View/Views"
+import { HugeText, SubTitleText } from "../../../styles/StyledText"
 import { useNavigation, useRoute } from "@react-navigation/native"
-import { useThemeColor } from "../../components/Themed"
-import { ColorsList } from "../../data/ColorsList"
-import StepIndicator from '../../components/Other/StepIndicator.js'
-import CustomColorBottomScreen from "../BottomScreens/CustomColorBottomScreen"
+import { useThemeColor } from "../../../components/Themed"
+import { ColorsList } from "../../../data/ColorsList"
+import StepIndicator from '../../../components/Other/StepIndicator.js'
+import CustomColorBottomScreen from "../../BottomScreens/CustomColorBottomScreen"
+import { NavigationButton } from "../../../components/Buttons/IconButtons.js"
+import ColorListSelector from "../../../components/Other/ColorListSelector.js"
 
 export const ChooseColorScreen = () => {
 
@@ -21,17 +23,6 @@ export const ChooseColorScreen = () => {
     const colorHabit = {...detailledHabit, color: selectedColor,}
 
     const handleGoNext = () =>  navigation.navigate("ChooseIconScreen", {colorHabit})
-
-    const renderItem = ({ item: color }) => {
-        const isSelected = color === selectedColor
-
-        return (
-            <TouchableOpacity style={styles.colorContainer} onPress={() => setSelectedColor(color)} key={color}>
-                    <View style={{backgroundColor: color, borderRadius: 15, width: "100%", borderWidth: 2, borderColor: isSelected ? font : color, aspectRatio: 1}}/>
-            </TouchableOpacity>
-        );
-
-    };
 
     const bottomSheetModalRef_CustomColor = useRef(null);
     const snapPoints_CustomColor = useMemo(() => ['65%'], []);
@@ -53,27 +44,19 @@ export const ChooseColorScreen = () => {
                         <HugeText text="Choisissez une couleur"/>
                     </View>
 
-                    <GoNextButton handleGoNext={handleGoNext}/>
+                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
                 </View>
 
-                <StepIndicator totalSteps={5} currentStep={3}/>
+                <StepIndicator totalSteps={5} currentStep={4}/>
 
                 <View style={styles.body}>
                     <View style={styles.centerFullContent}>
-
-                        <FlatList
-                            scrollEnabled={false}
-                            data={ColorsList} renderItem={renderItem} 
-                            keyExtractor={(itm) => itm} key={4} numColumns={5}
-                            contentContainerStyle={styles.colorListContainer}/>
+                        <ColorListSelector selectedColor={selectedColor} setSelectedColor={setSelectedColor}/>
                     </View>
 
                     <View style={styles.centered}>
                         <View style={styles.customColorContainer}>
-                            <TouchableOpacity onPress={() => handleOpenCustomColor()} style={[styles.selectedColor, {borderColor: font}]}>
-                                <SubTitleText text="Aa"/>
-                            </TouchableOpacity>
-
+                            <BorderTextButton bold text="Aa" onPress={handleOpenCustomColor}/>
                             <View style={[styles.selectedColor, {borderColor: font, backgroundColor: selectedColor}]}/>
                         </View>
                     </View>
@@ -112,11 +95,9 @@ const styles = StyleSheet.create({
     },
 
     selectedColor: {
-        height: 60, 
-        width: 60, 
+        aspectRatio: 1,
         borderWidth: 2, 
-        borderRadius: 15,
-        justifyContent: "center", display: "flex", alignItems: "center"
+        borderRadius: 18,
     },
 
     body: {

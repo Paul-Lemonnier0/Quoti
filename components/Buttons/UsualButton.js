@@ -1,145 +1,53 @@
-import { Pressable, StyleSheet, TouchableOpacity, View } from "react-native"
+import { StyleSheet, TouchableOpacity } from "react-native"
 import { useThemeColor } from "../Themed";
-import { useNavigation } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
+import { NormalText, SubTitleText } from "../../styles/StyledText";
 
-export const SimpleButton = (props) =>
-{
-    return(
-        <TouchableOpacity 
-        onPress={props.onClick}>
-
-                {props.children}
-
-        </TouchableOpacity>);
-}
-
-export const GoBackButton = ({isCloseButton, additionalMethod, borderHidden}) =>
-{
-    const isClosingButton = isCloseButton
-
+export const BorderTextButton = ({onPress, text, isTransparent, disabled, extend, bold}) => {
+    
     const font = useThemeColor({}, "Font")
+    const contrast = useThemeColor({}, "Contrast")
+    const secondary = useThemeColor({}, "Secondary")
+    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
 
-    const navigation = useNavigation()
-    const handleBack = () => {
-        if(additionalMethod) additionalMethod()
-        
-        navigation.goBack()
-    }
+    const backgroundColor = isTransparent ? "transparent" : secondary
+    const width = extend ? "100%" : null
 
-    const fontGray = useThemeColor({}, "FontGray")
+    const color = disabled ? disabledButtonText : font
+    const borderColor = disabled ? disabledButtonText : contrast
 
     return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: borderHidden ? 'transparent' : font, paddingLeft: borderHidden ? 0 : 15}]}
-        onPress={handleBack}>
-            <Feather name={isClosingButton ? "x" : "chevron-left"} size={20} color={font} />                
-        </TouchableOpacity>);
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {backgroundColor, width, borderColor}]}>
+        { bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/> }
+    </TouchableOpacity>);
 }
 
-export const GoNextButton = ({handleGoNext}) =>
-{
+export const BackgroundTextButton = ({onPress, text, color, bold, disabled, extend}) => {
+    
     const font = useThemeColor({}, "Font")
+    const fontContrast = useThemeColor({}, "FontContrast")
+    const contrast = useThemeColor({}, "Contrast")
+    const disabledBackground = useThemeColor({}, "DisabledButtonBackground")
 
-    const fontGray = useThemeColor({}, "FontGray")
+    const backgroundColor = disabled ? disabledBackground : contrast
+    const colorBase = color ? color : fontContrast
 
-    return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: fontGray}]}
-        onPress={handleGoNext}>
-            <Feather name="chevron-right" size={20} color={font} />                
-        </TouchableOpacity>);
-}
-
-export const SimpleButtonBackground = (props) =>
-{
-    const {onPress, backgroundColor} = props
-    return(
-        <TouchableOpacity style={[styles.simpleBgButton, {backgroundColor: backgroundColor, borderColor: backgroundColor}]}
-        onPress={props.onPress}>
-                {props.children}
-        </TouchableOpacity>);
-}
-
-export const SimpleSquareButtonBackground = (props) =>
-{
-    const {onPress, backgroundColor} = props
-    return(
-        <TouchableOpacity style={[styles.simpleBgButton, {backgroundColor: backgroundColor, borderColor: backgroundColor, aspectRatio: 1}]}
-        onPress={props.onPress}>
-                {props.children}
-        </TouchableOpacity>);
-}
-
-export const RoundBorderButton = (props) =>
-{
-    const fontGray = useThemeColor({}, "FontGray")
+    const width = extend ? "100%" : null
 
     return(
-        <TouchableOpacity style={[styles.roundBorderButton, {borderColor: fontGray}]}
-        onPress={props.onPress}>
-                {props.children}
-        </TouchableOpacity>);
-}
-
-export const CircleBorderButton = (props) =>
-{
-    const fontGray = useThemeColor({}, "FontGray")
-    const font = useThemeColor({}, "Font")
-
-    return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: font}]}
-        onPress={props.onPress}>
-                {props.children}
-        </TouchableOpacity>);
-}
-
-export const BigCircleBorderButton = (props) =>
-{
-    const fontGray = useThemeColor({}, "FontGray")
-    const font = useThemeColor({}, "Font")
-
-    const borderColor = props.borderColor ? props.borderColor : font
-
-    return(
-        <TouchableOpacity style={[styles.circleBorderButton, {borderColor: borderColor, padding: 20}]}
-        onPress={props.onPress}>
-                {props.children}
-        </TouchableOpacity>);
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {backgroundColor, width, borderColor: backgroundColor}]}>
+        {bold ? <SubTitleText text={text} style={{color: colorBase}}/> : <NormalText text={text} style={{color: colorBase}}/>}
+    </TouchableOpacity>);
 }
 
 const styles = StyleSheet.create(
     {
-        usualBackgroundButton: {
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 20,
-            aspectRatio: 1,
-        },
-
-        simpleBgButton: {
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 20,
+        borderButton: {
+            borderRadius: 18,
             display: "flex",
-            padding: 15,
-            borderWidth: 2, 
-        },
-
-        roundBorderButton: {
-            alignItems: "center",
             justifyContent: "center",
-            borderRadius: 20,
-            display: "flex",
-            padding: 15,
-            borderWidth: 2, aspectRatio: 1
-        },
-
-        circleBorderButton: {
             alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 50,
-            display: "flex",
-            padding: 15,
-            borderWidth: 2,
+            padding: 18,
+            borderWidth: 2
         },
     }
 )

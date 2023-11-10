@@ -5,6 +5,7 @@ import BottomTabNavigator from "./BottomTabNavigator";
 import LinkingConfiguration from "./LinkingConfiguration";
 
 export default function Navigation({ colorScheme }) {
+
   return (
     <NavigationContainer
       linking={LinkingConfiguration}

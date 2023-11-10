@@ -1,9 +1,12 @@
 import { useSharedValue } from "react-native-reanimated"
 import { useRef } from "react"
 import {Animated} from 'react-native'
-import { HabitudeBlock } from "../Habitudes/HabitudeBlock"
+import { HabitPresentationBlock, HabitudeBlock } from "../Habitudes/HabitudeBlock"
+import { NormalText } from "../../styles/StyledText"
+import { View } from "react-native"
+import { HabitudeListItem } from "../Habitudes/HabitudeListItem"
 
-export default VerticalAnimatedFlatList = ({data, currentDateString}) => {
+export default VerticalAnimatedFlatList = ({data, currentDateString, presentation, numCols = 1}) => {
 
     const viewableItems = useSharedValue([]);
     const listVisibility = useSharedValue(1);
@@ -16,11 +19,9 @@ export default VerticalAnimatedFlatList = ({data, currentDateString}) => {
         { onViewableItemsChanged },
     ]);
 
-    const numCols = 2;
-
-      const renderHabits = ({item, index}) => {
+    const renderHabits = ({item, index}) => {
         return (
-            <HabitudeBlock habitID={item.habitID} index={index}
+            <HabitudeListItem habitID={item.habitID} index={index}
                 currentDateString={currentDateString}
                 scrollY={scrollY} 
                 listVisibility={listVisibility}
@@ -28,12 +29,17 @@ export default VerticalAnimatedFlatList = ({data, currentDateString}) => {
         )
     }
 
+    const renderHabitPresentation = ({item: habit}) => {
+        console.log("HAB : ", habit)
+        return <HabitPresentationBlock habitude={habit} viewableItems={viewableItems}/>
+    }
+
     return(
         <Animated.FlatList 
             data={data} 
-            renderItem={renderHabits}
+            renderItem={presentation ? renderHabitPresentation : renderHabits}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 120, marginLeft: 30}} //30 + 10 dans le habitudeBlock
+            contentContainerStyle={{paddingBottom: 120}} //30 + 10 dans le habitudeBlock
             viewabilityConfig={{itemVisiblePercentThreshold: 100}}
             viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
             key={numCols}

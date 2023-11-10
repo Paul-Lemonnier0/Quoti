@@ -1,12 +1,12 @@
-import { GoNextButton } from "../../components/Buttons/UsualButton"
-import { UsualScreen } from "../../components/View/Views"
-import { HugeText, NormalText, SubText, SubTitleText } from "../../styles/StyledText"
+import { UsualScreen } from "../../../components/View/Views"
+import { HugeText, SubText, SubTitleText } from "../../../styles/StyledText"
 import { View, StyleSheet } from "react-native"
 import { useState } from "react"
-import { DaySelection, MonthSelection, WeekSelection } from "../../components/AddHabits/FrequencySelection"
-import { IncrementButtons } from "../../components/Buttons/IncrementButtons"
+import { SelectWeekDays } from "../../../components/AddHabits/FrequencySelection"
+import { IncrementButtons } from "../../../components/Buttons/IncrementButtons"
 import { useNavigation, useRoute } from "@react-navigation/native"
-import { HugeRadioButton } from "../../components/RadioButtons/HugeRadioButtons"
+import { NavigationButton } from "../../../components/Buttons/IconButtons"
+import { BorderRadioButton } from "../../../components/RadioButtons/RadioButton"
 
 const CreateHabitDetails = () => {
 
@@ -14,34 +14,25 @@ const CreateHabitDetails = () => {
     const route = useRoute()
     const {habit} = route.params
 
-    const [selectedDays, setSelectedDays] = useState(new Array(7).fill(false));
+    const [selectedDays, setSelectedDays] = useState([]);
     const [isAllDaySelected, setAllDaySelected] = useState(true);
 
-    const [selectedFrequency, setSelectedFrequency] = useState("Quotidien")
+    const frequencies = [{key: "Quotidien", suffixe: "jours"}, {key: "Hebdo", suffixe: "sem."}, {key: "Mensuel", suffixe: "mois"}]
+    const [selectedFrequency, setSelectedFrequency] = useState(frequencies[0])
+
+    //J'EN SUIS LA, FREQUENCY PEUT ETRE BUGUEE
 
     const [occurences, setOccurences] = useState(1)
     const [reccurence, setReccurence] = useState(1)
 
     const handleGoNext = () => {
 
-        const daysOfWeek = []
-
-        if(isAllDaySelected)
-            daysOfWeek.push(7)
-        
-        else {
-            selectedDays.map((isSelectedDay, index) => {
-                if(isSelectedDay)
-                    daysOfWeek.push(index)
-            })
-        }
-
         const detailledHabit = {
             ...habit,
             frequency: selectedFrequency,
             occurence: occurences,
             reccurence: reccurence,
-            daysOfWeek: daysOfWeek,
+            daysOfWeek: selectedDays,
             notificationEnabled: true,
             alertTime: ""
           };
@@ -50,26 +41,33 @@ const CreateHabitDetails = () => {
     }
 
     const handleSelectDay = (dayIndex) => {
-
-        setAllDaySelected(false)
-        setSelectedDays((prevSelectedDays) => {
-            const tempSelectedDays = [...prevSelectedDays];
-            tempSelectedDays[dayIndex] = !tempSelectedDays[dayIndex];
-
-            if(tempSelectedDays.filter((day) => day === true).length === 7)
-                handleSelectAllDay()
-
-            return tempSelectedDays;
-        });
+        if(selectedDays.includes(dayIndex)){
+            const indexOfElement = selectedDays.indexOf(dayIndex)
+            setSelectedDays(previousSelectedDays => previousSelectedDays.filter(day => day !== dayIndex))
+            selectedDays.splice(indexOfElement, 1)
+        }
+        
+        else setSelectedDays(previousSelectedDays => [...previousSelectedDays, dayIndex])
       };
-
-    const handleSelectAllDay = () => {
-        setSelectedDays(new Array(7).fill(false));    
-        setAllDaySelected(true)
-    }
 
     const handleChangeFrequency = (frequency) => {
         setSelectedFrequency(frequency)
+    } 
+
+    let isRecurrenceIncrementBorderHidden = true;
+
+    if(selectedFrequency.key === "Quotidien"){
+        isRecurrenceIncrementBorderHidden = selectedDays.length > 0
+    }
+
+    else isRecurrenceIncrementBorderHidden = reccurence === 1
+
+    const handleSetReccurence = (rec) => {
+        if(selectedFrequency.key === "Quotidien"){
+            setSelectedDays([])
+        }
+
+        setReccurence(rec)
     }
 
     return(
@@ -82,7 +80,7 @@ const CreateHabitDetails = () => {
                         <HugeText text="À quelle fréquence ?"/>
                     </View>
 
-                    <GoNextButton handleGoNext={handleGoNext}/>
+                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
 
                 </View>
 
@@ -91,30 +89,36 @@ const CreateHabitDetails = () => {
                 <View style={styles.body}>
                     
                     <View style={styles.groupContainer}>
-
-                        <HugeRadioButton handleOnClick={() => handleChangeFrequency("Quotidien")} isHighlight={selectedFrequency === "Quotidien"}>
-                            <NormalText text="Quotidien"/>
-                        </HugeRadioButton>
-
-                        <HugeRadioButton handleOnClick={() => handleChangeFrequency("Hebdo")} isHighlight={selectedFrequency === "Hebdo"}>
-                            <NormalText text="Hebdomadaire"/>
-                        </HugeRadioButton>
-
-                        <HugeRadioButton handleOnClick={() => handleChangeFrequency("Mensuel")} isHighlight={selectedFrequency === "Mensuel"}>
-                            <NormalText text="Mensuel"/>
-                        </HugeRadioButton>
-
+                        {frequencies.map(frequency => (
+                            <BorderRadioButton hideInactiveBorder
+                                key={frequency.key}
+                                text={frequency.key}
+                                isHighlight={selectedFrequency.key === frequency.key}
+                                handleOnClick={() => handleChangeFrequency(frequency)}
+                            />
+                        ))}
                     </View>
 
                     <Separator/>
 
                     <View style={styles.groupContainer}>
-                        {selectedFrequency === "Quotidien" && <DaySelection selectedDays={selectedDays} handleSelectDay={handleSelectDay} 
-                                                                        isAllDaySelected={isAllDaySelected} handleSelectAllDay={handleSelectAllDay}/>}
+                        <View style={styles.listContainer}>
+                            <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
+                                <SubTitleText text="Récurrence :"/>
+                                <SubText text="Ex : Tous les 2 jours"/>
+                            </View>
 
-                        {selectedFrequency === "Hebdo" && <WeekSelection reccurence={reccurence} setReccurence={setReccurence}/>}
+                            <IncrementButtons isBorderHidden={isRecurrenceIncrementBorderHidden} value={reccurence} setValue={handleSetReccurence} suffixe={selectedFrequency.suffixe}/>
 
-                        {selectedFrequency === "Mensuel" && <MonthSelection reccurence={reccurence} setReccurence={setReccurence}/>}
+                        </View>
+
+                        {
+                            selectedFrequency.key === "Quotidien" ?
+                                <SelectWeekDays selectedDays={selectedDays} handleSelectDay={handleSelectDay}/> :
+
+                                <BorderRadioButton hideInactiveBorder isHighlight={reccurence === 1} handleOnClick={() => setReccurence(1)}
+                                    text={selectedFrequency.key === "Mois" ? "Tous les mois" : "Toutes les semaines"} />
+                        }
                     </View>
 
 
@@ -184,7 +188,8 @@ const styles = StyleSheet.create({
         display: 'flex', 
         flexDirection: "column",
         justifyContent: "center", 
-        gap: 20
+        gap: 20,
+        width: "100%"
     },
 })
 

@@ -1,16 +1,15 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { BigCircleBorderButton } from "../Buttons/UsualButton"
 import { SubTitleText, SubText, NormalText, TitleText } from "../../styles/StyledText"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../Themed"
 import { CustomDurationIndicator } from "./Clock"
 import { durationToTimeString } from "../../primitives/BasicsMethods"
 import cardStyle from "../../styles/StyledCard"
+import { CircleBorderIconButton } from "../Buttons/IconButtons"
 
 export const AddEtapeItem = ({handleOpenAddStep}) => {
 
     const cardStyles = cardStyle()
-    const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
 
     return(
@@ -21,15 +20,13 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
             </View>
 
             <View style={styles.fullFlexEndContainer}>
-                <BigCircleBorderButton onPress={handleOpenAddStep} borderColor={font}>
-                    <Feather name="plus" size={20} color={font} />
-                </BigCircleBorderButton>
+                <CircleBorderIconButton onPress={handleOpenAddStep} provider={"Feather"} name={"plus"}/>
             </View>
         </View>
     )
 }
 
-export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) => {
+export const AddedEtapeItem = ({step}) => {
 
     const cardStyles = cardStyle()
     const secondary = useThemeColor({}, "Secondary")
@@ -48,9 +45,7 @@ export const AddedEtapeItem = ({step, handleDelete, handleModification, index}) 
                 <CustomDurationIndicator duration={step.duration} />
 
                 <View style={styles.fullFlexEndContainer}>
-                    <BigCircleBorderButton onPress={() => {}}>
-                        <Feather name="trash-2" size={20} color={font} />
-                    </BigCircleBorderButton>
+                    <CircleBorderIconButton onPress={handleOpenAddStep} provider={"Feather"} name={"trash-2"}/>
                 </View>
             </View>
         </TouchableOpacity>

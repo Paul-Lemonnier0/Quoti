@@ -5,8 +5,8 @@ import { useSharedValue } from "react-native-reanimated"
 import Calendar, { useCalendarContext  } from 'react-native-swipe-calendar';
 import { addMonths } from 'date-fns'
 import { useThemeColor } from '../Themed';
-import { SimpleButton } from "../Buttons/UsualButton";
 import { Feather } from '@expo/vector-icons';
+import { IconButton } from "../Buttons/IconButtons";
     
 const DayComponentWrapper = ({ date, isInDisplayedMonth, isToday, isSelected }) => {
 
@@ -45,12 +45,8 @@ const HeaderComponent = (calendarRef) => (date) => {
       </View>
 
       <View style={styles.incrementDecrementContainer}>
-          <SimpleButton onClick={() => calendarRef.current?.decrementPage()}>
-              <Feather name="chevron-left" size={24} color={font}/>
-          </SimpleButton>
-          <SimpleButton onClick={() => calendarRef.current?.incrementPage()}>
-              <Feather name="chevron-right" size={24} color={font}/>
-          </SimpleButton>
+            <IconButton onPress={() => calendarRef.current?.decrementPage()} provider={"Feather"} name={"chevron-left"}/>
+            <IconButton onPress={() => calendarRef.current?.incrementPage()} provider={"Feather"} name={"chevron-right"}/>
       </View>
     </View>
   );
@@ -125,7 +121,6 @@ const styles = StyleSheet.create({
     display: "flex", 
     flexDirection: "row", 
     alignItems: "center", 
-    gap: 20, 
     marginRight: 5
   },
 

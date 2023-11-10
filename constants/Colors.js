@@ -1,20 +1,28 @@
 export default {
   light: {
-    FontGray: "#696969",
+    FontGray: "#808080",
     Font: "#071220",
-    Contrast: "#664efc",
+    FontContrast: "#fff",
+    Contrast: "#222222",
     Primary: "#f6f6f9",
-    Secondary: "#ffffff",
+    Secondary: "#fff",
     Tertiary: "#bfbfbf",
     Popup: "#f6f6f9",
-    Error: "#CF6679",
+    Error: "#ee1b15",
+
+    InputBackground: "#f9f9f9",
+    InputDisabledBackground: "#ededed",
+    DisabledButtonBackground: "#7b7b7b",
+    DisabledButtonText: "#afafaf",
+
     LinearGradientOpacity: ['rgba(256,256,256,0)', 'rgba(256,256,256,1)']
   },
 
   dark: {
     FontGray: "#696969",
     Font: "#fff",
-    Contrast: "#6B46CA",
+    FontContrast: "#071220",
+    Contrast: "#fff",
     Primary: "#0A0A0A",
     Secondary: "#141414",
     Tertiary: "#69738c",

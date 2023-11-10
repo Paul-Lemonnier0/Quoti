@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from "react";
-import { addHabitToFireStore, getAllOwnHabits } from "../firebase/FirestorePrimitives";
+import { addHabitToFireStore, getAllOwnHabits } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepState, fetchStepLogs } from "../firebase/Firestore_Step_Primitives";
 import { isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
 import { AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
@@ -32,6 +32,8 @@ const HabitsProvider = ({ children }) => {
         const habitsNotInOldVersion = []
         const habitsInOldVersion = []
 
+        const newFilteredHabitsByDate = { Quotidien: {}, Hebdo: {}, Mensuel: {} }
+
         const oldFilteredHabitsID = [...Object.keys(filteredHabitsByDate.Quotidien), ...Object.keys(filteredHabitsByDate.Hebdo), ...Object.keys(filteredHabitsByDate.Mensuel)]
 
         for (const habitID in habits) {
@@ -48,8 +50,6 @@ const HabitsProvider = ({ children }) => {
             else habitsInOldVersion.push(habitID)
           }
         }
-
-        const newFilteredHabitsByDate = { Quotidien: {}, Hebdo: {}, Mensuel: {} }
 
         if(habitsNotInOldVersion.length > 0) {
             fetchStepLogs(currentDate, habitsNotInOldVersion).then(stepLogs => {

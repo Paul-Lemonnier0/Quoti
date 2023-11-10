@@ -3,11 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View } from "react-native";
 import { useThemeColor } from "../components/Themed";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { PreAddScreen } from "../screens/AddScreen/PreAddScreen";
 import { StatProfilScreen } from "../screens/ProfilScreens/StatsProfilScreen";
-import { AddBasicDetails } from "../screens/AddScreen/AddBasicDetails";
-import { ChooseIconScreen } from "../screens/AddScreen/ChooseIconScreen";
-import { ChooseColorScreen } from "../screens/AddScreen/ChooseColorScreen";
+
 import BottomMenuStyle from "../styles/StyledBottomMenu";
 import DayDetailScreen from "../screens/DayDetailScreen";
 import ProfilDetailsScreen from "../screens/ProfilScreens/ProfilDetailsScreen";
@@ -15,8 +12,23 @@ import MultipleAchievementScreen from "../screens/MultipleAchievementScreen";
 import HabitudeScreen from "../screens/HabitudeScreen";
 import NewsScreen from "../screens/NewsScreen";
 import HomeScreen from "../screens/HomeScreen";
-import CreateHabitDetails from "../screens/AddScreen/CreateHabitDetails";
-import ValidationScreenHabit from "../screens/AddScreen/ValidationScreenHabit";
+
+import { PreAddScreen } from "../screens/AddScreen/PreAddScreen";
+import { AddBasicDetails } from "../screens/AddScreen/Habit/AddBasicDetails";
+import { ChooseColorScreen } from "../screens/AddScreen/Habit/ChooseColorScreen";
+import { ChooseIconScreen } from "../screens/AddScreen/Habit/ChooseIconScreen";
+import CreateHabitDetails from "../screens/AddScreen/Habit/CreateHabitDetails";
+import ValidationScreenHabit from "../screens/AddScreen/Habit/ValidationScreenHabit";
+import AddBasicDetailsObjectif from '../screens/AddScreen/Objectif/AddBasicDetailsObjectif';
+import AddBasicDetailsDefi from '../screens/AddScreen/Défi/AddBasicDetailsDefi';
+import AddHabitsToObjectif from '../screens/AddScreen/Objectif/AddHabitsToObjectif';
+import { ChooseColorScreenObjectif } from '../screens/AddScreen/Objectif/ChooseColorScreenObjectif';
+import { ChooseIconScreenObjectif } from '../screens/AddScreen/Objectif/ChooseIconScreenObjectif';
+import { AddBasicDetailsHabitObjectif } from '../screens/AddScreen/Objectif/AddBasicDetailsHabitObjectif';
+import { CreateObjectifHabitDetails } from '../screens/AddScreen/Objectif/CreateObjectifHabitDetails';
+import AddHabitToObjectifNav from '../screens/AddScreen/Objectif/AddHabitToObjectifNav';
+import ComponentPresentation from '../screens/ComponentPresentation';
+
 
 const BottomTab = createBottomTabNavigator();
 
@@ -30,6 +42,9 @@ export default function BottomTabNavigator() {
       initialRouteName="HomeScreen"
       screenOptions={{ tabBarStyle: bottomMenuStyle, tabBarInactiveTintColor: fontGray, tabBarActiveTintColor: "white",
         tabBarHideOnKeyboard: false, headerShown: false, tabBarShowLabel: false}}>
+
+        {/* <BottomTab.Screen name="Home" component={ComponentNavigator}
+                    options={{tabBarIcon: ({ color, focused }) => (<AntDesignIcon name="user" color={color} focused={focused}/>)}}/> */}
 
         <BottomTab.Screen name="Home" component={HomeNavigator}
             options={{tabBarIcon: ({ color, focused }) => (<AntDesignIcon name="user" color={color} focused={focused}/>)}}/>
@@ -63,6 +78,20 @@ function FeatherIcon(props) {
     </View>)
 }
 
+//TEMP
+
+const ComponentStack = createNativeStackNavigator();
+
+function ComponentNavigator() {
+  return (
+    <ComponentStack.Navigator screenOptions={{ headerShown: false }}>
+      <ComponentStack.Screen name="HomeScreen" component={ComponentPresentation} options={{ tabBarStyle: { display: 'none' } }}/>
+    </ComponentStack.Navigator>
+  );
+}
+
+//FIN TEMP
+
 const HomeStack = createNativeStackNavigator();
 
 function HomeNavigator() {
@@ -83,12 +112,22 @@ const AddScreenStack = createNativeStackNavigator();
 function AddScreenNavigator() {
   return (
     <AddScreenStack.Navigator screenOptions={{ headerShown: false }}>
+
       <AddScreenStack.Screen name="PreAddScreen" component={PreAddScreen}/>   
+
       <AddScreenStack.Screen name="AddBasicDetails" component={AddBasicDetails}/>   
       <AddScreenStack.Screen name="CreateHabitDetails" component={CreateHabitDetails}/>   
       <AddScreenStack.Screen name="ChooseIconScreen" component={ChooseIconScreen}/>   
       <AddScreenStack.Screen name="ChooseColorScreen" component={ChooseColorScreen}/>   
       <AddScreenStack.Screen name="ValidationScreenHabit" component={ValidationScreenHabit}/>   
+
+      <AddScreenStack.Screen name="AddBasicDetailsObjectif" component={AddBasicDetailsObjectif}/>   
+      <AddScreenStack.Screen name="AddHabitsToObjectif" component={AddHabitsToObjectif}/>   
+      <AddScreenStack.Screen name="ChooseColorScreenObjectif" component={ChooseColorScreenObjectif}/>   
+      <AddScreenStack.Screen name="ChooseIconScreenObjectif" component={ChooseIconScreenObjectif}/>   
+
+      <AddScreenStack.Screen name="AddBasicDetailsDefi" component={AddBasicDetailsDefi}/>   
+
     </AddScreenStack.Navigator>
   );
 }

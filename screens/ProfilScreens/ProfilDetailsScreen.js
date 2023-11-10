@@ -1,17 +1,10 @@
-import { View, StyleSheet, FlatList } from "react-native"
-import { TitleText, SubTitleText, SubText } from "../../styles/StyledText"
+import { View, StyleSheet } from "react-native"
+import { HugeText } from "../../styles/StyledText"
 import { useRef, useMemo, useCallback, useState } from "react"
-import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../../components/Themed"
 import { useNavigation } from "@react-navigation/native"
-import { CircleBorderButton, GoBackButton, SimpleButton } from "../../components/Buttons/UsualButton"
-import { TouchableOpacity } from "react-native-gesture-handler"
-import { MainView, TopScreenView } from "../../components/View/Views"
-import { UserProfil } from "../../components/Profil/UserProfil"
-import { ActivityBlock } from "../../components/Activity/ActivityBlock"
+import { UsualScreen } from "../../components/View/Views"
 import AchievementBox from "../../components/Achievements/AchievementBox"
-import AchievementsScreen from "../BottomScreens/AchievementsScreen"
-import Achievements from "../../data/Achievements"
 
 const ProfilDetailsScreen = () => {
 
@@ -68,92 +61,10 @@ const ProfilDetailsScreen = () => {
 
     // renders
     return(
-        <MainView>
+        <UsualScreen>
+          <HugeText text="ProfilDetailsScreen"/>
 
-          <TopScreenView>
-                <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginBottom: 15, marginTop: -10}}>
-
-                    <GoBackButton/>
-
-                    <TitleText text="Profil"/>
-
-                    <CircleBorderButton onPress={() => {}}>
-                        <Feather name="settings" size={20} color={font} />                                
-                    </CircleBorderButton>
-
-                </View>
-
-                  <View style={{ gap: 20, marginBottom: 10}}>
-
-
-                          <View style={{alignItems: "center", marginBottom: 0}}>
-                            {/* <UserProfil profil={Friends[0]}/> */}
-                          </View>                               
-
-                          <View style={{alignItems: "center", marginBottom: 0}}>
-                            <SubTitleText text="Paul Lemonnier"/>
-                            <SubText text="Angers, France"/>
-                          </View>
-
-                          <View style={{display: "flex", flexDirection: "row", justifyContent: "space-around", gap: 20, marginTop: 10, marginHorizontal: 20}}>
-                              <TouchableOpacity style={{alignItems:"center"}}>
-                                <SubTitleText text="20"/>
-                                <SubText text="Abonnés"/>
-                              </TouchableOpacity>
-
-                              <TouchableOpacity style={{alignItems:"center"}}>
-                                <SubTitleText text="14"/>
-                                <SubText text="Amis"/>
-                              </TouchableOpacity>
-
-                              <TouchableOpacity style={{alignItems:"center"}}>
-                                <SubTitleText text="12"/>
-                                <SubText text="Habitudes"/>
-                              </TouchableOpacity>
-                              
-                              <TouchableOpacity style={{alignItems:"center"}}>
-                                <SubTitleText text="5"/>
-                                <SubText text="Défis"/>
-                              </TouchableOpacity>
-                          </View>
-
-                  </View>
-              </TopScreenView>
-
-              <View style={{flex: 1, gap: 30, marginTop: 0}}>
-
-                    <View style={{flex: 1}}>
-                        <ActivityBlock onPress={handleNavigateToStat}/>
-                    </View>
-
-                    <View style={{ gap: 20}}>
-
-                      <View style={{justifyContent: "space-between", alignItems: "center", paddingHorizontal:0, display: "flex", flexDirection: "row"}}>
-
-                          <SubTitleText text="Vos Succès"/>
-                          <SimpleButton onClick={handleOpenAchievements}>
-                            <SubText text="Tout voir"/>
-                          </SimpleButton>
-
-                      </View>
-
-                      <FlatList 
-                          renderItem={renderAchievements} 
-                          style={styles.succesList} key={1} horizontal={true}
-                          data={Achievements} showsHorizontalScrollIndicator={false}
-                          keyExtractor={item => item.description}
-                          contentContainerStyle={{gap: 10, paddingHorizontal: 20}}
-                        />
-                    </View>
-
-                <AchievementsScreen
-                    bottomSheetModalRef={bottomSheetModalRef} 
-                    snapPoints={snapPoints} 
-                    handleSheetChanges={handleSheetChanges}
-                    achievement={clickedAchievement}
-                    />
-            </View>
-        </MainView>
+        </UsualScreen>
     );
   };
   

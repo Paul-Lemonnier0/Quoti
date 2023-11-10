@@ -22,10 +22,6 @@ export const InviteFriendListItem = ({friend, handleInvite}) => {
                     <SubText text={friend.prenom + " " + friend.nom}/>
                 </View>
             </View>
-
-            <CircleBorderButton>
-                <Feather name="user-plus" size={20} color={fontGray} />            
-            </CircleBorderButton>
         </View>
     )
 }

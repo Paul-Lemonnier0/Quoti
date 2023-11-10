@@ -13,36 +13,24 @@ import { HabitsContext } from "../../data/HabitContext";
 import Animated, { interpolate, useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { SimpleButtonBackground } from "../Buttons/UsualButton";
-import { IconButton, SimpleIconButton } from "../Buttons/IconButton";
+import { IconButton, SimpleIconButton } from "../Buttons/IconButtons";
+import { Dimensions } from "react-native";
 
-export const HabitudeListItem = ({id, index, viewableItems, listVisibility, scrollY, habitude}) => {
+export const HabitudeListItem =  ({habitID, viewableItems, habitude, currentDateString}) => {
 
     const {Habits} = useContext(HabitsContext)
-    const fontGray = useThemeColor({}, "FontGray")
-
-    const indexHabit = Habits.findIndex((hab) => {
-        return hab.habitID === id
-    })
-
-    const habit = habitude ? habitude : Habits[indexHabit]
-
     const navigation = useNavigation();
     const stylesCard = cardStyle()
 
+    const habit = habitude ? habitude : Habits[habitID]
     const isFinished = habit.doneSteps >= habit.totalSteps
 
-    const handlePress = () =>
-    {
-        navigation.navigate("HabitudeScreen", {habitIndex: indexHabit});
-    }      
-
+    const handlePress = () => navigation.navigate("HabitudeScreen", {habitID, currentDateString})    
 
     const rStyle = useAnimatedStyle(() => {
-
         const isVisible = viewableItems.value.some((viewableItem) => {
-                return viewableItem.item.habitID === id
-            })
-
+                return viewableItem.item.habitID === habitID
+        })
 
         return {
             opacity: withTiming(isVisible ? 1 : 0),
@@ -51,17 +39,24 @@ export const HabitudeListItem = ({id, index, viewableItems, listVisibility, scro
             }]
         };
     }, [])
+
+    const steps = Object.values(habit.steps)
+
+    const font = useThemeColor({}, "Font")
+    const fontGray = useThemeColor({}, "FontGray")
+
+    const habitDoneSteps = steps.filter(step => step.isChecked).length
     
     return(
         <TouchableOpacity onPress={handlePress}>
             <Animated.View style={[rStyle, stylesCard.card, styles.habit]}>
                 <View style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
-                    <StepCircularBar habit={habit} isFinished={isFinished}/>
+                    <StepCircularBar habit={habit} habitDoneSteps={habitDoneSteps} isFinished={isFinished}/>
                 </View>
 
                 <View style={styles.habitTitleStateContainer}>
-                    {isFinished ? <SubTitleGrayText text={habit.titre}/> : <SubTitleText text={habit.titre}/>}
-                    <SubText text={habit.description}/>
+                    {isFinished ? <SubTitleGrayText numberOfLines={1} text={habit.titre}/> : <SubTitleText numberOfLines={1} text={habit.titre}/>}
+                    <SubText numberOfLines={1} text={habit.description}/>
                 </View>
 
                 <View style={{display: "flex", justifyContent: "center"}}>
@@ -75,9 +70,7 @@ export const HabitudeListItem = ({id, index, viewableItems, listVisibility, scro
 const styles = StyleSheet.create(
     {    
         habit: {
-            flex: 1,
-            margin: 10, 
-            marginLeft: 40,
+            marginVertical: 10, 
             gap: 20,
             display: "flex",
             flexDirection: "row",
@@ -106,7 +99,7 @@ const styles = StyleSheet.create(
             flex:1,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "space-around"
+            justifyContent: "center"
         }
     }
 )

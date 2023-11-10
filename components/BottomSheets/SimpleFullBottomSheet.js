@@ -3,8 +3,9 @@ import { useThemeColor } from "../Themed"
 import { useState, useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
+import { SafeAreaView } from "react-native";
 
-const CustomBottomSheet = (props) => {
+const SimpleFullBottomSheet = (props) => {
     
     const {bottomSheetModalRef, snapPoints, handleSheetChanges} = props
 
@@ -12,6 +13,8 @@ const CustomBottomSheet = (props) => {
 
     const fontGray = useThemeColor({}, "FontGray")
     const popupColor = useThemeColor({}, "Popup")
+    const primary = useThemeColor({}, "Primary")
+    const secondary = useThemeColor({}, "Secondary")
 
     const [backdropPressBehavior, setBackdropPressBehavior] = useState('close');
 
@@ -26,18 +29,20 @@ const CustomBottomSheet = (props) => {
     return (
         <BottomSheetModal
             ref={bottomSheetModalRef}
-            style={{flex: 1}}
-            backgroundStyle={{backgroundColor: popupColor, borderRadius: 40}}
-            handleIndicatorStyle={{backgroundColor: fontGray}}
+            enableHandlePanningGesture={false}
+            enableContentPanningGesture={false}
+            style={{flex: 1, borderRadius: 0, marginTop: -30,}}
+            backgroundStyle={{backgroundColor: primary, borderRadius: 0}}
+            handleIndicatorStyle={{backgroundColor: primary}}
             index={0}
             enablePanDownToClose={true}
             snapPoints={snapPoints}
             onChange={handleSheetChangesMethod}
-            backdropComponent={props.noBackdrop ? null : renderBackdrop}>
+            backdropComponent={renderBackdrop}>
 
-                <View style={styles.container}>
-                    {props.children}
-                </View>
+                    <View style={[styles.container, {backgroundColor: "red"}]}>
+                      {props.children}
+                    </View>
 
       </BottomSheetModal>
   );
@@ -45,13 +50,15 @@ const CustomBottomSheet = (props) => {
 
 const styles = StyleSheet.create({
     container: { 
-      marginTop: 20, 
-      gap: 20, 
-      padding:15, 
-      paddingHorizontal:30, 
-      flex:1, 
-      display:"flex",
+      flex: 1,
+      borderRadius: 0,
+      // marginTop: 20, 
+      // gap: 20, 
+      // padding:15, 
+      // paddingHorizontal:30, 
+      // flex:1, 
+      // display:"flex",
     }
 });
   
-  export default CustomBottomSheet;
+export default SimpleFullBottomSheet;

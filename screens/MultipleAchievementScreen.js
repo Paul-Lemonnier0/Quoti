@@ -4,13 +4,14 @@ import { useRef, useMemo, useCallback, useState } from "react"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../components/Themed"
 import { useNavigation } from "@react-navigation/native"
-import { CircleBorderButton, GoBackButton } from "../components/Buttons/UsualButton"
+import { CircleBorderButton } from "../components/Buttons/UsualButton"
 import { TitleText } from "../styles/StyledText"
 import { BackgroundView, MainView, TopScreenView } from "../components/View/Views"
 import { ScrollView } from "react-native-gesture-handler"
 import GroupedAchievements from "../components/Achievements/GroupedAchievements"
 import Achievements from "../data/Achievements"
 import AchievementsScreen from "./BottomScreens/AchievementsScreen"
+import { NavigationButton } from "../components/Buttons/IconButtons"
 
 const MultipleAchievementScreen = () => {
 
@@ -52,13 +53,9 @@ const MultipleAchievementScreen = () => {
           <TopScreenView>
               <View style={{display: "flex", flexDirection: "row", alignItems:"center", justifyContent: "space-between", marginBottom: 15, marginTop: -10}}>
 
-                <GoBackButton/>
+                <NavigationButton action={"goBack"}/>
 
                 <TitleText text="Succès"/>
-
-                <CircleBorderButton onPress={() => {}}>
-                    <Feather name="more-horizontal" size={20} color={font} />                                
-                </CircleBorderButton>
 
               </View>
             

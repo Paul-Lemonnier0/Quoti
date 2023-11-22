@@ -26,7 +26,7 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
     )
 }
 
-export const AddedEtapeItem = ({step}) => {
+export const AddedEtapeItem = ({step, handleOpenAddStep}) => {
 
     const cardStyles = cardStyle()
     const secondary = useThemeColor({}, "Secondary")
@@ -38,7 +38,7 @@ export const AddedEtapeItem = ({step}) => {
 
             <View style={styles.addedTextContainer}>
                 <TitleText text={step.titre}/>
-                <NormalText text={step.description}/>
+                <SubText text={step.description}/>
             </View>
 
             <View style={styles.addedFooterContainer}>
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
     addedTextContainer: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 10
+        gap: 5
     },
 
     addedFooterContainer: {

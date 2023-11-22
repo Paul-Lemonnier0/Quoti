@@ -19,7 +19,7 @@ export const PreAddScreen = () => {
     const radios = [
         {key: "AddBasicDetails", text: "Habitude" },
         {key: "AddBasicDetailsObjectif", text: "Objectif"},
-        {key: "AddBasicDetailsDefi", text: "Défi"},
+        // {key: "AddBasicDetailsDefi", text: "Défi"},
       ];
 
     const handleGoNext = () => navigation.navigate(selectedItem)

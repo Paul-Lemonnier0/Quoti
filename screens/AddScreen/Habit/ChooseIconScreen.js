@@ -39,9 +39,7 @@ export const ChooseIconScreen = () => {
     const handleValidation = async() => {
         try{
             const fullHabit = await addHabit(finalHabit)
-        
-            const startingDateToString = fullHabit.startingDate.toDateString() //pour éviter le warning non-seriazable values
-            navigation.navigate("ValidationScreenHabit", {habit: {...fullHabit, startingDate: startingDateToString}})
+            navigation.navigate("ValidationScreenHabit", {habit: {...fullHabit}})
         }
 
         catch (e){

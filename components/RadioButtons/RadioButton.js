@@ -6,11 +6,12 @@ export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number,
    
     const secondary = useThemeColor({}, "Secondary")  
     const contrast = useThemeColor({}, "Contrast")  
+    const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
     const fontContrast = useThemeColor({}, "FontContrast")
     const disabledBackground = useThemeColor({}, "DisabledButtonBackground")
    
-    const color = isHighlight ? fontContrast : (disabled ? fontGray : null)
+    const color = isHighlight ? fontContrast : (disabled ? fontGray : font)
     const backgroundColor = disabled ? (isHighlight ? disabledBackground : secondary) : (isHighlight ? contrast : secondary)
 
     const paddingAndRadius = small ? 15 : 18
@@ -23,7 +24,7 @@ export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number,
             <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
 
                {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
-               {number ? (bold ? <SubTitleGrayText text={number}/> : (disabled && isHighlight ? <NormalText text={number} style={{color: fontContrast}}/> : <NormalGrayText  text={number}/>)) : null}
+               {number !== undefined ? (bold ? <SubTitleGrayText text={number}/> : (disabled && isHighlight ? <NormalText text={number} style={{color: fontContrast}}/> : <NormalGrayText  text={number}/>)) : null}
 
             </View>
         </TouchableOpacity>                 

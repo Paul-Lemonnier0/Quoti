@@ -29,7 +29,7 @@ const CreateHabitDetails = () => {
 
         const detailledHabit = {
             ...habit,
-            frequency: selectedFrequency,
+            frequency: selectedFrequency.key,
             occurence: occurences,
             reccurence: reccurence,
             daysOfWeek: selectedDays,

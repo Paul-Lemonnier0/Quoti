@@ -39,6 +39,21 @@ export const BackgroundTextButton = ({onPress, text, color, bold, disabled, exte
     </TouchableOpacity>);
 }
 
+export const TextButton = ({onPress, text, bold, disabled, extend}) => {
+    
+    const font = useThemeColor({}, "Font")
+    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+
+    const color = disabled ? disabledButtonText : font
+
+    const width = extend ? "100%" : null
+
+    return(
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.normalButton, {width}]}>
+        {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
+    </TouchableOpacity>);
+}
+
 const styles = StyleSheet.create(
     {
         borderButton: {
@@ -49,5 +64,12 @@ const styles = StyleSheet.create(
             padding: 18,
             borderWidth: 2
         },
+
+        normalButton: {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 18,
+        }
     }
 )

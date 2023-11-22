@@ -5,7 +5,7 @@ function isHabitScheduledForDate(habit, currentDate) {
     switch (habit.frequency){
         case "Quotidien":
             if(habit.startingDate > currentDate) return false
-            return isHabitPlannedThisDay(habit.daysOfWeek, currentDate)
+            return isHabitPlannedThisDay(habit.daysOfWeek, habit.startingDate, habit.reccurence, currentDate)
 
         case "Hebdo":
             if(startOfWeek(habit.startingDate, {weekStartsOn: 1}) > currentDate) return false
@@ -38,11 +38,15 @@ const weekNumber = (date) => {
     console.log("Week number of " + date + " is :   " + weekNumber);
 }
 
-const isHabitPlannedThisDay = (daysOfActivity, date) => {
+const isHabitPlannedThisDay = (daysOfActivity, startingDate, reccurence, date) => {
 
     let dayNumberInWeek = date.getDay() === 0 ? 6 : date.getDay() - 1
 
-    return daysOfActivity.includes(dayNumberInWeek) || daysOfActivity.includes(7)
+    if(daysOfActivity.length === 0){
+        return reccurence === 1 || (numberOfDayBetweenDates(startingDate, date) % reccurence == 0);
+    }
+
+    return daysOfActivity.includes(dayNumberInWeek)
 }
 
 const numberOfDayBetweenDates = (date1, date2) => {

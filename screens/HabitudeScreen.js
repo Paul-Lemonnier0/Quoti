@@ -19,13 +19,13 @@ const HabitudeScreen = () => {
     const font = useThemeColor({}, "Font")
     const tertiary = useThemeColor({}, "Tertiary")
 
-    const {Habits, handleCheckStep} = useContext(HabitsContext)
+    const {Habits, filteredHabitsByDate, handleCheckStep} = useContext(HabitsContext)
 
     const route = useRoute()
-    const {habitID, currentDateString} = route.params;
+    const {habitID, habitFrequency, currentDateString} = route.params;
     const currentDate = new Date(currentDateString)
 
-    const habit = Habits[habitID]
+    const habit = filteredHabitsByDate[habitFrequency]["Habitudes"][habitID]
     const steps = Object.values(habit.steps)
     const [displayedSteps, setDisplayedSteps] = useState(steps)
     const isDone = steps.filter(step => step.isChecked).length === steps.length
@@ -34,7 +34,7 @@ const HabitudeScreen = () => {
         const isStepChecked = !step.isChecked
         steps[index] = {...step, isChecked: isStepChecked}
 
-        handleCheckStep(habitID, step.stepID, index, currentDate, isStepChecked)
+        handleCheckStep(habitID, step.stepID, currentDate, isStepChecked)
         setDisplayedSteps([...steps])
     }
 

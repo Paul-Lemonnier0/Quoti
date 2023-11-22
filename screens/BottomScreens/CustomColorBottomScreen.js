@@ -72,7 +72,7 @@ const CustomColorBottomScreen = ({ bottomSheetModalRef, snapPoints, handleSheetC
                                 <View style={[styles.textInputContainer, {borderColor: isHexWrong ? errorColor : font}]}>
                                     <Feather name="hash" size={20} color={isHexWrong ? errorColor : font} />
 
-                                    <TextInput style={styles.textInput} autoCorrect={false} autoCapitalize='none'
+                                    <TextInput style={[styles.textInput, {color: font}]} autoCorrect={false} autoCapitalize='none'
                                         value={hexValue} onBlur={handleBlur} onChangeText={handleHexChange}/>
                                 </View>
                             </View>

@@ -16,6 +16,9 @@ import { useCallback } from "react"
 import AddHabitToObjectifNav from "./AddHabitToObjectifNav"
 import VerticalAnimatedFlatList from "../../../components/FlatList/VerticalAnimatedFlatList"
 import { generateUniqueID } from "../../../primitives/BasicsMethods"
+import { useContext } from "react"
+import { ObjectifsContext } from "../../../data/ObjectifContext"
+import { HabitsContext } from "../../../data/HabitContext"
 
 
 
@@ -24,18 +27,33 @@ const AddHabitsToObjectif = () => {
     const route = useRoute()
     const {objectif} = route.params
 
-    const fontContrast = useThemeColor({}, "FontContrast")
+    const {addObjectif} = useContext(ObjectifsContext)
+    const {addHabit} = useContext(HabitsContext)
 
     const [habitsForObjectif, setHabitsForObjectif] = useState([])
-    console.log("ARRAY : ", habitsForObjectif)
 
-    const handleGoNext = () => {
-        //navigation.navigate()
+    const handleValidate = async() => {
+        const objectifWithID = await addObjectif(objectif)
+
+        const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID}))
+        console.log(updatedHabitsForObjectif)
+        await Promise.all(updatedHabitsForObjectif.map(addHabit));
+
+        console.log("objectif and habit(s) well added")
     }
 
     const addHabitForObjectif = (habit) => {
         setHabitsForObjectif((prevHabits => {
-            return [...prevHabits, {...habit, color: objectif.color, icon: objectif.icon, habitID: generateUniqueID()}]
+            return [
+                ...prevHabits, 
+                {
+                    ...habit, 
+                    color: objectif.color, 
+                    icon: objectif.icon,
+                    startingDate: objectif.startingDate, 
+                    endingDate: objectif.endingDate, 
+                }
+            ]
         }))
     }
 
@@ -97,7 +115,7 @@ const AddHabitsToObjectif = () => {
                         <HugeText text="Décomposez votre objectif !"/>
                     </View>
 
-                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
+                    <NavigationButton action={"validation"} methode={handleValidate}/>
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={4}/>

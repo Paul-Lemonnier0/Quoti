@@ -67,6 +67,7 @@ export default AddBasicDetailsObjectif = () => {
                 startingDate: startingDate.toDateString(), 
                 endingDate: endingDate.toDateString()
             }
+
             navigation.navigate("ChooseColorScreenObjectif", {detailledObjectif})
         }
     }

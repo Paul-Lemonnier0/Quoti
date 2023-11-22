@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "GoodHabits",
+    "name": "Daily",
     "slug": "expo-template-tabs",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/DailyIcon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/DailySplash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },

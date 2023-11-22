@@ -57,7 +57,7 @@ const ComponentPresentation = () => {
     const isSelected = item.frequency === selectedPeriode
 
     return(
-      <BackgroundRadioButton isHighlight={isSelected} text={item.displayedText}
+      <BackgroundRadioButton isHighlight={true} text={"hello"}
             handleOnClick={() => handleChangeSelectedPeriode(item)}/>
     )
   }
@@ -67,7 +67,7 @@ const ComponentPresentation = () => {
     const isSelected = item.frequency === selectedPeriode
 
     return(
-      <BackgroundRadioButton bold isHighlight={isSelected} text={item.displayedText} number={item.nbElement}
+      <BackgroundRadioButton isHighlight={true} text={"hello"}
             handleOnClick={() => handleChangeSelectedPeriode(item)}/>
     )
   }
@@ -77,7 +77,7 @@ const ComponentPresentation = () => {
     const isSelected = item.frequency === selectedPeriode
 
     return(
-      <BackgroundRadioButton disabled isHighlight={isSelected} text={item.displayedText} number={item.nbElement}
+      <BackgroundRadioButton isHighlight={true} text={"hello"}
             handleOnClick={() => handleChangeSelectedPeriode(item)}/>
     )
   }

@@ -3,7 +3,7 @@ import { db } from "./InitialisationFirebase";
 
 const collectionName = "StepsDone"
 
-async function changeStepState(date, stepID, isChecked) {
+async function changeStepStateFirestore(date, stepID, isChecked) {
 
     const dateString = date.toDateString()
     console.log("step concerned at date : ", stepID, " | ", dateString)
@@ -34,16 +34,19 @@ async function changeStepState(date, stepID, isChecked) {
 }
 
 async function fetchStepLogs(date, allStepsID) {
+
+    const flattenStepsID = allStepsID.flat(1)
     const stepsLogs = {};
 
     try {
-        const qry = query(collection(db, collectionName), where("date", "==", date.toDateString()), where("stepID", "in", allStepsID));
+        const qry = query(collection(db, collectionName), where("date", "==", date.toDateString()), where("stepID", "in", flattenStepsID));
         const querySnapShot = await getDocs(qry);
 
         querySnapShot.forEach(stepLogDoc => {
             const stepID = stepLogDoc.get('stepID');
-            stepsLogs[stepID] = { stepID, isChecked: true };
+            stepsLogs[stepID] = true ;
         });
+
     } 
     catch (e) {
         console.log("Error while fetching stepLogs: ", e);
@@ -51,5 +54,41 @@ async function fetchStepLogs(date, allStepsID) {
 
     return stepsLogs;
 }
-  
-export {fetchStepLogs, changeStepState}
+
+async function fetchStepLog(date, stepID) {
+
+    let isChecked = false;
+
+    try {
+        const qry = query(collection(db, collectionName), where("date", "==", date.toDateString()), where("stepID", "==", stepID));
+        const querySnapShot = await getDocs(qry);
+
+        querySnapShot.forEach(stepLogDoc => {
+            isChecked = true ;
+        });
+
+    } 
+    catch (e) {
+        console.log("Error while fetching stepLog with id : ", stepID, " | error : ", e);
+    }
+
+    return isChecked;
+}
+
+async function deleteStepLogs (stepID){
+    console.log("Deleting stepLogs of step : ", stepID, "...")
+
+    const qry = query(collection(db, collectionName), where('stepID', '==', stepID))
+
+    getDocs(qry)
+        .then(querySnapShot => {
+                querySnapShot.forEach(stepLog => {
+                    deleteDoc(stepLog.ref)
+                        .then(() => console.log("Steplog deleted of step : ", stepID))
+                        .catch(() => console.log("Error while deleting stepLog : ", e))
+                })  
+            })
+        .catch(() => console.log("Error while deleting stepLogs : ", e))
+}
+
+export {fetchStepLogs, fetchStepLog, changeStepStateFirestore, deleteStepLogs}

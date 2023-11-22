@@ -47,7 +47,8 @@ const styles = StyleSheet.create({
     container: { 
       marginTop: 20, 
       gap: 20, 
-      padding:15, 
+      padding:15,
+      paddingBottom: 0, 
       paddingHorizontal:30, 
       flex:1, 
       display:"flex",

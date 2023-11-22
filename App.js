@@ -14,13 +14,16 @@ import { useEffect } from "react";
 import { HabitsContext, HabitsProvider } from "./data/HabitContext";
 import { useContext } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { ObjectifsProvider } from "./data/ObjectifContext";
 
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  // const colorScheme = useColorScheme();
-  const colorScheme = 'light'
+  const colorScheme = useColorScheme();
+  // console.log(colorScheme)
+
+  // const colorScheme = 'light'
 
   const [isLoaded] = useFonts({
     "poppinsLight": require("./assets/fonts/Poppins-Light.ttf"),
@@ -43,10 +46,12 @@ export default function App() {
     <GestureHandlerRootView style={{flex: 1}}>
           <BottomSheetModalProvider>
               <SafeAreaProvider onLayout={handleOnLayout}>
+                <ObjectifsProvider>
                 <HabitsProvider>
                   <Navigation colorScheme={colorScheme} />
                   <StatusBar />
                 </HabitsProvider>
+                </ObjectifsProvider>
               </SafeAreaProvider>
           </BottomSheetModalProvider>
     </GestureHandlerRootView>

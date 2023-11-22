@@ -2,6 +2,8 @@ import { useSharedValue } from "react-native-reanimated"
 import { useRef } from "react"
 import {Animated} from 'react-native'
 import { HabitudeBlock } from "../Habitudes/HabitudeBlock"
+import ObjectifBlock from "../Objectifs/ObjectifBlock"
+import { FlatList } from "react-native"
 
 export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
 
@@ -12,11 +14,12 @@ export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
     const onViewableItemsChanged = ({viewableItems: vItems}) => {
         viewableItems.value = vItems
     };
+
     const viewabilityConfigCallbackPairs = useRef([
         { onViewableItemsChanged },
     ]);
 
-      const renderHabits = ({item, index}) => {
+    const renderHabits = ({item, index}) => {
         return (
             <HabitudeBlock habitID={item.habitID} index={index}
                 currentDateString={currentDateString}
@@ -25,23 +28,24 @@ export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
                 viewableItems={viewableItems}/>
         )
     }
+    const renderObjectifs = ({item, index}) => {
+        console.log("Item : ", item)
+        const objectifID = item.objectifID
+        const frequency = item.frequency
+
+        return (
+            <ObjectifBlock key={objectifID} objectifID={objectifID} frequency={frequency}/>
+        )
+    }
 
     return(
-        <Animated.FlatList 
+        <FlatList 
             data={data} 
-            renderItem={renderHabits}
+            renderItem={renderObjectifs}
             showsHorizontalScrollIndicator={false}
             style={{marginHorizontal: -30}}
-            contentContainerStyle={{paddingHorizontal: 30}} //30 + 10 dans le habitudeBlock
-            viewabilityConfig={{itemVisiblePercentThreshold: 100}}
-            viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-            keyExtractor={(item) => item.habitID}
-            scrollEventThrottle={16}
+            contentContainerStyle={{paddingHorizontal: 30, gap: 15}}
             horizontal
-            onScroll={Animated.event(
-                [{nativeEvent: {contentOffset: {y: scrollY}}}],
-                {useNativeDriver: true}
-            )}
         />
     )
 }

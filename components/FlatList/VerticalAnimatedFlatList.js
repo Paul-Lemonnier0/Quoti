@@ -20,12 +20,10 @@ export default VerticalAnimatedFlatList = ({data, currentDateString, presentatio
     ]);
 
     const renderHabits = ({item, index}) => {
+        // console.log("ITEM : ", item)
         return (
-            <HabitudeListItem habitID={item.habitID} index={index}
-                currentDateString={currentDateString}
-                scrollY={scrollY} 
-                listVisibility={listVisibility}
-                viewableItems={viewableItems}/>
+            <HabitudeListItem habitID={item.habitID} habitude={item} index={index}
+                currentDateString={currentDateString}/>
         )
     }
 

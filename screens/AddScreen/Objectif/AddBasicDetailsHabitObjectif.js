@@ -1,6 +1,6 @@
 import { View } from "react-native"
 import { UsualScreen } from "../../../components/View/Views"
-import { BorderTextButton } from "../../../components/Buttons/UsualButton"
+import { BorderTextButton, TextButton } from "../../../components/Buttons/UsualButton"
 import { HugeText, NormalText, SubTitleText } from "../../../styles/StyledText"
 import { useContext, useState } from "react"
 import { StyleSheet } from "react-native"
@@ -15,6 +15,7 @@ import { generateUniqueID } from "../../../primitives/BasicsMethods"
 import AddStepBottomScreen from "../../BottomScreens/AddStepBottomScreen"
 import { NavigationButton } from "../../../components/Buttons/IconButtons"
 import { AddHabitToObjContext } from "./AddHabitToObjectifNav"
+import Separator from "../../../components/Other/Separator"
 
 export const AddBasicDetailsHabitObjectif = () => {
 
@@ -58,11 +59,18 @@ export const AddBasicDetailsHabitObjectif = () => {
 
         if(canGoNext) 
         {
-            stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
-            stepsFinal.pop()
+            let stepsFinal;
 
+            if(steps.length > 1){
+                stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
+                stepsFinal.pop()
+            }
 
-            const habit = {titre, description, steps: stepsFinal.length > 0 ? [{titre, description, stepID: generateUniqueID(), numero: 0}] : stepsFinal}
+            else stepsFinal = [{numero: -1}]
+
+            console.log(stepsFinal)
+
+            const habit = {titre, description, steps: stepsFinal}
             
             navigation.navigate("CreateObjectifHabitDetails", {habit})
         }
@@ -99,8 +107,12 @@ export const AddBasicDetailsHabitObjectif = () => {
                     </View>
                 </View>
 
-                <View style={styles.footer}>
-                    <BorderTextButton extend isTransparent onPress={() => closeModal()} text={"Annuler"}/>
+                <View style={{gap: 10, marginTop: 10}}>
+                    <Separator opacity={0.5}/>
+
+                    <View style={styles.footer}>
+                        <TextButton bold extend onPress={() => closeModal()} text={"Annuler"}/>
+                    </View>
                 </View>
             </View>
 
@@ -124,7 +136,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         gap: 30, 
         flex: 1, 
-        marginTop: 20
+        marginTop: 20,
+        marginBottom: -30
     },
 
     header: {

@@ -28,7 +28,7 @@ export const AddBasicDetails = () => {
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
     const bottomSheetModalRefAddStep = useRef(null);
-    const snapPointsAddStep = useMemo(() => ['80%'], [])
+    const snapPointsAddStep = useMemo(() => ['70%'], [])
 
     const handleOpenAddStep = useCallback(() => {
         bottomSheetModalRefAddStep.current?.present();
@@ -56,10 +56,16 @@ export const AddBasicDetails = () => {
 
         if(canGoNext) 
         {
-            stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
-            stepsFinal.pop()
+            let stepsFinal;
+
+            if(steps.length > 1){
+                stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
+                stepsFinal.pop()
+            }
+
+            else stepsFinal = [{numero: -1}]
             
-            const habit = {titre: titre, description: description, steps: stepsFinal}
+            const habit = {titre: titre, description: description, steps: stepsFinal, objectifID: null}
  
             navigation.navigate("CreateHabitDetails", {habit})
         }
@@ -114,6 +120,8 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
+        marginTop: 20,
+
         marginBottom: 0
     },
 

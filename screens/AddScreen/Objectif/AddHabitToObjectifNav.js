@@ -28,7 +28,7 @@ export default AddHabitToObjectifNav = ({bottomSheetModalRef, snapPoints, handle
     return(
             <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} onChange={handleSheetChanges}>
                 <BottomSheetModalProvider>
-                    <View style={{flex: 1, marginTop: 0, paddingTop: -30, marginBottom: -30}}>
+                    <View style={{flex: 1}}>
                     <AddHabitToObjProvider addHabitForObjectif={addHabitForObjectif} bottomSheetModalRef={bottomSheetModalRef}>
                         <NavigationContainer independent>
                             <AddHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="AddBasicsHabitDetailsObj">

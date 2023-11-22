@@ -10,20 +10,25 @@ import { IconButton } from "../Buttons/IconButtons";
     
 const DayComponentWrapper = ({ date, isInDisplayedMonth, isToday, isSelected }) => {
 
-  const fontGray = useThemeColor({}, "FontGray")
   const font = useThemeColor({}, "Font")
+  const fontContrast = useThemeColor({}, "FontContrast")
 
   const ctx = useCalendarContext();
   const handleClickOnDay = () => {
       ctx.onDateSelect?.(date, { isSelected });
   }
 
-  const borderColor = isSelected ? font : (isToday ? fontGray : 'transparent')
+  const borderColor = isSelected || isToday ? font : 'transparent'
+  const color = font
 
+  const backgroundColor = isSelected ? font : "transparent"
+  const opacity = isInDisplayedMonth ? 1 : 0.25
   return (
     <TouchableOpacity onPress={handleClickOnDay} style={styles.dayContainer}>
-        <View style={[styles.daySubContainer, {borderColor: borderColor, borderWidth: 2, borderRadius: 12}]}>
-            <NormalText text={date.getDate()} style={{color: isInDisplayedMonth ? font : fontGray}}/>
+        <View style={[styles.daySubContainer, {borderColor: borderColor, borderWidth: 2, borderRadius: 12, opacity}]}>
+            <View style={{borderColor: borderColor, borderWidth: 2, borderRadius: 9, margin: 2, flex: 1, alignItems: "center", justifyContent: "center"}}>
+              <NormalText text={date.getDate()} style={{color}}/>
+            </View>
         </View>
     </TouchableOpacity>
   );
@@ -32,20 +37,19 @@ const DayComponentWrapper = ({ date, isInDisplayedMonth, isToday, isSelected }) 
 const HeaderComponent = (calendarRef) => (date) => {
 
   const {endDate} = date
-  const monthName = endDate.toLocaleString('fr', { month: 'long' })
-  const yearNumber = endDate.getFullYear()
+  const monthName = endDate.toLocaleString('fr', { month: 'long', year: 'numeric' })
 
   const font = useThemeColor({}, "Font")
 
   return (
     <View style={styles.headerContainer}>
-      <View style={styles.monthNameContainer}>
-          <TitleText text={monthName}/>
-          <SubText text={yearNumber}/>
+      <View style={styles.incrementDecrementContainer}>
+        <IconButton onPress={() => calendarRef.current?.decrementPage()} provider={"Feather"} name={"chevron-left"}/>
       </View>
 
+      <TitleText text={monthName}/>
+
       <View style={styles.incrementDecrementContainer}>
-            <IconButton onPress={() => calendarRef.current?.decrementPage()} provider={"Feather"} name={"chevron-left"}/>
             <IconButton onPress={() => calendarRef.current?.incrementPage()} provider={"Feather"} name={"chevron-right"}/>
       </View>
     </View>
@@ -53,11 +57,11 @@ const HeaderComponent = (calendarRef) => (date) => {
 };
 
 const DayLabelComponent  = ({date}) => {
-  const dayName = date.toLocaleString('fr', { weekday: 'short' }).substring(0, 3);
+  const dayName = date.toLocaleString('fr', { weekday: 'short' }).substring(0, 1);
 
   return(
       <View style={styles.dayLabelContainer}>
-          <LittleNormalText text={dayName}/>
+          <LittleNormalText text={dayName} bold/>
       </View>
   )
 }
@@ -104,8 +108,7 @@ const styles = StyleSheet.create({
   },
 
   daySubContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+
     height: 40, width: 40,
     borderRadius: 5,
     opacity: 1, margin: 0
@@ -114,7 +117,8 @@ const styles = StyleSheet.create({
   dayLabelContainer: {
     alignItems:'center', 
     justifyContent:'center', 
-    flex:1
+    flex:1,
+    marginVertical: 10
   },
 
   incrementDecrementContainer: {

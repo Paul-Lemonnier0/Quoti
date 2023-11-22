@@ -28,8 +28,6 @@ export const ChooseIconScreenObjectif = () => {
     const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 20);
     const [selectedIcon, setSelectedIcon] = useState(splitHabitsIconsData[0][0].id)
 
-    console.log(selectedIcon)
-
     const iconedObjectif = {...coloredObjectif, icon: selectedIcon}
 
     const secondary = useThemeColor({}, "Secondary")
@@ -38,7 +36,7 @@ export const ChooseIconScreenObjectif = () => {
 
     const handleValidation = async() => {
         try{        
-            navigation.navigate("AddHabitsToObjectif", {objectif: iconedObjectif})
+            navigation.navigate("AddHabitsToObjectif", {objectif: {...iconedObjectif}})
         }
 
         catch (e){

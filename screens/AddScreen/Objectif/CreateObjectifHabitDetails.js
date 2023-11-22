@@ -1,4 +1,4 @@
-import { BorderTextButton } from "../../../components/Buttons/UsualButton"
+import { BorderTextButton, TextButton } from "../../../components/Buttons/UsualButton"
 import { UsualScreen } from "../../../components/View/Views"
 import { HugeText, SubText, SubTitleText } from "../../../styles/StyledText"
 import { View, StyleSheet } from "react-native"
@@ -9,6 +9,7 @@ import { NavigationButton } from "../../../components/Buttons/IconButtons"
 import { AddHabitToObjContext } from "./AddHabitToObjectifNav"
 import { SelectWeekDays } from "../../../components/AddHabits/FrequencySelection"
 import { BorderRadioButton } from "../../../components/RadioButtons/RadioButton"
+import Separator from "../../../components/Other/Separator"
 
 export const CreateObjectifHabitDetails = () => {
 
@@ -31,7 +32,7 @@ export const CreateObjectifHabitDetails = () => {
 
         const detailledHabit = {
             ...habit,
-            frequency: selectedFrequency,
+            frequency: selectedFrequency.key,
             occurence: occurences,
             reccurence: reccurence,
             daysOfWeek: selectedDays,
@@ -137,8 +138,12 @@ export const CreateObjectifHabitDetails = () => {
                     </View>
                 </View>
 
-                <View style={styles.footer}>
-                    <BorderTextButton extend isTransparent onPress={() => closeModal()} text={"Annuler"}/>
+                <View style={{gap: 10, marginTop: 10}}>
+                    <Separator opacity={0.5}/>
+
+                    <View style={styles.footer}>
+                        <TextButton bold extend onPress={() => closeModal()} text={"Annuler"}/>
+                    </View>
                 </View>
 
             </View>
@@ -177,7 +182,8 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
-        marginBottom: 0
+        marginTop: 20,
+        marginBottom: -30
     },
 
     header: {

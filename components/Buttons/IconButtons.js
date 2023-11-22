@@ -4,7 +4,7 @@ import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons } f
 import { NormalText } from "../../styles/StyledText";
 import { useNavigation } from "@react-navigation/native";
 
-const Icon = ({name, provider, color, size}) => {
+export const Icon = ({name, provider, color, size}) => {
 
     const iconBaseSize = size ? size : 24
     const iconProps = { name, color, size: iconBaseSize };

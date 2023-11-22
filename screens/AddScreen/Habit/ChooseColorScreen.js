@@ -101,8 +101,7 @@ const styles = StyleSheet.create({
     },
 
     body: {
-        flex: 1, 
-        gap: 0,
+        flex: 1,
     },
 
     header: {

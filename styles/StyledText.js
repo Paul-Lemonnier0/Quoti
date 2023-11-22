@@ -23,8 +23,8 @@ export function TitleText(props) {
 
   const mergedStyles = StyleSheet.flatten([
     styles.titleText,
-    props.style,
     { color: fontColor },
+    props.style,
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;
@@ -96,7 +96,7 @@ export function LittleNormalText(props) {
   const mergedStyles = StyleSheet.flatten([
     styles.littleNormalText,
     props.style,
-    { color: fontColor },
+    { color: fontColor, fontFamily: props.bold ? "poppinsSemiBold" : "poppinsLight"},
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;
@@ -107,8 +107,20 @@ export function HugeText(props) {
 
   const mergedStyles = StyleSheet.flatten([
     styles.hugeText,
-    props.style,
     { color: fontColor },
+    props.style,
+  ]);
+
+  return <Text {...props} style={mergedStyles}>{props.text}</Text>;
+}
+
+export function MassiveText(props) {
+  const fontColor = useThemeColor({}, "Font");
+
+  const mergedStyles = StyleSheet.flatten([
+    styles.massiveText,
+    { color: fontColor },
+    props.style,
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;
@@ -133,6 +145,12 @@ const styles = StyleSheet.create({
 
   hugeText: {
     fontSize: 30,
+    fontWeight: "bold",
+    fontFamily: "poppinsBold",
+  },
+
+  massiveText: {
+    fontSize: 50,
     fontWeight: "bold",
     fontFamily: "poppinsBold",
   },

@@ -9,7 +9,7 @@ import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
 import { Image } from 'react-native';
 import { BackgroundRadioButton } from '../components/RadioButtons/RadioButton';
-import { BackgroundIconButton, BorderButton, BorderIconButton, NavigationButton } from '../components/Buttons/IconButtons';
+import { BackgroundIconButton, BorderButton, BorderIconButton, IconButton, NavigationButton } from '../components/Buttons/IconButtons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import { AnimatedBasicSpinnerView } from '../components/Spinners/AnimatedSpinner';
 import { endOfWeek, startOfWeek } from 'date-fns';
@@ -19,34 +19,46 @@ import HomeCalendarCustomWeek from '../components/Calendars/HomeCalendarCustomWe
 import { ScrollView } from 'react-native';
 import HorizontalAnimatedFlatList from '../components/FlatList/HorizontalAnimatedFlatList';
 import { useThemeColor } from '../components/Themed';
-import { BackgroundTextButton, BorderTextButton } from '../components/Buttons/UsualButton';
+import { BackgroundTextButton, BorderTextButton, TextButton } from '../components/Buttons/UsualButton';
+import { displayTree } from '../primitives/BasicsMethods';
+import { HabitudeListItem } from '../components/Habitudes/HabitudeListItem';
 
 const HomeScreen = () => {
 
   //IMPORTS
 
-  const font = useThemeColor({}, "Font")
-
   const navigation = useNavigation()
-  const { changeDate, filteredHabitsByDate, isFetchingHabit, isFetched } = useContext(HabitsContext);
+  const { changeDate, filteredHabitsByDate, isFetchingHabit, Habits, isFetched, removeHabit, updateHabit } = useContext(HabitsContext);
+
+  const handleTest = () => {
+    const firstHabit = Object.values(filteredHabitsByDate["Quotidien"]["Habitudes"])[0]
+    // const firstHabit = Object.values(Habits)[0]
+
+    const date =  new Date(2022, 10, 21)
+    // updateHabit(firstHabit.habitID, {startingDate: date}, selectedDate)
+    removeHabit(firstHabit)
+  }
 
   //PERIODES
 
   const [selectedPeriode, setSelectedPeriode] = useState("Quotidien")
 
   const initialPeriodes = [
-    {frequency: "Quotidien", displayedText: "Jour", nbElement: 0}, 
-    {frequency: "Hebdo", displayedText: "Semaine", nbElement: 0}, 
-    {frequency: "Mensuel", displayedText: "Mois", nbElement: 0}
+    {frequency: "Quotidien", displayedText: "Jour", nbElements: 0}, 
+    {frequency: "Hebdo", displayedText: "Semaine", nbElements: 0}, 
+    {frequency: "Mensuel", displayedText: "Mois", nbElements: 0}
   ]
 
   const [periodes, setPeriodes] = useState(["Calendar", ...initialPeriodes]) 
 
   useEffect(() =>{
     const updatedPeriodes = initialPeriodes.map(initPeriode => {
+
+      const nbElements = Object.values(filteredHabitsByDate[initPeriode.frequency]["Habitudes"]).length + Object.values(filteredHabitsByDate[initPeriode.frequency]["Objectifs"]).length
+
       return({
         ...initPeriode,
-        nbElement: Object.values(filteredHabitsByDate[initPeriode.frequency]).length
+        nbElements
       })
     })
 
@@ -57,7 +69,10 @@ const HomeScreen = () => {
   const handleChangeSelectedPeriode = (newPeriode) => {
     if(isFetched) {
       setSelectedPeriode(newPeriode.frequency)
-      setDisplayedHabits(Object.values(filteredHabitsByDate[newPeriode.frequency]))
+      const data = filteredHabitsByDate[newPeriode.frequency]
+
+      setDisplayedHabits(Object.values(data["Habitudes"]))
+      setDisplayedObjectifs(Object.keys(data["Objectifs"]))
     }
 
     setSelectedPeriode(newPeriode.frequency)
@@ -65,11 +80,12 @@ const HomeScreen = () => {
 
   //DISPLAYED HABITS
 
-
-  const [displayedHabits, setDisplayedHabits] = useState(Object.values(filteredHabitsByDate[selectedPeriode]))
+  const [displayedHabits, setDisplayedHabits] = useState(Object.values(filteredHabitsByDate[selectedPeriode]["Habitudes"]))
+  const [displayedObjectifs, setDisplayedObjectifs] = useState(Object.keys(filteredHabitsByDate[selectedPeriode]["Objectifs"]))
 
   useEffect(() => {
-    setDisplayedHabits(Object.values(filteredHabitsByDate[selectedPeriode]))
+    setDisplayedHabits(Object.values(filteredHabitsByDate[selectedPeriode]["Habitudes"]))
+    setDisplayedObjectifs(Object.keys(filteredHabitsByDate[selectedPeriode]["Objectifs"]))
   }, [filteredHabitsByDate])
 
 
@@ -94,25 +110,7 @@ const HomeScreen = () => {
     }
   }
 
-  //STATEMENT SENTENCE
-
-  const getStatementSentence = () => {
-    switch (selectedPeriode) {
-      case 'Quotidien':
-        return 'À faire ce jour :';
-      case 'Hebdo':
-        return 'À faire cette semaine :';
-      case 'Mensuel':
-        return 'À faire ce mois ci :';
-      default:
-        return 'À faire aujourd\'hui:';
-    }
-  };
-
-  const statementSentence = getStatementSentence()
-
   //BOTTOM SHEETS
-
 
   const bottomSheetModalRef_Calendar = useRef(null);
   const snapPoints_Calendar = useMemo(() => ['55%'], []);
@@ -124,7 +122,6 @@ const HomeScreen = () => {
   const handleSheetChangesCalendar = useCallback((index) => {
       console.log("handleSheetChange", index)
   }, []);
-
 
   //JSX
 
@@ -139,7 +136,7 @@ const HomeScreen = () => {
       const isSelected = item.frequency === selectedPeriode
 
       return(
-        <BackgroundRadioButton bold isHighlight={isSelected} text={item.displayedText} number={item.nbElement}
+        <BackgroundRadioButton isHighlight={isSelected} text={item.displayedText} number={item.nbElements}
               handleOnClick={() => handleChangeSelectedPeriode(item)}/>
       )
   }
@@ -157,10 +154,25 @@ const HomeScreen = () => {
 
   const NotEmptyHabitsScreen = () => {
     return(
-      <View style={{flex: 1, marginTop: 15, display: "flex", flexDirection: "column", gap: 30}}>
+      <View style={{gap: 20}}>
 
-        <VerticalAnimatedFlatList data={displayedHabits} currentDateString={selectedDate.toDateString()}/>
+        {
+          displayedHabits.map(habit => (
+            <HabitudeListItem 
+              habitude={habit} 
+              currentDateString={selectedDate.toDateString()}/>)
+          )
+        }
 
+      </View>)
+  }
+
+  const objectifs = displayedObjectifs.map(obj => ({objectifID: obj, frequency: selectedPeriode}))
+  console.log(objectifs)
+  const NotEmptyObjectifsScreen = () => {
+    return(
+      <View>
+        <HorizontalAnimatedFlatList data={objectifs} currentDateString={selectedDate.toDateString()}/>
       </View>)
   }
 
@@ -168,15 +180,18 @@ const HomeScreen = () => {
     navigation.navigate("ProfilDetailsScreen");
   }, []);
 
+
   return (
       <UsualScreen>
         <View style={styles.container}>
           <View style={styles.header}>
             <View style={styles.ProfilContainer}>
                 <View style={styles.center}>
-                    <HugeText text={displayedDate}/>  
                     <SubTitleGrayText text={selectedDate.getFullYear()}/>  
+                    <HugeText text={displayedDate}/>  
                 </View> 
+
+                <IconButton name={"update"} provider={"MaterialCommunityIcons"} onPress={handleTest}/>
 
                 <View style={styles.center}>
                     <ProfilButton onPress={handleOpenProfilDetails} profil={{image: require("../img/TestVrai.png")}}/>
@@ -194,10 +209,8 @@ const HomeScreen = () => {
             </View>
           </View>
         
-          <View style={[styles.displayColumn, {gap: 10, flex: 1}]}>                  
-            <View>
-                <TitleText text={statementSentence}/>
-            </View>
+          <View style={{gap: 10, flex: 1}}>            
+
             {
               isFetchingHabit ? 
               <View style={styles.loadingAndEmptyScreenContainer}>
@@ -212,10 +225,30 @@ const HomeScreen = () => {
               </View>
 
               :
+              
+              <ScrollView style={[styles.displayColumn, {gap: 10, flex: 1, marginHorizontal: -30, marginBottom: -120}]}>
+                <View style={[styles.displayColumn, {flex: 1, marginBottom: 100, marginHorizontal: 30, gap: 20}]}>
+                  <View style={styles.objectifsContainer}>
+                    <View>
+                      <TitleText text={"Objectifs"}/>
+                    </View>
 
-              <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
-                   <NotEmptyHabitsScreen/>
-              </View>
+                    <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
+                        <NotEmptyObjectifsScreen/>
+                    </View>
+                  </View>
+
+                  <View style={styles.habitsContainer}>
+                    <View>
+                      <TitleText text={"Habitudes"}/>
+                    </View>
+
+                    <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
+                        <NotEmptyHabitsScreen/>
+                    </View>
+                  </View>
+                </View>
+              </ScrollView>
 
 
             }
@@ -265,9 +298,6 @@ const styles = StyleSheet.create({
   dayPlanContainer: {
     flex:1,
     flexGrow: 1,
-    marginHorizontal: -30,
-    paddingHorizontal: 30,
-    marginBottom: -150,
   },
 
   center:{
@@ -305,6 +335,18 @@ const styles = StyleSheet.create({
   emptyScreenSubContainer: {
     justifyContent: "space-evenly", 
     alignItems: "center"
+  },
+
+  objectifsContainer: {
+    gap: 20,
+    display: 'flex',
+    flexDirection: "column"
+  },
+
+  habitsContainer: {
+    gap: 20,
+    display: 'flex',
+    flexDirection: "column"
   }
 });
 

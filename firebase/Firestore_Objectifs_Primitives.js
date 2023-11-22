@@ -1,73 +1,54 @@
 import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
-import { listKeyIDfromArray } from "../primitives/BasicsMethods"
-import { addHabitToFireStore } from "./Firestore_Habits_Primitives"
 
 const userID = "Paul"
+const collectionName = "Objectifs"
 
 const addObjectifToFirestore = async(objectif) => {
 
-    console.log("adding habits of objectif to firestore...")
-
-    const objectifRef = await addDoc(collection(db, "Objectifs"), {
+    console.log("adding objectif to firestore...")
+    console.log("Objectif to add : ", objectif)
+    const objectifRef = await addDoc(collection(db, collectionName), {
         ...objectif,
         userID: userID
     })
 
     const objectifID = objectifRef.id;
+    console.log("objectif added to firestore with id : ", objectifID)
 
-    const habitsIDArray = []
-    objectif.habits.forEach(habit => {
-
-        const habitToAdd = {
-            ...habit,
-            objectifID        
-        }
-
-        addHab(habitToAdd)
-            .then(addedHabit => {
-                habitsIDArray.push(addedHabit.habitID)
-            })
-    });
-
-    const updatedObjectif = {...objectif, objectifID, habits: habitsIDArray} 
-
-    console.log("adding objectif to firestore...")
-
+    return {...objectif, objectifID}
 }
 
-const getAllOwnHabits = async() => {
+const fetchAllObjectifs = async() => {
 
-    const qry = query(collection(db, "Habits"), where("userID", "==", userID));
+    const qry = query(collection(db, collectionName), where("userID", "==", userID));
     const querySnapshot = await getDocs(qry)
 
-    const habitArray = await Promise.all(
-        querySnapshot.docs.map(async (habit) => {
-        const habitID = habit.id;
+    const objectifArray = await Promise.all(
+        querySnapshot.docs.map(async (obj) => {
+        const objectifID = obj.id;
 
-        const data = habit.data();
-        let steps = {}
- 
-        if(data.steps[0].numero === -1)
-        {
-            steps[habitID] = {
-                ...data.steps[0],
-                numero: 0,
-                titre: data.titre, 
-                description: data.description, 
-                duration: 30, 
-                stepID: habitID,
-                habitID,
-            }
-        }
+        const obj_data = obj.data();
+        const startingDate = new Date(obj_data.startingDate)
+        const endingDate = new Date(obj_data.endingDate)
 
-        else steps = listKeyIDfromArray(data.steps, "stepID", habitID)
+        console.log(obj.data())
 
-        return  {habitID: habitID, ...data, startingDate: new Date(data.startingDate), steps, daysOfWeek: data.daysOfWeek == [7] ? [0,1,2,3,4,5,6] : data.daysOfWeek };
+        return  {
+            ...obj_data, 
+            startingDate,
+            endingDate,
+            objectifID, 
+        };
     }));
 
-    return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});
+    return objectifArray.reduce((newObjectifsList, objectif) => 
+        ({
+            ...newObjectifsList, 
+            [objectif.objectifID]: {...objectif}
+        }),
+    {});
 }
 
 
-export {addHabitToFireStore, getAllOwnHabits}
+export {addObjectifToFirestore, fetchAllObjectifs}

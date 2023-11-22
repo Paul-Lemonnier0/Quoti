@@ -5,7 +5,7 @@ import { StyleSheet } from "react-native";
 import { NormalText, SubText, SubTitleText } from "../../styles/StyledText";
 import { IconButton } from "../Buttons/IconButtons";
 
-export const TextInputCustom = forwardRef(({ startingValue, labelName, onFocus, disabled, onBlur, isWrong, errorMessage, ...props }, ref) => {
+export const TextInputCustom = forwardRef(({ startingValue, labelName, boldLabel, onFocus, disabled, onBlur, isWrong, errorMessage, ...props }, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState(false)
 
@@ -17,7 +17,7 @@ export const TextInputCustom = forwardRef(({ startingValue, labelName, onFocus, 
     const inputDisabledBackground = useThemeColor({}, "InputDisabledBackground") 
 
     const backgroundColor = disabled ? inputDisabledBackground : secondary
-    const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : fontGray)
+    const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : "transparent")
 
     const [value, setValue] = useState(startingValue ? startingValue : "");
 
@@ -29,7 +29,7 @@ export const TextInputCustom = forwardRef(({ startingValue, labelName, onFocus, 
 
     return(
         <View style={styles.container}>
-            <NormalText text={labelName}/>
+            {boldLabel ? <SubTitleText text={labelName}/> : <NormalText text={labelName}/>}
             <View style={[styles.textInputContainer, {borderColor, backgroundColor, color: font}]}>
                 <TextInput {...props} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
@@ -37,13 +37,13 @@ export const TextInputCustom = forwardRef(({ startingValue, labelName, onFocus, 
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
                     onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
 
-                    style={[styles.textInput, {paddingRight: isWrong ? 0 : 18}]}
+                    style={[styles.textInput, {paddingRight: isWrong ? 0 : 18, color: font}]}
                 />
 
                 {isWrong && <IconButton onPress={() => {}} provider={"Feather"} name={"x-circle"} color={errorColor} noPadding/>}
             </View>
 
-            {isWrong ? <SubText text={errorMessage} style={{color: errorColor}}/> : <SubText text={""} style={{color: errorColor}}/>}
+            <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>
         </View>
     )
 })
@@ -60,7 +60,7 @@ export const PasswordInputCustom = forwardRef(({ startingValue, labelName, onFoc
     const inputDisabledBackground = useThemeColor({}, "InputDisabledBackground") 
 
     const backgroundColor = disabled ? inputDisabledBackground : secondary
-    const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : fontGray)
+    const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : "transparent")
 
     const [value, setValue] = useState(startingValue ? startingValue : "");
 
@@ -90,13 +90,13 @@ export const PasswordInputCustom = forwardRef(({ startingValue, labelName, onFoc
                     autoCorrect={false}
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
                     onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
-                    style={[styles.textInput, {paddingRight: 0}]}
+                    style={[styles.textInput, {paddingRight: 0, color: font}]}
                 />
 
                 <IconButton onPress={togglePasswordVisibility} provider={"Feather"} name={isPasswordHidden ? "eye" : "eye-off"} noPadding/>
             </View>            
     
-            {isWrong ? <SubText text={errorMessage} style={{color: errorColor}}/> : <SubText text={""} style={{color: errorColor}}/>}
+            <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>
         </View>
     )
 })

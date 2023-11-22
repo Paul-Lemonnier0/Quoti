@@ -1,6 +1,19 @@
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from 'uuid';
 
+export function displayTree(node, indent = 0) {
+  const spaces = '  '.repeat(indent);
+
+  for (const key in node) {
+    if (typeof node[key] === 'object') {
+      console.log(`${spaces}${key}: `);
+      displayTree(node[key], indent + 1);
+    } else {
+      console.log(`${spaces}${key}: ${JSON.stringify(node[key])}`);
+    }
+  }
+}
+
 const generateUniqueID = () => {
     return uuidv4()
 }

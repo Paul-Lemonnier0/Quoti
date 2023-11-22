@@ -16,7 +16,7 @@ const cardStyle = () => {
     },
 
     card: {
-      borderRadius: 25,
+      borderRadius: 20,
       backgroundColor: secondary,
       padding: 20,
 

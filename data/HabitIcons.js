@@ -1,5 +1,4 @@
 export default HabitIcons = {
-
     "ArtistPalette": require("../img/HabitsIcons/ArtistPalette.png"),
     "ball": require("../img/HabitsIcons/ball.png"),
     "basket": require("../img/HabitsIcons/basket.png"),

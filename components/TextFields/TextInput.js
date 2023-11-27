@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
         fontSize: 14, 
         padding: 18, 
         borderRadius: 18, 
-        fontFamily: "poppinsLight", 
+        fontFamily: "fontLight", 
     },
 
     textInputContainer: {

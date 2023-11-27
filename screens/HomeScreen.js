@@ -3,8 +3,8 @@ import { StyleSheet, View} from 'react-native';
 import { FlatList } from 'react-native';
 import { SubTitleText, HugeText, SubTitleGrayText, NormalText, TitleText } from '../styles/StyledText';
 import { ProfilButton } from '../components/Profil/ProfilButton';
-import { useNavigation } from "@react-navigation/native";
-import { UsualScreen } from '../components/View/Views';
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { CustomScrollView, UsualScreen } from '../components/View/Views';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
 import { Image } from 'react-native';
@@ -22,26 +22,50 @@ import { useThemeColor } from '../components/Themed';
 import { BackgroundTextButton, BorderTextButton, TextButton } from '../components/Buttons/UsualButton';
 import { displayTree } from '../primitives/BasicsMethods';
 import { HabitudeListItem } from '../components/Habitudes/HabitudeListItem';
+import HabitudesList from '../components/Habitudes/HabitudesList';
+import HabitIcons from '../data/HabitIcons';
+import { ObjectifPlaceholder_Meditation, ObjectifPlaceholder_SemiMarathon, habitsPlaceholder } from '../data/HabitsPlaceholder';
+import IllustrationsList from '../data/IllustrationsList';
+import * as Linking from 'expo-linking';
 
 const HomeScreen = () => {
 
   //IMPORTS
 
+  const url = Linking.useURL()
+  console.log("URL : ", {url})
+  if(url) create
+
   const navigation = useNavigation()
-  const { changeDate, filteredHabitsByDate, isFetchingHabit, Habits, isFetched, removeHabit, updateHabit } = useContext(HabitsContext);
 
-  const handleTest = () => {
-    const firstHabit = Object.values(filteredHabitsByDate["Quotidien"]["Habitudes"])[0]
-    // const firstHabit = Object.values(Habits)[0]
-
-    const date =  new Date(2022, 10, 21)
-    // updateHabit(firstHabit.habitID, {startingDate: date}, selectedDate)
-    removeHabit(firstHabit)
-  }
+  const { changeDate, Habits, filteredHabitsByDate, isFetchingHabit, isFetched, addHabit, addObjectif } = useContext(HabitsContext);
 
   //PERIODES
 
   const [selectedPeriode, setSelectedPeriode] = useState("Quotidien")
+
+  const handleAddHabitsPlaceholder = async() => {
+    try{
+      console.log("Starting...")
+      const obj_hab_SemiMarathon = ObjectifPlaceholder_SemiMarathon()
+      const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
+
+      const objectifWithID_Semi = await addObjectif(obj_hab_SemiMarathon["objectif"]) 
+      const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
+      await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
+
+      const objectifWithID_BienEtre = await addObjectif(obj_hab_BienEtre["objectif"]) 
+      const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
+      await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
+
+      await Promise.all(habitsPlaceholder.map(addHabit));
+      console.log("FINI !!!")
+
+    }
+    catch(e){
+      console.log("et non...", e)
+    }
+  }
 
   const initialPeriodes = [
     {frequency: "Quotidien", displayedText: "Jour", nbElements: 0}, 
@@ -117,7 +141,7 @@ const HomeScreen = () => {
 
   const handleOpenCalendar = useCallback(() => {
         bottomSheetModalRef_Calendar.current?.present();
-    }, []);
+  }, []);
 
   const handleSheetChangesCalendar = useCallback((index) => {
       console.log("handleSheetChange", index)
@@ -136,7 +160,7 @@ const HomeScreen = () => {
       const isSelected = item.frequency === selectedPeriode
 
       return(
-        <BackgroundRadioButton isHighlight={isSelected} text={item.displayedText} number={item.nbElements}
+        <BackgroundRadioButton bold isHighlight={isSelected} text={item.displayedText} number={item.nbElements}
               handleOnClick={() => handleChangeSelectedPeriode(item)}/>
       )
   }
@@ -144,7 +168,7 @@ const HomeScreen = () => {
   const EmptyHabitsScreen = () => {
     return(
     <View style={styles.emptySreenContainer}>
-      <Image style={styles.emptyScreenImageContainer} source={require('../img/Illustration/Light_theme/Workout_Break.png')}/>
+      <Image style={styles.emptyScreenImageContainer} source={IllustrationsList["NothingPlanned"]}/>
       <View style={styles.emptyScreenSubContainer}>
         <SubTitleText text="Rien de prévu ce jour"/>
         <NormalText text="Profitez en pour vous reposer !"/>
@@ -153,27 +177,45 @@ const HomeScreen = () => {
   }
 
   const NotEmptyHabitsScreen = () => {
-    return(
-      <View style={{gap: 20}}>
+    const habitsNotEmpty = displayedHabits.length > 0
 
+    return(
+      <View style={styles.habitsContainer}>
         {
-          displayedHabits.map(habit => (
-            <HabitudeListItem 
-              habitude={habit} 
-              currentDateString={selectedDate.toDateString()}/>)
-          )
+          habitsNotEmpty && 
+            <View>
+              <TitleText text={"Habitudes"}/>
+            </View>
         }
 
-      </View>)
+        <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
+          <HabitudesList habits={displayedHabits} selectedDate={selectedDate}/>
+        </View>
+      </View>
+    )
   }
 
   const objectifs = displayedObjectifs.map(obj => ({objectifID: obj, frequency: selectedPeriode}))
-  console.log(objectifs)
+
   const NotEmptyObjectifsScreen = () => {
+    const objectifsNotEmpty = objectifs.length > 0
+
     return(
-      <View>
-        <HorizontalAnimatedFlatList data={objectifs} currentDateString={selectedDate.toDateString()}/>
-      </View>)
+      <View style={styles.objectifsContainer}>
+        {
+          objectifsNotEmpty && 
+            <View>
+              <TitleText text={"Objectifs"}/>
+            </View>
+        }
+
+        <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
+          <View>
+            <HorizontalAnimatedFlatList data={objectifs} currentDateString={selectedDate.toDateString()}/>
+          </View>                    
+        </View>
+      </View>
+    )
   }
 
   const handleOpenProfilDetails = useCallback(() => {
@@ -191,7 +233,7 @@ const HomeScreen = () => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                <IconButton name={"update"} provider={"MaterialCommunityIcons"} onPress={handleTest}/>
+                {/* <IconButton name={"update"} provider={"MaterialCommunityIcons"} onPress={handleAddHabitsPlaceholder}/> */}
 
                 <View style={styles.center}>
                     <ProfilButton onPress={handleOpenProfilDetails} profil={{image: require("../img/TestVrai.png")}}/>
@@ -226,31 +268,12 @@ const HomeScreen = () => {
 
               :
               
-              <ScrollView style={[styles.displayColumn, {gap: 10, flex: 1, marginHorizontal: -30, marginBottom: -120}]}>
-                <View style={[styles.displayColumn, {flex: 1, marginBottom: 100, marginHorizontal: 30, gap: 20}]}>
-                  <View style={styles.objectifsContainer}>
-                    <View>
-                      <TitleText text={"Objectifs"}/>
-                    </View>
-
-                    <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
-                        <NotEmptyObjectifsScreen/>
-                    </View>
-                  </View>
-
-                  <View style={styles.habitsContainer}>
-                    <View>
-                      <TitleText text={"Habitudes"}/>
-                    </View>
-
-                    <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
-                        <NotEmptyHabitsScreen/>
-                    </View>
-                  </View>
+              <CustomScrollView>
+                <View style={[styles.displayColumn, {flex: 1, gap: 20}]}>
+                  <NotEmptyObjectifsScreen/>
+                  <NotEmptyHabitsScreen/>
                 </View>
-              </ScrollView>
-
-
+              </CustomScrollView>
             }
           </View>
         </View>
@@ -293,6 +316,7 @@ const styles = StyleSheet.create({
   loadingAndEmptyScreenContainer: {
     flex:1,
     flexGrow: 1,
+    margin: 30
   },
 
   dayPlanContainer: {

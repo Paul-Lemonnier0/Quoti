@@ -1,13 +1,14 @@
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { useThemeColor } from "../Themed"
-import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons } from '@expo/vector-icons'; 
+import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons, Octicons } from '@expo/vector-icons'; 
 import { NormalText } from "../../styles/StyledText";
 import { useNavigation } from "@react-navigation/native";
 
 export const Icon = ({name, provider, color, size}) => {
 
+    const font = useThemeColor({}, "Font")
     const iconBaseSize = size ? size : 24
-    const iconProps = { name, color, size: iconBaseSize };
+    const iconProps = { name, color : color ? color : font, size: iconBaseSize };
 
     switch (provider){
         case "Feather":
@@ -24,6 +25,9 @@ export const Icon = ({name, provider, color, size}) => {
 
         case "IonIcons":
             return <Ionicons {...iconProps}/>
+        
+        case "Octicons":
+            return <Octicons {...iconProps}/>
 
         default: {
             return <NormalText text="?"/>

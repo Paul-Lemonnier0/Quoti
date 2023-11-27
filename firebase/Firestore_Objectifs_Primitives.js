@@ -6,17 +6,22 @@ const collectionName = "Objectifs"
 
 const addObjectifToFirestore = async(objectif) => {
 
+    let startingDate = objectif.startingDate;
+    let endingDate = objectif.endingDate;
+    if(typeof objectif.startingDate !== 'string'){
+        startingDate = objectif.startingDate.toDateString();
+        endingDate = objectif.endingDate.toDateString();
+    }
+
+    const objectifToAdd = {...objectif, startingDate, endingDate, userID}
+
     console.log("adding objectif to firestore...")
-    console.log("Objectif to add : ", objectif)
-    const objectifRef = await addDoc(collection(db, collectionName), {
-        ...objectif,
-        userID: userID
-    })
+    const objectifRef = await addDoc(collection(db, collectionName), objectifToAdd)
 
     const objectifID = objectifRef.id;
     console.log("objectif added to firestore with id : ", objectifID)
 
-    return {...objectif, objectifID}
+    return {...objectifToAdd, objectifID}
 }
 
 const fetchAllObjectifs = async() => {
@@ -31,8 +36,6 @@ const fetchAllObjectifs = async() => {
         const obj_data = obj.data();
         const startingDate = new Date(obj_data.startingDate)
         const endingDate = new Date(obj_data.endingDate)
-
-        console.log(obj.data())
 
         return  {
             ...obj_data, 

@@ -1,11 +1,11 @@
 {
   "expo": {
     "name": "Daily",
-    "slug": "expo-template-tabs",
+    "slug": "Daily",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/DailyIcon.png",
-    "scheme": "myapp",
+    "scheme": "Daily",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/DailySplash.png",
@@ -15,9 +15,12 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.arzakal.Daily"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,6 +30,11 @@
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "939c8fe8-de54-461f-bb4a-748e1700974a"
+      }
     }
   }
 }

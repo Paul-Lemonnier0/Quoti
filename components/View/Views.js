@@ -2,6 +2,7 @@ import { useThemeColor } from "../Themed";
 import { View, StyleSheet, SafeAreaView } from "react-native";
 import { Fragment } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScrollView } from "react-native-gesture-handler";
 
 export const MainView = (props) => {
     const primary = useThemeColor({}, "Primary")
@@ -39,7 +40,7 @@ export const UsualScreen = (props) => {
     const linearGradientOpacity = useThemeColor({}, "LinearGradientOpacity")
 
     return(
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, backgroundColor: primary}}>
         <SafeAreaView style={{ flex: 1, backgroundColor: primary }}>
             <View style={[styles.container, {paddingBottom: props.hideMenu ? 20 : 120}]}>
                 {props.children}
@@ -62,6 +63,21 @@ export const BackgroundView = (props) => {
     </View>
     );
 }
+
+export const CustomScrollView = ({hiddenMenu, ...props}) => {
+
+    const marginBottom = hiddenMenu ? 0 : -100
+    const marginHorizontal = -25
+
+    return(
+        <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom, marginHorizontal}} {...props}>
+            <View style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}>
+                {props.children}
+            </View>
+        </ScrollView>
+    )
+}
+
 
 const styles = StyleSheet.create({
 

@@ -3,8 +3,12 @@ import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateHab
 import { changeStepStateFirestore, fetchStepLog } from "../firebase/Firestore_Step_Primitives";
 import { isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
 import { AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
-import { filterHabits, getHabitType, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
-import { createDefaultStepFromHabit, updateHabitStepState } from "../primitives/StepMethods";
+import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
+import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
+import { displayTree } from "../primitives/BasicsMethods";
+import { addObjectifToFirestore, fetchAllObjectifs } from "../firebase/Firestore_Objectifs_Primitives";
+import { Alert } from "react-native";
+import { convertBackSeriazableObjectif } from "../primitives/ObjectifMethods";
 
 const HabitsContext = createContext();
 
@@ -12,9 +16,11 @@ const HabitsProvider = ({ children }) => {
 
     const alreadyFetchedStepLogs = {};  //de la forme [stepID, currentDay]: isChecked
     const alreadySeenHabitsScheduledForDay = {}; //De la forme {date: [habitID_1, habitID_2, ...]}
-    const [Habits, setHabits] = useState({});
 
-    const selectedDate = new Date()
+    const [Habits, setHabits] = useState({});
+    const [Objectifs, setObjectifs] = useState({});
+
+    let selectedDate = new Date()
 
     const [filteredHabitsByDate, setFilteredHabitsByDate] = useState(
       {
@@ -26,19 +32,22 @@ const HabitsProvider = ({ children }) => {
     const [isFetched, setIsFetched] = useState(false)
     const [isFetchingHabit, setIsFetchingHabit] = useState(false)
 
-    const fetchAllHabits = async () => {
+
+    const fetchHabits = async () => {
         console.log("Fetching habits...")
 
         const habits = await getAllOwnHabits()
-        setHabits(habits);
+        setHabits(habits);        
 
         console.log("habits successfully fetched.")
         return habits;
     };
 
-    const fetchHabits = async () => {
+
+
+    const settupHabits = async () => {
       try{
-        const habits = await fetchAllHabits()
+        const habits = await fetchHabits()
 
         filterHabits(new Date(), habits, alreadySeenHabitsScheduledForDay, alreadyFetchedStepLogs, setIsFetchingHabit)
           .then(filteredHabits => {
@@ -52,9 +61,26 @@ const HabitsProvider = ({ children }) => {
       }
     }
 
+    const fetchObjectifs = async () => {
+      try{
+        console.log("fetching objectifs...")
+        const objectifs = await fetchAllObjectifs();
+        setObjectifs(objectifs)
+        console.log("objectifs successfully fetched.")
+      }
+
+      catch(e){
+        console.log("Error while fetching objectifs : ", e)
+      }
+    }
+
+
     useEffect(() => {
-      fetchHabits();
+      settupHabits();
+      fetchObjectifs();
     }, []);
+
+
 
     const changeDate = async(date) => {
       selectedDate = date
@@ -69,8 +95,8 @@ const HabitsProvider = ({ children }) => {
       catch(e) { console.log("error while changing date : ", e)}
     }
 
-    const handleCheckStep = (habitID, stepID, date, isChecked) => {
-      const habit = Habits[habitID]
+
+    const isHabitPlannedForSelectedDay = (habit, date) => {
       const frequency = habit.frequency
       const isObjective = getHabitType(habit) === "Objectifs"
 
@@ -78,37 +104,42 @@ const HabitsProvider = ({ children }) => {
             filteredHabitsByDate[frequency]["Objectifs"]?.[habit.objectifID]?.hasOwnProperty(habit.habitID)
 
       const habitPlannedForCurrentDate = isHabitInObjectifPlanned ||
-            filteredHabitsByDate[frequency]["Habitudes"]?.[habit.habitID] !== undefined;
+            filteredHabitsByDate[frequency]["Habitudes"].hasOwnProperty(habit.habitID);
 
-      if(habitPlannedForCurrentDate){        
+      return habitPlannedForCurrentDate
+    }
+
+
+    const handleCheckStep = (habitID, stepID, date, isChecked) => {
+      const habit = Habits[habitID]
+
+      if(isHabitPlannedForSelectedDay(habit, date)){       
+        const habitType = getHabitType(habit)
+
         setFilteredHabitsByDate(previousFilteredHabits => (
-          updateHabitStepState(previousFilteredHabits, habit, stepID, isChecked)))
+          updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked)))
       }
 
       changeStepStateFirestore(date, stepID, isChecked)
     }
 
+
+
+
     const addHabit = async(habit) => {
       try{
-          console.log("adding habit...")
-          const habitWithID = await addHabitToFireStore(habit)
-
-          let finalHabit = {...habitWithID}
           
-          if(Object.values(habitWithID.steps).length === 0){
-            const placeholderStep = createDefaultStepFromHabit(habitWithID, habitWithID.habitID, true);
-            finalHabit = {...finalHabit, steps: placeholderStep}
-          }
-          
-          if(isHabitScheduledForDate(finalHabit, selectedDate)){
-            setFilteredHabitsByDate(previousFilteredHabits => (
-              updateFilteredHabitsWithNewHabit(previousFilteredHabits, finalHabit, selectedDate)
-            ))
-          }
+          const habitWithID = await addHabitToFireStore(habit)          
+          const finalHabit = setHabitWithDefaultStep(habitWithID)
 
           setHabits((prevHabits) => (updateHabitsWithNewHabit(prevHabits, finalHabit)));
 
-          console.log("habit well added", finalHabit)
+          setFilteredHabitsByDate(previousFilteredHabits => (
+            updateFilteredHabitsWithNewHabit(previousFilteredHabits, finalHabit, selectedDate)
+          ))
+
+
+          console.log("habit well added !")
           return finalHabit
       }
 
@@ -117,16 +148,49 @@ const HabitsProvider = ({ children }) => {
       }
     }
 
+
+    const addObjectif = async(objectif) => {
+      try{
+        console.log("Adding objectif...")
+        const addedObjectif = await addObjectifToFirestore(objectif)
+        const deserializedObjectif = convertBackSeriazableObjectif(addedObjectif)
+
+        console.log(addedObjectif)
+        setObjectifs(prevObjs => ({...prevObjs, [deserializedObjectif.objectifID]: deserializedObjectif}))
+
+        console.log("Objectif well added !")
+
+        return addedObjectif
+      }
+
+      catch(e) { console.log("Error while adding objectif : ", e) }
+    }
+
+
+
+
     const removeHabit = async(habit) => {
       console.log("Deleting habit : ", habit.titre, "...")
       const habitID = habit.habitID
 
       await removeHabitInFirestore(habit)
-      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
+
       setHabits(previousHabits => removeHabitFromHabits(previousHabits, habitID))
+      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
 
       console.log("Habit : ", habit.titre, " succesfully deleted !")
     }
+
+
+    const updateHabitRelationWithObjectif = async(habit, destination_objectifID = null) => {
+      const newHabit = await updateHabit(habit.habitID, { objectifID: destination_objectifID}, selectedDate)
+      console.log(Objectifs)
+
+      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
+    }
+
+
+
 
     const updateHabit = async(oldHabitID, newValues, currentDate) => {
       const oldHabit = Habits[oldHabitID]
@@ -140,6 +204,12 @@ const HabitsProvider = ({ children }) => {
       setHabits(previousHabits => updateHabitsWithNewHabit(previousHabits, updatedHabit))
 
       console.log("Habit : ", updatedHabit.titre, " successfully updated !")
+      return updatedHabit
+    }
+
+
+    const getHabitFromFilteredHabits = (frequency, objectifID, habitID) => {
+      return getHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
     }
 
     if(!isFetched) {
@@ -148,12 +218,16 @@ const HabitsProvider = ({ children }) => {
 
     const exportedValues = {
       Habits,
+      Objectifs,
       filteredHabitsByDate,
+      getHabitFromFilteredHabits,
       isFetched,
       changeDate,
       addHabit,
       removeHabit,
+      updateHabitRelationWithObjectif,
       updateHabit,
+      addObjectif,
       handleCheckStep,
     }
 

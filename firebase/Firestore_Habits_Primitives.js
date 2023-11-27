@@ -30,10 +30,9 @@ const addHabitToFireStore = async(habit) => {
 
     const steps = listKeyIDfromArray(oldSteps, "stepID", habitID)
       
-    console.log("Habit well added to firestore.")
+    console.log("Habit well added to firestore with id : ", habitID)
 
     const startingDate =  new Date(habitToAdd.startingDate)
-    console.log(startingDate)
     return {...habitToAdd, startingDate, habitID, steps}
 }
 

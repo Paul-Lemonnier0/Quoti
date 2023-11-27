@@ -29,12 +29,12 @@ export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
         )
     }
     const renderObjectifs = ({item, index}) => {
-        console.log("Item : ", item)
         const objectifID = item.objectifID
         const frequency = item.frequency
 
         return (
-            <ObjectifBlock key={objectifID} objectifID={objectifID} frequency={frequency}/>
+            <ObjectifBlock key={objectifID} objectifID={objectifID} frequency={frequency}
+                currentDateString={currentDateString}/>
         )
     }
 

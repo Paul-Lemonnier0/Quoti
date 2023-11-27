@@ -40,7 +40,7 @@ const SimpleFullBottomSheet = (props) => {
             onChange={handleSheetChangesMethod}
             backdropComponent={renderBackdrop}>
 
-                    <View style={[styles.container, {backgroundColor: "red"}]}>
+                    <View style={[styles.container, {backgroundColor: primary}]}>
                       {props.children}
                     </View>
 

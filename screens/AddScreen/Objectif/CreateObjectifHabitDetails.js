@@ -6,10 +6,12 @@ import { useContext, useState } from "react"
 import { IncrementButtons } from "../../../components/Buttons/IncrementButtons"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { NavigationButton } from "../../../components/Buttons/IconButtons"
-import { AddHabitToObjContext } from "./AddHabitToObjectifNav"
 import { SelectWeekDays } from "../../../components/AddHabits/FrequencySelection"
 import { BorderRadioButton } from "../../../components/RadioButtons/RadioButton"
 import Separator from "../../../components/Other/Separator"
+import { AddHabitToObjContext } from "./AddHabitToObjContext"
+import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext"
+import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets"
 
 export const CreateObjectifHabitDetails = () => {
 
@@ -17,7 +19,9 @@ export const CreateObjectifHabitDetails = () => {
 
     const route = useRoute()
     const {habit} = route.params
-    const {closeModal, addHabitForObjectif} = useContext(AddHabitToObjContext)
+    
+    const {addHabitForObjectif} = useContext(AddHabitToObjContext)
+    const {closeModal} = useContext(BottomSheetModalMethodsContext)
 
     const [selectedDays, setSelectedDays] = useState([]);
     const [isAllDaySelected, setAllDaySelected] = useState(true);
@@ -138,13 +142,7 @@ export const CreateObjectifHabitDetails = () => {
                     </View>
                 </View>
 
-                <View style={{gap: 10, marginTop: 10}}>
-                    <Separator opacity={0.5}/>
-
-                    <View style={styles.footer}>
-                        <TextButton bold extend onPress={() => closeModal()} text={"Annuler"}/>
-                    </View>
-                </View>
+                <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
 
             </View>
         </UsualScreen>

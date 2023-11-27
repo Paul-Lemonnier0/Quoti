@@ -2,34 +2,60 @@ import "react-native-gesture-handler";
 
 import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { Asset } from 'expo-asset';
 
 import { useLoadedAssets } from "./hooks/useLoadedAssets";
 import Navigation from "./navigation";
-import { useColorScheme } from "react-native";
+import { Image, useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
+import * as Linking from 'expo-linking';
 import { useCallback } from "react";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet"
-import { useEffect } from "react";
-import { HabitsContext, HabitsProvider } from "./data/HabitContext";
-import { useContext } from "react";
+import { HabitsProvider } from "./data/HabitContext";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ObjectifsProvider } from "./data/ObjectifContext";
+import { habitIconRequires } from "./data/HabitIcons";
+import { IllustrationsRequire } from "./data/IllustrationsList";
 
+import { makeRedirectUri } from "expo-auth-session"
+import { QueryParams } from "expo-auth-session/build/QueryParams"
 
 SplashScreen.preventAutoHideAsync();
 
+const redirectTo = makeRedirectUri();
+
+const createSessionFromUrl = async(url) => {
+  const { params, errorCode } = QueryParams.getQueryParams(url);
+
+  if(errorCode) throw new Error(errorCode)
+  const { access_token, refresh_token } = params;
+
+  if(!access_token) return;
+}
+
 export default function App() {
   const colorScheme = useColorScheme();
-  // console.log(colorScheme)
+  
+  function cacheImages(images) {
+    return images.map(image => {
+      if (typeof image === 'string') {
+        return Image.prefetch(image);
+      } else {
+        return Asset.fromModule(image).downloadAsync();
+      }
+    });
+  }
+  
+  const images = habitIconRequires.concat(IllustrationsRequire)
+  cacheImages(images)
 
-  // const colorScheme = 'light'
 
   const [isLoaded] = useFonts({
-    "poppinsLight": require("./assets/fonts/Poppins-Light.ttf"),
-    "poppinsMedium": require("./assets/fonts/Poppins-Medium.ttf"),
-    "poppinsSemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
-    "poppinsBold": require("./assets/fonts/Poppins-Bold.ttf"),
+    "fontLight": require("./assets/fonts/WorkSans/WorkSans-Light.ttf"),
+    "fontMedium": require("./assets/fonts/WorkSans/WorkSans-Medium.ttf"),
+    "fontSemiBold": require("./assets/fonts/WorkSans/WorkSans-SemiBold.ttf"),
+    "fontBold": require("./assets/fonts/WorkSans/WorkSans-Bold.ttf"),
   });
 
   const handleOnLayout = useCallback(async () => {
@@ -41,6 +67,7 @@ export default function App() {
   if (!isLoaded) {
     return null;
   }
+
 
   return (
     <GestureHandlerRootView style={{flex: 1}}>

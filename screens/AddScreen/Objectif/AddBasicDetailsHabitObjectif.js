@@ -10,17 +10,18 @@ import { useMemo } from "react"
 import { useRef } from "react"
 import { useCallback } from "react"
 import { RenderAddStepCarouselItem } from '../../../components/Habitudes/Step/StepCarouselItem'
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { generateUniqueID } from "../../../primitives/BasicsMethods"
-import AddStepBottomScreen from "../../BottomScreens/AddStepBottomScreen"
 import { NavigationButton } from "../../../components/Buttons/IconButtons"
-import { AddHabitToObjContext } from "./AddHabitToObjectifNav"
+import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext"
 import Separator from "../../../components/Other/Separator"
+import AddStepBottomScreen from "../../BottomScreens/AddStepBottomScreen"
+import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets"
 
 export const AddBasicDetailsHabitObjectif = () => {
 
     const navigation = useNavigation();
-    const {closeModal} = useContext(AddHabitToObjContext)
+    const {closeModal} = useContext(BottomSheetModalMethodsContext)
 
     const [steps, setSteps] = useState([{addStepItem: true}])
 
@@ -68,8 +69,6 @@ export const AddBasicDetailsHabitObjectif = () => {
 
             else stepsFinal = [{numero: -1}]
 
-            console.log(stepsFinal)
-
             const habit = {titre, description, steps: stepsFinal}
             
             navigation.navigate("CreateObjectifHabitDetails", {habit})
@@ -107,13 +106,7 @@ export const AddBasicDetailsHabitObjectif = () => {
                     </View>
                 </View>
 
-                <View style={{gap: 10, marginTop: 10}}>
-                    <Separator opacity={0.5}/>
-
-                    <View style={styles.footer}>
-                        <TextButton bold extend onPress={() => closeModal()} text={"Annuler"}/>
-                    </View>
-                </View>
+                <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
             </View>
 
 

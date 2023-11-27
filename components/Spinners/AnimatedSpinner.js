@@ -3,7 +3,7 @@ import { useThemeColor } from "../Themed"
 import LottieView from "lottie-react-native"
 
 export const AnimatedBasicSpinner = () => {
-    return(<LottieView source={require('../../assets/spinners/SimpleSpinnerBar.json')} autoPlay loop />)
+    return(<LottieView source={require('../../assets/spinners/AnimatedCircleSpinner.json')} autoPlay loop />)
 }
 
 export const AnimatedBasicSpinnerView = () => {

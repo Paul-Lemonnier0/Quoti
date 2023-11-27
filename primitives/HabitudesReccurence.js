@@ -1,10 +1,15 @@
 import { isFirstDayOfMonth, startOfWeek } from "date-fns"
 
 function isHabitScheduledForDate(habit, currentDate) {
+    if(habit.startingDate > currentDate) return false
+
+    if(habit.startingDate.getFullYear() === currentDate.getFullYear()
+        && habit.startingDate.getMonth() === currentDate.getMonth()
+        && habit.startingDate.getDate() === currentDate.getDate())
+    { return true }
 
     switch (habit.frequency){
         case "Quotidien":
-            if(habit.startingDate > currentDate) return false
             return isHabitPlannedThisDay(habit.daysOfWeek, habit.startingDate, habit.reccurence, currentDate)
 
         case "Hebdo":

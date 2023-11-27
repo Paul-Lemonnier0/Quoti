@@ -1,4 +1,4 @@
-import { BottomSheetBackdrop, BottomSheetModal } from "@gorhom/bottom-sheet"
+import { BottomSheetBackdrop, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useThemeColor } from "../Themed"
 import { useState, useCallback } from "react";
 import { StyleSheet } from "react-native";

@@ -19,4 +19,4 @@ const AchievementsScreen = ({bottomSheetModalRef, snapPoints, handleSheetChanges
     );
   };
   
-  export default AchievementsScreen;
+export default AchievementsScreen;

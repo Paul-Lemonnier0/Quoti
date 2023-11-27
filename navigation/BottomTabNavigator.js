@@ -28,6 +28,9 @@ import { AddBasicDetailsHabitObjectif } from '../screens/AddScreen/Objectif/AddB
 import { CreateObjectifHabitDetails } from '../screens/AddScreen/Objectif/CreateObjectifHabitDetails';
 import AddHabitToObjectifNav from '../screens/AddScreen/Objectif/AddHabitToObjectifNav';
 import ComponentPresentation from '../screens/ComponentPresentation';
+import ObjectifDetailsScreen from '../screens/Objectif/ObjectifDetailsScreen';
+import SpinnerView from '../components/Spinners/SpinnerView';
+import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
 
 
 const BottomTab = createBottomTabNavigator();
@@ -98,7 +101,11 @@ function HomeNavigator() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
       <HomeStack.Screen name="HomeScreen" component={HomeScreen} options={{tabBarVisible: true}}/>
+
       <HomeStack.Screen name="HabitudeScreen" component={HabitudeScreen} options={{tabBarVisible: false}}/>
+      <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{tabBarVisible: false}}/>
+
+      <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{tabBarVisible: false}}/>
       <HomeStack.Screen name="DayDetailScreen" component={DayDetailScreen} options={{tabBarVisible: false}}/>
       <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{tabBarVisible: true}}/>
       <HomeStack.Screen name="MultipleAchievementScreen" component={MultipleAchievementScreen} options={{tabBarVisible: true}}/>

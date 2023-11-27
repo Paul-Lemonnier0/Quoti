@@ -35,7 +35,7 @@ export function SubTitleText(props) {
 
   const mergedStyles = StyleSheet.flatten([
     styles.subTitleText,
-    { color: fontColor },
+    { color: fontColor, fontFamily: props.notBold ? "fontLight" : "fontMedium" },
     props.style,
   ]);
 
@@ -70,9 +70,9 @@ export function NormalText(props) {
   const fontColor = useThemeColor({}, "Font");
 
   const mergedStyles = StyleSheet.flatten([
-    { color: fontColor },
-    props.style,
     styles.normalText,
+    { color: fontColor, fontFamily: props.bold ? "fontSemiBold" : "fontLight"},
+    props.style,
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;
@@ -96,7 +96,7 @@ export function LittleNormalText(props) {
   const mergedStyles = StyleSheet.flatten([
     styles.littleNormalText,
     props.style,
-    { color: fontColor, fontFamily: props.bold ? "poppinsSemiBold" : "poppinsLight"},
+    { color: fontColor, fontFamily: props.bold ? "fontSemiBold" : "fontLight"},
   ]);
 
   return <Text {...props} style={mergedStyles}>{props.text}</Text>;
@@ -129,39 +129,39 @@ export function MassiveText(props) {
 const styles = StyleSheet.create({
   normalText: {
     fontSize: 16,
-    fontFamily: "poppinsLight",
+    fontFamily: "fontLight",
   },
 
   littleNormalText: {
     fontSize: 14,
-    fontFamily: "poppinsLight",
+    fontFamily: "fontLight",
   },
 
   titleText: {
     fontSize: 24,
     fontWeight: "bold",
-    fontFamily: "poppinsSemiBold",
+    fontFamily: "fontSemiBold",
   },
 
   hugeText: {
     fontSize: 30,
     fontWeight: "bold",
-    fontFamily: "poppinsBold",
+    fontFamily: "fontBold",
   },
 
   massiveText: {
     fontSize: 50,
     fontWeight: "bold",
-    fontFamily: "poppinsBold",
+    fontFamily: "fontBold",
   },
 
   subTitleText: {
     fontSize: 18,
     fontWeight: "bold",
-    fontFamily: "poppinsMedium",
+    fontFamily: "fontSemiBold",
   },
 
   subText: {
-    fontFamily: "poppinsLight",
+    fontFamily: "fontLight",
   },
 });

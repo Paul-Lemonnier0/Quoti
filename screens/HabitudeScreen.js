@@ -1,6 +1,6 @@
 import React from "react";
 import { View, StyleSheet, Image } from "react-native"
-import { HugeText, TitleText } from "../styles/StyledText"
+import { HugeText, LittleNormalText, NormalGrayText, TitleText } from "../styles/StyledText"
 import { useThemeColor } from "../components/Themed"
 import { Feather } from '@expo/vector-icons'; 
 import { useRoute } from "@react-navigation/native";
@@ -12,35 +12,80 @@ import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
 import { RenderStep } from "../components/Habitudes/EtapeItem";
 import HabitIcons from "../data/HabitIcons";
-import { NavigationButton } from "../components/Buttons/IconButtons";
+import { CircleBorderIconButton, NavigationButton } from "../components/Buttons/IconButtons";
+import ProgressBar from "../components/Progress/ProgressBar";
+import { Share } from "react-native";
+import { Alert } from "react-native";
 
 const HabitudeScreen = () => {
 
     const font = useThemeColor({}, "Font")
+    const fontGray = useThemeColor({}, "FontGray")
     const tertiary = useThemeColor({}, "Tertiary")
+    const secondary = useThemeColor({}, "Secondary")
 
-    const {Habits, filteredHabitsByDate, handleCheckStep} = useContext(HabitsContext)
+    const {getHabitFromFilteredHabits, handleCheckStep} = useContext(HabitsContext)
 
     const route = useRoute()
-    const {habitID, habitFrequency, currentDateString} = route.params;
-    const currentDate = new Date(currentDateString)
+    const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
+    
+    //POUR L'INSTANT : 
 
-    const habit = filteredHabitsByDate[habitFrequency]["Habitudes"][habitID]
+    const currentDate = currentDateString === "none" ? new Date(currentDateString) :  new Date(currentDateString)
+
+    const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID)
+    
     const steps = Object.values(habit.steps)
+
     const [displayedSteps, setDisplayedSteps] = useState(steps)
-    const isDone = steps.filter(step => step.isChecked).length === steps.length
+
+    const doneSteps = steps.filter(step => step.isChecked).length
+    const totalSteps = steps.length
+    const pourcentage_value = doneSteps * 100 / totalSteps
+
+    const isFinished = steps.filter(step => step.isChecked).length === steps.length
 
     const handleCheckingStep = (step, index) => {
         const isStepChecked = !step.isChecked
         steps[index] = {...step, isChecked: isStepChecked}
 
         handleCheckStep(habitID, step.stepID, currentDate, isStepChecked)
-        setDisplayedSteps([...steps])
-    }
+        setDisplayedSteps(previousSteps => {
+            const updatedSteps = [...previousSteps];
+            updatedSteps[index] = { ...step, isChecked: isStepChecked };
+            return updatedSteps;
+          });    }
 
     const imageSize = 35
     const paddingImage = 15
     const barWidth = 3
+
+    const handleShare = async() => {
+        try{
+            const result = await Share.share({
+                message: habit.titre + " : " + habit.description,
+                url: `exp://172.20.10.2:8081/--/SharedHabitScreen?`,
+            })
+
+            if(result.action === Share.sharedAction){
+                if(result.activityType){
+                    //Result of the activity type app shared
+                }
+
+                else{
+                    //shared
+                }
+            }
+
+            else if(result.action === Share.dismissedAction){
+                //Pas shared
+            }
+        }
+
+        catch(e){
+            Alert.alert("Shared Error : ", e)
+        }
+    }
 
     return(
         <UsualScreen hideMenu={true}>
@@ -48,26 +93,30 @@ const HabitudeScreen = () => {
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton action={"goBack"}/>
-                        <View>
-
-                        </View>
+                        <CircleBorderIconButton name={"share-2"} provider={"Feather"} onPress={handleShare}/>
                     </View>
                 </View>
 
                 <View style={styles.body}>                 
-                    <View>
-                        <HugeText text="Progression"/>
+
+                    <View style={styles.bodyHeader}>
+                        <View style={[styles.displayRow, {gap: 20}]}>
+                            <View style={{borderRadius: 20, borderColor: isFinished ? habit.color : tertiary, borderWidth: 2, padding: 15}}>
+                                <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
+                            </View>
+
+                            <View style={styles.titreEtDescriptionContainer}>
+                                <HugeText text={habit.titre}/>
+                                <NormalGrayText text={habit.description}/>
+                            </View>
+                        </View>
+
+                        <ProgressBar progress={pourcentage_value/100} color={habit.color} inactiveColor={secondary} withPourcentage/>
                     </View>
 
-                    <View style={[styles.displayRow, {gap: 20}]}>
-                        <View style={{borderRadius: 20, borderColor: isDone ? habit.color : font, borderWidth: 2, padding: 15}}>
-                            <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
-                        </View>
 
-                        <View style={styles.titreEtDescriptionContainer}>
-                            <SubText text={habit.description}/>
-                            <TitleText text={habit.titre}/>
-                        </View>
+                    <View>
+                        <TitleText text="Progression"/>
                     </View>
 
                     <View style={styles.displayColumn}>
@@ -91,25 +140,6 @@ const HabitudeScreen = () => {
                             })
                         }
                     </View>
-
-                    {/* <View style={styles.detailPanel}>
-                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
-                            <Feather name="users" size={24} color={font}/>
-                            <SubTitleText text="2"/>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
-                            <Octicons name="flame" size={24} color={font}/>
-                            <SubTitleText text="50"/>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={[styles.detailPanelItem, styleCard.shadow, {borderColor: font, backgroundColor: secondary}]}>
-                            <Feather name="award" size={24} color={font}/>
-                            <SubTitleText text="7"/>
-                        </TouchableOpacity>
-
-                    </View> */}
-                         
                 </View>
             </View>
         </UsualScreen>
@@ -120,32 +150,9 @@ const styles = StyleSheet.create({
     container: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 10, 
+        gap: 20, 
         flex: 1, 
         marginBottom: 0    
-    },
-
-    detailPanel:{
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        gap: 20,
-    },
-
-    detailPanelItem: {
-        display: "flex", 
-        paddingHorizontal: 30, 
-        paddingVertical: 15, 
-        flex: 1,
-        borderWidth: 2,
-        borderRadius: 15, 
-        flexDirection: "column", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        gap: 10,
-        aspectRatio: 1
-
     },
 
     header: {
@@ -167,7 +174,8 @@ const styles = StyleSheet.create({
     },
 
     titreEtDescriptionContainer:{
-        display: "flex", flex: 1,
+        display: "flex", 
+        flex: 1,
         flexDirection: "column", 
         justifyContent: "center",
     },
@@ -182,7 +190,13 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center"
-    }
+    },
+
+    bodyHeader: {
+        gap: 15,
+        display: "flex",
+        flexDirection: "column"
+    }, 
 })
 
 export default HabitudeScreen

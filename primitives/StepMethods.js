@@ -1,5 +1,4 @@
 import { deleteStepLogs, fetchStepLog } from "../firebase/Firestore_Step_Primitives";
-import { getHabitType } from "./HabitMethods";
 
 export const getStepLog = async (date, stepID, alreadyFetchedStepLogs) => {
     const stepLogID = [stepID, date];
@@ -22,26 +21,50 @@ export const getStepLog = async (date, stepID, alreadyFetchedStepLogs) => {
     }
 }
 
-export const updateHabitStepState = (previousHabits, habit, stepID, isChecked) => {
-  
-    const habitType = getHabitType(habit)
-  
+export const updateHabitStepState = (previousHabits, habit, habitType, stepID, isChecked) => {
+    
     const frequency = habit.frequency
+    const objectifID = habit.objectifID
     const habitID = habit.habitID
     const habitSteps = habit.steps
     const step = habitSteps[stepID]
     
-    return {
-      ...previousHabits,
-      [frequency]: {
-        ...previousHabits[frequency],
-        [habitType]: {
-          ...previousHabits[frequency][habitType],
-          [habitID]: {
-            ...previousHabits[frequency][habitType][habitID],
-            steps: {
-              ...habitSteps,
-              [stepID]: {...step, isChecked}
+    if(habitType === "Habitudes"){
+
+      return {
+        ...previousHabits,
+        [frequency]: {
+          ...previousHabits[frequency],
+          [habitType]: {
+            ...previousHabits[frequency][habitType],
+            [habitID]: {
+              ...previousHabits[frequency][habitType][habitID],
+              steps: {
+                ...habitSteps,
+                [stepID]: {...step, isChecked}
+              }
+            }
+          }
+        }
+      }
+    }
+
+    else {
+      return {
+        ...previousHabits,
+        [frequency]: {
+          ...previousHabits[frequency],
+          [habitType]: {
+            ...previousHabits[frequency][habitType],
+            [objectifID]: {
+              ...previousHabits[frequency][habitType][objectifID],
+              [habitID]: {
+                ...previousHabits[frequency][habitType][objectifID][habitID],
+                steps: {
+                  ...habitSteps,
+                  [stepID]: {...step, isChecked}
+                }
+              }
             }
           }
         }
@@ -65,6 +88,18 @@ export const createDefaultStepFromHabit = (habit, habitID, listFormat) => {
     }
 
     return defaultStep;
+}
+
+export const setHabitWithDefaultStep = (habit) => {
+  let finalHabit = {...habit}
+
+  if(Object.values(habit.steps).length === 0){
+    const placeholderStep = [createDefaultStepFromHabit(habit, habit.habitID)];
+    console.log("placeholderStep : ", placeholderStep)
+    finalHabit = {...finalHabit, steps: placeholderStep}
+  }
+
+  return finalHabit
 }
 
 export const removeStepLogs = async(stepsID) => {

@@ -57,8 +57,13 @@ export const RenderStep = ({habit, steps, step, index, onPress, imageSize, paddi
     const secondary = useThemeColor({}, "Secondary")
 
     let isNextToBeChecked = false
-    if(index === 0 && step.isChecked === false) isNextToBeChecked = true
-    else if (index != 0 && step.isChecked === false && steps[index-1].isChecked) isNextToBeChecked = true
+    
+    if(index !== 0 && steps[index-1].isChecked){
+        isNextToBeChecked = true
+    }
+
+    const borderWidth = step.isChecked || isNextToBeChecked ? 2 : 0
+    console.log(borderWidth)
 
     return(
         <View style={[styles.renderStepContainer, {minHeight: imageSize+paddingImage}]}>
@@ -71,7 +76,7 @@ export const RenderStep = ({habit, steps, step, index, onPress, imageSize, paddi
                 { 
                     height: imageSize+paddingImage,
                     borderColor: habit.color, backgroundColor: secondary, 
-                    borderWidth: step.isChecked || isNextToBeChecked ? 2 : 0
+                    borderWidth
                 }]}>
                 {step.isChecked ? <Feather name="check" size={20} color={habit.color}/> :  <SubTitleText text={index+1}/>}
             </TouchableOpacity>

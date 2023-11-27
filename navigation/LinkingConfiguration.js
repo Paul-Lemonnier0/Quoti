@@ -11,9 +11,11 @@ export default {
     screens: {
       Root: {
         screens: {
-          TabOne: {
+          HomeScreen: {
             screens: {
-              TabOneScreen: "one",
+              HomeScreen: "Home",
+              HabitudeScreen: "HabitudeScreen",
+              SharedHabitScreen: "SharedHabitScreen",
             },
           },
           TabTwo: {

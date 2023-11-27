@@ -9,6 +9,7 @@ import StepIndicator from "../../../components/Other/StepIndicator"
 import { Image } from "react-native"
 import HabitIcons from "../../../data/HabitIcons"
 import { CircleBorderIconButton } from "../../../components/Buttons/IconButtons"
+import IllustrationsList from "../../../data/IllustrationsList"
 
 const ValidationScreenHabit = () => {
 
@@ -28,7 +29,7 @@ const ValidationScreenHabit = () => {
                 <View style={{flex: 1, flexGrow: 1}}>
                     <View style={styles.emptySreenContainer}>
                     
-                        <Image style={styles.emptyScreenImageContainer} source={require('../../../img/Illustration/Light_theme/Idea.png')}/>
+                        <Image style={styles.emptyScreenImageContainer} source={IllustrationsList["Validation"]}/>
 
                         <View style={styles.emptyScreenSubContainer}>
                             <NormalText text={"Continuez comme ça! "}/>

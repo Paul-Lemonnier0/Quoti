@@ -3,58 +3,63 @@ import { useThemeColor } from "../Themed"
 import { useNavigation } from "@react-navigation/native";
 import cardStyle from "../../styles/StyledCard";
 import { useContext } from "react";
-import { ObjectifsContext } from "../../data/ObjectifContext";
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import IconImage from "../Other/IconImage";
-import { HugeText, MassiveText, NormalText, SubText, SubTitleText } from "../../styles/StyledText";
+import { HugeText, LittleNormalText, MassiveText, NormalText, SubText, SubTitleText } from "../../styles/StyledText";
 import { Dimensions } from "react-native";
 import { Icon } from "../Buttons/IconButtons";
 import { displayTree } from "../../primitives/BasicsMethods";
 import { HabitsContext } from "../../data/HabitContext";
+import ProgressBar from "../Progress/ProgressBar";
+import { getSeriazableObjectif } from "../../primitives/ObjectifMethods";
 
-export default ObjectifBlock = ({objectifID, frequency}) => {
+export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
 
-    const {AllObjectifs} = useContext(ObjectifsContext)
-    const {filteredHabitsByDate} = useContext(HabitsContext)
+    const {Objectifs, filteredHabitsByDate} = useContext(HabitsContext)
 
     try{
-        const objectif = AllObjectifs[objectifID]
+        const objectif = Objectifs[objectifID]
         const habits = Object.values(filteredHabitsByDate[frequency]["Objectifs"][objectifID])
 
         const stylesCard = cardStyle()
 
         const width = Dimensions.get('window').width / 1.5
 
-        const startDate = objectif.startingDate.toLocaleDateString("fr", {month: "short", day: "numeric"});
-        const endDate = objectif.endingDate.toLocaleDateString("fr", {month: "short", day: "numeric", year: "numeric"});
+        const navigation = useNavigation()
+        const handlePress = () => {
+            const seriazableObjectif = getSeriazableObjectif(objectif)
+            console.log(frequency)
+            navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
+        }
 
-        const isFinished = false
-        const handlePress = () => {}
+        const steps = []
+        for(const habit of habits){
+            Object.values(habit.steps).map(step => steps.push(step))
+        }
 
-        console.log(objectif)
+        const doneSteps = steps.filter(step => step.isChecked).length
+        const pourcentage_value = Math.round(doneSteps * 100 / steps.length) 
+        const isFinished = pourcentage_value === 100
 
         return(
-            <TouchableOpacity style={{width}}>
+            <TouchableOpacity style={{width}} onPress={handlePress}>
                 <View style={[stylesCard.card, styles.objectif]}>
                     <View style={styles.header}>
                         <View style={[styles.iconContainer, {borderColor: objectif.color}]}>
                             <IconImage image={objectif.icon}/>
                         </View>
-                        <View style={styles.footer}>
-
-                            <View style={styles.titleDescriptionContainer}>
-                                <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                                <SubText numberOfLines={1} text={objectif.description}/>
-                            </View>
-
-
-
-                        </View>
                     </View>
 
-                    <View style={styles.displayColumn}>
-                        <StepIndicator currentStep={habits.length} totalSteps={habits.length} color={objectif.color} height={3}/>
+                    <View style={styles.titleDescriptionContainer}>
+                        <SubTitleText numberOfLines={1} text={objectif.titre}/>
+                        <SubText numberOfLines={1} text={objectif.description}/>
+                    </View>
+
+                    <View style={styles.progressContainer}>
+                        <ProgressBar progress={pourcentage_value/100} color={objectif.color}/>
+                        <LittleNormalText text={pourcentage_value + "%"} bold/>
+                        {/* <StepIndicator currentStep={habits.length} totalSteps={habits.length} color={objectif.color} height={3}/> */}
                     </View>
 
 
@@ -71,7 +76,7 @@ export default ObjectifBlock = ({objectifID, frequency}) => {
 
 const styles = StyleSheet.create({
     objectif: {
-        gap: 50,
+        gap: 20,
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -108,9 +113,9 @@ const styles = StyleSheet.create({
         borderRadius: 15 
     },
 
-    displayColumn:{
+    progressContainer:{
         display: "flex",
         flexDirection: "column",
-        gap: 10
+        gap: 10,
     }
 })

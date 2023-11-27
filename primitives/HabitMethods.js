@@ -1,3 +1,4 @@
+import { displayTree } from "./BasicsMethods";
 import { isHabitPlannedThisMonth, isHabitScheduledForDate } from "./HabitudesReccurence";
 import { getStepLog } from "./StepMethods";
 
@@ -34,7 +35,7 @@ export const filterHabits = async (date, habits, alreadySeenHabitsScheduledForDa
 
               habitsScheduledForDate[habit.frequency]["Objectifs"][habit.objectifID][habitID] = habitWithStepsLogs;
           }
-        } 
+        }
       })
     );
 
@@ -51,6 +52,7 @@ export const getHabitType = (habit) => {
 }
 
 export const getHabitWithStepsLogs = async (habit, date, alreadyFetchedStepLogs) => {
+  
   const stepsID = Object.keys(habit.steps)
   const stepsWithLogsPromises = stepsID.map(async(stepID) => {
     const isChecked = await getStepLog(date, stepID, alreadyFetchedStepLogs);
@@ -81,11 +83,20 @@ export const removeHabitFromFilteredHabits = (FilteredHabits, habit) => {
   const frequency = habit.frequency
   const updatedFilteredHabits  = {...FilteredHabits}
 
-  if(updatedFilteredHabits [frequency] && updatedFilteredHabits [frequency][habitType]){
-    delete updatedFilteredHabits [frequency][habitType][habit.habitID]
+  if(updatedFilteredHabits[frequency] && updatedFilteredHabits[frequency][habitType]){
+    if(habitType === "Objectifs" && updatedFilteredHabits[frequency][habitType][habit.objectifID]){
+      
+      delete updatedFilteredHabits[frequency][habitType][habit.objectifID][habit.habitID]
+      const isObjectifEmpty = Object.keys(updatedFilteredHabits[frequency][habitType][habit.objectifID]).length === 0
+      if(isObjectifEmpty){
+        delete updatedFilteredHabits[frequency][habitType][habit.objectifID]
+      }
+    }
+
+    else delete updatedFilteredHabits[frequency][habitType][habit.habitID]
   }
 
-  return updatedFilteredHabits ;
+  return {...updatedFilteredHabits} ;
 }
 
 export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabit, currentDate) => {
@@ -93,15 +104,32 @@ export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabi
   const habitType = getHabitType(newHabit)
   const frequency = newHabit.frequency
   const habitID = newHabit.habitID
+  const objectifID = newHabit.objectifID
 
   if(isHabitScheduledForDate(newHabit, currentDate)){
+    if(habitType === "Habitudes"){
+      return {
+        ...previousFilteredHabits,
+        [frequency]: {
+          ...previousFilteredHabits[frequency],
+          [habitType]: {
+            ...previousFilteredHabits[frequency][habitType],
+            [habitID]: newHabit
+          }
+        }
+      }
+    }
+
     return {
       ...previousFilteredHabits,
       [frequency]: {
         ...previousFilteredHabits[frequency],
         [habitType]: {
           ...previousFilteredHabits[frequency][habitType],
-          [habitID]: newHabit
+          [objectifID]: {
+            ...previousFilteredHabits[frequency][habitType][objectifID],
+            [habitID]: newHabit
+          }
         }
       }
     }
@@ -111,8 +139,49 @@ export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabi
 }
 
 export const updateHabitsWithNewHabit = (previousHabits, newHabit) => {
+  const habitID = newHabit.habitID
+
   return {
     ...previousHabits,
-    [newHabit.habitID]: newHabit
+    [habitID]: newHabit
   }
+}
+
+export const getSeriazableHabit = (habit) => {
+  const startingDate = habit.startingDate.toDateString()
+  
+  return({
+      ...habit,
+      startingDate
+    })
+}
+
+export const convertBackSeriazableHabit = (habit) => {
+  const startingDate = new Date(habit.startingDate)
+  
+  return({
+    ...habit,
+    startingDate
+  })
+}
+
+
+export const getObjectifHabitFromFilteredHabitsMethod = (filteredHabitsByDate, frequency, objectifID, habitID) => {
+  if(habitID){
+    return filteredHabitsByDate[frequency]["Objectifs"][objectifID][habitID]
+  }
+
+  else return Object.values(filteredHabitsByDate[frequency]["Objectifs"][objectifID]);
+}
+
+export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate, frequency, objectifID, habitID) => {
+  if(objectifID !== null && objectifID !== undefined){
+    return getObjectifHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
+  }
+
+  if(habitID !== null && habitID !== undefined){
+    return filteredHabitsByDate[frequency]["Habitudes"][habitID]
+  }
+
+  else return Object.values(filteredHabitsByDate[frequency]["Habitudes"]);
 }

@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
 
   textInput: {
     borderWidth: 0,
-    fontFamily: "poppinsLight", 
+    fontFamily: "fontMedium", 
     borderRadius: 10, 
     fontSize: 14, 
     width: 80

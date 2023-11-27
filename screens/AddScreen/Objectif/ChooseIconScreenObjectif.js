@@ -61,7 +61,7 @@ export const ChooseIconScreenObjectif = () => {
     const renderIconSelectorItem = ({item}) => {
         return(
             <View style={styles.centerFullContent}>
-                <FlatList
+                <FlatList scrollEnabled={false}
                     data={item} renderItem={renderItem}
                     numColumns={4} key={1} keyExtractor={(itm) => itm.id}
                     contentContainerStyle={styles.iconListContainer}/>
@@ -78,7 +78,7 @@ export const ChooseIconScreenObjectif = () => {
                         <HugeText text="Choisissez une icône"/>
                     </View>
 
-                    <NavigationButton action={"validation"} methode={handleValidation}/>
+                    <NavigationButton action={"goNext"} methode={handleValidation}/>
                 </View>
 
                 <StepIndicator totalSteps={5} currentStep={4}/>

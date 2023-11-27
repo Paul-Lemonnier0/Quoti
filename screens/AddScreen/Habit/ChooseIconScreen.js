@@ -15,6 +15,7 @@ import { splitArrayIntoChunks } from "../../../primitives/BasicsMethods"
 import StepIndicator from '../../../components/Other/StepIndicator.js'
 import HabitIcons from "../../../data/HabitIcons"
 import { NavigationButton } from "../../../components/Buttons/IconButtons.js"
+import { getSeriazableHabit } from "../../../primitives/HabitMethods.js"
 
 
 export const ChooseIconScreen = () => {
@@ -39,7 +40,8 @@ export const ChooseIconScreen = () => {
     const handleValidation = async() => {
         try{
             const fullHabit = await addHabit(finalHabit)
-            navigation.navigate("ValidationScreenHabit", {habit: {...fullHabit}})
+            const seriazableHabit = getSeriazableHabit(fullHabit)
+            navigation.navigate("ValidationScreenHabit", {habit: {...seriazableHabit}})
         }
 
         catch (e){
@@ -64,7 +66,7 @@ export const ChooseIconScreen = () => {
     const renderIconSelectorItem = ({item}) => {
         return(
             <View style={styles.centerFullContent}>
-                <FlatList
+                <FlatList scrollEnabled={false}
                     data={item} renderItem={renderItem}
                     numColumns={4} key={1} keyExtractor={(itm) => itm.id}
                     contentContainerStyle={styles.iconListContainer}/>

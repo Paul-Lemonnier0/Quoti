@@ -1,5 +1,5 @@
 import { View } from "react-native"
-import { UsualScreen } from "../../../components/View/Views"
+import { CustomScrollView, UsualScreen } from "../../../components/View/Views"
 import { StyleSheet } from "react-native"
 import { HugeText, NormalText, SubTitleText } from "../../../styles/StyledText"
 import { BorderTextButton } from "../../../components/Buttons/UsualButton"
@@ -17,28 +17,99 @@ import AddHabitToObjectifNav from "./AddHabitToObjectifNav"
 import VerticalAnimatedFlatList from "../../../components/FlatList/VerticalAnimatedFlatList"
 import { generateUniqueID } from "../../../primitives/BasicsMethods"
 import { useContext } from "react"
-import { ObjectifsContext } from "../../../data/ObjectifContext"
 import { HabitsContext } from "../../../data/HabitContext"
+import HabitudesList from "../../../components/Habitudes/HabitudesList"
+import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
+import { Success_Impact } from "../../../constants/Impacts"
+import SpinnerView from "../../../components/Spinners/SpinnerView"
+import { AnimatedBasicSpinnerView } from "../../../components/Spinners/AnimatedSpinner"
+import { useEffect } from "react"
+import BottomMenuStyle from "../../../styles/StyledBottomMenu"
 
 
 
 const AddHabitsToObjectif = () => {
 
     const route = useRoute()
-    const {objectif} = route.params
+    const navigation = useNavigation()
 
-    const {addObjectif} = useContext(ObjectifsContext)
-    const {addHabit} = useContext(HabitsContext)
+    const {objectif} = route.params
+    const deserializedObjectif = convertBackSeriazableObjectif(objectif)
+    
+    const {addObjectif, addHabit} = useContext(HabitsContext)
 
     const [habitsForObjectif, setHabitsForObjectif] = useState([])
 
+    const [isLoading, setIsLoading] = useState(false)
+    const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
+
+    useEffect(() => {
+
+        const handleHideBottomBar = () => {
+            navigation.getParent()?.setOptions({
+                tabBarStyle: {display: 'none'},
+                tabBarVisible: false       
+            });
+        }
+
+        const handleShowBottomBar = () => {
+            navigation.getParent()?.setOptions({
+                tabBarStyle: bottomMenuStyle,
+                tabBarVisible: true       
+              });
+        }
+
+        const disableGestures = () => {
+            navigation.setOptions({
+                gestureEnabled: false, // Désactive les gestes de navigation
+            });
+        };
+
+        const enableGestures = () => {
+            navigation.setOptions({
+                gestureEnabled: true, // Active les gestes de navigation
+            });
+        };
+
+        if (isLoading) {
+            disableGestures();
+            handleHideBottomBar();
+        } else {
+            enableGestures();
+            handleShowBottomBar();
+        }
+
+        return () => {
+            // Rétablir les gestes lorsque le composant est démonté
+            enableGestures();
+        };
+    }, [isLoading, navigation]);
+
+    function timeout(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+    async function sleep() {
+        await timeout(3000);
+        return;
+    }
+
     const handleValidate = async() => {
-        const objectifWithID = await addObjectif(objectif)
 
-        const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID}))
-        console.log(updatedHabitsForObjectif)
+        const startingDate = deserializedObjectif.startingDate
+        const endingDate = deserializedObjectif.endingDate
+
+        // const handleValidation = async() => {
+        //     navigation.navigate("SpinnerView", {method})
+        // }
+
+        setIsLoading(true)
+        const objectifWithID = await addObjectif(deserializedObjectif) 
+
+        const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID, startingDate, endingDate}))
         await Promise.all(updatedHabitsForObjectif.map(addHabit));
+        setIsLoading(false)
 
+        Success_Impact()
         console.log("objectif and habit(s) well added")
     }
 
@@ -50,8 +121,6 @@ const AddHabitsToObjectif = () => {
                     ...habit, 
                     color: objectif.color, 
                     icon: objectif.icon,
-                    startingDate: objectif.startingDate, 
-                    endingDate: objectif.endingDate, 
                 }
             ]
         }))
@@ -99,12 +168,16 @@ const AddHabitsToObjectif = () => {
 
                 <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend/>
 
-                <View style={{flex: 1, marginBottom: -120}}>
-                    <VerticalAnimatedFlatList data={habitsForObjectif} currentDateString={today.toDateString()} presentation numCols={1}/>
-                </View>
+                <CustomScrollView>
+                    <HabitudesList habits={habitsForObjectif}/>
+                </CustomScrollView>
 
             </View>
         )
+    }
+
+    if(isLoading){
+        return <AnimatedBasicSpinnerView/>
     }
 
     return(

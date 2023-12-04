@@ -40,7 +40,7 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
             [habitID]: {
               ...previousHabits[frequency][habitType][habitID],
               steps: {
-                ...habitSteps,
+                ...previousHabits[frequency][habitType][habitID]["steps"],
                 [stepID]: {...step, isChecked}
               }
             }
@@ -61,7 +61,7 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
               [habitID]: {
                 ...previousHabits[frequency][habitType][objectifID][habitID],
                 steps: {
-                  ...habitSteps,
+                  ...previousHabits[frequency][habitType][objectifID][habitID]["steps"],
                   [stepID]: {...step, isChecked}
                 }
               }

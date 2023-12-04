@@ -31,8 +31,9 @@ const SimpleFullBottomSheet = (props) => {
             ref={bottomSheetModalRef}
             enableHandlePanningGesture={false}
             enableContentPanningGesture={false}
-            style={{flex: 1, borderRadius: 0, marginTop: -30,}}
-            backgroundStyle={{backgroundColor: primary, borderRadius: 0}}
+            style={{flex: 1}}
+            topInset={-0}
+            backgroundStyle={{backgroundColor: primary}}
             handleIndicatorStyle={{backgroundColor: primary}}
             index={0}
             enablePanDownToClose={true}
@@ -51,13 +52,6 @@ const SimpleFullBottomSheet = (props) => {
 const styles = StyleSheet.create({
     container: { 
       flex: 1,
-      borderRadius: 0,
-      // marginTop: 20, 
-      // gap: 20, 
-      // padding:15, 
-      // paddingHorizontal:30, 
-      // flex:1, 
-      // display:"flex",
     }
 });
   

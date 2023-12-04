@@ -20,7 +20,6 @@ export default AddHabitToObjectifNav = ({bottomSheetModalRef, snapPoints, handle
     return(
             <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} onChange={handleSheetChanges}>
                 <BottomSheetModalProvider>
-                    <View style={{flex: 1}}>
                     <AddHabitToObjProvider addHabitForObjectif={addHabitForObjectif}>
                         <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
@@ -31,15 +30,7 @@ export default AddHabitToObjectifNav = ({bottomSheetModalRef, snapPoints, handle
                             </NavigationContainer>
                         </BottomSheetModalMethodsContextProvider>
                     </AddHabitToObjProvider>
-                    </View>
                 </BottomSheetModalProvider>
             </SimpleFullBottomSheet>
     )
 }
-
-const styles = StyleSheet.create({
-    footer: {
-        justifyContent: "center", 
-        alignItems: "center"
-    }
-})

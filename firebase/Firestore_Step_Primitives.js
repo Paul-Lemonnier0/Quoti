@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, getDocs, query, where } from "firebase/firestore";
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
 import { db } from "./InitialisationFirebase";
 
 const collectionName = "StepsDone"
@@ -91,4 +91,79 @@ async function deleteStepLogs (stepID){
         .catch(() => console.log("Error while deleting stepLogs : ", e))
 }
 
-export {fetchStepLogs, fetchStepLog, changeStepStateFirestore, deleteStepLogs}
+async function addStepLog(date, habitID, stepID) {
+
+    const [date_string] = date.toISOString().split('T');
+    
+    const dateDocRef = doc(db, "History", date_string)
+
+    
+    setDoc(dateDocRef, {
+        habitudes: 
+            {
+                [habitID]: arrayUnion(stepID)
+            }
+    }, {merge: true})
+}
+
+async function removeStepLog(date, habitID, stepID){
+    const [date_string] = date.toISOString().split('T');
+    
+    const dateDocRef = doc(db, "History", date_string)
+
+    
+    setDoc(dateDocRef, {
+        habitudes: 
+            {
+                [habitID]: arrayRemove(stepID)
+            }
+    }, {merge: true})
+}
+
+async function getDateLogs(date) {
+
+    let doneSteps = [];
+    const [date_string] = date.toISOString().split('T');
+
+    const dateDocRef = doc(db, "History", date_string)
+    const dateDocSnap = await getDoc(dateDocRef);
+
+    const habitudes = dateDocSnap.data().habitudes
+    for(const habitID in habitudes){
+        doneSteps = doneSteps.concat(habitudes[habitID])
+    }
+
+    return doneSteps
+}
+
+export async function getLogsForHabitInDate(date, habitID = 0){
+
+    const [date_string] = date.toISOString().split('T');
+    
+    const dateDocRef = doc(db, "History", date_string)
+    const dateDocSnap = await getDoc(dateDocRef);
+
+    if(dateDocSnap.exists()){
+        const habits = dateDocSnap.data()?.habitudes || {}
+
+        for(const habID in habits){
+            console.log(habID, " => ", habits[habID])
+        }
+    }
+}
+
+export function getLogsForHabitInDateRange(startDate, endDate, habitID){
+
+    const [start_date_string] = startDate.toISOString().split('T');
+    const [end_date_string] = endDate.toISOString().split('T');
+}
+
+export {
+    fetchStepLogs, 
+    fetchStepLog, 
+    changeStepStateFirestore, 
+    deleteStepLogs, 
+    addStepLog,
+    removeStepLog,
+    getDateLogs
+}

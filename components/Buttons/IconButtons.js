@@ -39,7 +39,7 @@ export const IconButton = ({onPress, name, provider, color, size, disabled, noPa
     const font = useThemeColor({}, "Font")
     const disabledButtonText = useThemeColor({}, "DisabledButtonText")
 
-    const colorIconBase =  disabled ? disabledButtonText : (color ? color : font)
+    const colorIconBase =  disabled ? disabledButtonText : (color ?? font)
 
     return(
         <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.iconButton, {padding: noPadding ? 0 : 15, borderWidth: 0}]}>

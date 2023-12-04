@@ -35,10 +35,7 @@ export const HabitudeListItem =  ({habitude, currentDateString}) => {
     if(habit.steps !== undefined){
         steps = Object.values(habit.steps)
     }
-
-    else {
-    }
-
+    
     const habitDoneSteps = steps.filter(step => step.isChecked).length
     const totalSteps = steps.length
 

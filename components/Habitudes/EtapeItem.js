@@ -1,6 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { SubTitleText, SubText, NormalText, TitleText } from "../../styles/StyledText"
-import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../Themed"
 import { CustomDurationIndicator } from "./Clock"
 import { durationToTimeString } from "../../primitives/BasicsMethods"
@@ -52,43 +51,6 @@ export const AddedEtapeItem = ({step, handleOpenAddStep}) => {
     )
 }
 
-export const RenderStep = ({habit, steps, step, index, onPress, imageSize, paddingImage }) => {
-
-    const secondary = useThemeColor({}, "Secondary")
-
-    let isNextToBeChecked = false
-    
-    if(index !== 0 && steps[index-1].isChecked){
-        isNextToBeChecked = true
-    }
-
-    const borderWidth = step.isChecked || isNextToBeChecked ? 2 : 0
-    console.log(borderWidth)
-
-    return(
-        <View style={[styles.renderStepContainer, {minHeight: imageSize+paddingImage}]}>
-            <View style={styles.stepDurationContainer}>
-                <SubText text={durationToTimeString(step.duration)}/>
-            </View>
-
-            <TouchableOpacity onPress={onPress}
-                style={[styles.stepCheckBox,
-                { 
-                    height: imageSize+paddingImage,
-                    borderColor: habit.color, backgroundColor: secondary, 
-                    borderWidth
-                }]}>
-                {step.isChecked ? <Feather name="check" size={20} color={habit.color}/> :  <SubTitleText text={index+1}/>}
-            </TouchableOpacity>
-
-            <View style={styles.titreEtDescriptionContainer}>
-                <SubTitleText text={step.titre}/>
-                <SubText text={step.description}/>
-            </View>
-        </View>
-    )
-}
-
 const styles = StyleSheet.create({
     container: {
         borderRadius: 25, 
@@ -131,13 +93,6 @@ const styles = StyleSheet.create({
         gap: 20
     },
 
-    stepCheckBox: {
-        borderRadius: 15,
-        aspectRatio: 1/1,
-        alignItems:"center", 
-        justifyContent: "center",
-    },
-
     fullFlexEndContainer: {
         flex: 1, 
         justifyContent: "flex-end", 
@@ -149,23 +104,11 @@ const styles = StyleSheet.create({
         gap: 10
     },
 
-    stepDurationContainer: {
-        width: 65, 
-        alignItems: "center", 
-        justifyContent: "center"
-    },
-
     titreEtDescriptionContainer:{
         display: "flex", flex: 1,
         flexDirection: "column", 
         justifyContent: "center",
     },
 
-    renderStepContainer: {
-        display: "flex", 
-        flexDirection: "row", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        gap: 20,
-    }
+
 })

@@ -6,7 +6,7 @@ import { Asset } from 'expo-asset';
 
 import { useLoadedAssets } from "./hooks/useLoadedAssets";
 import Navigation from "./navigation";
-import { Image, useColorScheme } from "react-native";
+import { Image, View, useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 import * as SplashScreen from 'expo-splash-screen';
 import * as Linking from 'expo-linking';
@@ -20,19 +20,20 @@ import { IllustrationsRequire } from "./data/IllustrationsList";
 
 import { makeRedirectUri } from "expo-auth-session"
 import { QueryParams } from "expo-auth-session/build/QueryParams"
+import { NormalText } from "./styles/StyledText";
 
 SplashScreen.preventAutoHideAsync();
 
-const redirectTo = makeRedirectUri();
+// const redirectTo = makeRedirectUri();
 
-const createSessionFromUrl = async(url) => {
-  const { params, errorCode } = QueryParams.getQueryParams(url);
+// const createSessionFromUrl = async(url) => {
+//   const { params, errorCode } = QueryParams.getQueryParams(url);
 
-  if(errorCode) throw new Error(errorCode)
-  const { access_token, refresh_token } = params;
+//   if(errorCode) throw new Error(errorCode)
+//   const { access_token, refresh_token } = params;
 
-  if(!access_token) return;
-}
+//   if(!access_token) return;
+// }
 
 export default function App() {
   const colorScheme = useColorScheme();

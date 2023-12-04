@@ -7,7 +7,6 @@ import { useThemeColor } from "../Themed";
 export default IconImage = ({image}) => {
 
     const img = HabitIcons[image]
-    console.log(img)
     const primary = useThemeColor({}, "Primary")
 
 

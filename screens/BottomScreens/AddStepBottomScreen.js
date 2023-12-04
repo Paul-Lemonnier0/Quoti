@@ -126,7 +126,8 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
         display: "flex",
         flexDirection: "column",
         flex: 1,
-        gap: 20
+        gap: 20,
+        marginBottom: 30,
     },
 
     pageTitleContainer: {

@@ -29,7 +29,6 @@ export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
         const navigation = useNavigation()
         const handlePress = () => {
             const seriazableObjectif = getSeriazableObjectif(objectif)
-            console.log(frequency)
             navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
         }
 
@@ -69,7 +68,6 @@ export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
     }
 
     catch(e){
-        console.log(e)
         return(<View><NormalText text={""}/></View>)
     }
 }

@@ -16,7 +16,7 @@ export default SharedHabitScreen = () => {
     if(!Habits.hasOwnProperty(habitID)){
         return(
             <MainView>
-                <HugeText text={"Habitude indisponible..."}/>
+                <HugeText text={"Habitude indisponible... id : " + habitID}/>
             </MainView>
         )
     }

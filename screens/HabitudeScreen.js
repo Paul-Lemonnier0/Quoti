@@ -1,28 +1,36 @@
 import React from "react";
 import { View, StyleSheet, Image } from "react-native"
-import { HugeText, LittleNormalText, NormalGrayText, TitleText } from "../styles/StyledText"
+import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../styles/StyledText"
 import { useThemeColor } from "../components/Themed"
 import { Feather } from '@expo/vector-icons'; 
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState} from "react";
-import { UsualScreen } from "../components/View/Views";
+import { CustomScrollView, UsualScreen } from "../components/View/Views";
 import { SubText } from "../styles/StyledText";
-import { SimpleButton } from "../components/Buttons/UsualButton";
+import { SimpleButton, TextButton } from "../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../data/HabitContext";
 import { RenderStep } from "../components/Habitudes/EtapeItem";
 import HabitIcons from "../data/HabitIcons";
-import { CircleBorderIconButton, NavigationButton } from "../components/Buttons/IconButtons";
+import { CircleBorderIconButton, IconButton, NavigationButton } from "../components/Buttons/IconButtons";
 import ProgressBar from "../components/Progress/ProgressBar";
 import { Share } from "react-native";
 import { Alert } from "react-native";
+import StepsList from "../components/Habitudes/Step/StepsList";
+import cardStyle from "../styles/StyledCard";
+import { addDays } from "date-fns";
+import AchievementBox from "../components/Achievements/AchievementBox";
+import { FlatList } from "react-native";
+import Achievements from "../data/Achievements";
 
 const HabitudeScreen = () => {
 
     const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
+    const primary = useThemeColor({}, "Primary")
     const tertiary = useThemeColor({}, "Tertiary")
     const secondary = useThemeColor({}, "Secondary")
+
+    const styleCard = cardStyle();
 
     const {getHabitFromFilteredHabits, handleCheckStep} = useContext(HabitsContext)
 
@@ -31,11 +39,11 @@ const HabitudeScreen = () => {
     
     //POUR L'INSTANT : 
 
-    const currentDate = currentDateString === "none" ? new Date(currentDateString) :  new Date(currentDateString)
+    const currentDate = currentDateString === "none" ? new Date(currentDateString) : new Date(currentDateString)
 
     const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID)
     
-    const steps = Object.values(habit.steps)
+    const [steps, setSteps] = useState(Object.values(habit.steps))
 
     const [displayedSteps, setDisplayedSteps] = useState(steps)
 
@@ -45,16 +53,16 @@ const HabitudeScreen = () => {
 
     const isFinished = steps.filter(step => step.isChecked).length === steps.length
 
-    const handleCheckingStep = (step, index) => {
+    const onStepChecked = (step, index) => {
         const isStepChecked = !step.isChecked
-        steps[index] = {...step, isChecked: isStepChecked}
 
         handleCheckStep(habitID, step.stepID, currentDate, isStepChecked)
-        setDisplayedSteps(previousSteps => {
+        setSteps(previousSteps => {
             const updatedSteps = [...previousSteps];
             updatedSteps[index] = { ...step, isChecked: isStepChecked };
             return updatedSteps;
-          });    }
+          });    
+        }
 
     const imageSize = 35
     const paddingImage = 15
@@ -64,7 +72,7 @@ const HabitudeScreen = () => {
         try{
             const result = await Share.share({
                 message: habit.titre + " : " + habit.description,
-                url: `exp://172.20.10.2:8081/--/SharedHabitScreen?`,
+                url: `exp://172.20.10.2:8081/--/SharedHabitScreen?habitID='50'&userID='Paul'`,
             })
 
             if(result.action === Share.sharedAction){
@@ -87,8 +95,50 @@ const HabitudeScreen = () => {
         }
     }
 
+    const RenderHistory = () => {
+        const history = [];
+        for(let i = 0; i < 7; ++i){
+            const new_date = addDays(currentDate, -i)
+            const dayName = new_date.toLocaleDateString("fr", {weekday: "short"}).substring(0, 2);
+            history.unshift({done: Math.random()+0.1, dayName})
+        }
+
+        
+        return(
+            <View style={{display: "flex", flexDirection: "row", gap: 15, flex: 1, justifyContent: "space-between", alignItems: "flex-end"}}>
+            {
+                history.map((day, index) => {
+                    const isDone = day.done > 0.75
+                    
+                    return(
+                        <View key={index} style={[styles.displayColumn, {flex: 1, gap: 10}]}>
+                            <View style={{aspectRatio: 1, backgroundColor: isDone ? habit.color : secondary, flex: 1,paddingVertical: 15, height: day.done * 100 + "%", borderRadius: 5}}/>
+                            <View style={{justifyContent: "center", alignItems: "center"}}>
+                                <LittleNormalText bold text={day.dayName}/>
+                            </View>
+                        </View>
+                    )
+                })
+            }
+            </View>
+        )
+    }
+
+    const ReturnAchievementList = ({}) => {
+        const renderAchievement = ({item}) => {
+            console.log("Item : ", item)
+            return <AchievementBox achievement={item}/>
+        }
+
+        return(
+            <FlatList data={Achievements} renderItem={renderAchievement}
+            horizontal={true} showsHorizontalScrollIndicator={false}
+            style={{marginHorizontal: -30}} contentContainerStyle={{gap: 15, paddingHorizontal: 30}}/>
+        )
+    }
+
     return(
-        <UsualScreen hideMenu={true}>
+        <UsualScreen>
             <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
@@ -97,50 +147,59 @@ const HabitudeScreen = () => {
                     </View>
                 </View>
 
-                <View style={styles.body}>                 
+                <CustomScrollView>     
+                    <View style={styles.body}>            
+                        <View style={styles.bodyHeader}>
+                            <View style={[styles.displayRow, {gap: 20}]}>
+                                <View style={{borderRadius: 20, borderColor: isFinished ? habit.color : tertiary, borderWidth: 2, padding: 15}}>
+                                    <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
+                                </View>
 
-                    <View style={styles.bodyHeader}>
-                        <View style={[styles.displayRow, {gap: 20}]}>
-                            <View style={{borderRadius: 20, borderColor: isFinished ? habit.color : tertiary, borderWidth: 2, padding: 15}}>
-                                <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
+                                <View style={styles.titreEtDescriptionContainer}>
+                                    <HugeText text={habit.titre}/>
+                                    <NormalGrayText text={habit.description}/>
+                                </View>
                             </View>
 
-                            <View style={styles.titreEtDescriptionContainer}>
-                                <HugeText text={habit.titre}/>
-                                <NormalGrayText text={habit.description}/>
-                            </View>
+                            <ProgressBar progress={pourcentage_value/100} color={habit.color} inactiveColor={secondary} withPourcentage/>
                         </View>
 
-                        <ProgressBar progress={pourcentage_value/100} color={habit.color} inactiveColor={secondary} withPourcentage/>
-                    </View>
+                        <View style={styles.bodyCore}>
+                            
+                            <View style={styles.groupContainer}>
+                                <TitleText text="Progression"/>
 
-
-                    <View>
-                        <TitleText text="Progression"/>
-                    </View>
-
-                    <View style={styles.displayColumn}>
-                        {
-                            displayedSteps.map((step, index) => {
-
-                                return(
-                                <View key={index} style={styles.displayColumn}>
-                                    <RenderStep habit={habit} steps={steps} step={step} index={index} onPress={() => handleCheckingStep(step, index)}
-                                        imageSize={imageSize} paddingImage={paddingImage}/>
-
-                                    {index != steps.length-1 && <View style={{
-                                        marginVertical: 15, 
-                                        backgroundColor: tertiary, 
-                                        borderRadius: 50, 
-                                        height: 30, 
-                                        width: barWidth, 
-                                        marginLeft: (paddingImage*2 + imageSize)+20 + (paddingImage + imageSize)/2 - barWidth/2}}/>}
+                                <View style={styles.displayColumn}>
+                                    <StepsList steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
                                 </View>
-                                )
-                            })
-                        }
+                            </View>
+
+                            <View style={styles.groupContainer}>
+                                <TitleText text="Série"/>
+
+                                <View style={styles.streakContainer}>
+
+                                    <View style={styles.streakHeader}>
+                                        <View style={styles.streakLeftHeader}>
+                                            <IconButton name={"flame"} color={habit.color} provider={"IonIcons"} noPadding size={35}/>
+                                            <MassiveText text={"10"}/>
+                                        </View>
+
+                                        <TextButton text={"Voir plus"} isGray noPadding/>
+                                    </View>
+
+                                    <RenderHistory/>
+                                </View>
+                            </View>
+
+                            <View style={styles.groupContainer}>
+                                <TitleText text={"Succès"}/>
+
+                                <ReturnAchievementList/>
+                            </View>
+                        </View>
                     </View>
-                </View>
+                </CustomScrollView>
             </View>
         </UsualScreen>
     )
@@ -197,6 +256,38 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column"
     }, 
+
+    bodyCore: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 40
+    },
+
+    groupContainer: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 30
+    },
+
+    streakContainer: {
+        display: "flex", 
+        flexDirection: "column", 
+        flex: 1, 
+        gap: 20
+    },
+
+    streakHeader: {
+        display: "flex", 
+        flexDirection: "row", 
+        justifyContent: "space-between"
+    },
+
+    streakLeftHeader: {
+        display: "flex", 
+        flexDirection: "row", 
+        alignItems: "center", 
+        gap: 10
+    }
 })
 
 export default HabitudeScreen

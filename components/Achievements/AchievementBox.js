@@ -4,45 +4,22 @@ import { useThemeColor } from "../Themed";
 import { LittleNormalText, NormalText, SubText, SubTitleText, TitleText } from "../../styles/StyledText";
 import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
-export const AchievementBox = ({ titre, image, description, isAchieved, onPress, whiteText, TitleHide }) => {
-
-  const isWhiteText = whiteText ? true : false
-  const isTitleHide = TitleHide 
-
-  const primary = useThemeColor({}, "Primary");
-  const contrast = useThemeColor({}, "Contrast");
+export const AchievementBox = ({ achievement, onPress, whiteText, TitleHide }) => {
+  
+  console.log(!TitleHide)
   const secondary = useThemeColor({}, "Secondary");
 
-  const bottomSheetModalRef = useRef(null);
-  const snapPoints = useMemo(() => ["50%"], []);
-
-
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={styles.container}
-      accessibilityLabel={"achievement : " + titre}
-    >
+    <TouchableOpacity onPress={onPress} style={styles.container}>
       <View style={[styles.achievementContainer, { backgroundColor: secondary }]}>
-        <Image
-          style={[
-            styles.imageStyle,
-            {
-              tintColor: isAchieved ? null : "gray",
-            },
-          ]}
-          source={image}
-        />
+        <Image style={styles.imageStyle} source={achievement.image}/>
       </View>
 
-      {!isTitleHide ? 
+      {!TitleHide && 
       <View style={{display: "flex", flexDirection: "row"}}>
-        {isWhiteText ? <LittleNormalText text={titre} style={styles.titleText} /> : <SubText text={titre} style={styles.titleText} />}
-      </View>
-      
-      :
-      
-      null}
+        {whiteText ? <LittleNormalText text={achievement.nom} style={styles.titleText} /> : 
+                     <SubText text={achievement.nom} style={styles.titleText} />}
+      </View>} 
 
     </TouchableOpacity>
   );

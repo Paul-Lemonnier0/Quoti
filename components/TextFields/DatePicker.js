@@ -17,7 +17,7 @@ export const DatePicker = ({onPress, date, label}) => {
             <NormalText text={label}/>
 
             <View style={styles.dateSelectionButtonContainer}>
-                <TouchableOpacity onPress={onPress} style={[styles.dateSelectionButton, {borderColor: tertiary}]}>
+                <TouchableOpacity onPress={onPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
                     <NormalText text={date.toLocaleDateString('fr', dateStringOptions)}/>
 
                     <Icon name="calendar-range-outline" provider={"MaterialCommunityIcons"}/>

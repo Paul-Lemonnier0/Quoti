@@ -212,7 +212,6 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
-        marginBottom: 0
     },
 
     header: {

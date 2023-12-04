@@ -1,14 +1,13 @@
 import { createContext, useState, useEffect } from "react";
 import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
-import { changeStepStateFirestore, fetchStepLog } from "../firebase/Firestore_Step_Primitives";
-import { isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
+import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
-import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
-import { displayTree } from "../primitives/BasicsMethods";
+import { setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
 import { addObjectifToFirestore, fetchAllObjectifs } from "../firebase/Firestore_Objectifs_Primitives";
-import { Alert } from "react-native";
 import { convertBackSeriazableObjectif } from "../primitives/ObjectifMethods";
+import { NormalText } from "../styles/StyledText";
+import { View } from "react-native";
 
 const HabitsContext = createContext();
 
@@ -37,6 +36,7 @@ const HabitsProvider = ({ children }) => {
         console.log("Fetching habits...")
 
         const habits = await getAllOwnHabits()
+        // const habits={}
         setHabits(habits);        
 
         console.log("habits successfully fetched.")
@@ -114,6 +114,7 @@ const HabitsProvider = ({ children }) => {
       const habit = Habits[habitID]
 
       if(isHabitPlannedForSelectedDay(habit, date)){       
+        console.log("Planned")
         const habitType = getHabitType(habit)
 
         setFilteredHabitsByDate(previousFilteredHabits => (
@@ -213,7 +214,8 @@ const HabitsProvider = ({ children }) => {
     }
 
     if(!isFetched) {
-      return <AnimatedBasicSpinnerView/>
+      // return <AnimatedBasicSpinnerView/>
+      return <View><NormalText text={"Attente..."}/></View>
     }
 
     const exportedValues = {

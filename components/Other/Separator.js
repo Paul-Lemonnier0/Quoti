@@ -8,10 +8,27 @@ export default Separator = ({color, opacity = 0.25, height = 2, borderRadius = 2
     return(
         <View style={
             {
-                backgroundColor: color ? color : tertiary, 
-                height: height, 
-                opacity: opacity,
-                borderRadius: borderRadius
+                backgroundColor: color ?? tertiary, 
+                height, 
+                opacity,
+                borderRadius
+            }
+        }/>
+    )
+}
+
+export const VerticalSeparator = ({color, minHeight, opacity = 0.25, width = 3, borderRadius = 2}) => {
+    
+    const tertiary = useThemeColor({}, "Tertiary")
+    
+    return(
+        <View style={
+            {
+                backgroundColor: color ?? tertiary, 
+                width, 
+                opacity,
+                borderRadius,
+                flex: 1
             }
         }/>
     )

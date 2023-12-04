@@ -34,6 +34,7 @@ import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
 
 
 const BottomTab = createBottomTabNavigator();
+const hideStyle = {display: 'none'}
 
 export default function BottomTabNavigator() {
   const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
@@ -100,16 +101,16 @@ const HomeStack = createNativeStackNavigator();
 function HomeNavigator() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="HomeScreen" component={HomeScreen} options={{tabBarVisible: true}}/>
+      <HomeStack.Screen name="HomeScreen" component={HomeScreen} options={{}}/>
 
-      <HomeStack.Screen name="HabitudeScreen" component={HabitudeScreen} options={{tabBarVisible: false}}/>
-      <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{tabBarVisible: false}}/>
+      <HomeStack.Screen name="HabitudeScreen" component={HabitudeScreen} options={{}}/>
+      <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{}}/>
 
-      <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{tabBarVisible: false}}/>
-      <HomeStack.Screen name="DayDetailScreen" component={DayDetailScreen} options={{tabBarVisible: false}}/>
-      <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{tabBarVisible: true}}/>
-      <HomeStack.Screen name="MultipleAchievementScreen" component={MultipleAchievementScreen} options={{tabBarVisible: true}}/>
-      <HomeStack.Screen name="StatProfilScreen" component={StatProfilScreen} options={{tabBarVisible: true}}/>
+      <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{}}/>
+      <HomeStack.Screen name="DayDetailScreen" component={DayDetailScreen} options={{}}/>
+      <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{}}/>
+      <HomeStack.Screen name="MultipleAchievementScreen" component={MultipleAchievementScreen} options={{}}/>
+      <HomeStack.Screen name="StatProfilScreen" component={StatProfilScreen} options={{}}/>
     </HomeStack.Navigator>
   );
 }

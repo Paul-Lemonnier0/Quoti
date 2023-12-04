@@ -1,5 +1,5 @@
 import { View } from "react-native"
-import { UsualScreen } from "../../../components/View/Views"
+import { BackgroundView, UsualScreen } from "../../../components/View/Views"
 import { BorderTextButton, TextButton } from "../../../components/Buttons/UsualButton"
 import { HugeText, NormalText, SubTitleText } from "../../../styles/StyledText"
 import { useContext, useState } from "react"
@@ -32,7 +32,7 @@ export const AddBasicDetailsHabitObjectif = () => {
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
     const bottomSheetModalRefAddStep = useRef(null);
-    const snapPointsAddStep = useMemo(() => ['80%'], [])
+    const snapPointsAddStep = useMemo(() => ['70%'], [])
 
     const handleOpenAddStep = useCallback(() => {
         bottomSheetModalRefAddStep.current?.present();
@@ -106,17 +106,16 @@ export const AddBasicDetailsHabitObjectif = () => {
                     </View>
                 </View>
 
-                <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
+                <View style={{marginTop: 10}}>
+                    <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
+                </View>
             </View>
-
-
 
             <AddStepBottomScreen
                 
                 snapPoints={snapPointsAddStep}
                 bottomSheetModalRef={bottomSheetModalRefAddStep}
                 setSteps={setSteps}/>
-
         </UsualScreen>
     )
 }
@@ -128,9 +127,7 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         justifyContent: "space-between",
         gap: 30, 
-        flex: 1, 
-        marginTop: 20,
-        marginBottom: -30
+        flex: 1,
     },
 
     header: {

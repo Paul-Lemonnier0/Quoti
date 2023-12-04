@@ -108,7 +108,8 @@ export const CreateObjectifHabitDetails = () => {
                     </View>
 
                     <Separator/>
-
+                    
+                    <View style={{flex: 1, justifyContent: "space-around"}}>
                     <View style={styles.groupContainer}>
                         <View style={styles.listContainer}>
                             <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
@@ -140,6 +141,7 @@ export const CreateObjectifHabitDetails = () => {
                             <IncrementButtons value={occurences} setValue={setOccurences}/>
                         </View>
                     </View>
+                    </View>
                 </View>
 
                 <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
@@ -165,7 +167,7 @@ const styles = StyleSheet.create({
         width: "100%", 
         justifyContent: "space-between",
         alignItems: "center",
-        gap: 20, marginTop: 10
+        gap: 20,
     },
 
     subTitleHeaderContainer: {
@@ -180,8 +182,7 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
-        marginTop: 20,
-        marginBottom: -30
+
     },
 
     header: {
@@ -194,6 +195,7 @@ const styles = StyleSheet.create({
     body: {
         flex: 1, 
         gap: 30,
+        justifyContent: "space-between"
     },
 
     groupContainer: {

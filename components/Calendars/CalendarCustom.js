@@ -11,14 +11,14 @@ import { IconButton } from "../Buttons/IconButtons";
 const DayComponentWrapper = ({ date, isInDisplayedMonth, isToday, isSelected }) => {
 
   const font = useThemeColor({}, "Font")
-  const fontContrast = useThemeColor({}, "FontContrast")
+  const fontGray = useThemeColor({}, "FontGray")
 
   const ctx = useCalendarContext();
   const handleClickOnDay = () => {
       ctx.onDateSelect?.(date, { isSelected });
   }
 
-  const borderColor = isSelected || isToday ? font : 'transparent'
+  const borderColor = isSelected ? font : (isToday ? fontGray : 'transparent')
   const color = font
 
   const backgroundColor = isSelected ? font : "transparent"

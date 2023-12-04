@@ -39,17 +39,19 @@ export const BackgroundTextButton = ({onPress, text, color, bold, disabled, exte
     </TouchableOpacity>);
 }
 
-export const TextButton = ({onPress, text, bold, disabled, extend}) => {
+export const TextButton = ({onPress, text, bold, disabled, extend, isGray, noPadding}) => {
     
     const font = useThemeColor({}, "Font")
+    const fontGray = useThemeColor({}, "FontGray")
     const disabledButtonText = useThemeColor({}, "DisabledButtonText")
 
-    const color = disabled ? disabledButtonText : font
+    const color = disabled ? disabledButtonText : (isGray ? fontGray : font)
 
+    const padding = noPadding ? 0 : 18
     const width = extend ? "100%" : null
 
     return(
-    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.normalButton, {width}]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.normalButton, {width, padding}]}>
         {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
     </TouchableOpacity>);
 }

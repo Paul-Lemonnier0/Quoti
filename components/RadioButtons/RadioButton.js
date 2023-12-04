@@ -19,7 +19,7 @@ export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number,
     return(
         <TouchableOpacity disabled={disabled}
             onPress={handleOnClick} 
-            style={[styles.radioButton, {borderColor: backgroundColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: paddingAndRadius}]}>
+            style={[styles.radioButton, {borderColor: backgroundColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: 15}]}>
 
             <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
 
@@ -50,7 +50,7 @@ export const BorderRadioButton = ({isHighlight, handleOnClick, text, number, bol
     return(
         <TouchableOpacity disabled={disabled}
             onPress={handleOnClick} 
-            style={[styles.radioButton, {borderColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: paddingAndRadius}]}>
+            style={[styles.radioButton, {borderColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: 15}]}>
                 <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
                     {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
                     {number ? (bold ? <SubTitleGrayText text={number}/> : (disabled && isHighlight ? <NormalText text={number} style={{color: fontContrast}}/> : <NormalGrayText  text={number}/>)) : null}

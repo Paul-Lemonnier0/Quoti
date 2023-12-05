@@ -1,26 +1,5 @@
 import { deleteStepLogs, fetchStepLog } from "../firebase/Firestore_Step_Primitives";
 
-export const getStepLog = async (date, stepID, alreadyFetchedStepLogs) => {
-    const stepLogID = [stepID, date];
-    if(alreadyFetchedStepLogs.hasOwnProperty(stepLogID)){
-        return alreadyFetchedStepLogs[stepLogID]
-    }
-
-    else{
-      try{
-        const isChecked = await fetchStepLog(date, stepID)
-        alreadyFetchedStepLogs[stepLogID] = isChecked
-
-        return isChecked
-      }
-
-      catch(e){
-        console.log("error while fetching step log : ", e)
-        return false;
-      }
-    }
-}
-
 export const updateHabitStepState = (previousHabits, habit, habitType, stepID, isChecked) => {
     
     const frequency = habit.frequency

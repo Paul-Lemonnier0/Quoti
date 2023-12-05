@@ -2,6 +2,7 @@ import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } 
 import { db } from "./InitialisationFirebase"
 import { listKeyIDfromArray } from "../primitives/BasicsMethods"
 import { createDefaultStepFromHabit, removeStepLogs } from "../primitives/StepMethods"
+import { removeHabitLogs } from "./Firestore_Step_Primitives"
 
 const userID = "Paul"
 
@@ -69,9 +70,7 @@ const removeHabitInFirestore = async(habit) => {
     await deleteDoc(docRef);
     console.log("Habit successfully deleted in firestore !")
 
-    const stepsID = Object.keys(habit.steps)
-
-    await removeStepLogs(stepsID)
+    await removeHabitLogs(habit.habitID)
 }
 
 const updateHabitInFirestore = async(oldHabit, newValues) => {

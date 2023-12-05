@@ -133,6 +133,7 @@ const HomeScreen = () => {
     if(isFetched){
       console.log("changing date...")
       setSelectedDate(date)
+      console.log(date.toDateString())
       changeDate(date)
       console.log("date changed")
     }
@@ -237,7 +238,7 @@ const HomeScreen = () => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                <IconButton name={"update"} provider={"MaterialCommunityIcons"} onPress={handleAddHabitsPlaceholder}/>
+                {/* <IconButton name={"update"} provider={"MaterialCommunityIcons"} onPress={handleAddHabitsPlaceholder}/> */}
 
                 <View style={styles.center}>
                     <ProfilButton onPress={handleOpenProfilDetails} profil={{image: require("../img/TestVrai.png")}}/>

@@ -1,47 +1,45 @@
+import { getDateLogs } from "../firebase/Firestore_Step_Primitives";
 import { displayTree } from "./BasicsMethods";
 import { isHabitPlannedThisMonth, isHabitScheduledForDate } from "./HabitudesReccurence";
 import { getStepLog } from "./StepMethods";
 
-export const filterHabits = async (date, habits, alreadySeenHabitsScheduledForDay, alreadyFetchedStepLogs, setIsFetchingHabit) => {
-    setIsFetchingHabit(true)
+export const filterHabits = async (date, habits, setIsFetchingHabit) => {
+  setIsFetchingHabit(true)
 
-    if (!alreadySeenHabitsScheduledForDay.hasOwnProperty(date)) 
-      alreadySeenHabitsScheduledForDay[date] = [];
-  
-    const habitsScheduledForDate = { 
-        Quotidien: {Habitudes: {}, Objectifs: {}}, 
-        Hebdo: {Habitudes: {}, Objectifs: {}}, 
-        Mensuel: {Habitudes: {}, Objectifs: {}} 
-    };
-  
-    const habitsID = Object.keys(habits)
-    await Promise.all(habitsID.map(async(habitID) => {
-        const habit = habits[habitID];
-        const habitNotInObjectif = !habit.objectifID
-    
-        if(alreadySeenHabitsScheduledForDay[date].includes(habitID) || isHabitScheduledForDate(habit, date)){
-            alreadySeenHabitsScheduledForDay[date].push(habitID);
+  let habitsScheduledForDate = { 
+      Quotidien: {Habitudes: {}, Objectifs: {}}, 
+      Hebdo: {Habitudes: {}, Objectifs: {}}, 
+      Mensuel: {Habitudes: {}, Objectifs: {}} 
+  };
 
-            const habitWithStepsLogs = await getHabitWithStepsLogs(habit, date, alreadyFetchedStepLogs);
+  const doneSteps = await getDateLogs(date)
 
-            if(habitNotInObjectif){
-                habitsScheduledForDate[habit.frequency]["Habitudes"][habitID] = habitWithStepsLogs;
-            }
+  for(let habitID in habits){
 
-            else {
-              if (!habitsScheduledForDate[habit.frequency]["Objectifs"][habit.objectifID]) {
-                  habitsScheduledForDate[habit.frequency]["Objectifs"][habit.objectifID] = {};
-              }
+    const habit = habits[habitID]
+    const habitPlannedForThisDate = isHabitScheduledForDate(habit, date)
 
-              habitsScheduledForDate[habit.frequency]["Objectifs"][habit.objectifID][habitID] = habitWithStepsLogs;
-          }
-        }
+    if(habitPlannedForThisDate){
+      const habitStepsID = Object.keys(habit.steps);
+      const stepsWithLogsArray = habitStepsID.map(habitStepID => {
+
+        const habitStep = habit.steps[habitStepID]
+        const isChecked = doneSteps.includes(habitStepID)
+
+        return { [habitStepID]: {...habitStep, isChecked}}
       })
-    );
 
-    setIsFetchingHabit(false)
+      const stepsWithLogs = Object.assign({}, ...stepsWithLogsArray);
 
-    return habitsScheduledForDate;
+      const habitWithLogs = {...habit, steps: stepsWithLogs}
+
+      habitsScheduledForDate = addPlannedHabitsToFilteredHabits(habitsScheduledForDate, habitWithLogs)
+    }
+  }
+
+  setIsFetchingHabit(false)
+
+  return habitsScheduledForDate;
 };
 
 export const getHabitType = (habit) => {
@@ -51,28 +49,10 @@ export const getHabitType = (habit) => {
   return habitType
 }
 
-export const getHabitWithStepsLogs = async (habit, date, alreadyFetchedStepLogs) => {
-  
-  const stepsID = Object.keys(habit.steps)
-  const stepsWithLogsPromises = stepsID.map(async(stepID) => {
-    const isChecked = await getStepLog(date, stepID, alreadyFetchedStepLogs);
-
-    const step = habit.steps[stepID];
-    return { [stepID]: { ...step, isChecked } };
-  });
-
-  const stepsWithLogsArray = await Promise.all(stepsWithLogsPromises);
-  const stepsWithLogs = Object.assign({}, ...stepsWithLogsArray);
-
-  return { ...habit, steps: stepsWithLogs };
-};
-
 
 export const removeHabitFromHabits = (Habits, habitID) => {
-  console.log(Object.keys(Habits).length)
   const habits = {...Habits}
   delete habits[habitID]
-  console.log(Object.keys(habits).length)
 
   return habits;
 }
@@ -99,44 +79,49 @@ export const removeHabitFromFilteredHabits = (FilteredHabits, habit) => {
   return {...updatedFilteredHabits} ;
 }
 
-export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabit, currentDate) => {
+const addPlannedHabitsToFilteredHabits = (filteredHabits, habit) => {
+  const habitType = getHabitType(habit)
+  const frequency = habit.frequency
+  const habitID = habit.habitID
+  const objectifID = habit.objectifID
 
-  const habitType = getHabitType(newHabit)
-  const frequency = newHabit.frequency
-  const habitID = newHabit.habitID
-  const objectifID = newHabit.objectifID
-
-  if(isHabitScheduledForDate(newHabit, currentDate)){
-    if(habitType === "Habitudes"){
-      return {
-        ...previousFilteredHabits,
-        [frequency]: {
-          ...previousFilteredHabits[frequency],
-          [habitType]: {
-            ...previousFilteredHabits[frequency][habitType],
-            [habitID]: newHabit
-          }
-        }
-      }
-    }
-
+  if(habitType === "Habitudes"){
     return {
-      ...previousFilteredHabits,
+      ...filteredHabits,
       [frequency]: {
-        ...previousFilteredHabits[frequency],
+        ...filteredHabits[frequency],
         [habitType]: {
-          ...previousFilteredHabits[frequency][habitType],
-          [objectifID]: {
-            ...previousFilteredHabits[frequency][habitType][objectifID],
-            [habitID]: newHabit
-          }
+          ...filteredHabits[frequency][habitType],
+          [habitID]: habit
         }
       }
     }
   }
 
+  return {
+    ...filteredHabits,
+    [frequency]: {
+      ...filteredHabits[frequency],
+      [habitType]: {
+        ...filteredHabits[frequency][habitType],
+        [objectifID]: {
+          ...filteredHabits[frequency][habitType][objectifID],
+          [habitID]: habit
+        }
+      }
+    }
+  }
+}
+
+
+export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabit, currentDate) => {
+
+  if(isHabitScheduledForDate(newHabit, currentDate))
+    return addPlannedHabitsToFilteredHabits(previousFilteredHabits, newHabit)
+
   else return removeHabitFromFilteredHabits(previousFilteredHabits, newHabit)
 }
+
 
 export const updateHabitsWithNewHabit = (previousHabits, newHabit) => {
   const habitID = newHabit.habitID

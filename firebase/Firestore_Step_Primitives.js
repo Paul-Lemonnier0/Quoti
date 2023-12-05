@@ -1,104 +1,63 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, where } from "firebase/firestore";
+import { FieldValue, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "./InitialisationFirebase";
 
-const collectionName = "StepsDone"
-
-async function changeStepStateFirestore(date, stepID, isChecked) {
+async function changeStepStateFirestore(date, habitID, stepID, isChecked) {
 
     const dateString = date.toDateString()
     console.log("step concerned at date : ", stepID, " | ", dateString)
 
-    const qry = query(collection(db, collectionName), where('date', '==', dateString), where('stepID', '==', stepID))
+    try{
+        if(isChecked){
+            await addStepLog(date, habitID, stepID)
+        }
+    
+        else await removeStepLog(date, habitID, stepID)
 
-    getDocs(qry)
-        .then(querySnapShot => {
-            if(!querySnapShot.empty){
-                querySnapShot.forEach(stepLog => {
-                    if(!isChecked){
-                        deleteDoc(stepLog.ref)
-                            .then(() => console.log("Step ", stepID, " marked as not done for the date : ", date))
-                            .catch(() => console.log("Error while deleting stepLog : ", e))
-                    }  
-                })
-            }
-        
-            else {
-                const newStepLog = {date: dateString, stepID}
-        
-                addDoc(collection(db, collectionName), newStepLog)
-                    .then(stepLogRef => console.log("Step marked as done with ref : ", stepLogRef.path))
-                    .catch(e => console.log("Error while adding log : ", e))
-            }
-        })
-        .catch(e => console.log("Error while fetching log : ", e))
-}
-
-async function fetchStepLogs(date, allStepsID) {
-
-    const flattenStepsID = allStepsID.flat(1)
-    const stepsLogs = {};
-
-    try {
-        const qry = query(collection(db, collectionName), where("date", "==", date.toDateString()), where("stepID", "in", flattenStepsID));
-        const querySnapShot = await getDocs(qry);
-
-        querySnapShot.forEach(stepLogDoc => {
-            const stepID = stepLogDoc.get('stepID');
-            stepsLogs[stepID] = true ;
-        });
-
-    } 
-    catch (e) {
-        console.log("Error while fetching stepLogs: ", e);
+        console.log("step successfully updated !")
     }
 
-    return stepsLogs;
-}
-
-async function fetchStepLog(date, stepID) {
-
-    let isChecked = false;
-
-    try {
-        const qry = query(collection(db, collectionName), where("date", "==", date.toDateString()), where("stepID", "==", stepID));
-        const querySnapShot = await getDocs(qry);
-
-        querySnapShot.forEach(stepLogDoc => {
-            isChecked = true ;
-        });
-
-    } 
-    catch (e) {
-        console.log("Error while fetching stepLog with id : ", stepID, " | error : ", e);
+    catch(e){
+        console.log("Error while updating state of step : ", stepID, " => ", e)
     }
 
-    return isChecked;
 }
 
-async function deleteStepLogs (stepID){
-    console.log("Deleting stepLogs of step : ", stepID, "...")
+async function removeHabitLogs (habitID){
+    console.log("Deleting logs of habit : ", habitID, "...")
 
-    const qry = query(collection(db, collectionName), where('stepID', '==', stepID))
+    const qry = query(collection(db, "History"), where(`habitudes.${habitID}`, '!=', undefined))
+    const querySnapshot = await getDocs(qry)
 
-    getDocs(qry)
-        .then(querySnapShot => {
-                querySnapShot.forEach(stepLog => {
-                    deleteDoc(stepLog.ref)
-                        .then(() => console.log("Steplog deleted of step : ", stepID))
-                        .catch(() => console.log("Error while deleting stepLog : ", e))
-                })  
-            })
-        .catch(() => console.log("Error while deleting stepLogs : ", e))
+    try{
+        const deletePromises = querySnapshot.docs.map(async (doc) => {
+            await updateDoc(doc.ref, {
+                [`habitudes.${habitID}`]: FieldValue.delete()
+            });
+        });
+
+        await Promise.all(deletePromises);
+
+        console.log("Logs well deleted !");
+    }
+
+    catch(e){
+        console.log("Error while deleting logs of habit : ", habitID, " => ", e)
+    }
 }
 
 async function addStepLog(date, habitID, stepID) {
 
-    const [date_string] = date.toISOString().split('T');
+    const date_string = date.toDateString()
     
     const dateDocRef = doc(db, "History", date_string)
 
+    const docSnapshot = await getDoc(dateDocRef);
+
+    if (!docSnapshot.exists()) {
+        await setDoc(dateDocRef, { date });
+    }
     
-    setDoc(dateDocRef, {
+    await setDoc(dateDocRef, {
         habitudes: 
             {
                 [habitID]: arrayUnion(stepID)
@@ -107,12 +66,12 @@ async function addStepLog(date, habitID, stepID) {
 }
 
 async function removeStepLog(date, habitID, stepID){
-    const [date_string] = date.toISOString().split('T');
+    const date_string = date.toDateString()
     
     const dateDocRef = doc(db, "History", date_string)
 
     
-    setDoc(dateDocRef, {
+    await setDoc(dateDocRef, {
         habitudes: 
             {
                 [habitID]: arrayRemove(stepID)
@@ -123,12 +82,12 @@ async function removeStepLog(date, habitID, stepID){
 async function getDateLogs(date) {
 
     let doneSteps = [];
-    const [date_string] = date.toISOString().split('T');
+    const date_string = date.toDateString()
 
     const dateDocRef = doc(db, "History", date_string)
     const dateDocSnap = await getDoc(dateDocRef);
 
-    const habitudes = dateDocSnap.data().habitudes
+    const habitudes = dateDocSnap.data()?.habitudes || {}
     for(const habitID in habitudes){
         doneSteps = doneSteps.concat(habitudes[habitID])
     }
@@ -138,7 +97,7 @@ async function getDateLogs(date) {
 
 export async function getLogsForHabitInDate(date, habitID = 0){
 
-    const [date_string] = date.toISOString().split('T');
+    const date_string = date.toDateString()
     
     const dateDocRef = doc(db, "History", date_string)
     const dateDocSnap = await getDoc(dateDocRef);
@@ -152,17 +111,60 @@ export async function getLogsForHabitInDate(date, habitID = 0){
     }
 }
 
-export function getLogsForHabitInDateRange(startDate, endDate, habitID){
+export async function getDateLogsForHabit(date, habitID){
 
-    const [start_date_string] = startDate.toISOString().split('T');
-    const [end_date_string] = endDate.toISOString().split('T');
+    const qry = query(collection(db, "History"), where(`habitudes.${habitID}`, '!=', undefined))
+    const querySnapshot = await getDocs(qry)
+
+    try{
+        const deletePromises = querySnapshot.docs.map(async (doc) => {
+            await updateDoc(doc.ref, {
+                [`habitudes.${habitID}`]: FieldValue.delete()
+            });
+        });
+
+        await Promise.all(deletePromises);
+
+        console.log("Logs well deleted !");
+    }
+
+    catch(e){
+        console.log("Error while deleting logs of habit : ", habitID, " => ", e)
+    }
+}
+
+export async function getLogsForHabitInDateRange(startDate, endDate, habitID){
+
+    try{
+        let doneSteps = {}
+
+        const qry = query(collection(db, "History"),
+        where("date", ">=", startDate),
+        where("date", "<=", endDate))
+
+        const querySnapshot = await getDocs(qry)
+
+        querySnapshot.forEach((doc) => {
+            const habitudes = doc.data()?.habitudes || {}
+
+            if(habitudes.hasOwnProperty(habitID)){
+                const dateTimeStamp = doc.data().date;
+                const date = dateTimeStamp.toDate();
+                
+                doneSteps[date] = habitudes[habitID]
+            }
+        })
+        return doneSteps;
+    }
+
+    catch(e){
+        console.log("Error while getting logs in range of habit : ", habitID, " => ", e)
+    }
 }
 
 export {
-    fetchStepLogs, 
-    fetchStepLog, 
     changeStepStateFirestore, 
-    deleteStepLogs, 
+    removeHabitLogs, 
     addStepLog,
     removeStepLog,
     getDateLogs

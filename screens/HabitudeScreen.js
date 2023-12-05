@@ -22,6 +22,8 @@ import { addDays } from "date-fns";
 import AchievementBox from "../components/Achievements/AchievementBox";
 import { FlatList } from "react-native";
 import Achievements from "../data/Achievements";
+import { useEffect } from "react";
+import { getLogsForHabitInDateRange } from "../firebase/Firestore_Step_Primitives";
 
 const HabitudeScreen = () => {
 
@@ -45,8 +47,6 @@ const HabitudeScreen = () => {
     
     const [steps, setSteps] = useState(Object.values(habit.steps))
 
-    const [displayedSteps, setDisplayedSteps] = useState(steps)
-
     const doneSteps = steps.filter(step => step.isChecked).length
     const totalSteps = steps.length
     const pourcentage_value = doneSteps * 100 / totalSteps
@@ -56,17 +56,56 @@ const HabitudeScreen = () => {
     const onStepChecked = (step, index) => {
         const isStepChecked = !step.isChecked
 
+        console.log(currentDateString)
+
         handleCheckStep(habitID, step.stepID, currentDate, isStepChecked)
         setSteps(previousSteps => {
             const updatedSteps = [...previousSteps];
             updatedSteps[index] = { ...step, isChecked: isStepChecked };
             return updatedSteps;
           });    
-        }
+    }
 
     const imageSize = 35
-    const paddingImage = 15
-    const barWidth = 3
+
+    const [lastSevenDaysLogs, setLastSevenDaysLogs] = useState({})
+
+    useEffect(() => {
+        let logsForCurrentDate = {}
+        const currentDateString = currentDate.toString()
+
+        const doneStepsAtCurrentDate = steps.filter(step => step.isChecked).map(step => step.stepID)
+
+        if(doneStepsAtCurrentDate.length > 0){
+            console.log("ok ?")
+            logsForCurrentDate[currentDateString] = doneStepsAtCurrentDate
+            setLastSevenDaysLogs(previousLogs => {
+                const updatedLogs = previousLogs;
+                updatedLogs[currentDateString] = doneStepsAtCurrentDate
+                return {...previousLogs, [currentDateString]: doneStepsAtCurrentDate}
+            })
+        }
+
+        else {
+            setLastSevenDaysLogs(previousLogs => {
+                delete previousLogs[currentDateString]
+                return {...previousLogs}
+            })
+        }
+    }, [steps])
+
+    useEffect(() => {
+        const getLast7DaysLogs = async() => {
+
+            const startingDate = addDays(currentDate, -7);
+            const endingDate = currentDate;
+
+            const lastSevenDaysLogs_temp = await getLogsForHabitInDateRange(startingDate, endingDate, habitID)
+            setLastSevenDaysLogs(lastSevenDaysLogs_temp)
+        }
+
+        getLast7DaysLogs();
+    }, [])
 
     const handleShare = async() => {
         try{
@@ -76,13 +115,7 @@ const HabitudeScreen = () => {
             })
 
             if(result.action === Share.sharedAction){
-                if(result.activityType){
-                    //Result of the activity type app shared
-                }
-
-                else{
-                    //shared
-                }
+                //shared
             }
 
             else if(result.action === Share.dismissedAction){
@@ -99,22 +132,29 @@ const HabitudeScreen = () => {
         const history = [];
         for(let i = 0; i < 7; ++i){
             const new_date = addDays(currentDate, -i)
-            const dayName = new_date.toLocaleDateString("fr", {weekday: "short"}).substring(0, 2);
-            history.unshift({done: Math.random()+0.1, dayName})
+            history.unshift(new_date)
         }
 
+        const dayWithLogs = Object.keys(lastSevenDaysLogs)
         
         return(
             <View style={{display: "flex", flexDirection: "row", gap: 15, flex: 1, justifyContent: "space-between", alignItems: "flex-end"}}>
             {
                 history.map((day, index) => {
-                    const isDone = day.done > 0.75
+
+                    let isDone = false;
+                    if(dayWithLogs.includes(day.toString())){
+                        isDone = true
+                    }
+
+                    const dayName = day.toLocaleDateString("fr", { weekday: 'long' }).substring(0,2);        
+
                     
                     return(
                         <View key={index} style={[styles.displayColumn, {flex: 1, gap: 10}]}>
-                            <View style={{aspectRatio: 1, backgroundColor: isDone ? habit.color : secondary, flex: 1,paddingVertical: 15, height: day.done * 100 + "%", borderRadius: 5}}/>
+                            <View style={{aspectRatio: 1, backgroundColor: isDone ? habit.color : secondary, flex: 1,paddingVertical: 15, borderRadius: 5}}/>
                             <View style={{justifyContent: "center", alignItems: "center"}}>
-                                <LittleNormalText bold text={day.dayName}/>
+                                <LittleNormalText bold text={dayName}/>
                             </View>
                         </View>
                     )
@@ -126,7 +166,6 @@ const HabitudeScreen = () => {
 
     const ReturnAchievementList = ({}) => {
         const renderAchievement = ({item}) => {
-            console.log("Item : ", item)
             return <AchievementBox achievement={item}/>
         }
 

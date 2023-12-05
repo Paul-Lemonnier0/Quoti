@@ -49,7 +49,7 @@ const HabitsProvider = ({ children }) => {
       try{
         const habits = await fetchHabits()
 
-        filterHabits(new Date(), habits, alreadySeenHabitsScheduledForDay, alreadyFetchedStepLogs, setIsFetchingHabit)
+        filterHabits(new Date(), habits, setIsFetchingHabit)
           .then(filteredHabits => {
             setFilteredHabitsByDate(filteredHabits)
             setIsFetched(true)
@@ -86,7 +86,7 @@ const HabitsProvider = ({ children }) => {
       selectedDate = date
 
       try{
-        filterHabits(date, Habits, alreadySeenHabitsScheduledForDay, alreadyFetchedStepLogs, setIsFetchingHabit)
+        filterHabits(date, Habits, setIsFetchingHabit)
           .then(filteredHabits => {
             setFilteredHabitsByDate(filteredHabits)
           })
@@ -111,6 +111,9 @@ const HabitsProvider = ({ children }) => {
 
 
     const handleCheckStep = (habitID, stepID, date, isChecked) => {
+
+      console.log(date)
+
       const habit = Habits[habitID]
 
       if(isHabitPlannedForSelectedDay(habit, date)){       
@@ -121,7 +124,7 @@ const HabitsProvider = ({ children }) => {
           updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked)))
       }
 
-      changeStepStateFirestore(date, stepID, isChecked)
+      changeStepStateFirestore(date, habitID, stepID, isChecked)
     }
 
 

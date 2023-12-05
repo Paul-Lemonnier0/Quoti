@@ -86,7 +86,6 @@ export default function TestList() {
     console.log(item, index);
     let a = listData;
     a.splice(index, 1);
-    console.log(a);
     setListData([...a]);
   };
 

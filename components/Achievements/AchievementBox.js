@@ -6,7 +6,6 @@ import { BottomSheetBackdrop, BottomSheetModal, BottomSheetModalProvider } from 
 
 export const AchievementBox = ({ achievement, onPress, whiteText, TitleHide }) => {
   
-  console.log(!TitleHide)
   const secondary = useThemeColor({}, "Secondary");
 
   return (

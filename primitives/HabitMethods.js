@@ -1,6 +1,6 @@
 import { getDateLogs } from "../firebase/Firestore_Step_Primitives";
 import { displayTree } from "./BasicsMethods";
-import { isHabitPlannedThisMonth, isHabitScheduledForDate } from "./HabitudesReccurence";
+import { calculateNextScheduledDate, isHabitPlannedThisMonth, isHabitScheduledForDate } from "./HabitudesReccurence";
 import { getStepLog } from "./StepMethods";
 
 export const filterHabits = async (date, habits, setIsFetchingHabit) => {
@@ -169,4 +169,32 @@ export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate, frequency
   }
 
   else return Object.values(filteredHabitsByDate[frequency]["Habitudes"]);
+}
+
+export const getUpdatedStreakOfHabit = (habit, currentDate) => {
+
+  const completedDateString = currentDate.toDateString()
+  let streakStopped = false;
+  if(habit.lastCompletionDate !== "none"){
+    const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
+    streakStopped = nextDateAfterLastCompletion < currentDate 
+  }
+
+  const newStreak = streakStopped ? 1 : habit.currentStreak + 1
+
+  const currentStreak = newStreak
+  const lastCompletionDate = completedDateString
+  const bestStreak = newStreak > habit.bestStreak ? newStreak : habit.bestStreak
+
+  let newStreakValues = {
+      currentStreak,
+      lastCompletionDate,
+      bestStreak
+  }
+
+  if(bestStreak === habit.bestStreak){
+      delete newStreakValues[bestStreak]
+  }
+
+  return newStreakValues
 }

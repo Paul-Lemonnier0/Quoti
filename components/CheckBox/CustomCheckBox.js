@@ -3,14 +3,14 @@ import { SubTitleText } from "../../styles/StyledText"
 import { useThemeColor } from "../Themed"
 import { Feather } from "@expo/vector-icons"
 
-export default CustomCheckBox = ({color, number, isChecked, isBorderHidden, onPress}) => {
+export default CustomCheckBox = ({color, number, isChecked, isBorderHidden, onPress, disabled}) => {
 
     const secondary = useThemeColor({}, "Secondary")
     const borderWidth = 2
     const borderColor = isBorderHidden ? secondary : color
 
     return(
-        <TouchableOpacity onPress={onPress}
+        <TouchableOpacity onPress={onPress} disabled={disabled}
             style={[styles.stepCheckBox,
             { 
                 backgroundColor: secondary,

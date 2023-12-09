@@ -4,30 +4,31 @@ import {Animated} from 'react-native'
 import { HabitudeBlock } from "../Habitudes/HabitudeBlock"
 import ObjectifBlock from "../Objectifs/ObjectifBlock"
 import { FlatList } from "react-native"
+import { useContext } from "react"
+import { HabitsContext } from "../../data/HabitContext"
 
-export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
+export default HorizontalAnimatedFlatList = ({objectifs, currentDateString}) => {
+    
+    console.log(objectifs)
 
-    const viewableItems = useSharedValue([]);
-    const listVisibility = useSharedValue(1);
-    const scrollY = useRef(new Animated.Value(0)).current;
+    const {filteredHabitsByDate} = useContext(HabitsContext)
 
-    const onViewableItemsChanged = ({viewableItems: vItems}) => {
-        viewableItems.value = vItems
-    };
 
-    const viewabilityConfigCallbackPairs = useRef([
-        { onViewableItemsChanged },
-    ]);
+    const doneObjectifs = objectifs.filter(objectif => {
+        let steps = []
+        const habits = Object.values(filteredHabitsByDate[objectif.frequency]["Objectifs"][objectif.objectifID])
+        for(const habit of habits){
+            steps = steps.concat(Object.values(habit.steps))
+            const doneSteps = steps.filter(step => step.isChecked).length
+            const totalSteps = steps.length
 
-    const renderHabits = ({item, index}) => {
-        return (
-            <HabitudeBlock habitID={item.habitID} index={index}
-                currentDateString={currentDateString}
-                scrollY={scrollY} 
-                listVisibility={listVisibility}
-                viewableItems={viewableItems}/>
-        )
-    }
+            return totalSteps === doneSteps
+        }
+    })
+
+    const notDoneObjectifs = objectifs.filter(objectif => !doneObjectifs.includes(objectif))
+    const sortedObjectif = notDoneObjectifs.concat(doneObjectifs)
+
     const renderObjectifs = ({item, index}) => {
         const objectifID = item.objectifID
         const frequency = item.frequency
@@ -40,7 +41,7 @@ export default HorizontalAnimatedFlatList = ({data, currentDateString}) => {
 
     return(
         <FlatList 
-            data={data} 
+            data={sortedObjectif} 
             renderItem={renderObjectifs}
             showsHorizontalScrollIndicator={false}
             style={{marginHorizontal: -30}}

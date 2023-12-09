@@ -24,15 +24,12 @@ import { FlatList } from "react-native";
 import Achievements from "../data/Achievements";
 import { useEffect } from "react";
 import { getLogsForHabitInDateRange } from "../firebase/Firestore_Step_Primitives";
+import RangeActivity from "../components/Calendars/RangeActivity";
 
 const HabitudeScreen = () => {
 
-    const font = useThemeColor({}, "Font")
-    const primary = useThemeColor({}, "Primary")
     const tertiary = useThemeColor({}, "Tertiary")
     const secondary = useThemeColor({}, "Secondary")
-
-    const styleCard = cardStyle();
 
     const {getHabitFromFilteredHabits, handleCheckStep} = useContext(HabitsContext)
 
@@ -44,68 +41,78 @@ const HabitudeScreen = () => {
     const currentDate = currentDateString === "none" ? new Date(currentDateString) : new Date(currentDateString)
 
     const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID)
-    
     const [steps, setSteps] = useState(Object.values(habit.steps))
 
     const doneSteps = steps.filter(step => step.isChecked).length
     const totalSteps = steps.length
+    const isCompleted = doneSteps === totalSteps
+
+    // const isNotToday = currentDate !== new Date()
+    const isNotToday = false //pour les tests
+    const isDisabled = isCompleted || isNotToday
+
     const pourcentage_value = doneSteps * 100 / totalSteps
 
     const isFinished = steps.filter(step => step.isChecked).length === steps.length
 
     const onStepChecked = (step, index) => {
-        const isStepChecked = !step.isChecked
+        const isChecked = !step.isChecked
 
         console.log(currentDateString)
 
-        handleCheckStep(habitID, step.stepID, currentDate, isStepChecked)
-        setSteps(previousSteps => {
-            const updatedSteps = [...previousSteps];
-            updatedSteps[index] = { ...step, isChecked: isStepChecked };
-            return updatedSteps;
-          });    
+        const updatedSteps = [...steps]
+        updatedSteps[index] = {...step, isChecked}
+
+        const new_doneSteps = updatedSteps.filter(step => step.isChecked).length
+        const isHabitNowCompleted = new_doneSteps === totalSteps
+
+        handleCheckStep(habitID, step.stepID, currentDate, isChecked, isHabitNowCompleted)
+        setSteps(updatedSteps);    
     }
 
     const imageSize = 35
 
     const [lastSevenDaysLogs, setLastSevenDaysLogs] = useState({})
-
-    useEffect(() => {
-        let logsForCurrentDate = {}
-        const currentDateString = currentDate.toString()
-
-        const doneStepsAtCurrentDate = steps.filter(step => step.isChecked).map(step => step.stepID)
-
-        if(doneStepsAtCurrentDate.length > 0){
-            console.log("ok ?")
-            logsForCurrentDate[currentDateString] = doneStepsAtCurrentDate
-            setLastSevenDaysLogs(previousLogs => {
-                const updatedLogs = previousLogs;
-                updatedLogs[currentDateString] = doneStepsAtCurrentDate
-                return {...previousLogs, [currentDateString]: doneStepsAtCurrentDate}
-            })
-        }
-
-        else {
-            setLastSevenDaysLogs(previousLogs => {
-                delete previousLogs[currentDateString]
-                return {...previousLogs}
-            })
-        }
-    }, [steps])
+    const [logsReady, setLogsReady] = useState(false)
 
     useEffect(() => {
         const getLast7DaysLogs = async() => {
-
             const startingDate = addDays(currentDate, -7);
             const endingDate = currentDate;
 
             const lastSevenDaysLogs_temp = await getLogsForHabitInDateRange(startingDate, endingDate, habitID)
             setLastSevenDaysLogs(lastSevenDaysLogs_temp)
+            setLogsReady(true)
         }
 
         getLast7DaysLogs();
     }, [])
+
+    useEffect(() => {
+        if(logsReady){
+
+            let logsForCurrentDate = {}
+            const currentDateString = currentDate.toString()
+            const doneStepsAtCurrentDate = steps.filter(step => step.isChecked).map(step => step.stepID)
+            
+            if(isCompleted){
+                logsForCurrentDate[currentDateString] = doneStepsAtCurrentDate
+                setLastSevenDaysLogs(previousLogs => {
+                    const updatedLogs = previousLogs;
+                    updatedLogs[currentDateString] = doneStepsAtCurrentDate
+
+                    return {...previousLogs, [currentDateString]: doneStepsAtCurrentDate}
+                })
+            }
+
+            else {
+                setLastSevenDaysLogs(previousLogs => {
+                    delete previousLogs[currentDateString]
+                    return {...previousLogs}
+                })
+            }
+        }
+    }, [logsReady, steps])
 
     const handleShare = async() => {
         try{
@@ -128,42 +135,6 @@ const HabitudeScreen = () => {
         }
     }
 
-    const RenderHistory = () => {
-        const history = [];
-        for(let i = 0; i < 7; ++i){
-            const new_date = addDays(currentDate, -i)
-            history.unshift(new_date)
-        }
-
-        const dayWithLogs = Object.keys(lastSevenDaysLogs)
-        
-        return(
-            <View style={{display: "flex", flexDirection: "row", gap: 15, flex: 1, justifyContent: "space-between", alignItems: "flex-end"}}>
-            {
-                history.map((day, index) => {
-
-                    let isDone = false;
-                    if(dayWithLogs.includes(day.toString())){
-                        isDone = true
-                    }
-
-                    const dayName = day.toLocaleDateString("fr", { weekday: 'long' }).substring(0,2);        
-
-                    
-                    return(
-                        <View key={index} style={[styles.displayColumn, {flex: 1, gap: 10}]}>
-                            <View style={{aspectRatio: 1, backgroundColor: isDone ? habit.color : secondary, flex: 1,paddingVertical: 15, borderRadius: 5}}/>
-                            <View style={{justifyContent: "center", alignItems: "center"}}>
-                                <LittleNormalText bold text={dayName}/>
-                            </View>
-                        </View>
-                    )
-                })
-            }
-            </View>
-        )
-    }
-
     const ReturnAchievementList = ({}) => {
         const renderAchievement = ({item}) => {
             return <AchievementBox achievement={item}/>
@@ -174,6 +145,10 @@ const HabitudeScreen = () => {
             horizontal={true} showsHorizontalScrollIndicator={false}
             style={{marginHorizontal: -30}} contentContainerStyle={{gap: 15, paddingHorizontal: 30}}/>
         )
+    }
+
+    if(habit.titre === "Hydratation"){
+        console.log(lastSevenDaysLogs)
     }
 
     return(
@@ -209,7 +184,7 @@ const HabitudeScreen = () => {
                                 <TitleText text="Progression"/>
 
                                 <View style={styles.displayColumn}>
-                                    <StepsList steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
+                                    <StepsList disabled={isDisabled} steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
                                 </View>
                             </View>
 
@@ -220,14 +195,14 @@ const HabitudeScreen = () => {
 
                                     <View style={styles.streakHeader}>
                                         <View style={styles.streakLeftHeader}>
-                                            <IconButton name={"flame"} color={habit.color} provider={"IonIcons"} noPadding size={35}/>
-                                            <MassiveText text={"10"}/>
+                                            <IconButton name={"flame"} color={habit.color} provider={"IonIcons"} noPadding size={30}/>
+                                            <HugeText text={habit.currentStreak}/>
                                         </View>
 
                                         <TextButton text={"Voir plus"} isGray noPadding/>
                                     </View>
 
-                                    <RenderHistory/>
+                                    <RangeActivity start={currentDate} activity={lastSevenDaysLogs} steps={steps} activityColor={habit.color}/>
                                 </View>
                             </View>
 

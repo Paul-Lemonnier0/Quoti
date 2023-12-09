@@ -31,6 +31,9 @@ import ComponentPresentation from '../screens/ComponentPresentation';
 import ObjectifDetailsScreen from '../screens/Objectif/ObjectifDetailsScreen';
 import SpinnerView from '../components/Spinners/SpinnerView';
 import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
+import SignUpScreen from '../screens/SignUpScreens/SignUpScreen';
+import LoginScreen from '../screens/SignUpScreens/LoginScreen';
+import WelcomeScreen from '../screens/SignUpScreens/WelcomeScreen';
 
 
 const BottomTab = createBottomTabNavigator();
@@ -43,12 +46,15 @@ export default function BottomTabNavigator() {
   return (
 
     <BottomTab.Navigator
-      initialRouteName="HomeScreen"
+      initialRouteName="SignUpScreen"
       screenOptions={{ tabBarStyle: bottomMenuStyle, tabBarInactiveTintColor: fontGray, tabBarActiveTintColor: "white",
         tabBarHideOnKeyboard: false, headerShown: false, tabBarShowLabel: false}}>
 
         {/* <BottomTab.Screen name="Home" component={ComponentNavigator}
                     options={{tabBarIcon: ({ color, focused }) => (<AntDesignIcon name="user" color={color} focused={focused}/>)}}/> */}
+
+        <BottomTab.Screen name="Auth" component={LoginNavigator}
+            options={{tabBarStyle: { display: "none"}}}/>
 
         <BottomTab.Screen name="Home" component={HomeNavigator}
             options={{tabBarIcon: ({ color, focused }) => (<AntDesignIcon name="user" color={color} focused={focused}/>)}}/>
@@ -92,6 +98,20 @@ function ComponentNavigator() {
       <ComponentStack.Screen name="HomeScreen" component={ComponentPresentation} options={{ tabBarStyle: { display: 'none' } }}/>
     </ComponentStack.Navigator>
   );
+}
+
+//SignUP/IN
+
+const LoginStack = createNativeStackNavigator()
+
+function LoginNavigator() {
+  return(
+    <LoginStack.Navigator screenOptions={{ headerShown: false}}>
+      <LoginStack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ tabBarStyle: { display: 'none' } }}/>
+      <LoginStack.Screen name="SignUpScreen" component={SignUpScreen} options={{ tabBarStyle: { display: 'none' } }}/>
+      <LoginStack.Screen name="LoginScreen" component={LoginScreen} options={{ tabBarStyle: { display: 'none' } }}/>
+    </LoginStack.Navigator>
+  )
 }
 
 //FIN TEMP

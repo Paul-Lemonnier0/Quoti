@@ -1,6 +1,6 @@
 import { deleteStepLogs, fetchStepLog } from "../firebase/Firestore_Step_Primitives";
 
-export const updateHabitStepState = (previousHabits, habit, habitType, stepID, isChecked) => {
+export const updateHabitStepState = (previousHabits, habit, habitType, stepID, isChecked, newStreakValues) => {
     
     const frequency = habit.frequency
     const objectifID = habit.objectifID
@@ -18,6 +18,7 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
             ...previousHabits[frequency][habitType],
             [habitID]: {
               ...previousHabits[frequency][habitType][habitID],
+              ...newStreakValues,
               steps: {
                 ...previousHabits[frequency][habitType][habitID]["steps"],
                 [stepID]: {...step, isChecked}
@@ -39,6 +40,7 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
               ...previousHabits[frequency][habitType][objectifID],
               [habitID]: {
                 ...previousHabits[frequency][habitType][objectifID][habitID],
+                ...newStreakValues,
                 steps: {
                   ...previousHabits[frequency][habitType][objectifID][habitID]["steps"],
                   [stepID]: {...step, isChecked}

@@ -3,6 +3,7 @@ import { db } from "./InitialisationFirebase"
 import { listKeyIDfromArray } from "../primitives/BasicsMethods"
 import { createDefaultStepFromHabit, removeStepLogs } from "../primitives/StepMethods"
 import { removeHabitLogs } from "./Firestore_Step_Primitives"
+import { getUpdatedStreakOfHabit } from "../primitives/HabitMethods"
 
 const userID = "Paul"
 
@@ -10,14 +11,26 @@ const setupHabit = (habit) => {
     const todayDateString = new Date().toDateString()
     const startingDate = habit.startingDate === undefined ? todayDateString : habit.startingDate
 
-    const settedUpHabit = { ...habit, startingDate, userID }
+    const bestStreak = 0;
+    const currentStreak = 0;
+    const lastCompletionDate = "none"
+
+    const settedUpHabit = { 
+        ...habit, 
+        startingDate, 
+        userID,
+        bestStreak,
+        currentStreak, 
+        lastCompletionDate
+    }
+
     return settedUpHabit
 }
 
 const addHabitToFireStore = async(habit) => {
     console.log("adding habit to firestore...")
 
-    let habitToAdd = setupHabit(habit)
+    const habitToAdd = setupHabit(habit)
 
     const habitRef = await addDoc(collection(db, "Habits"), habitToAdd)
     const habitID = habitRef.id
@@ -39,6 +52,8 @@ const addHabitToFireStore = async(habit) => {
 
 const getAllOwnHabits = async() => {
 
+    const today = new Date()
+
     const qry = query(collection(db, "Habits"), where("userID", "==", userID));
     const querySnapshot = await getDocs(qry)
 
@@ -57,7 +72,9 @@ const getAllOwnHabits = async() => {
         const daysOfWeek = data.daysOfWeek == [7] ? [0,1,2,3,4,5,6] : data.daysOfWeek
         const startingDate = new Date(data.startingDate)
 
-        return  {...data, habitID, startingDate, steps, daysOfWeek};
+        const newStreakValues = getUpdatedStreakOfHabit(data, today);
+
+        return  {...data, habitID, startingDate, steps, daysOfWeek, newStreakValues};
     }));
 
     return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});
@@ -81,5 +98,18 @@ const updateHabitInFirestore = async(oldHabit, newValues) => {
     console.log("Habit successfully updated in firestore !")
 } 
 
+const updateCompletedHabit = async(habitID, newStreakValues) => {
+    console.log("Updating habit streak...")
 
-export {addHabitToFireStore, removeHabitInFirestore, updateHabitInFirestore, getAllOwnHabits}
+    const docRef = doc(collection(db, "Habits"), habitID);
+
+    await updateDoc(docRef, {...newStreakValues});
+    console.log("Streak of habit updated !");
+}
+
+export {
+    addHabitToFireStore, 
+    removeHabitInFirestore, 
+    updateHabitInFirestore, 
+    getAllOwnHabits,
+    updateCompletedHabit}

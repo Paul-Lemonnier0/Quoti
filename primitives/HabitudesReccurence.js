@@ -1,4 +1,4 @@
-import { isFirstDayOfMonth, startOfWeek } from "date-fns"
+import { addDays, isFirstDayOfMonth, startOfWeek } from "date-fns"
 
 function isHabitScheduledForDate(habit, currentDate) {
     if(habit.startingDate > currentDate) return false
@@ -67,6 +67,61 @@ const numberOfWeekBetweenDates = (date1, date2) => {
 
 const numberOfMonthBetweenDates = (date1, date2) => {
     return Math.abs(date2.getFullYear() - date1.getFullYear()) * 12 + Math.abs(date2.getMonth() - date1.getMonth());    
+}
+
+const getNextDayInDaysOfActivity = (day, daysOfActivity) => {
+    for(let i = 0; i<daysOfActivity.length; ++i){
+        if(daysOfActivity[i] > day) {
+            console.log("OK ?")
+            return daysOfActivity[i]
+        }
+    }
+
+    return daysOfActivity[0]
+}
+
+const getFirstDayOfMonth = (date) => {
+    const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+    return firstDayOfMonth
+}
+
+export const calculateNextScheduledDate = (habit, startingDate) => {
+    let nextScheduledDate = new Date(startingDate);
+
+    switch (habit.frequency) {
+        case "Quotidien":      
+            const daysOfActivity = habit.daysOfWeek
+            if(daysOfActivity.length === 0){
+                nextScheduledDate.setDate(nextScheduledDate.getDate() + habit.reccurence);
+            }
+
+            else {
+                const dayNumberInWeek = startingDate.getDay() === 0 ? 6 : startingDate.getDay() - 1
+
+                const nextDayIndex = getNextDayInDaysOfActivity(dayNumberInWeek, daysOfActivity)
+                console.log("Current day index : ", dayNumberInWeek)
+                console.log("Next day index : ", nextDayIndex)
+                const dayToGoToNextDay = (7 - dayNumberInWeek + nextDayIndex) % 7
+
+                nextScheduledDate.setDate(nextScheduledDate.getDate() + dayToGoToNextDay);
+            }
+
+        break;
+
+        case "Hebdo":
+            
+            nextScheduledDate.setDate(nextScheduledDate.getDate() + (7 * habit.reccurence));
+            break;
+
+        case "Mensuel":
+            nextScheduledDate = getFirstDayOfMonth(nextScheduledDate)
+            console.log(nextScheduledDate.toDateString())
+            nextScheduledDate.setMonth(nextScheduledDate.getMonth() + habit.reccurence);
+            break;
+        // Ajoutez d'autres cas selon votre modèle de fréquence
+  }
+
+  return nextScheduledDate;
 }
 
 

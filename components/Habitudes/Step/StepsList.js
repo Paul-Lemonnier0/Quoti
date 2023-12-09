@@ -2,7 +2,8 @@ import { StyleSheet, View } from "react-native"
 import StepItem from "./StepItem"
 import { VerticalSeparator } from "../../Other/Separator"
 
-export default StepsList = ({steps, onStepChecked, color}) => {
+export default StepsList = ({steps, onStepChecked, color, disabled}) => {
+
     return(
         <View>
             {
@@ -12,7 +13,7 @@ export default StepsList = ({steps, onStepChecked, color}) => {
             
                     return(
                     <View key={index} style={styles.displayColumn}>
-                        <StepItem color={color} step={step} index={index} isNextToBeChecked={isNextToBeChecked} onPress={() => onStepChecked(step, index)}/>
+                        <StepItem disabled={disabled} color={color} step={step} index={index} isNextToBeChecked={isNextToBeChecked} onPress={() => onStepChecked(step, index)}/>
                     </View>
                     )
                 })

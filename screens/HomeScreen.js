@@ -28,10 +28,15 @@ import { ObjectifPlaceholder_Meditation, ObjectifPlaceholder_SemiMarathon, habit
 import IllustrationsList from '../data/IllustrationsList';
 import * as Linking from 'expo-linking';
 import { addStepLog, getDateLogs, getLogsForHabitInDate, removeStepLog } from '../firebase/Firestore_Step_Primitives';
+import { scheduleNotification, sendNotification } from '../primitives/SendNotification';
+import { useAuthentification } from '../primitives/useAuthentification';
 
 const HomeScreen = () => {
 
   //IMPORTS
+
+  const {user} = useAuthentification()
+  console.log(user)
 
   const url = Linking.useURL()
   // console.log("URL : ", {url})
@@ -45,30 +50,30 @@ const HomeScreen = () => {
   const [selectedPeriode, setSelectedPeriode] = useState("Quotidien")
 
   const handleAddHabitsPlaceholder = async() => {
-    // try{
-    //   console.log("Starting...")
-    //   const obj_hab_SemiMarathon = ObjectifPlaceholder_SemiMarathon()
-    //   const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
+    try{
+      console.log("Starting...")
+      const obj_hab_SemiMarathon = ObjectifPlaceholder_SemiMarathon()
+      const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
 
-    //   const objectifWithID_Semi = await addObjectif(obj_hab_SemiMarathon["objectif"]) 
-    //   const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
-    //   await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
+      const objectifWithID_Semi = await addObjectif(obj_hab_SemiMarathon["objectif"]) 
+      const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
+      await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
 
-    //   const objectifWithID_BienEtre = await addObjectif(obj_hab_BienEtre["objectif"]) 
-    //   const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
-    //   await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
+      const objectifWithID_BienEtre = await addObjectif(obj_hab_BienEtre["objectif"]) 
+      const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
+      await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
 
-    //   await Promise.all(habitsPlaceholder.map(addHabit));
-    //   console.log("FINI !!!")
+      await Promise.all(habitsPlaceholder.map(addHabit));
+      console.log("FINI !!!")
 
-    // }
-    // catch(e){
-    //   console.log("et non...", e)
-    // }
+    }
+    catch(e){
+      console.log("et non...", e)
+    }
 
     // addStepLog(new Date(), "habit1", "step2")
     // removeStepLog(new Date(), "habit2", "step2")
-    getDateLogs(new Date())
+    // getDateLogs(new Date())
   }
 
   const initialPeriodes = [
@@ -216,7 +221,7 @@ const HomeScreen = () => {
 
         <View style={styles.dayPlanContainer} showsVerticalScrollIndicator={false}>
           <View>
-            <HorizontalAnimatedFlatList data={objectifs} currentDateString={selectedDate.toDateString()}/>
+            <HorizontalAnimatedFlatList objectifs={objectifs} currentDateString={selectedDate.toDateString()}/>
           </View>                    
         </View>
       </View>
@@ -227,6 +232,10 @@ const HomeScreen = () => {
     navigation.navigate("ProfilDetailsScreen");
   }, []);
 
+  
+  const handleSendNotification = async() => {
+    await scheduleNotification()
+  }
 
   return (
       <UsualScreen>
@@ -238,7 +247,7 @@ const HomeScreen = () => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                {/* <IconButton name={"update"} provider={"MaterialCommunityIcons"} onPress={handleAddHabitsPlaceholder}/> */}
+                {/* <IconButton name={"send"} provider={"Feather"} onPress={handleAddHabitsPlaceholder}/> */}
 
                 <View style={styles.center}>
                     <ProfilButton onPress={handleOpenProfilDetails} profil={{image: require("../img/TestVrai.png")}}/>

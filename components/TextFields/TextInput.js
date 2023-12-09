@@ -29,7 +29,7 @@ export const TextInputCustom = forwardRef(({ startingValue, labelName, boldLabel
 
     return(
         <View style={styles.container}>
-            {boldLabel ? <SubTitleText text={labelName}/> : <NormalText text={labelName}/>}
+            {labelName !== undefined ? (boldLabel ? <SubTitleText text={labelName}/> : <NormalText text={labelName}/>) : null}
             <View style={[styles.textInputContainer, {borderColor, backgroundColor, color: font}]}>
                 <TextInput {...props} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
@@ -83,8 +83,8 @@ export const PasswordInputCustom = forwardRef(({ startingValue, labelName, onFoc
             <NormalText text={labelName}/>
             <View style={[styles.textInputContainer, {borderColor, backgroundColor, color: font}]}>
                 <TextInput {...props} value={value} onChangeText={handlePasswordChange}
-                    secureTextEntry={isPasswordHidden} 
-                    editable={!disabled} 
+                    secureTextEntry={!isPasswordHidden} 
+                    editable={!disabled}
                     placeholderTextColor={fontGray} 
                     selectionColor={font}
                     autoCorrect={false}

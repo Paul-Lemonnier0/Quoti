@@ -51,7 +51,7 @@ export const HabitudeListItem =  ({habitude, currentDateString}) => {
     }
 
     return(
-        <TouchableOpacity delayLongPress={750} onLongPress={handleLongPress} onPress={handlePress}>
+        <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1}} delayLongPress={750} onLongPress={handleLongPress} onPress={handlePress}>
             <Animated.View style={[stylesCard.card, styles.container]}>
 
                 <View style={styles.habit}>

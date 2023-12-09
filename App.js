@@ -21,6 +21,7 @@ import { IllustrationsRequire } from "./data/IllustrationsList";
 import { makeRedirectUri } from "expo-auth-session"
 import { QueryParams } from "expo-auth-session/build/QueryParams"
 import { NormalText } from "./styles/StyledText";
+import * as Notifications from 'expo-notifications';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,6 +35,15 @@ SplashScreen.preventAutoHideAsync();
 
 //   if(!access_token) return;
 // }
+
+
+Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
 
 export default function App() {
   const colorScheme = useColorScheme();

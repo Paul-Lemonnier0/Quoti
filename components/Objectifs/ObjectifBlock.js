@@ -38,11 +38,12 @@ export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
         }
 
         const doneSteps = steps.filter(step => step.isChecked).length
+        const totalSteps = steps.length
         const pourcentage_value = Math.round(doneSteps * 100 / steps.length) 
-        const isFinished = pourcentage_value === 100
+        const isFinished = totalSteps === doneSteps
 
         return(
-            <TouchableOpacity style={{width}} onPress={handlePress}>
+            <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, width}} onPress={handlePress}>
                 <View style={[stylesCard.card, styles.objectif]}>
                     <View style={styles.header}>
                         <View style={[styles.iconContainer, {borderColor: objectif.color}]}>

@@ -5,18 +5,18 @@ import CustomCheckBox from "../../CheckBox/CustomCheckBox"
 import { StyleSheet } from "react-native"
 import { durationToTimeString } from "../../../primitives/BasicsMethods"
 
-export default StepItem = ({color, isNextToBeChecked, step, onPress, index }) => {
+export default StepItem = ({color, isNextToBeChecked, step, onPress, index, disabled}) => {
 
     const borderHidden = !step.isChecked && !isNextToBeChecked
     const duration = step.duration ? durationToTimeString(step.duration) :  "--"
 
     return(
-        <View style={styles.renderStepContainer}>
+        <View style={[styles.renderStepContainer, {opacity: disabled ? 0.5 : 1}]}>
             <View style={styles.stepDurationContainer}>
                 <SubText text={duration}/>
             </View>
 
-            <CustomCheckBox color={color} isChecked={step.isChecked} isBorderHidden={borderHidden} number={index+1} onPress={onPress}/>
+            <CustomCheckBox disabled={disabled} color={color} isChecked={step.isChecked} isBorderHidden={borderHidden} number={index+1} onPress={onPress}/>
 
             <View style={styles.titreEtDescriptionContainer}>
                 <SubTitleText text={step.titre}/>

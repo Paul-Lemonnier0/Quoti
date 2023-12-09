@@ -1,13 +1,14 @@
 import { createContext, useState, useEffect } from "react";
-import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
+import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
-import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
+import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
 import { addObjectifToFirestore, fetchAllObjectifs } from "../firebase/Firestore_Objectifs_Primitives";
 import { convertBackSeriazableObjectif } from "../primitives/ObjectifMethods";
 import { NormalText } from "../styles/StyledText";
 import { View } from "react-native";
+import { displayTree } from "../primitives/BasicsMethods";
 
 const HabitsContext = createContext();
 
@@ -110,21 +111,34 @@ const HabitsProvider = ({ children }) => {
     }
 
 
-    const handleCheckStep = (habitID, stepID, date, isChecked) => {
+    const handleCheckStep = async(habitID, stepID, date, isChecked, isHabitNowCompleted) => {
+      let habit = Habits[habitID]
 
-      console.log(date)
+      const promises = []
+      promises.push(changeStepStateFirestore(date, habitID, stepID, isChecked))
 
-      const habit = Habits[habitID]
+      let newStreakValues = {}
+      if(isHabitNowCompleted){
+        newStreakValues = getUpdatedStreakOfHabit(habit, date)
+        promises.push(updateCompletedHabit(habitID, newStreakValues))
+
+        setHabits(previousHabits => ({
+          ...previousHabits,
+          [habitID]: {...habit, ...newStreakValues}
+        }))
+
+        habit = {...habit, ...newStreakValues}
+      }
 
       if(isHabitPlannedForSelectedDay(habit, date)){       
-        console.log("Planned")
         const habitType = getHabitType(habit)
 
         setFilteredHabitsByDate(previousFilteredHabits => (
-          updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked)))
+          updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked, newStreakValues)))
       }
 
-      changeStepStateFirestore(date, habitID, stepID, isChecked)
+      await Promise.all(promises)
+      console.log("End of check step transactions.")
     }
 
 

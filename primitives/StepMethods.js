@@ -61,7 +61,9 @@ export const createDefaultStepFromHabit = (habit, habitID, listFormat) => {
         description: habit.description, 
         duration: 30, 
         stepID: habitID,
-        habitID
+        habitID,
+        // created: habit.startingDate
+        created: "Sun Jan 31 2024"
     }
     
     if(listFormat){
@@ -76,7 +78,6 @@ export const setHabitWithDefaultStep = (habit) => {
 
   if(Object.values(habit.steps).length === 0){
     const placeholderStep = [createDefaultStepFromHabit(habit, habit.habitID)];
-    console.log("placeholderStep : ", placeholderStep)
     finalHabit = {...finalHabit, steps: placeholderStep}
   }
 

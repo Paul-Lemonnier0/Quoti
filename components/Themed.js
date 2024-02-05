@@ -3,7 +3,6 @@ import Colors from "../constants/Colors";
 
 export function useThemeColor(props, colorName) {
   const theme = useColorScheme();
-  // const theme = 'light';
   const colorFromProps = props[theme];
 
   if (colorFromProps) return colorFromProps;

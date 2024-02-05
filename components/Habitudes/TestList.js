@@ -39,7 +39,6 @@ export default function TestList() {
   const renderItem = ({ item, index }, onClick) => {
     //
     const closeRow = (index) => {
-      console.log('closerow');
       if (prevOpenedRow && prevOpenedRow !== row[index]) {
         prevOpenedRow.close();
       }
@@ -83,7 +82,6 @@ export default function TestList() {
   };
 
   const deleteItem = ({ item, index }) => {
-    console.log(item, index);
     let a = listData;
     a.splice(index, 1);
     setListData([...a]);
@@ -95,7 +93,6 @@ export default function TestList() {
         data={listData}
         renderItem={(v) =>
           renderItem(v, () => {
-            console.log('Pressed', v);
             deleteItem(v);
           })
         }

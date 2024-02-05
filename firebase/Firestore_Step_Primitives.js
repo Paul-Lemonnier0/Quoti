@@ -1,17 +1,17 @@
 import { FieldValue, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "./InitialisationFirebase";
 
-async function changeStepStateFirestore(date, habitID, stepID, isChecked) {
+async function changeStepStateFirestore(date, userID, habitID, stepID, isChecked) {
 
     const dateString = date.toDateString()
     console.log("step concerned at date : ", stepID, " | ", dateString)
 
     try{
         if(isChecked){
-            await addStepLog(date, habitID, stepID)
+            await addStepLog(date, userID, habitID, stepID)
         }
     
-        else await removeStepLog(date, habitID, stepID)
+        else await removeStepLog(date, userID, habitID, stepID)
 
         console.log("step successfully updated !")
     }
@@ -22,16 +22,20 @@ async function changeStepStateFirestore(date, habitID, stepID, isChecked) {
 
 }
 
-async function removeHabitLogs (habitID){
+async function removeHabitLogs (userID, habitID){
     console.log("Deleting logs of habit : ", habitID, "...")
+    
+    const userDoc = doc(db, "Users", userID)
 
-    const qry = query(collection(db, "History"), where(`habitudes.${habitID}`, '!=', undefined))
+    const qry = query(collection(userDoc, "History"), where("habitsID", 'array-contains', habitID))
     const querySnapshot = await getDocs(qry)
 
     try{
         const deletePromises = querySnapshot.docs.map(async (doc) => {
             await updateDoc(doc.ref, {
-                [`habitudes.${habitID}`]: FieldValue.delete()
+                [`habitudes.${habitID}`]: null,
+                habitsID: arrayRemove(habitID)
+
             });
         });
 
@@ -45,11 +49,14 @@ async function removeHabitLogs (habitID){
     }
 }
 
-async function addStepLog(date, habitID, stepID) {
+async function addStepLog(date, userID, habitID, stepID) {
 
     const date_string = date.toDateString()
+
     
-    const dateDocRef = doc(db, "History", date_string)
+    const userDoc = doc(db, "Users", userID)
+
+    const dateDocRef = doc(userDoc, "History", date_string)
 
     const docSnapshot = await getDoc(dateDocRef);
 
@@ -61,14 +68,21 @@ async function addStepLog(date, habitID, stepID) {
         habitudes: 
             {
                 [habitID]: arrayUnion(stepID)
-            }
+            },
+
+        habitsID: arrayUnion(habitID)
+
+        
     }, {merge: true})
 }
 
-async function removeStepLog(date, habitID, stepID){
+async function removeStepLog(date, userID, habitID, stepID){
     const date_string = date.toDateString()
     
-    const dateDocRef = doc(db, "History", date_string)
+    
+    const userDoc = doc(db, "Users", userID)
+
+    const dateDocRef = doc(userDoc, "History", date_string)
 
     
     await setDoc(dateDocRef, {
@@ -79,12 +93,15 @@ async function removeStepLog(date, habitID, stepID){
     }, {merge: true})
 }
 
-async function getDateLogs(date) {
+async function getDateLogs(date, userID) {
 
     let doneSteps = [];
     const date_string = date.toDateString()
 
-    const dateDocRef = doc(db, "History", date_string)
+    
+    const userDoc = doc(db, "Users", userID)
+
+    const dateDocRef = doc(userDoc, "History", date_string)
     const dateDocSnap = await getDoc(dateDocRef);
 
     const habitudes = dateDocSnap.data()?.habitudes || {}
@@ -95,11 +112,14 @@ async function getDateLogs(date) {
     return doneSteps
 }
 
-export async function getLogsForHabitInDate(date, habitID = 0){
+export async function getLogsForHabitInDate(date, userID, habitID = 0){
 
     const date_string = date.toDateString()
+
     
-    const dateDocRef = doc(db, "History", date_string)
+    const userDoc = doc(db, "Users", userID)
+    
+    const dateDocRef = doc(userDoc, "History", date_string)
     const dateDocSnap = await getDoc(dateDocRef);
 
     if(dateDocSnap.exists()){
@@ -111,9 +131,12 @@ export async function getLogsForHabitInDate(date, habitID = 0){
     }
 }
 
-export async function getDateLogsForHabit(date, habitID){
+export async function getDateLogsForHabit(date, userID, habitID){
 
-    const qry = query(collection(db, "History"), where(`habitudes.${habitID}`, '!=', undefined))
+    
+    const userDoc = doc(db, "Users", userID)
+
+    const qry = query(collection(userDoc, "History"), where(`habitudes.${habitID}`, '!=', undefined))
     const querySnapshot = await getDocs(qry)
 
     try{
@@ -133,12 +156,13 @@ export async function getDateLogsForHabit(date, habitID){
     }
 }
 
-export async function getLogsForHabitInDateRange(startDate, endDate, habitID){
+export async function getLogsForHabitInDateRange(startDate, endDate, userID, habitID){
 
     try{
         let doneSteps = {}
+        const userDoc = doc(db, "Users", userID)
 
-        const qry = query(collection(db, "History"),
+        const qry = query(collection(userDoc, "History"),
         where("date", ">=", startDate),
         where("date", "<=", endDate))
 

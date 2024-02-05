@@ -3,10 +3,11 @@ import { useThemeColor } from "../Themed";
 import { LittleNormalText } from "../../styles/StyledText";
 import { addDays } from "date-fns";
 import { StyleSheet } from "react-native";
+import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 
 
 export default RangeActivity = ({start, end, activity, activityColor, steps}) => {
-    console.log("Activity : ", activity)
+    
     const secondary = useThemeColor({}, "Secondary")
 
     const history = [];
@@ -45,7 +46,7 @@ const styles = StyleSheet.create({
     container: {
         display: "flex", 
         flexDirection: "row", 
-        gap: 15, 
+        gap: getWidthResponsive(15), 
         flex: 1, 
         justifyContent: "space-between", 
         alignItems: "flex-end"
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     subContainer: {
         display: "flex",
         flexDirection: "column",
-        flex: 1, gap: 10
+        flex: 1, gap: getHeightResponsive(10)
     },
 
     center: {
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     day: {
         aspectRatio: 1, 
         flex: 1,
-        paddingVertical: 10, 
-        borderRadius: 10
+        paddingVertical: getHeightResponsive(10), 
+        borderRadius: getWidthResponsive(10)
     },
 })

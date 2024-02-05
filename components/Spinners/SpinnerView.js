@@ -1,8 +1,9 @@
-import { View } from "react-native"
+import { ActivityIndicator, Modal, View } from "react-native"
 import { MainView } from "../View/Views"
 import { AnimatedCircularProgress } from "react-native-circular-progress"
-import { AnimatedBasicSpinnerView } from "./AnimatedSpinner"
+import { AnimatedBasicSpinner, AnimatedBasicSpinnerView } from "./AnimatedSpinner"
 import { useNavigation } from "@react-navigation/native"
+import { ViewBase } from "react-native"
 
 export default SpinnerView = ({method, screen_output, screen_params}) => {
     const navigation = useNavigation()
@@ -16,5 +17,15 @@ export default SpinnerView = ({method, screen_output, screen_params}) => {
 
     return(
         <AnimatedBasicSpinnerView/>
+    )
+}
+
+export const CustomSpinnerView = () => {
+    return(
+        <Modal animationType="fade" transparent={true}>
+            <View style={{backgroundColor: 'rgba(0, 0, 0, 0.33)', justifyContent: 'center', flex: 1}}>
+                <ActivityIndicator size="large"/>
+            </View>
+        </Modal>
     )
 }

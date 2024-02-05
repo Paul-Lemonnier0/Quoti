@@ -4,10 +4,11 @@ import { TouchableOpacity } from "react-native"
 import CustomCheckBox from "../../CheckBox/CustomCheckBox"
 import { StyleSheet } from "react-native"
 import { durationToTimeString } from "../../../primitives/BasicsMethods"
+import { getWidthResponsive } from "../../../styles/UtilsStyles"
 
-export default StepItem = ({color, isNextToBeChecked, step, onPress, index, disabled}) => {
+export default StepItem = ({color, isNextToBeChecked, step, onPress, index, disabled, noPress, isHighlight}) => {
 
-    const borderHidden = !step.isChecked && !isNextToBeChecked
+    const borderHidden = !step.isChecked && !isNextToBeChecked && !isHighlight
     const duration = step.duration ? durationToTimeString(step.duration) :  "--"
 
     return(
@@ -16,7 +17,7 @@ export default StepItem = ({color, isNextToBeChecked, step, onPress, index, disa
                 <SubText text={duration}/>
             </View>
 
-            <CustomCheckBox disabled={disabled} color={color} isChecked={step.isChecked} isBorderHidden={borderHidden} number={index+1} onPress={onPress}/>
+            <CustomCheckBox disabled={disabled} color={color} isChecked={step.isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} onPress={onPress}/>
 
             <View style={styles.titreEtDescriptionContainer}>
                 <SubTitleText text={step.titre}/>
@@ -32,11 +33,11 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         justifyContent: "center", 
         alignItems: "center", 
-        gap: 20,
+        gap: getWidthResponsive(20),
     },
 
     stepDurationContainer: {
-        width: 65, 
+        width: getWidthResponsive(65), 
         alignItems: "center", 
         justifyContent: "center"
     },

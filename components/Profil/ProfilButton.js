@@ -2,34 +2,58 @@ import { Image, View, StyleSheet, TouchableOpacity } from "react-native"
 import Badge from "../Other/Badge"
 import { useThemeColor } from "../Themed"
 import cardStyle from "../../styles/StyledCard"
+import { useCallback, useContext } from "react"
+import { UserContext } from "../../data/UserContext"
+import { useNavigation } from "@react-navigation/native"
+import { HugeText, NormalText, TitleGrayText, TitleText } from "../../styles/StyledText"
 
-export const ProfilButton = ({profil, onPress}) => {
+export const ProfilButton = () => {
+    
+    const {user} = useContext(UserContext)
 
     const primary = useThemeColor({}, "Primary")
-    const contrast = useThemeColor({}, "Contrast")
     const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
 
     const stylesShadow = cardStyle()
 
+    const navigation = useNavigation()
+
+    const onPress = useCallback(() => {
+        navigation.navigate("ProfilDetailsScreen");
+      }, []);
+
+    const hasNotifications = user.friendRequests && user.friendRequests.length > 0
+
+    const PLACEHOLDER_PROFIL_PICTURE = require("../../img/TestVrai.png")
+
+
+    const RenderPlaceholderProfilPicture = () => {
+        const firstUsernameLetter = user.displayName.substr(0,1)
+
+        return(
+            <View style={[styles.imageStyle, {justifyContent: "center", alignItems: "center", backgroundColor: secondary }]}>
+                <TitleText text={firstUsernameLetter}/>
+            </View>
+        )
+    }
+
     return(
         <TouchableOpacity onPress={onPress} accessibilityLabel={"profilPictureBtn"}>
             <View style={[styles.imageContainerStyle, stylesShadow.shadow, {backgroundColor: primary}]}>
-                <Image 
-                style={
-                    [
-                        styles.imageStyle, { backgroundColor: secondary }
-                    ]
-                } 
+                {
+                    user.photoURL ?
 
-                    source={profil.image}>
+                    <Image style={[styles.imageStyle, { backgroundColor: secondary }]} source={{uri: user.photoURL}}/>
+                    :
+                    <RenderPlaceholderProfilPicture/>
+                }
 
-                </Image>    
 
-                <Badge fillColor={font} bgColor={secondary}/>
+                { hasNotifications && <Badge fillColor={font} bgColor={secondary}/> }
 
             </View>
-          </TouchableOpacity>
+        </TouchableOpacity>
     )
 }
 

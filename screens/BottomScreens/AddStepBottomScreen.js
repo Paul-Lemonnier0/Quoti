@@ -1,19 +1,23 @@
 import { View, StyleSheet } from "react-native"
 import { TitleText, SubTitleText } from "../../styles/StyledText"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../../components/Themed"
 import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet"
-import { TextInputCustom } from "../../components/TextFields/TextInput"
+import { BottomTextInputCustom, TextInputCustom } from "../../components/TextFields/TextInput"
 import { IncrementTime } from "../../components/Buttons/IncrementButtons"
-import { BigCircleBorderButton, TextButton } from "../../components/Buttons/UsualButton"
+import { BackgroundTextButton, BigCircleBorderButton, TextButton } from "../../components/Buttons/UsualButton"
 import { Keyboard } from "react-native"
 import { TouchableWithoutFeedback } from "react-native"
 import { useRef } from "react"
-import { CircleBorderIconButton } from "../../components/Buttons/IconButtons"
+import { CircleBorderIconButton, CloseButton, NavigationButton } from "../../components/Buttons/IconButtons"
 import Separator from "../../components/Other/Separator"
+import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet"
+import { UsualScreen } from "../../components/View/Views"
 
-const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackdrop}) => {
+const AddStepBottomScreen = ({bottomSheetModalRef, setSteps, noBackdrop}) => {
+
+    const snapPoints = useMemo(() => ['85%'], [])
 
     const font = useThemeColor({}, "Font")
     const popupColor = useThemeColor({}, "Popup")
@@ -28,7 +32,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
     const [hourDuration, setHourDuration] = useState(0)
-    const [minutesDuration, setMinutesDuration] = useState(30)
+    const [minutesDuration, setMinutesDuration] = useState(0)
 
 
     const clearAll = () => {
@@ -37,7 +41,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
         handleSetDescription("")
         setIsDescriptionWrong(false)
         setHourDuration(0)
-        setMinutesDuration(30)
+        setMinutesDuration(0)
     }
 
     const handleValidate = () => {
@@ -57,65 +61,71 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
 
         if(canClose)
         {
+            const stepDuration = hourDuration !== 0 || minutesDuration !== 0 ? hourDuration * 60 + minutesDuration : null
+
             const newStep = {
                 titre: titre,
                 description: description,
-                duration: hourDuration * 60 + minutesDuration
+                duration: stepDuration
             }
 
             setSteps((previousSteps) => 
-            {
-                const beforeLastIndex = previousSteps.length - 1;
-                const newSteps = [...previousSteps];
-                newSteps.splice(beforeLastIndex, 0, newStep);
-                
-                return newSteps
-            })
+                ([...previousSteps, newStep]))
 
             clearAll()
-            bottomSheetModalRef.current?.close();
+            closeModal()  
         }
     }
   
+    const closeModal = () => {
+        bottomSheetModalRef.current?.close();
+    }
+
+    const handleSetNoDuration = () => {
+        setHourDuration(0)
+        setMinutesDuration(0)
+    }
+
     return (
             <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} handleSheetChanges={() => {}} noBackdrop={noBackdrop}>
-                <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+                    <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={{flex: 1}}>
 
-                    <View style={styles.contentContainer}>
-                        <View style={styles.pageTitleContainer}>
-                            <TitleText text="Nouvelle étape" style={{textAlign: "center"}}/>
-                        </View>
+                        <View style={styles.contentContainer}>
+                            <View style={styles.pageTitleContainer}>
+                                <View style={{flex: 1}}>
+                                    <TitleText text="Nouvelle étape"/>
+                                </View>
+                                <CloseButton noPadding methode={closeModal}/>
+                            </View>
 
-                        <View style={styles.body}>
+                        
+                            <View style={styles.body}>
 
-                            <View style={[styles.subBodyContainer, {gap: 15}]}>
                                 <View style={styles.subBodyContainer}>
-                                    <TextInputCustom boldLabel ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
+                                    <BottomTextInputCustom semiBold ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
+                                    <BottomTextInputCustom semiBold ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
                                 </View>
 
                                 <View style={styles.subBodyContainer}>
-                                    <TextInputCustom boldLabel ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
+                                    <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                                        <SubTitleText text={"Durée"}/>
+                                        <TextButton text={"Aucune"} semiBold noPadding onPress={handleSetNoDuration}/>
+                                    </View>
+
+                                    <View style={styles.listContainer}>
+                                        <IncrementTime value={hourDuration} isBorderHidden={hourDuration === 0} setValue={setHourDuration} customBackgroundColor={popupColor}/>
+                                        <IncrementTime value={minutesDuration} isBorderHidden={minutesDuration === 0} setValue={setMinutesDuration} isMinutes={true} customBackgroundColor={popupColor}/>
+                                    </View>
                                 </View>
                             </View>
 
-                            <View style={[styles.subBodyContainer, {gap: 15}]}>
-                                <SubTitleText text="Durée :"/>
-
-                                <View style={styles.listContainer}>
-                                    <IncrementTime value={hourDuration} setValue={setHourDuration} customBackgroundColor={popupColor}/>
-                                    <IncrementTime value={minutesDuration} setValue={setMinutesDuration} isMinutes={true} customBackgroundColor={popupColor}/>
-                                </View>
-                            </View>
-                        </View>
-                        <View style={{gap: 10}}>
-                            <Separator opacity={0.5}/>
 
                             <View style={styles.footer}>
+                                <Separator/>
                                 <TextButton bold extend onPress={handleValidate} text={"Ajouter"}/>
                             </View>
                         </View>
-                    </View>
-                </TouchableWithoutFeedback>
+                    </TouchableWithoutFeedback>
         </CustomBottomSheet>
     );
   };
@@ -126,7 +136,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
         display: "flex",
         flexDirection: "column",
         flex: 1,
-        gap: 20,
+        gap: 30,
         marginBottom: 30,
     },
 
@@ -134,22 +144,22 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
         display: "flex", 
         flexDirection: "row", 
         alignItems:"center", 
-        justifyContent: "center", 
-        marginBottom: 25, 
-        marginTop: -10
+        gap: 20,
+        marginLeft: 5
     },
 
     body: {
         display: "flex", 
         flexDirection: "column", 
         flex: 1, 
-        marginBottom: 0,
-        gap: 15
+        gap: 30
     },
 
     subBodyContainer: {
         display: 'flex', 
         flexDirection: "column",
+        flex: 1,
+        gap: 30
     },
 
     listContainer: {
@@ -168,8 +178,9 @@ const AddStepBottomScreen = ({bottomSheetModalRef, snapPoints, setSteps, noBackd
     },
 
     footer: {
-        justifyContent: "center", 
-        alignItems: "center"
+        display: "flex",
+        flexDirection: "column",
+        gap: 10
     },
   });
   

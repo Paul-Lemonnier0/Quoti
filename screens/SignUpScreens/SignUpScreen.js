@@ -1,17 +1,27 @@
-import { getAuth, createUserWithEmailAndPassword } from "@firebase/auth"
-import { View } from "react-native"
-import { HugeText, NormalText } from "../../styles/StyledText"
+import { getAuth, createUserWithEmailAndPassword, updateCurrentUser } from "@firebase/auth"
+import { Image, View } from "react-native"
+import { HugeText, LittleNormalText, NormalText, SubText } from "../../styles/StyledText"
 import { UsualScreen } from "../../components/View/Views"
 import { StyleSheet } from "react-native"
 import { PasswordInputCustom, TextInputCustom } from "../../components/TextFields/TextInput"
-import { BackgroundTextButton } from "../../components/Buttons/UsualButton"
+import { BackgroundTextButton, TextButton } from "../../components/Buttons/UsualButton"
 import { useRef } from "react"
 import { useState } from "react"
-import { auth } from "../../firebase/InitialisationFirebase"
+import { auth, db } from "../../firebase/InitialisationFirebase"
 import { Alert } from "react-native"
 import { NavigationButton } from "../../components/Buttons/IconButtons"
+import { doc, getDoc, setDoc } from "firebase/firestore"
+import { updateProfile } from "firebase/auth"
+import { useNavigation } from "@react-navigation/native"
+import { useColorScheme } from "react-native"
+import SocialButton from "../../components/Buttons/SocialButton"
+import Separator from "../../components/Other/Separator"
+import { Error_Impact, Success_Impact } from "../../constants/Impacts"
 
 export default SignUpScreen = () => {
+
+    const usernameRef = useRef()
+    const [isUserNameWrong, setIsUserNameWrong] = useState(false)
 
     const emailRef = useRef()
     const [isEmailWrong, setIsEmailWrong] = useState(false)
@@ -19,14 +29,25 @@ export default SignUpScreen = () => {
     const passwordRef = useRef()
     const [isPasswordWrong, setIsPasswordWrong] = useState(false)
 
+    const navigation = useNavigation()
+
+    const handleGoToLoginScreen = () => {
+        navigation.navigate("LoginScreen")
+    }
+
     const handleSignUp = async() => {
 
+     const username = usernameRef.current?.getValue()
      const email = emailRef.current?.getValue()
      const password = passwordRef.current?.getValue()
 
 
 
-     if(email === ""){
+     if(username === ""){
+        setIsUserNameWrong(true)
+     }
+
+     else if(email === ""){
         setIsEmailWrong(true)
      }
 
@@ -36,17 +57,40 @@ export default SignUpScreen = () => {
 
      else{
         try{
-            await createUserWithEmailAndPassword(auth, email, password);
-            Alert.alert("Ok !!");
+            const {user} = await createUserWithEmailAndPassword(auth, email, password);
+            await updateProfile(user, {displayName: username});
+
+            const userDocRef = doc(db, "Users", email)
+            const docSnapshot = await getDoc(userDocRef);
+        
+            if (!docSnapshot.exists()) {
+                await setDoc(userDocRef, {});
+                Success_Impact()
+
+                navigation.navigate("AccountCreatedScreen")
+            }            
         }
 
         catch(e){
-            console.log("Errerur lors du signIn : ", e)
+            console.log("probleme lors de l'inscription : ", e)
+            Error_Impact()
         }
+
      }
-
-
     }
+
+    const colorScheme = useColorScheme()
+
+    const Google_Icon = require("../../img/Auth/Google.png")
+    const Facebook_Icon = colorScheme === "dark" ? require("../../img/Auth/Facebook-white.png") : require("../../img/Auth/Facebook-blue.png")
+
+    const Apple_Icon = colorScheme === "dark" ? require("../../img/Auth/Apple-white.png") : require("../../img/Auth/Apple-black.png")
+    const handleAppleSignUp = () => {}
+
+    const handleGoogleSignUp = () => {}
+
+    const handleFacebookSignUp = () => {}
+
 
     return (
         <UsualScreen hideMenu>
@@ -56,17 +100,49 @@ export default SignUpScreen = () => {
                     <View style={styles.subHeader}>
                         <NavigationButton action={"goBack"}/>
                     </View>
-                    <HugeText text={"Signup Screen"}/>
+                    <HugeText text={"Inscription"}/>
                 </View>
 
 
                 <View style={styles.body}>
-                    <TextInputCustom ref={emailRef} isWrong={isEmailWrong} errorMessage={"Erreur sur le mail"} placeholder={"Email"}/>
-                    <PasswordInputCustom ref={passwordRef} isWrong={isPasswordWrong} errorMessage={"Erreur sur le mdp"} placeholder={"Mot de passe"}/>
-                </View>
+                    <View style={{gap: 20}}>
+                        <TextInputCustom ref={usernameRef} isWrong={isUserNameWrong} placeholder={"Nom d'utilisateur"}/>
+                        <TextInputCustom ref={emailRef} isWrong={isEmailWrong} placeholder={"Email"}/>
+                        <PasswordInputCustom ref={passwordRef} isWrong={isPasswordWrong} placeholder={"Mot de passe"}/>
+                    </View>
+                    
+                    <View style={{display: "flex", flexDirection: "column", gap: 20}}>
 
-                <View style={styles.footer}>
-                    <BackgroundTextButton text={"S'inscrire"} bold onPress={handleSignUp}/>
+                        <BackgroundTextButton text={"S'inscrire"} bold onPress={handleSignUp}/>
+
+                        <View style={{justifyContent: "center", marginHorizontal: 30, display: "flex", alignItems: "center", flexDirection: "column"}}>
+                            <SubText style={{textAlign: "center"}} text={"En vous inscrivant, vous acceptez nos conditions d'utilisations "}/>
+                        </View>
+
+                    </View>
+                    <Separator/>
+
+                    <View style={{flex: 1, alignItems: "center", display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
+
+                        {/* <NormalText text={"Ou continuez avec :"} bold/> */}
+
+                        <View style={{display: "flex", flexDirection: "row", gap: 20, alignItems: "center", justifyContent: "center", flex: 1}}>
+                            {/* <SocialButton image={Apple_Icon}/> */}
+                            <SocialButton image={Google_Icon} onPress={handleGoogleSignUp}/>
+                            <SocialButton image={Facebook_Icon} onPress={handleFacebookSignUp}/>
+                        </View>
+
+
+              
+                    </View>
+
+                    <View style={{display: "flex", flexDirection: "column", gap: 20}}>
+
+                        <View style={styles.footer}>
+                            <NormalText text={"Déjà membre ? "}/> 
+                            <TextButton semiBold noPadding text={"Connectez vous"} onPress={handleGoToLoginScreen}/>
+                        </View>
+                    </View>
                 </View>
             </View>
         </UsualScreen>
@@ -76,15 +152,17 @@ export default SignUpScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        gap: 20,
+        gap: 50,
         display: "flex",
         justifyContent: "space-between",
+        marginBottom: 20
     },
 
     header: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 20
+        gap: 20,
+        
     },
 
     subHeader: {
@@ -94,12 +172,20 @@ const styles = StyleSheet.create({
 
     body: {
         flex: 1,
-        gap: 0,
+        gap: 40,
+    },
+
+    connexionContainer: {
+        justifyContent: "center",
         display: "flex",
-        justifyContent: "center"
+        flexDirection: "column",
+        gap: 20
     },
 
     footer: {
-        
+        display: "flex", 
+        flexDirection: "row", 
+        justifyContent: "center", 
+        alignItems: "center"
     }
 })

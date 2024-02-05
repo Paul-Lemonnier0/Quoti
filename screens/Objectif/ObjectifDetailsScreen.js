@@ -64,19 +64,15 @@ export default ObjectifDetailsScreen = () => {
   const objectif = seriazableObjectif || {};
 
   useEffect(() => {
-    if (
-      seriazableObjectif?.objectifID &&
-      filteredHabitsByDate?.Quotidien?.Objectifs?.hasOwnProperty(
-        seriazableObjectif.objectifID
+    if (seriazableObjectif?.objectifID && filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(seriazableObjectif.objectifID)) {
+
+      const habits_temp = Object.values(
+        filteredHabitsByDate[frequency].Objectifs[
+          seriazableObjectif.objectifID
+        ]
       )
-    ) {
-      setDisplayedHabits(
-        Object.values(
-          filteredHabitsByDate.Quotidien.Objectifs[
-            seriazableObjectif.objectifID
-          ]
-        )
-      );
+
+      setDisplayedHabits(habits_temp.map((habit) => ({...habit, color: objectif.color})));
     }
   }, [seriazableObjectif, filteredHabitsByDate]);
 

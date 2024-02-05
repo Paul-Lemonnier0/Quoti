@@ -1,4 +1,4 @@
-import { Animated, View, StyleSheet, TouchableOpacity, Vibration} from "react-native";
+import { View, StyleSheet, TouchableOpacity, Vibration} from "react-native";
 import { HugeText, LittleNormalText, NormalText, SubText, SubTitleText, TitleText} from "../../styles/StyledText";
 import { useThemeColor } from "../Themed";
 import { useNavigation } from "@react-navigation/native";
@@ -11,13 +11,16 @@ import { getHabitType } from "../../primitives/HabitMethods";
 import { RectButton } from "react-native-gesture-handler";
 import Swipeable from "react-native-gesture-handler/Swipeable";
 import { Alert } from "react-native";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useContext } from "react";
-import { BottomSheetModalMethodsContext } from "../../data/BottomSheetModalContext";
+import { BottomSheetModalMethodsContext, BottomSheetModalMethodsContextProvider } from "../../data/BottomSheetModalContext";
 import * as Haptics from 'expo-haptics';
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
+import { getHeightResponsive, getWidthResponsive, pixelSizeHorizontal, pixelSizeVertical } from "../../styles/UtilsStyles";
+import ItemIcon from "../Icons/ItemIcon";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
-export const HabitudeListItem =  ({habitude, currentDateString}) => {
+export const HabitudeListItem =  ({habitude, currentDateString, index}) => {
     const primary = useThemeColor({}, "Primary")
 
     const navigation = useNavigation();
@@ -43,21 +46,26 @@ export const HabitudeListItem =  ({habitude, currentDateString}) => {
 
     const isFinished = habitDoneSteps === steps.length
 
-    const {openModal} = useContext(BottomSheetModalMethodsContext)
-
     const handleLongPress = () => {
         BottomScreenOpen_Impact();
         openModal()
     }
 
+    const bottomSheetModalRef = useRef(null);
+
+    const openModal = useCallback(() => {
+        bottomSheetModalRef.current?.present();
+    }, []);
+
+
+
     return(
+        <>
         <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1}} delayLongPress={750} onLongPress={handleLongPress} onPress={handlePress}>
-            <Animated.View style={[stylesCard.card, styles.container]}>
+            <Animated.View entering={FadeInDown.duration(400).delay(index * 200)} style={[stylesCard.card, styles.container]}>
 
                 <View style={styles.habit}>
-                    <View style={[styles.iconContainer, {borderColor: habit.color}]}>
-                        <IconImage image={habit.icon}/>
-                    </View>
+                    <ItemIcon icon={habit.icon} color={habit.color}/>
 
                     <View style={styles.habitTitleStateContainer}>
                         <SubTitleText numberOfLines={1} text={habit.titre}/>
@@ -73,20 +81,61 @@ export const HabitudeListItem =  ({habitude, currentDateString}) => {
                     currentStep={habitDoneSteps} totalSteps={totalSteps}/>
             </Animated.View>
         </TouchableOpacity>
-    )};
+
+        <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef} habit={habit}/>
+
+        </>
+)};
+
+export const HabitudeListItemPresentation =  ({habitude}) => {
+    const primary = useThemeColor({}, "Primary")
+    const stylesCard = cardStyle()
+
+    const objectifID  = habitude.objectifID
+
+    const habit = habitude
+
+    let steps = []
+    if(habit.steps !== undefined){
+        steps = Object.values(habit.steps)
+    }
+    
+    const habitDoneSteps = steps.length
+    const totalSteps = steps.length
+
+    const pourcentage = (habitDoneSteps * 100 / totalSteps)
+
+    const isFinished = habitDoneSteps === steps.length
+
+    return(
+        <View style={[stylesCard.card, styles.container]}>
+
+            <View style={styles.habit}>
+                <ItemIcon icon={habit.icon} color={habit.color}/>
+
+                <View style={styles.habitTitleStateContainer}>
+                    <SubTitleText numberOfLines={1} text={habit.titre}/>
+                    <SubText numberOfLines={1} text={habit.description}/>
+                </View>
+            </View>
+
+            <StepIndicator height={3} inactiveColor={primary} color={habit.color}
+                currentStep={habitDoneSteps} totalSteps={totalSteps}/>
+        </View>
+)};
 
 const styles = StyleSheet.create(
     {   
         container: {
-            gap: 20,
+            gap: getHeightResponsive(20),
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
+            // flex: 1
         },
 
         pourcentageContainer: {
             display: "flex", 
-            gap: 5,
             justifyContent: "center",
         },
 
@@ -99,19 +148,11 @@ const styles = StyleSheet.create(
         },
         
         habit: {
-            gap: 20,
-            flex: 1,
+            gap: getWidthResponsive(20),
+            // flex: 1,
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-        },
-
-        timeContainer: {
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            marginLeft: 10
         },
 
         TouchableScreen: {
@@ -130,6 +171,6 @@ const styles = StyleSheet.create(
             display: "flex",
             flexDirection: "column",
             justifyContent: "center"
-        }
+        },     
     }
 )

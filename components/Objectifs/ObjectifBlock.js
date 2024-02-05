@@ -13,8 +13,9 @@ import { displayTree } from "../../primitives/BasicsMethods";
 import { HabitsContext } from "../../data/HabitContext";
 import ProgressBar from "../Progress/ProgressBar";
 import { getSeriazableObjectif } from "../../primitives/ObjectifMethods";
+import Animated, { FadeInLeft, FadeInRight } from "react-native-reanimated";
 
-export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
+export default ObjectifBlock = ({objectifID, frequency, currentDateString, index}) => {
 
     const {Objectifs, filteredHabitsByDate} = useContext(HabitsContext)
 
@@ -44,7 +45,7 @@ export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
 
         return(
             <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, width}} onPress={handlePress}>
-                <View style={[stylesCard.card, styles.objectif]}>
+                <Animated.View entering={FadeInRight.duration(400).delay(index * 200)} style={[stylesCard.card, styles.objectif]}>
                     <View style={styles.header}>
                         <View style={[styles.iconContainer, {borderColor: objectif.color}]}>
                             <IconImage image={objectif.icon}/>
@@ -57,13 +58,17 @@ export default ObjectifBlock = ({objectifID, frequency, currentDateString}) => {
                     </View>
 
                     <View style={styles.progressContainer}>
-                        <ProgressBar progress={pourcentage_value/100} color={objectif.color}/>
+
+
+                        <View style={{flex: 1}}>
+                            <ProgressBar progress={pourcentage_value/100} color={objectif.color}/>
+                        </View>
+
                         <LittleNormalText text={pourcentage_value + "%"} bold/>
-                        {/* <StepIndicator currentStep={habits.length} totalSteps={habits.length} color={objectif.color} height={3}/> */}
                     </View>
 
 
-                </View>
+                </Animated.View>
             </TouchableOpacity>
         )
     }
@@ -115,6 +120,6 @@ const styles = StyleSheet.create({
     progressContainer:{
         display: "flex",
         flexDirection: "column",
-        gap: 10,
+        gap: 10
     }
 })

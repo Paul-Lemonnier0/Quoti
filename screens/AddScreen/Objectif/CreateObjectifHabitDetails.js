@@ -79,75 +79,75 @@ export const CreateObjectifHabitDetails = () => {
     }
 
     return(
-        <UsualScreen hideMenu>
-            <View style={styles.container}>
+        <View/>
+        // <UsualScreen hideMenu>
+        //     <View style={styles.container}>
 
-                <View style={styles.header}>
+        //         <View style={styles.header}>
+        //             <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+        //                 <NavigationButton noPadding action={"close"} methode={closeModal}/>
+        //                 <NavigationButton noPadding action={"validation"} methode={handleValidation}/>
+        //             </View>
 
-                    <View style={{width: "80%"}}>
-                        <HugeText text="À quelle fréquence ?"/>
-                    </View>
+        //             <HugeText text="À quelle fréquence ?"/>
 
-                    <NavigationButton action={"validation"} methode={handleValidation}/>
+        //             <StepIndicator totalSteps={2} currentStep={1}/>
+        //         </View>
 
-                </View>
 
-                <StepIndicator totalSteps={2} currentStep={2}/>
-
-                <View style={styles.body}>
+        //         <View style={styles.body}>
                     
-                    <View style={styles.groupContainer}>
-                        {frequencies.map(frequency => (
-                            <BorderRadioButton hideInactiveBorder
-                                key={frequency.key}
-                                text={frequency.key}
-                                isHighlight={selectedFrequency.key === frequency.key}
-                                handleOnClick={() => handleChangeFrequency(frequency)}
-                            />
-                        ))}
-                    </View>
-
-                    <Separator/>
+        //             <View style={styles.groupContainer}>
+        //                 {frequencies.map(frequency => (
+        //                     <BorderRadioButton hideInactiveBorder
+        //                         key={frequency.key}
+        //                         text={frequency.key}
+        //                         isHighlight={selectedFrequency.key === frequency.key}
+        //                         handleOnClick={() => handleChangeFrequency(frequency)}
+        //                     />
+        //                 ))}
+        //             </View>
                     
-                    <View style={{flex: 1, justifyContent: "space-around"}}>
-                    <View style={styles.groupContainer}>
-                        <View style={styles.listContainer}>
-                            <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
-                                <SubTitleText text="Récurrence :"/>
-                                <SubText text="Ex : Tous les 2 jours"/>
-                            </View>
+        //             <Separator/>
 
-                            <IncrementButtons isBorderHidden={isRecurrenceIncrementBorderHidden} value={reccurence} setValue={handleSetReccurence} suffixe={selectedFrequency.suffixe}/>
+                    
+        //             <View style={{flex: 1, justifyContent: "space-around"}}>
+        //                 <View style={styles.groupContainer}>
+        //                     <View style={styles.listContainer}>
+        //                         <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
+        //                             <SubTitleText text="Récurrence :"/>
+        //                             <SubText text="Ex : Tous les 2 jours"/>
+        //                         </View>
 
-                        </View>
+        //                         <IncrementButtons isBorderHidden={isRecurrenceIncrementBorderHidden} value={reccurence} setValue={handleSetReccurence} suffixe={selectedFrequency.suffixe}/>
 
-                        {
-                            selectedFrequency.key === "Quotidien" ?
-                                <SelectWeekDays selectedDays={selectedDays} handleSelectDay={handleSelectDay}/> :
+        //                     </View>
 
-                                <BorderRadioButton hideInactiveBorder isHighlight={reccurence === 1} handleOnClick={() => setReccurence(1)}
-                                    text={selectedFrequency.key === "Mois" ? "Tous les mois" : "Toutes les semaines"} />
-                        }
-                    </View>
+        //                     {
+        //                         selectedFrequency.key === "Quotidien" ?
+        //                             <SelectWeekDays selectedDays={selectedDays} handleSelectDay={handleSelectDay}/> :
+
+        //                             <BorderRadioButton hideInactiveBorder isHighlight={reccurence === 1} handleOnClick={() => setReccurence(1)}
+        //                                 text={selectedFrequency.key === "Mois" ? "Tous les mois" : "Toutes les semaines"} />
+        //                     }
+        //                 </View>
 
 
-                    <View style={styles.groupContainer}>
-                        <View style={styles.listContainer}>
-                            <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
-                                <SubTitleText text="Occurences :"/>
-                                <SubText text="Ex : 2 fois par semaine"/>
-                            </View>
+        //                 <View style={styles.groupContainer}>
+        //                     <View style={styles.listContainer}>
+        //                         <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
+        //                             <SubTitleText text="Occurences :"/>
+        //                             <SubText text="Ex : 2 fois par semaine"/>
+        //                         </View>
 
-                            <IncrementButtons value={occurences} setValue={setOccurences}/>
-                        </View>
-                    </View>
-                    </View>
-                </View>
+        //                         <IncrementButtons value={occurences} setValue={setOccurences}/>
+        //                     </View>
+        //                 </View>
+        //             </View>
+        //         </View>
 
-                <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
-
-            </View>
-        </UsualScreen>
+        //     </View>
+        // </UsualScreen>
     )
 }
 
@@ -187,15 +187,14 @@ const styles = StyleSheet.create({
 
     header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        flexDirection: "column",
+        gap: 30    
     },
     
     body: {
         flex: 1, 
         gap: 30,
-        justifyContent: "space-between"
+        justifyContent: "space-around"
     },
 
     groupContainer: {
@@ -203,7 +202,6 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "center", 
         gap: 20,
-        width: "100%"
     },
 
     footer: {

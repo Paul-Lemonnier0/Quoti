@@ -7,27 +7,62 @@
     "icon": "./assets/images/DailyIcon.png",
     "scheme": "Daily",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/DailySplash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+
     "updates": {
       "fallbackToCacheTimeout": 0
     },
+
     "assetBundlePatterns": [
       "**/*"
     ],
+
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.arzakal.Daily"
+      "bundleIdentifier": "com.arzakal.Daily",
+      "splash": {
+        "image": "./assets/images/DailySplashDark.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#000000",
+        "dark": {
+            "image": "./assets/images/DailySplashDark.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#000000"
+        }
+      }
     },
     "android": {
+      "splash": {
+        "image": "./assets/images/DailySplash.png",
+        "resizeMode": "cover",
+        "backgroundColor": "#ffffff",
+        "dark": {
+            "image": "./assets/images/DailySplash.png",
+            "resizeMode": "cover",
+            "backgroundColor": "#000000"
+        }
+      },
+
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.arzakal.Daily"
+
+      "package": "com.arzakal.Daily",
+
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "*.myapp.io",
+              "pathPrefix": "/records"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -36,6 +71,14 @@
       "eas": {
         "projectId": "939c8fe8-de54-461f-bb4a-748e1700974a"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access your photos"
+        }
+      ]
+    ]
   }
 }

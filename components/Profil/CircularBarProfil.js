@@ -29,7 +29,6 @@ export const CircularBarProfil = ({profil, couleur}) =>
                 fill={pourcentage}
                 tintColor={couleur}
                 lineCap="round"
-                onAnimationComplete={() => console.log('onAnimationComplete')}
                 backgroundColor={secondary}>
                     {
                         () => {

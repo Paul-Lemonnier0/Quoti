@@ -19,6 +19,7 @@ const generateUniqueID = () => {
 }
 
 const listKeyIDfromArray = (array, idName, habitID = null) => {
+
   return array.reduce((newList, item) => {
     newList[item[idName]] = { ...item, idName: item[idName], ...(habitID && { habitID }) };
     return newList;

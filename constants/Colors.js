@@ -15,6 +15,8 @@ export default {
     DisabledButtonBackground: "#7b7b7b",
     DisabledButtonText: "#afafaf",
 
+    Selection: 'rgba(246, 246, 249, 0.5)',
+
     LinearGradientOpacity: ['rgba(256,256,256,0)', 'rgba(256,256,256,1)']
   },
 
@@ -25,8 +27,16 @@ export default {
     Contrast: "#fff",
     Primary: "#000000",
     Secondary: "#12161b",
+
+    Selection: 'rgba(65, 68, 71, 0.5)',
     // Primary: "#232323",
     // Secondary: "#303030",
+
+    InputBackground: "#f9f9f9",
+    InputDisabledBackground: "#ededed",
+    DisabledButtonBackground: "#12161b",
+    DisabledButtonText: "#fff",
+
     Tertiary: "#414447",
     ShadowColor: "#171717",
     Popup: "#181b1f",

@@ -23,14 +23,12 @@ const ComponentPresentation = () => {
     {frequency: "Radio2", displayedText: "Radio", nbElement: 2}, 
   ]
 
-  const [selectedItem, setSelectedItem] = useState("AddBasicDetails")
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [incrementValue, setIncrementValue] = useState(1)
   const [incrementHour, setIncrementHour] = useState(1)
   const [incrementMinutes, setIncrementMinutes] = useState(30)
 
   const handleChangeSelectedDate = async(date) =>  {
-    console.log("changing date")
     setSelectedDate(date)
   }
 
@@ -45,7 +43,6 @@ const ComponentPresentation = () => {
     }, []);
 
   const handleSheetChangesCalendar = useCallback((index) => {
-      console.log("handleSheetChange", index)
   }, []);
 
   const handleChangeSelectedPeriode = (newPeriode) => {

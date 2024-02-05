@@ -34,7 +34,6 @@ const ProfilDetailsScreen = () => {
       }, []);
 
     const handleSheetChanges = useCallback((index) => {
-        console.log("handleSheetChange", index)
     }, []);
 
     const handleOpenAchievements = () => {

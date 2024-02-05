@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { View, StyleSheet, Image } from "react-native"
 import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../styles/StyledText"
 import { useThemeColor } from "../components/Themed"
@@ -25,22 +25,35 @@ import Achievements from "../data/Achievements";
 import { useEffect } from "react";
 import { getLogsForHabitInDateRange } from "../firebase/Firestore_Step_Primitives";
 import RangeActivity from "../components/Calendars/RangeActivity";
+import { getHeightResponsive, getWidthResponsive } from "../styles/UtilsStyles";
+import { Success_Impact } from "../constants/Impacts";
+import HabitCompletedBottomScreen from "./BottomScreens/Habitudes/HabitCompletedBottomScreen";
+import { useRef } from "react";
 
 const HabitudeScreen = () => {
+
+    const navigation = useNavigation()
 
     const tertiary = useThemeColor({}, "Tertiary")
     const secondary = useThemeColor({}, "Secondary")
 
-    const {getHabitFromFilteredHabits, handleCheckStep} = useContext(HabitsContext)
-
+    const {getHabitFromFilteredHabits, handleCheckStep, Objectifs} = useContext(HabitsContext)
     const route = useRoute()
     const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
+
+    const bottomSheetModalRef_HabitCompleted = useRef(null)
+    const bottomSheetModalRef_Settings = useRef(null)
     
     //POUR L'INSTANT : 
 
     const currentDate = currentDateString === "none" ? new Date(currentDateString) : new Date(currentDateString)
 
     const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID)
+
+    if(objectifID){
+        habit["color"] = Objectifs[objectifID].color ?? habit.color
+    }
+
     const [steps, setSteps] = useState(Object.values(habit.steps))
 
     const doneSteps = steps.filter(step => step.isChecked).length
@@ -58,8 +71,6 @@ const HabitudeScreen = () => {
     const onStepChecked = (step, index) => {
         const isChecked = !step.isChecked
 
-        console.log(currentDateString)
-
         const updatedSteps = [...steps]
         updatedSteps[index] = {...step, isChecked}
 
@@ -68,6 +79,11 @@ const HabitudeScreen = () => {
 
         handleCheckStep(habitID, step.stepID, currentDate, isChecked, isHabitNowCompleted)
         setSteps(updatedSteps);    
+
+        if(isHabitNowCompleted){
+            bottomSheetModalRef_HabitCompleted.current?.present();
+            Success_Impact()
+        }
     }
 
     const imageSize = 35
@@ -114,26 +130,6 @@ const HabitudeScreen = () => {
         }
     }, [logsReady, steps])
 
-    const handleShare = async() => {
-        try{
-            const result = await Share.share({
-                message: habit.titre + " : " + habit.description,
-                url: `exp://172.20.10.2:8081/--/SharedHabitScreen?habitID='50'&userID='Paul'`,
-            })
-
-            if(result.action === Share.sharedAction){
-                //shared
-            }
-
-            else if(result.action === Share.dismissedAction){
-                //Pas shared
-            }
-        }
-
-        catch(e){
-            Alert.alert("Shared Error : ", e)
-        }
-    }
 
     const ReturnAchievementList = ({}) => {
         const renderAchievement = ({item}) => {
@@ -143,13 +139,18 @@ const HabitudeScreen = () => {
         return(
             <FlatList data={Achievements} renderItem={renderAchievement}
             horizontal={true} showsHorizontalScrollIndicator={false}
-            style={{marginHorizontal: -30}} contentContainerStyle={{gap: 15, paddingHorizontal: 30}}/>
+            style={{marginHorizontal: getWidthResponsive(-30)}} contentContainerStyle={{gap: getWidthResponsive(15), paddingHorizontal: getWidthResponsive(30)}}/>
         )
     }
 
-    if(habit.titre === "Hydratation"){
-        console.log(lastSevenDaysLogs)
+    const handleOpenSettings = useCallback(() => {
+        bottomSheetModalRef_Settings.current?.present();
+    }, []);
+
+    const goBack = () => {
+        navigation.goBack()
     }
+ 
 
     return(
         <UsualScreen>
@@ -157,16 +158,16 @@ const HabitudeScreen = () => {
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton action={"goBack"}/>
-                        <CircleBorderIconButton name={"share-2"} provider={"Feather"} onPress={handleShare}/>
+                        <IconButton noPadding name={"settings"} provider={"Feather"} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 
                 <CustomScrollView>     
                     <View style={styles.body}>            
                         <View style={styles.bodyHeader}>
-                            <View style={[styles.displayRow, {gap: 20}]}>
-                                <View style={{borderRadius: 20, borderColor: isFinished ? habit.color : tertiary, borderWidth: 2, padding: 15}}>
-                                    <Image source={HabitIcons[habit.icon]} style={{width: imageSize, height: imageSize}}/>
+                            <View style={[styles.displayRow, {gap: getWidthResponsive(20)}]}>
+                                <View style={{borderRadius: getWidthResponsive(20), borderColor: isFinished ? habit.color : tertiary, borderWidth: 2, padding: getWidthResponsive(15)}}>
+                                    <Image source={HabitIcons[habit.icon]} style={{height: getHeightResponsive(imageSize), aspectRatio: 1}}/>
                                 </View>
 
                                 <View style={styles.titreEtDescriptionContainer}>
@@ -184,7 +185,7 @@ const HabitudeScreen = () => {
                                 <TitleText text="Progression"/>
 
                                 <View style={styles.displayColumn}>
-                                    <StepsList disabled={isDisabled} steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
+                                    <StepsList disabled={false} steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
                                 </View>
                             </View>
 
@@ -205,16 +206,17 @@ const HabitudeScreen = () => {
                                     <RangeActivity start={currentDate} activity={lastSevenDaysLogs} steps={steps} activityColor={habit.color}/>
                                 </View>
                             </View>
-
-                            <View style={styles.groupContainer}>
-                                <TitleText text={"Succès"}/>
-
-                                <ReturnAchievementList/>
-                            </View>
                         </View>
                     </View>
                 </CustomScrollView>
             </View>
+
+            <HabitCompletedBottomScreen bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} habit={habit}/>
+            <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef_Settings} habit={habit} 
+            deleteAdditionnalMethod={goBack} 
+            attachToObjectifAdditionnalMethod={goBack}
+            modifyAdditionnalMethod={goBack}/>
+
         </UsualScreen>
     )
 };
@@ -223,7 +225,7 @@ const styles = StyleSheet.create({
     container: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 20, 
+        gap: getHeightResponsive(20), 
         flex: 1, 
         marginBottom: 0    
     },
@@ -231,7 +233,7 @@ const styles = StyleSheet.create({
     header: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 20
+        gap: getHeightResponsive(20)
     },
     
     subHeader: {
@@ -243,7 +245,8 @@ const styles = StyleSheet.create({
 
     body: {
         flex: 1, 
-        gap: 30,
+        marginTop: 10,
+        gap: getHeightResponsive(30),
     },
 
     titreEtDescriptionContainer:{
@@ -266,7 +269,7 @@ const styles = StyleSheet.create({
     },
 
     bodyHeader: {
-        gap: 15,
+        gap: getHeightResponsive(15),
         display: "flex",
         flexDirection: "column"
     }, 
@@ -274,20 +277,20 @@ const styles = StyleSheet.create({
     bodyCore: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 40
+        gap: getHeightResponsive(40)
     },
 
     groupContainer: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 30
+        gap: getHeightResponsive(30)
     },
 
     streakContainer: {
         display: "flex", 
         flexDirection: "column", 
         flex: 1, 
-        gap: 20
+        gap: getHeightResponsive(20)
     },
 
     streakHeader: {
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
         display: "flex", 
         flexDirection: "row", 
         alignItems: "center", 
-        gap: 10
+        gap: getWidthResponsive(10)
     }
 })
 

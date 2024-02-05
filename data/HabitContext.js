@@ -1,18 +1,22 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { AnimatedBasicSpinnerView } from "../components/Spinners/AnimatedSpinner";
-import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
-import { setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
+import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
+import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
 import { addObjectifToFirestore, fetchAllObjectifs } from "../firebase/Firestore_Objectifs_Primitives";
 import { convertBackSeriazableObjectif } from "../primitives/ObjectifMethods";
 import { NormalText } from "../styles/StyledText";
 import { View } from "react-native";
 import { displayTree } from "../primitives/BasicsMethods";
+import { UserContext } from "./UserContext";
 
 const HabitsContext = createContext();
 
 const HabitsProvider = ({ children }) => {
+
+    const {user} = useContext(UserContext)
+    const userID = user.email
 
     const alreadyFetchedStepLogs = {};  //de la forme [stepID, currentDay]: isChecked
     const alreadySeenHabitsScheduledForDay = {}; //De la forme {date: [habitID_1, habitID_2, ...]}
@@ -36,7 +40,7 @@ const HabitsProvider = ({ children }) => {
     const fetchHabits = async () => {
         console.log("Fetching habits...")
 
-        const habits = await getAllOwnHabits()
+        const habits = await getAllOwnHabits(userID)
         // const habits={}
         setHabits(habits);        
 
@@ -50,7 +54,7 @@ const HabitsProvider = ({ children }) => {
       try{
         const habits = await fetchHabits()
 
-        filterHabits(new Date(), habits, setIsFetchingHabit)
+        filterHabits(new Date(), userID, habits, setIsFetchingHabit)
           .then(filteredHabits => {
             setFilteredHabitsByDate(filteredHabits)
             setIsFetched(true)
@@ -65,7 +69,7 @@ const HabitsProvider = ({ children }) => {
     const fetchObjectifs = async () => {
       try{
         console.log("fetching objectifs...")
-        const objectifs = await fetchAllObjectifs();
+        const objectifs = await fetchAllObjectifs(userID);
         setObjectifs(objectifs)
         console.log("objectifs successfully fetched.")
       }
@@ -87,10 +91,8 @@ const HabitsProvider = ({ children }) => {
       selectedDate = date
 
       try{
-        filterHabits(date, Habits, setIsFetchingHabit)
-          .then(filteredHabits => {
-            setFilteredHabitsByDate(filteredHabits)
-          })
+        const filteredHabits = await filterHabits(date, userID, Habits, setIsFetchingHabit)
+        setFilteredHabitsByDate(filteredHabits)
       }
 
       catch(e) { console.log("error while changing date : ", e)}
@@ -115,12 +117,12 @@ const HabitsProvider = ({ children }) => {
       let habit = Habits[habitID]
 
       const promises = []
-      promises.push(changeStepStateFirestore(date, habitID, stepID, isChecked))
+      promises.push(changeStepStateFirestore(date, userID, habitID, stepID, isChecked))
 
       let newStreakValues = {}
       if(isHabitNowCompleted){
         newStreakValues = getUpdatedStreakOfHabit(habit, date)
-        promises.push(updateCompletedHabit(habitID, newStreakValues))
+        promises.push(updateCompletedHabit(userID, habitID, newStreakValues))
 
         setHabits(previousHabits => ({
           ...previousHabits,
@@ -147,7 +149,7 @@ const HabitsProvider = ({ children }) => {
     const addHabit = async(habit) => {
       try{
           
-          const habitWithID = await addHabitToFireStore(habit)          
+          const habitWithID = await addHabitToFireStore(habit, userID)          
           const finalHabit = setHabitWithDefaultStep(habitWithID)
 
           setHabits((prevHabits) => (updateHabitsWithNewHabit(prevHabits, finalHabit)));
@@ -170,10 +172,9 @@ const HabitsProvider = ({ children }) => {
     const addObjectif = async(objectif) => {
       try{
         console.log("Adding objectif...")
-        const addedObjectif = await addObjectifToFirestore(objectif)
+        const addedObjectif = await addObjectifToFirestore(objectif, userID)
         const deserializedObjectif = convertBackSeriazableObjectif(addedObjectif)
 
-        console.log(addedObjectif)
         setObjectifs(prevObjs => ({...prevObjs, [deserializedObjectif.objectifID]: deserializedObjectif}))
 
         console.log("Objectif well added !")
@@ -191,7 +192,7 @@ const HabitsProvider = ({ children }) => {
       console.log("Deleting habit : ", habit.titre, "...")
       const habitID = habit.habitID
 
-      await removeHabitInFirestore(habit)
+      await removeHabitInFirestore(habit, userID)
 
       setHabits(previousHabits => removeHabitFromHabits(previousHabits, habitID))
       setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
@@ -201,23 +202,43 @@ const HabitsProvider = ({ children }) => {
 
 
     const updateHabitRelationWithObjectif = async(habit, destination_objectifID = null) => {
-      const newHabit = await updateHabit(habit.habitID, { objectifID: destination_objectifID}, selectedDate)
-      console.log(Objectifs)
 
-      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
+      const habitWithLogs = getHabitFromFilteredHabits(habit.frequency, habit.objectifID, habit.habitID)
+
+      setFilteredHabitsByDate(previousFilteredHabits =>  removeHabitFromFilteredHabits(previousFilteredHabits, habit))
+      const newHabit = await updateHabit(habit, { objectifID: destination_objectifID}, selectedDate)
     }
 
 
 
 
-    const updateHabit = async(oldHabitID, newValues, currentDate) => {
-      const oldHabit = Habits[oldHabitID]
+    const updateHabit = async(oldHabit, newValues, currentDate = selectedDate) => {
+
+      setFilteredHabitsByDate(previousFilteredHabits =>  removeHabitFromFilteredHabits(previousFilteredHabits, oldHabit))
 
       console.log("Updating habit : ", oldHabit.titre, "...")
-      const updatedHabit = {...oldHabit, ...newValues}
+      let updatedHabit = {...oldHabit, ...newValues}
+
+      if(newValues.hasOwnProperty("steps")){
+        newValues["steps"] = Object.values(newValues.steps)
+      }
       
-      await updateHabitInFirestore(oldHabit, newValues)
-      
+      await updateHabitInFirestore(userID, oldHabit, newValues)
+
+      const isNewStepPlaceholder = Object.values(updatedHabit.steps).some(step => step.numero === -1);
+
+      if(isNewStepPlaceholder){
+        const newSteps =  Object.values(updatedHabit.steps).filter((step) => (step.numero !== -1))
+        newSteps.push(createDefaultStepFromHabit(updatedHabit, updatedHabit.habitID))
+
+        updatedHabit["steps"] = [...newSteps]
+      }
+
+
+
+      const validSteps = getValidHabitsStepsForDate(Object.values(updatedHabit.steps), oldHabit.habitID, currentDate)
+      updatedHabit["steps"] = {...validSteps}
+        
       setFilteredHabitsByDate(previousFilteredHabits => updateFilteredHabitsWithNewHabit(previousFilteredHabits, updatedHabit, currentDate))
       setHabits(previousHabits => updateHabitsWithNewHabit(previousHabits, updatedHabit))
 
@@ -230,10 +251,6 @@ const HabitsProvider = ({ children }) => {
       return getHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
     }
 
-    if(!isFetched) {
-      // return <AnimatedBasicSpinnerView/>
-      return <View><NormalText text={"Attente..."}/></View>
-    }
 
     const exportedValues = {
       Habits,

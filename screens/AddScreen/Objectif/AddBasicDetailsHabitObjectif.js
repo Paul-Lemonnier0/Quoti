@@ -10,113 +10,36 @@ import { useMemo } from "react"
 import { useRef } from "react"
 import { useCallback } from "react"
 import { RenderAddStepCarouselItem } from '../../../components/Habitudes/Step/StepCarouselItem'
-import { useNavigation } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import { generateUniqueID } from "../../../primitives/BasicsMethods"
 import { NavigationButton } from "../../../components/Buttons/IconButtons"
 import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext"
 import Separator from "../../../components/Other/Separator"
 import AddStepBottomScreen from "../../BottomScreens/AddStepBottomScreen"
 import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets"
+import { AddBasicDetails } from "../Habit/AddBasicDetails"
+import HabitForm from "../../../components/Forms/HabitForm"
 
 export const AddBasicDetailsHabitObjectif = () => {
 
     const navigation = useNavigation();
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
 
-    const [steps, setSteps] = useState([{addStepItem: true}])
+    const route = useRoute()
+    const {isForModifyingHabit, isForCreateObjectiveHabit, habit} = route.params
 
-    let titreRef = useRef(null)
-    let descriptionRef = useRef(null)
-
-    const [isTitleWrong, setIsTitleWrong] = useState(false)
-    const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
-
-    const bottomSheetModalRefAddStep = useRef(null);
-    const snapPointsAddStep = useMemo(() => ['70%'], [])
-
-    const handleOpenAddStep = useCallback(() => {
-        bottomSheetModalRefAddStep.current?.present();
-      }, []);
-
-    const handleGoNext = () => {
-
-        let canGoNext = true
-
-        let titre = titreRef.current?.getValue();
-        let description = descriptionRef.current?.getValue();
-
-        if(titre.trim().length === 0 || description.trim().length === 0) 
-        {
-            description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-            titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
-
-            canGoNext = false
-        }
-
-        else {
-            setIsTitleWrong(false)
-            setIsDescriptionWrong(false)
-        }
-
-        if(canGoNext) 
-        {
-            let stepsFinal;
-
-            if(steps.length > 1){
-                stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
-                stepsFinal.pop()
-            }
-
-            else stepsFinal = [{numero: -1}]
-
-            const habit = {titre, description, steps: stepsFinal}
-            
-            navigation.navigate("CreateObjectifHabitDetails", {habit})
-        }
-    }
-
-    const renderAddSteps = ({item, index}) => {
-        return <RenderAddStepCarouselItem item={item} index={index} data={steps} setData={setSteps} handleOpenAddStep={handleOpenAddStep}/>
+    const handleGoNext = (habit) => {
+        navigation.navigate("CreateObjectifHabitDetails", {habit})
     }
 
     return(
-        <UsualScreen hideMenu>
-            <View style={styles.container}>
-
-                <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <HugeText text="Ajoutez une habitude !"/>
-                    </View>
-
-                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
-                </View>
-
-                <StepIndicator totalSteps={2} currentStep={1}/>
-
-                <View style={styles.body}>
-
-                    <TextInputCustom ref={titreRef} labelName={"Titre"} placeholder={"Nom de l'habitude "} isWrong={isTitleWrong}/>
-
-                    <TextInputCustom ref={descriptionRef} labelName={"Description"} placeholder={"Description de l'habitude"} isWrong={isDescriptionWrong}/>
-
-                    <View style={styles.carouselContainer}>
-                        <SubTitleText text="Etapes :"/>
-
-                        <CustomCarousel data={steps} renderItem={renderAddSteps}/>                        
-                    </View>
-                </View>
-
-                <View style={{marginTop: 10}}>
-                    <FooterBottomSheets text={"Annuler"} onPress={closeModal}/>
-                </View>
-            </View>
-
-            <AddStepBottomScreen
-                
-                snapPoints={snapPointsAddStep}
-                bottomSheetModalRef={bottomSheetModalRefAddStep}
-                setSteps={setSteps}/>
-        </UsualScreen>
+        <HabitForm
+            isForCreateObjectiveHabit={isForCreateObjectiveHabit}
+            isForModifyingHabit={isForModifyingHabit}
+            baseHabit={habit}
+            handleGoNext={handleGoNext}
+            closeModal={closeModal}
+        />
     )
 }
 
@@ -132,16 +55,20 @@ const styles = StyleSheet.create({
 
     header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        flexDirection: "column",
+        gap: 30
     },
     
     body: {
         flex: 1, 
         gap: 0,
-        justifyContent: "center"
+        justifyContent: "center",
     },
+
+    subBody: {
+        flex: 1, 
+        gap: 30,
+    },  
 
     footer: {
         justifyContent: "center", 

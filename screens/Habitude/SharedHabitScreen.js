@@ -11,7 +11,6 @@ export default SharedHabitScreen = () => {
     const {habitID, userID} = route.params;
 
     const {Habits} = useContext(HabitsContext)
-    console.log("Habit retrieved : ", habitID)
     
     if(!Habits.hasOwnProperty(habitID)){
         return(
@@ -25,7 +24,9 @@ export default SharedHabitScreen = () => {
 
     return(
         <MainView>
-            <HugeText text={habit.titre}/>
+            <HugeText text={"Shared !"}/>
+            <HugeText text={"habitID : " + habitID}/>
+            <HugeText text={"UserID : " + userID}/>
         </MainView>
     )
 }

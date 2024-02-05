@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Keyboard, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import ColorPicker, { HueSlider, Panel1 } from 'reanimated-color-picker';
 import { useThemeColor } from "../../components/Themed";
@@ -7,19 +7,12 @@ import { Feather } from '@expo/vector-icons';
 import Separator from '../../components/Other/Separator';
 import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet";
 
-const CustomColorBottomScreen = ({ bottomSheetModalRef, snapPoints, handleSheetChanges, selectedColor, setSelectedColor }) => {
+const CustomColorBottomScreen = ({ bottomSheetModalRef, selectedColor, setSelectedColor }) => {
   const font = useThemeColor({}, "Font");
   const errorColor = useThemeColor({}, "Error") 
 
+  const snapPoints = useMemo(() => ['65%'], []);
 
-
-  const hexToRgb = (hex, opacityCustom) => {
-    hex = hex.replace(/^#/, '');
-    const r = parseInt(hex.substring(0, 2), 16);
-    const g = parseInt(hex.substring(2, 4), 16);
-    const b = parseInt(hex.substring(4, 6), 16);
-    return `rgba(${r}, ${g}, ${b}, ${opacityCustom})`;
-  }
 
   const [hexValue, setHexValue] = useState(selectedColor.substring(1));
   const [isHexWrong, setIsHexWrong] = useState(false);
@@ -31,7 +24,6 @@ const CustomColorBottomScreen = ({ bottomSheetModalRef, snapPoints, handleSheetC
 
   function isHex(h) {
     var a = parseInt(h,16);
-    console.log("Hex : ", h , " => ", (a.toString(16) === h.toLowerCase()), " => ", a.toString(16))
     return ((h.length === 3 || h.length === 6) && a.toString(16) === h.toLowerCase())
     }
   
@@ -56,9 +48,10 @@ const CustomColorBottomScreen = ({ bottomSheetModalRef, snapPoints, handleSheetC
   const onSelectColor = ({ hex }) => {
     setSelectedColor(hex);
   };
+  
 
   return (
-    <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} onChange={handleSheetChanges}>
+    <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} onChange={() => {}}>
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
             <View style={styles.container}>
                 <View style={{marginTop: -10}}>
@@ -66,7 +59,7 @@ const CustomColorBottomScreen = ({ bottomSheetModalRef, snapPoints, handleSheetC
                 </View>
 
                 <View style={styles.body}>
-                    <ColorPicker style={styles.contentContainer} thumbSize={30}  value={selectedColor} onComplete={onSelectColor}>
+                    <ColorPicker style={styles.contentContainer} thumbSize={30} value={selectedColor} onComplete={onSelectColor}>
                         <View style={styles.displayCenterRow}>
                             <View style={styles.displayCenterRow}>
                                 <View style={[styles.textInputContainer, {borderColor: isHexWrong ? errorColor : font}]}>

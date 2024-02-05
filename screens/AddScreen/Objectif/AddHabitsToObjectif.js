@@ -21,14 +21,18 @@ import { HabitsContext } from "../../../data/HabitContext"
 import HabitudesList from "../../../components/Habitudes/HabitudesList"
 import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 import { Success_Impact } from "../../../constants/Impacts"
-import SpinnerView from "../../../components/Spinners/SpinnerView"
 import { AnimatedBasicSpinnerView } from "../../../components/Spinners/AnimatedSpinner"
 import { useEffect } from "react"
 import BottomMenuStyle from "../../../styles/StyledBottomMenu"
+import PresentationHabitList from "../../../components/Habitudes/PresentationHabitList"
+import { AppContext } from "../../../data/AppContext"
 
 
 
 const AddHabitsToObjectif = () => {
+
+    const {setIsLoading} = useContext(AppContext)
+    const {addObjectif, addHabit} = useContext(HabitsContext)
 
     const route = useRoute()
     const navigation = useNavigation()
@@ -36,54 +40,10 @@ const AddHabitsToObjectif = () => {
     const {objectif} = route.params
     const deserializedObjectif = convertBackSeriazableObjectif(objectif)
     
-    const {addObjectif, addHabit} = useContext(HabitsContext)
 
     const [habitsForObjectif, setHabitsForObjectif] = useState([])
 
-    const [isLoading, setIsLoading] = useState(false)
     const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
-
-    useEffect(() => {
-
-        const handleHideBottomBar = () => {
-            navigation.getParent()?.setOptions({
-                tabBarStyle: {display: 'none'},
-                tabBarVisible: false       
-            });
-        }
-
-        const handleShowBottomBar = () => {
-            navigation.getParent()?.setOptions({
-                tabBarStyle: bottomMenuStyle,
-                tabBarVisible: true       
-              });
-        }
-
-        const disableGestures = () => {
-            navigation.setOptions({
-                gestureEnabled: false, // Désactive les gestes de navigation
-            });
-        };
-
-        const enableGestures = () => {
-            navigation.setOptions({
-                gestureEnabled: true, // Active les gestes de navigation
-            });
-        };
-
-        if (isLoading) {
-            disableGestures();
-            handleHideBottomBar();
-        } else {
-            enableGestures();
-            handleShowBottomBar();
-        }
-
-        return () => {
-            // Rétablir les gestes lorsque le composant est démonté
-            enableGestures();
-        };
-    }, [isLoading, navigation]);
 
     function timeout(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
@@ -98,10 +58,6 @@ const AddHabitsToObjectif = () => {
         const startingDate = deserializedObjectif.startingDate
         const endingDate = deserializedObjectif.endingDate
 
-        // const handleValidation = async() => {
-        //     navigation.navigate("SpinnerView", {method})
-        // }
-
         setIsLoading(true)
         const objectifWithID = await addObjectif(deserializedObjectif) 
 
@@ -111,6 +67,7 @@ const AddHabitsToObjectif = () => {
 
         Success_Impact()
         console.log("objectif and habit(s) well added")
+        navigation.navigate("ValidationScreenObjectif")
     }
 
     const addHabitForObjectif = (habit) => {
@@ -169,29 +126,26 @@ const AddHabitsToObjectif = () => {
                 <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend/>
 
                 <CustomScrollView>
-                    <HabitudesList habits={habitsForObjectif}/>
+                    <PresentationHabitList habits={habitsForObjectif}/>
                 </CustomScrollView>
 
             </View>
         )
     }
-
-    if(isLoading){
-        return <AnimatedBasicSpinnerView/>
-    }
-
+    
     return(
-        <UsualScreen>
+        <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <HugeText text="Décomposez votre objectif !"/>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                        <NavigationButton noPadding action={"goBack"}/>
+                        <NavigationButton noPadding action={"validation"} methode={handleValidate}/>
                     </View>
 
-                    <NavigationButton action={"validation"} methode={handleValidate}/>
-                </View>
+                    <HugeText text="Intégrez des habitudes"/>
 
-                <StepIndicator totalSteps={5} currentStep={4}/>
+                    <StepIndicator totalSteps={5} currentStep={4}/>
+                </View>
 
                 {habitsForObjectif.length === 0 ? <EmptyHabitsScreen/> : <DisplayHabitsScreen/>}
                     
@@ -216,9 +170,8 @@ const styles = StyleSheet.create({
 
     header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        flexDirection: "column", 
+        gap: 30
     },
     
     body: {
@@ -238,7 +191,7 @@ const styles = StyleSheet.create({
     
     emptyScreenImageContainer: {
         resizeMode: 'contain', 
-        maxHeight: "55%",
+        maxHeight: "45%",
     },
 
     emptyScreenSubContainer: {

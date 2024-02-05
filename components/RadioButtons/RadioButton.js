@@ -1,6 +1,8 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { useThemeColor } from "../Themed"
 import { NormalGrayText, NormalText, SubTitleGrayText, SubTitleText } from "../../styles/StyledText"
+import { Platform } from "react-native"
+import { androidPadding, getHeightResponsive, getWidthResponsive, pixelSizeHorizontal, pixelSizeVertical } from "../../styles/UtilsStyles"
 
 export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number, bold, small, extend, disabled}) => {
    
@@ -15,11 +17,15 @@ export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number,
     const backgroundColor = disabled ? (isHighlight ? disabledBackground : secondary) : (isHighlight ? contrast : secondary)
 
     const paddingAndRadius = small ? 15 : 18
+    const normalizedPadding = {
+        paddingVertical: getHeightResponsive(paddingAndRadius), 
+        paddingHorizontal: getWidthResponsive(paddingAndRadius)
+    }
 
     return(
         <TouchableOpacity disabled={disabled}
             onPress={handleOnClick} 
-            style={[styles.radioButton, {borderColor: backgroundColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: 15}]}>
+            style={[styles.radioButton, {borderColor: backgroundColor, backgroundColor, flex: extend ? 1 : null, ...normalizedPadding, borderRadius: 15}]}>
 
             <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
 
@@ -47,10 +53,12 @@ export const BorderRadioButton = ({isHighlight, handleOnClick, text, number, bol
 
     const paddingAndRadius = small ? 15 : 18
 
+    const androidStyle = Platform.OS === "android" ? {...androidPadding(paddingAndRadius)} : null
+
     return(
         <TouchableOpacity disabled={disabled}
             onPress={handleOnClick} 
-            style={[styles.radioButton, {borderColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: 15}]}>
+            style={[androidStyle, styles.radioButton, {borderColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: 15}]}>
                 <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
                     {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
                     {number ? (bold ? <SubTitleGrayText text={number}/> : (disabled && isHighlight ? <NormalText text={number} style={{color: fontContrast}}/> : <NormalGrayText  text={number}/>)) : null}
@@ -58,7 +66,6 @@ export const BorderRadioButton = ({isHighlight, handleOnClick, text, number, bol
         </TouchableOpacity>                 
     )
 }
-
 
 const styles = StyleSheet.create({
     radioButton: {

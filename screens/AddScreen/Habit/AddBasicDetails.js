@@ -1,146 +1,27 @@
-import { View } from "react-native"
-import { UsualScreen } from "../../../components/View/Views"
-import { GoNextButton } from "../../../components/Buttons/UsualButton"
-import { HugeText, SubTitleText } from "../../../styles/StyledText"
-import { useState } from "react"
-import { StyleSheet } from "react-native"
-import { TextInputCustom } from "../../../components/TextFields/TextInput"
-import { CustomCarousel } from "../../../components/Carousel/CustomCarousel"
-import { useMemo } from "react"
-import { useRef } from "react"
-import { useCallback } from "react"
-import { RenderAddStepCarouselItem } from '../../../components/Habitudes/Step/StepCarouselItem'
+import { useContext } from "react"
 import { useNavigation } from "@react-navigation/native"
-import { generateUniqueID } from "../../../primitives/BasicsMethods"
-import AddStepBottomScreen from "../../BottomScreens/AddStepBottomScreen"
-import { NavigationButton } from "../../../components/Buttons/IconButtons"
+import { HabitsContext } from "../../../data/HabitContext"
+import HabitForm from "../../../components/Forms/HabitForm"
 
 export const AddBasicDetails = () => {
 
     const navigation = useNavigation();
 
-    const [steps, setSteps] = useState([{addStepItem: true}])
+    const {Objectifs} = useContext(HabitsContext)    
 
-    let titreRef = useRef(null)
-    let descriptionRef = useRef(null)
+    const handleGoNext = (values) => {
 
-    const [isTitleWrong, setIsTitleWrong] = useState(false)
-    const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
-
-    const bottomSheetModalRefAddStep = useRef(null);
-    const snapPointsAddStep = useMemo(() => ['70%'], [])
-
-    const handleOpenAddStep = useCallback(() => {
-        bottomSheetModalRefAddStep.current?.present();
-      }, []);
-
-    const handleGoNext = () => {
-
-        let canGoNext = true
-
-        let titre = titreRef.current?.getValue();
-        let description = descriptionRef.current?.getValue();
-
-        if(titre.trim().length === 0 || description.trim().length === 0) 
-        {
-            description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-            titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
-
-            canGoNext = false
+        if(values.objectifID === null){
+            navigation.navigate("ChooseColorScreen", {habit: {...values}})
         }
 
-        else {
-            setIsTitleWrong(false)
-            setIsDescriptionWrong(false)
+        else{
+            const objectif = Objectifs[values.objectifID]
+            navigation.navigate("ChooseIconScreen", {habit: {...values, color: objectif.color}})
         }
-
-        if(canGoNext) 
-        {
-            let stepsFinal;
-
-            if(steps.length > 1){
-                stepsFinal = steps.map((step, index) =>  { return {...step, numero: index, stepID: generateUniqueID()} })
-                stepsFinal.pop()
-            }
-
-            else stepsFinal = [{numero: -1}]
-            
-            const habit = {titre: titre, description: description, steps: stepsFinal, objectifID: null}
- 
-            navigation.navigate("CreateHabitDetails", {habit})
-        }
-    }
-
-    const renderAddSteps = ({item, index}) => {
-        return <RenderAddStepCarouselItem item={item} index={index} data={steps} setData={setSteps} handleOpenAddStep={handleOpenAddStep}/>
     }
 
     return(
-        <UsualScreen>
-            <View style={styles.container}>
-
-                <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <HugeText text="Dites-nous en un peu plus !"/>
-                    </View>
-
-                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
-                </View>
-
-                <StepIndicator totalSteps={5} currentStep={2}/>
-
-                <View style={styles.body}>
-
-                    <TextInputCustom ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
-
-                    <TextInputCustom ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
-
-                    <View style={styles.carouselContainer}>
-                        <SubTitleText text="Etapes :"/>
-
-                        <CustomCarousel data={steps} renderItem={renderAddSteps}/>                        
-                    </View>
-
-                </View>
-            </View>
-
-            <AddStepBottomScreen
-                snapPoints={snapPointsAddStep}
-                bottomSheetModalRef={bottomSheetModalRefAddStep}
-                setSteps={setSteps}/>
-
-        </UsualScreen>
+        <HabitForm handleGoNext={handleGoNext}/>
     )
 }
-
-const styles = StyleSheet.create({
-    
-    container: {
-        display: "flex", 
-        flexDirection: "column", 
-        gap: 30, 
-        flex: 1, 
-        marginTop: 20,
-
-        marginBottom: 0
-    },
-
-    header: {
-        display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
-    },
-    
-    body: {
-        flex: 1, 
-        gap: 0,
-        justifyContent: "center"
-    },
-
-    carouselContainer: {
-        flex:1, 
-        marginTop: 10,
-        gap: 10
-    }
-})

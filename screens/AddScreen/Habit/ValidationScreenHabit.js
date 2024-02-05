@@ -1,31 +1,43 @@
-import { View, StyleSheet, FlatList } from "react-native"
-import { TitleText, NormalText, SubTitleText, HugeText } from "../../../styles/StyledText"
-import { Feather } from "@expo/vector-icons"
-import { useThemeColor } from "../../../components/Themed"
-import { useRoute } from "@react-navigation/native"
+import { View, StyleSheet } from "react-native"
+import { TitleText, NormalText, SubTitleText, MassiveText } from "../../../styles/StyledText"
+import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../../components/View/Views"
-import { StepCircularBar } from "../../../components/Habitudes/StepCircularBar"
-import StepIndicator from "../../../components/Other/StepIndicator"
 import { Image } from "react-native"
-import HabitIcons from "../../../data/HabitIcons"
-import { CircleBorderIconButton } from "../../../components/Buttons/IconButtons"
 import IllustrationsList from "../../../data/IllustrationsList"
+import { BackgroundTextButton } from "../../../components/Buttons/UsualButton"
+import { useEffect } from "react"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 const ValidationScreenHabit = () => {
 
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        const disableGestures = () => {
+            navigation.setOptions({
+                gestureEnabled: false,
+            });
+        };
+
+        disableGestures()
+    }, [])
+
+    const handleGoHome = () => {
+        BottomScreenOpen_Impact()
+        navigation.reset({index: 0, routes: [{ name: 'Home' }]})
+    }
+
     return (
-        <UsualScreen>   
+        <UsualScreen hideMenu>   
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{width: "80%"}}>
-                        <HugeText text="Et voilà !"/>
-                        <SubTitleText text="Nouvelle habitude ajoutée"/>
+                        <MassiveText text="Bravo !"/>
+                        <TitleText text="Nouvelle habitude ajoutée"/>
                     </View>
-
-                    <CircleBorderIconButton onPress={() => {}} provider={"Feather"} name={"share-2"}/>
                 </View>
 
-                <StepIndicator totalSteps={5} currentStep={5}/>
+
                 <View style={{flex: 1, flexGrow: 1}}>
                     <View style={styles.emptySreenContainer}>
                     
@@ -35,9 +47,11 @@ const ValidationScreenHabit = () => {
                             <NormalText text={"Continuez comme ça! "}/>
                             <SubTitleText text={"vous êtes sur la bonne voie !"}/>
                         </View>
-
-
                     </View>
+                </View>
+
+                <View>
+                    <BackgroundTextButton text={"Retour à l'accueil"} onPress={handleGoHome} bold/>
                 </View>
 
             </View>
@@ -65,30 +79,6 @@ const ValidationScreenHabit = () => {
     body: {
         flex: 1, 
         gap: 30,
-    },
-
-    habitPresentationContainer: {
-        display: "flex", 
-        flexDirection: "column", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        gap: 20, 
-        margin: 20
-    },
-
-    titleAndDescriptionContainer: {
-        display: "flex", 
-        flexDirection: "column", 
-        justifyContent: "center", 
-        alignItems: "center", 
-        gap: 10
-    },
-
-    groupContainer: {
-        display: 'flex', 
-        flexDirection: "column",
-        justifyContent: "center", 
-        gap: 20, flex: 1
     },
 
     emptySreenContainer: {

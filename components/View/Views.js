@@ -1,5 +1,5 @@
 import { useThemeColor } from "../Themed";
-import { View, StyleSheet, SafeAreaView } from "react-native";
+import { View, StyleSheet, SafeAreaView, KeyboardAvoidingView } from "react-native";
 import { Fragment } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
@@ -37,11 +37,12 @@ export const TopScreenView = (props) => {
 export const UsualScreen = (props) => {
 
     const primary = useThemeColor({}, "Primary")
+    const secondary = useThemeColor({}, "Secondary")
     const linearGradientOpacity = useThemeColor({}, "LinearGradientOpacity")
 
     return(
         <View style={{flex: 1, backgroundColor: primary}}>
-            <SafeAreaView style={{ flex: 1, backgroundColor: primary }}>
+            <SafeAreaView style={{ flex: 1, backgroundColor: props.secondaryBackground ? secondary : primary }}>
                 <View style={[styles.container, {paddingBottom: props.hideMenu ? 0 : 120}]}>
                     {props.children}
                 </View>
@@ -69,9 +70,9 @@ export const CustomScrollView = ({hiddenMenu, ...props}) => {
 
     return(
         <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom, marginHorizontal}} {...props}>
-            <View style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}>
+            <KeyboardAvoidingView style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}>
                 {props.children}
-            </View>
+            </KeyboardAvoidingView>
         </ScrollView>
     )
 }

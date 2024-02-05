@@ -10,25 +10,52 @@ export default StepIndicator = ({totalSteps, currentStep, color, inactiveColor, 
 
     const finalInactiveColor = inactiveColor ? inactiveColor : tertiary
 
-    const highlightColor = color ? color : font
-    const finalHeight = height ? height : 5
+    const highlightColor = color ?? font
+    const finalHeight = height ? height : 4
+
+    const justDoneStepWidth = useSharedValue(0)
+
+
+    const justDoneStepWidthAnimatedStyle = useAnimatedStyle(() => {
+        return({
+            width: justDoneStepWidth.value  + "%"
+        })
+    })
 
     return(
         <View style={styles.horizontalContainer}>
             {
 
                 Array.from({ length: totalSteps }).map((item, index) => {
+
+                    const isJustDoneStep = index === currentStep -1
+                    if(isJustDoneStep){
+                        justDoneStepWidth.value = withTiming(100, {duration: 400})
+                    }
+
                     return(
-                        <View
-                            key={index}
-                            style={[
-                                styles.singleBar,
-                                {
-                                    backgroundColor: index < currentStep ? highlightColor : finalInactiveColor,
-                                    height: finalHeight
-                                },
-                            ]}
-                        />
+                        <View key={index} style={[styles.singleBar, {height: finalHeight}]}>
+                            <Animated.View
+                                style={[
+                                    styles.singleBar,
+                                    {
+                                        backgroundColor: index < currentStep -1 ? highlightColor : finalInactiveColor,
+                                        height: finalHeight
+                                    },
+                                ]}
+                            />
+
+                            {isJustDoneStep && <Animated.View style={[
+                                    styles.singleBar,
+                                    {
+                                        position: "absolute",
+                                        backgroundColor: highlightColor,
+                                        height: finalHeight
+                                    },
+                                    justDoneStepWidthAnimatedStyle
+                                ]}
+                            />}
+                        </View>
 
                     )
                 })

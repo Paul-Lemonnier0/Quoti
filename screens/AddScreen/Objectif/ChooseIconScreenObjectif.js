@@ -34,7 +34,7 @@ export const ChooseIconScreenObjectif = () => {
     const font = useThemeColor({}, "Font")
       
 
-    const handleValidation = async() => {
+    const handleGoNext = async() => {
         try{        
             navigation.navigate("AddHabitsToObjectif", {objectif: {...iconedObjectif}})
         }
@@ -70,18 +70,19 @@ export const ChooseIconScreenObjectif = () => {
     }
 
     return(
-        <UsualScreen>
+        <UsualScreen hideMenu>
             <View style={styles.container}>
 
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <HugeText text="Choisissez une icône"/>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                        <NavigationButton noPadding action={"goBack"}/>
+                        <NavigationButton noPadding action={"goNext"} methode={handleGoNext}/>
                     </View>
 
-                    <NavigationButton action={"goNext"} methode={handleValidation}/>
-                </View>
+                    <HugeText text="Choisissez une icone"/>
 
-                <StepIndicator totalSteps={5} currentStep={4}/>
+                    <StepIndicator totalSteps={5} currentStep={3}/>
+                </View>
 
                 <View style={styles.body}>
                     <View style={{flex: 1}}>
@@ -101,21 +102,21 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
-        marginBottom: 0
+        marginBottom: 10
     },
 
     body: {
         flex: 1, 
         gap: 30,
+        marginBottom: 20
     },
 
     header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        flexDirection: "column", 
+        gap: 30
     },
-    
+
     iconListContainer: {
         flex: 1,
         justifyContent: "center",

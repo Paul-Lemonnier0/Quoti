@@ -4,16 +4,8 @@ import NotFoundScreen from "../screens/NotFoundScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 import LinkingConfiguration from "./LinkingConfiguration";
 
-export default function Navigation({ colorScheme }) {
-
-  return (
-    <NavigationContainer
-      linking={LinkingConfiguration}
-      theme={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-    >
-      <RootNavigator />
-    </NavigationContainer>
-  );
+export default function Navigation() {
+  return <RootNavigator />;
 }
 
 const Stack = createStackNavigator();

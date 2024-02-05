@@ -28,7 +28,6 @@ export default VerticalAnimatedFlatList = ({data, currentDateString, presentatio
     }
 
     const renderHabitPresentation = ({item: habit}) => {
-        console.log("HAB : ", habit)
         return <HabitPresentationBlock habitude={habit} viewableItems={viewableItems}/>
     }
 

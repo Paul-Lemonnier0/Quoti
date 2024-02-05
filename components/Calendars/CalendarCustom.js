@@ -1,144 +1,116 @@
-import { useRef, useState} from "react";
-import {View, StyleSheet, TouchableOpacity,} from 'react-native';
-import { LittleNormalText, NormalText, SubText, TitleText } from '../../styles/StyledText';
-import { useSharedValue } from "react-native-reanimated"
-import Calendar, { useCalendarContext  } from 'react-native-swipe-calendar';
-import { addMonths } from 'date-fns'
+import React, {useState, useMemo, useCallback} from 'react';
+import {StyleSheet, Text, View, TextStyle, Dimensions, TouchableOpacity, Pressable} from 'react-native';
+import {Calendar, CalendarList, DateData} from 'react-native-calendars';
 import { useThemeColor } from '../Themed';
-import { Feather } from '@expo/vector-icons';
-import { IconButton } from "../Buttons/IconButtons";
-    
-const DayComponentWrapper = ({ date, isInDisplayedMonth, isToday, isSelected }) => {
+import { NormalText, SubTitleText } from '../../styles/StyledText';
+import { BottomScreenOpen_Impact } from '../../constants/Impacts';
+import { MemoizedDayContainer } from './DayComponent';
 
-  const font = useThemeColor({}, "Font")
-  const fontGray = useThemeColor({}, "FontGray")
+const RANGE = 12;
 
-  const ctx = useCalendarContext();
-  const handleClickOnDay = () => {
-      ctx.onDateSelect?.(date, { isSelected });
-  }
+const theme={
+  backgroundColor: 'transparent',
+  calendarBackground: 'transparent',
+  'stylesheet.calendar.main': {
+    week: {
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      marginVertical: 0,
+      padding: 0
+    },
+    monthView: {
+      padding: 0,
+      margin: 0,
+    },
 
-  const borderColor = isSelected ? font : (isToday ? fontGray : 'transparent')
-  const color = font
-
-  const backgroundColor = isSelected ? font : "transparent"
-  const opacity = isInDisplayedMonth ? 1 : 0.25
-  return (
-    <TouchableOpacity onPress={handleClickOnDay} style={styles.dayContainer}>
-        <View style={[styles.daySubContainer, {borderColor: borderColor, borderWidth: 2, borderRadius: 12, opacity}]}>
-            <View style={{borderColor: borderColor, borderWidth: 2, borderRadius: 9, margin: 2, flex: 1, alignItems: "center", justifyContent: "center"}}>
-              <NormalText text={date.getDate()} style={{color}}/>
-            </View>
-        </View>
-    </TouchableOpacity>
-  );
-};
-
-const HeaderComponent = (calendarRef) => (date) => {
-
-  const {endDate} = date
-  const monthName = endDate.toLocaleString('fr', { month: 'long', year: 'numeric' })
-
-  const font = useThemeColor({}, "Font")
-
-  return (
-    <View style={styles.headerContainer}>
-      <View style={styles.incrementDecrementContainer}>
-        <IconButton onPress={() => calendarRef.current?.decrementPage()} provider={"Feather"} name={"chevron-left"}/>
-      </View>
-
-      <TitleText text={monthName}/>
-
-      <View style={styles.incrementDecrementContainer}>
-            <IconButton onPress={() => calendarRef.current?.incrementPage()} provider={"Feather"} name={"chevron-right"}/>
-      </View>
-    </View>
-  );
-};
-
-const DayLabelComponent  = ({date}) => {
-  const dayName = date.toLocaleString('fr', { weekday: 'short' }).substring(0, 1);
-
-  return(
-      <View style={styles.dayLabelContainer}>
-          <LittleNormalText text={dayName} bold/>
-      </View>
-  )
+    container: {
+      padding: 0,
+      margin: 0
+    }
+  },
 }
 
-export default function CalendarCustom({selectedDate, setSelectedDate}) {
+const CalendarListCustom = (props) => {
 
-  const calendarRef = useRef(null);
-  const monthAnimCallbackNode = useSharedValue(0);
+    const contrast = useThemeColor({}, "Contrast")
+    const fontContrast = useThemeColor({}, "FontContrast")
+    const fontGray = useThemeColor({}, "FontGray")
+    const font = useThemeColor({}, "Font")
 
-  const minDate=new Date(2023, 0, 1)
-  const maxDate=new Date(2026, 11, 31)
+    const WIDTH = Dimensions.get("window").width - 30
+    const initialDate = new Date()
+
+  const {closeModal, selectedDate, setSelectedDate} = props;
+
+  const onDayPress = useCallback((day) => {
+    setSelectedDate(new Date(day));
+    closeModal()
+    BottomScreenOpen_Impact()
+  }, []);
+  
+  const markedDates = useMemo(() => {
+    const markedDatesObject = {[selectedDate]: {selected: true}}
+    return markedDatesObject;
+  }, [selectedDate]);
+
+  const selectedDateString = selectedDate.toISOString().split('T')[0]
+
+  const dayComponent = useCallback(
+    (props) => {
+
+      let marking = props.marking
+      if(selectedDateString === props.date.dateString){
+        marking = {selected: true}
+      }
+
+      return <MemoizedDayContainer
+        key={props.date.dateString}
+        {...props}
+        marking={marking}
+        onDayPress={onDayPress}
+      />
+    }, 
+    [onDayPress]
+  );
 
   return (
-    <View style={[styles.container]}>
-        <Calendar
-          ref={calendarRef}
-          pageInterval="month"
-          minDate={minDate}
-          maxDate={maxDate}
-          
-          theme={{ inactiveOpacity: 0 }}
-          currentDate={selectedDate}
-          HeaderComponent={HeaderComponent(calendarRef)}
-          DayLabelComponent ={DayLabelComponent }
-          DayComponent={DayComponentWrapper}
-          selectedDate={selectedDate}
-          onDateSelect={(date) => { setSelectedDate(date)}}
-          monthAnimCallbackNode={monthAnimCallbackNode}
-          pageBuffer={1}
-        />
-    </View>
+    <Calendar
+      enableSwipeMonths
+      calendarWidth={WIDTH}
+      theme={theme}
+      markingType={'custom'}
+      markedDates={markedDates}
+      firstDay={1}
+      renderScrollComponent={null}
+      current={selectedDate}
+      pastScrollRange={RANGE}
+      futureScrollRange={RANGE}
+      onDayPress={onDayPress}
+      customHeader={renderCustomHeader}
+      style={{height: 400, maxHeight: 400}}
+    />
   );
-} 
-  
+};
+
+function renderCustomHeader(date) {
+
+    const currentDate = new Date(date.current)
+    const header = currentDate.toLocaleDateString('fr', {month: "long", year: "numeric"});
+
+    return (
+        <View style={styles.header}>
+            <SubTitleText text={header}/>
+        </View>
+    );
+}
+
+export default CalendarListCustom;
+
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: -10},
-
-  dayContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    padding: 5,
-    opacity: 1,
+  header: {
+    flexDirection: 'row',
+    width: '100%',
+    gap: 20,
+    marginBottom: 15
   },
-
-  daySubContainer: {
-
-    height: 40, width: 40,
-    borderRadius: 5,
-    opacity: 1, margin: 0
-  },
-
-  dayLabelContainer: {
-    alignItems:'center', 
-    justifyContent:'center', 
-    flex:1,
-    marginVertical: 10
-  },
-
-  incrementDecrementContainer: {
-    display: "flex", 
-    flexDirection: "row", 
-    alignItems: "center", 
-    marginRight: 5
-  },
-
-  headerContainer: {
-    display: "flex", 
-    flexDirection: "row", 
-    justifyContent: "space-between", 
-    alignItems: "center"
-  },
-
-  monthNameContainer: {
-    paddingVertical: 10,
-    justifyContent: "center",
-    marginHorizontal: 10
-  }
 });
-  

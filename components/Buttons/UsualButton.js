@@ -26,20 +26,22 @@ export const BackgroundTextButton = ({onPress, text, color, bold, disabled, exte
     const font = useThemeColor({}, "Font")
     const fontContrast = useThemeColor({}, "FontContrast")
     const contrast = useThemeColor({}, "Contrast")
-    const disabledBackground = useThemeColor({}, "DisabledButtonBackground")
 
-    const backgroundColor = disabled ? disabledBackground : contrast
+
+    const backgroundColor = contrast
     const colorBase = color ? color : fontContrast
+
+    const opacity = disabled ? 0.6 : 1
 
     const width = extend ? "100%" : null
 
     return(
-    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {backgroundColor, width, borderColor: backgroundColor}]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {opacity, backgroundColor, width, borderColor: backgroundColor}]}>
         {bold ? <SubTitleText text={text} style={{color: colorBase}}/> : <NormalText text={text} style={{color: colorBase}}/>}
     </TouchableOpacity>);
 }
 
-export const TextButton = ({onPress, text, bold, disabled, extend, isGray, noPadding}) => {
+export const TextButton = ({onPress, text, bold, semiBold, disabled, extend, isGray, noPadding}) => {
     
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
@@ -52,7 +54,7 @@ export const TextButton = ({onPress, text, bold, disabled, extend, isGray, noPad
 
     return(
     <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.normalButton, {width, padding}]}>
-        {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
+        {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText bold={semiBold} text={text} style={{color}}/>}
     </TouchableOpacity>);
 }
 

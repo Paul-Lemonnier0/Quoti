@@ -33,7 +33,15 @@ import SpinnerView from '../components/Spinners/SpinnerView';
 import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
 import SignUpScreen from '../screens/SignUpScreens/SignUpScreen';
 import LoginScreen from '../screens/SignUpScreens/LoginScreen';
-import WelcomeScreen from '../screens/SignUpScreens/WelcomeScreen';
+import ProfilSettingsScreen from '../screens/ProfilScreens/ProfilSettingsScreen';
+import UserDetailsScreen from '../screens/ProfilScreens/UserDetailsScreen';
+import DisplayUsersScreen from '../screens/ProfilScreens/DisplayUsersScreen';
+import AddHabitSteps from '../screens/AddScreen/Habit/AddHabitSteps';
+import { BottomScreenOpen_Impact } from '../constants/Impacts';
+import { TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NormalText, TitleText } from '../styles/StyledText';
+import ValidationScreenObjectif from '../screens/AddScreen/Objectif/ValidationScreenObjectif';
 
 
 const BottomTab = createBottomTabNavigator();
@@ -46,21 +54,29 @@ export default function BottomTabNavigator() {
   return (
 
     <BottomTab.Navigator
-      initialRouteName="SignUpScreen"
+      initialRouteName="HomeScreen"
       screenOptions={{ tabBarStyle: bottomMenuStyle, tabBarInactiveTintColor: fontGray, tabBarActiveTintColor: "white",
         tabBarHideOnKeyboard: false, headerShown: false, tabBarShowLabel: false}}>
 
         {/* <BottomTab.Screen name="Home" component={ComponentNavigator}
                     options={{tabBarIcon: ({ color, focused }) => (<AntDesignIcon name="user" color={color} focused={focused}/>)}}/> */}
 
-        <BottomTab.Screen name="Auth" component={LoginNavigator}
-            options={{tabBarStyle: { display: "none"}}}/>
-
         <BottomTab.Screen name="Home" component={HomeNavigator}
-            options={{tabBarIcon: ({ color, focused }) => (<AntDesignIcon name="user" color={color} focused={focused}/>)}}/>
+            options={{
+              tabBarIcon: ({ color, focused }) => 
+                (<AntDesignIcon name="user" color={color} focused={focused}/>),
+
+              }}/>
       
         <BottomTab.Screen name="Add" component={AddScreenNavigator}
-            options={{tabBarIcon: ({ color, focused  }) => (<AddButton name="plus" color={color} focused={focused}/>)}}/>
+          options={({ route }) => ({
+            tabBarIcon: ({color}) => (<View><Feather name="plus" size={24} color={color} /></View>),
+            tabBarButton: ({ onPress, children }) => (
+              <AddButton onPress={onPress} children={children}/>
+            ),
+
+            tabBarStyle: hideStyle,
+          })}/>
 
         <BottomTab.Screen name="Notifs" component={NewsScreenNavigator}
               options={{tabBarIcon: ({color, focused}) => (<FeatherIcon name="hash" color={color} focused={focused} />)}}/>
@@ -74,10 +90,20 @@ function AntDesignIcon(props) {
     </View>)
 }
 
-function AddButton(props) {
+function AddButton({onPress, children}) {
+  
+  const handleOnPress = () => {
+    BottomScreenOpen_Impact()
+    onPress()
+  }
+
   return (
-    <View style={{padding: 15, borderRadius: 50, backgroundColor: "#242227"}}>
-        <Feather size={24} {...props} />
+    <View style={{flex: 1,justifyContent: 'center', alignItems: 'center', }}>
+    <TouchableOpacity onPress={handleOnPress} style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 10, aspectRatio: 1/1, flex: 1, borderRadius: 50, backgroundColor: "#242227"}}>
+      <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, padding: 15}}>
+        {children}
+      </View>
+    </TouchableOpacity>
     </View>)
 }
 
@@ -107,7 +133,6 @@ const LoginStack = createNativeStackNavigator()
 function LoginNavigator() {
   return(
     <LoginStack.Navigator screenOptions={{ headerShown: false}}>
-      <LoginStack.Screen name="WelcomeScreen" component={WelcomeScreen} options={{ tabBarStyle: { display: 'none' } }}/>
       <LoginStack.Screen name="SignUpScreen" component={SignUpScreen} options={{ tabBarStyle: { display: 'none' } }}/>
       <LoginStack.Screen name="LoginScreen" component={LoginScreen} options={{ tabBarStyle: { display: 'none' } }}/>
     </LoginStack.Navigator>
@@ -128,7 +153,11 @@ function HomeNavigator() {
 
       <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{}}/>
       <HomeStack.Screen name="DayDetailScreen" component={DayDetailScreen} options={{}}/>
+
       <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{}}/>
+      <HomeStack.Screen name="ProfilSettingsScreen" component={ProfilSettingsScreen} options={{}}/>
+      <HomeStack.Screen name="DisplayUsersScreen" component={DisplayUsersScreen} options={{}}/>
+
       <HomeStack.Screen name="MultipleAchievementScreen" component={MultipleAchievementScreen} options={{}}/>
       <HomeStack.Screen name="StatProfilScreen" component={StatProfilScreen} options={{}}/>
     </HomeStack.Navigator>
@@ -144,6 +173,7 @@ function AddScreenNavigator() {
       <AddScreenStack.Screen name="PreAddScreen" component={PreAddScreen}/>   
 
       <AddScreenStack.Screen name="AddBasicDetails" component={AddBasicDetails}/>   
+      <AddScreenStack.Screen name="AddHabitSteps" component={AddHabitSteps}/>   
       <AddScreenStack.Screen name="CreateHabitDetails" component={CreateHabitDetails}/>   
       <AddScreenStack.Screen name="ChooseIconScreen" component={ChooseIconScreen}/>   
       <AddScreenStack.Screen name="ChooseColorScreen" component={ChooseColorScreen}/>   
@@ -153,6 +183,7 @@ function AddScreenNavigator() {
       <AddScreenStack.Screen name="AddHabitsToObjectif" component={AddHabitsToObjectif}/>   
       <AddScreenStack.Screen name="ChooseColorScreenObjectif" component={ChooseColorScreenObjectif}/>   
       <AddScreenStack.Screen name="ChooseIconScreenObjectif" component={ChooseIconScreenObjectif}/>   
+      <AddScreenStack.Screen name="ValidationScreenObjectif" component={ValidationScreenObjectif}/>   
 
       <AddScreenStack.Screen name="AddBasicDetailsDefi" component={AddBasicDetailsDefi}/>   
 
@@ -160,12 +191,30 @@ function AddScreenNavigator() {
   );
 }
 
+// const AddHabitScreenStack = createNativeStackNavigator();
+
+
+// function AddHabitScreenNavigator() {
+//   return (
+//     <AddHabitScreenStack.Navigator screenOptions={{ headerShown: false }}>
+
+//       <AddHabitScreenStack.Screen name="AddBasicDetails" component={AddBasicDetails}/>   
+//       <AddHabitScreenStack.Screen name="CreateHabitDetails" component={CreateHabitDetails}/>   
+//       <AddHabitScreenStack.Screen name="ChooseIconScreen" component={ChooseIconScreen}/>   
+//       <AddHabitScreenStack.Screen name="ChooseColorScreen" component={ChooseColorScreen}/>   
+//       <AddHabitScreenStack.Screen name="ValidationScreenHabit" component={ValidationScreenHabit}/>   
+
+//     </AddHabitScreenStack.Navigator>
+//   );
+// }
+
 const NewsScreenStack = createNativeStackNavigator();
 
 function NewsScreenNavigator() {
   return (
     <NewsScreenStack.Navigator screenOptions={{ headerShown: false }}>
       <NewsScreenStack.Screen name="NewsScreen" component={NewsScreen}/>   
+      <NewsScreenStack.Screen name="UserDetailsScreen" component={UserDetailsScreen} options={{}}/>
     </NewsScreenStack.Navigator>
   );
 }

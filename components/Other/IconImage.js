@@ -3,6 +3,7 @@ import { Image } from "react-native"
 import HabitIcons from "../../data/HabitIcons";
 import { View } from "react-native";
 import { useThemeColor } from "../Themed";
+import { getHeightResponsive, getWidthResponsive, pixelSizeHorizontal, pixelSizeVertical } from "../../styles/UtilsStyles";
 
 export default IconImage = ({image}) => {
 
@@ -24,9 +25,9 @@ const styles = StyleSheet.create({
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      borderRadius: 50,
+      borderRadius: getWidthResponsive(50),
       aspectRatio: 1,
-      height: 54,
+      height: getHeightResponsive(54),
     },
     imageStyle: {
       alignSelf: "center",

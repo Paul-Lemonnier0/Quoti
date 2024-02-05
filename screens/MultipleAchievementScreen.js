@@ -29,7 +29,6 @@ const MultipleAchievementScreen = () => {
       }, []);
 
     const handleSheetChanges = useCallback((index) => {
-        console.log("handleSheetChange", index)
     }, []);
 
     const groupAchievementsByClass = (achievements) => {

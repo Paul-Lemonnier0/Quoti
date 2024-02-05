@@ -32,22 +32,22 @@ export const ChooseColorScreenObjectif = () => {
       }, []);
   
     const handleSheetChangesCustomColor = useCallback((index) => {
-        console.log("handleSheetChange", index)
     }, []);
   
 
     return(
-        <UsualScreen>
+        <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <HugeText text="Choisissez une couleur"/>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                        <NavigationButton noPadding action={"goBack"}/>
+                        <NavigationButton noPadding action={"goNext"} methode={handleGoNext}/>
                     </View>
 
-                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
-                </View>
+                    <HugeText text="Choisissez une couleur"/>
 
-                <StepIndicator totalSteps={5} currentStep={3}/>
+                    <StepIndicator totalSteps={5} currentStep={2}/>
+                </View>
 
                 <View style={styles.body}>
                     <View style={styles.centerFullContent}>
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 30, 
         flex: 1, 
-        marginBottom: 0
+        marginBottom: 10
     },
 
     centered: {
@@ -107,9 +107,8 @@ const styles = StyleSheet.create({
 
     header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        flexDirection: "column", 
+        gap: 30
     },
 
     centerFullContent: {

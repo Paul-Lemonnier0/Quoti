@@ -1,10 +1,11 @@
-import { addDoc, collection, getDocs, query, where } from "firebase/firestore"
+import { addDoc, collection, doc, getDocs, query, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 
-const userID = "Paul"
 const collectionName = "Objectifs"
 
-const addObjectifToFirestore = async(objectif) => {
+const addObjectifToFirestore = async(objectif, userID) => {
+
+    const userDoc = doc(db, "Users", userID)
 
     let startingDate = objectif.startingDate;
     let endingDate = objectif.endingDate;
@@ -13,10 +14,10 @@ const addObjectifToFirestore = async(objectif) => {
         endingDate = objectif.endingDate.toDateString();
     }
 
-    const objectifToAdd = {...objectif, startingDate, endingDate, userID}
+    const objectifToAdd = {...objectif, startingDate, endingDate}
 
     console.log("adding objectif to firestore...")
-    const objectifRef = await addDoc(collection(db, collectionName), objectifToAdd)
+    const objectifRef = await addDoc(collection(userDoc, collectionName), objectifToAdd)
 
     const objectifID = objectifRef.id;
     console.log("objectif added to firestore with id : ", objectifID)
@@ -24,9 +25,11 @@ const addObjectifToFirestore = async(objectif) => {
     return {...objectifToAdd, objectifID}
 }
 
-const fetchAllObjectifs = async() => {
+const fetchAllObjectifs = async(userID) => {
 
-    const qry = query(collection(db, collectionName), where("userID", "==", userID));
+    const userDoc = doc(db, "Users", userID)
+
+    const qry = query(collection(userDoc, collectionName));
     const querySnapshot = await getDocs(qry)
 
     const objectifArray = await Promise.all(

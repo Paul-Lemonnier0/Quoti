@@ -14,7 +14,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import SelectDateBottomScreen from "../../BottomScreens/SelectDateBottomScreen"
 import { useThemeColor } from "../../../components/Themed"
 import Separator from "../../../components/Other/Separator"
-import { DatePicker } from "../../../components/TextFields/DatePicker"
+import { DatePicker, MultiDatePicker } from "../../../components/TextFields/DatePicker"
+import SelectMultipleDateBottomScreen from "../../BottomScreens/SelectMultipleDateBottomScreen"
 
 export default AddBasicDetailsObjectif = () => {
 
@@ -26,8 +27,6 @@ export default AddBasicDetailsObjectif = () => {
     let startingDateBase = new Date()
     let endingDateBase = new Date()
     endingDateBase.setDate(startingDateBase.getDate() + 3)
-
-    console.log("end date : ", endingDateBase)
 
     const [startingDate, setStartingDate] = useState(startingDateBase)
     const [endingDate, setEndingDate] = useState(endingDateBase)
@@ -80,70 +79,51 @@ export default AddBasicDetailsObjectif = () => {
       }, []);
   
     const handleSheetChangesCalendar = useCallback((index) => {
-        console.log("handleSheetChange", index)
     }, []);
 
-    let handleSetDateToChange = (date) => {
-        // Mettez à jour la date appropriée (début ou fin) en fonction de la logique de votre application.
-        if (dateToChange === startingDate) {
-            setStartingDate(date);
-        } else if (dateToChange === endingDate) {
-            setEndingDate(date);
-        }
-    };
-
-    const changeStartingDate = () => {
-        setDateToChange(startingDate)
-        handleSetDateToChange(startingDate)
-        handleOpenCalendar()
-    }
-
-    const changeEndingDate = () => {
-        setDateToChange(endingDate)
-        handleSetDateToChange(endingDate)
-        handleOpenCalendar()
-    }
-
-    const dateStringOptions = {day: 'numeric', weekday: 'short', month: 'long', year: 'numeric'}
-
     return(
-        <UsualScreen>
+        <UsualScreen hideMenu>
             <View style={styles.container}>
 
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <HugeText text="Dites-nous en un peu plus !"/>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                        <NavigationButton noPadding action={"goBack"}/>
+                        <NavigationButton noPadding action={"goNext"} methode={handleGoNext}/>
                     </View>
 
-                    <NavigationButton action={"goNext"} methode={handleGoNext}/>
-                </View>
+                    <HugeText text="Nouvel objectif"/>
 
-                <StepIndicator totalSteps={5} currentStep={2}/>
+                    <StepIndicator totalSteps={5} currentStep={1}/>
+                </View>
 
                 <View style={styles.body}>
                     <View style={styles.displayColumn}>
                         <TextInputCustom ref={titreRef} isWrong={isTitleWrong}
-                            placeholder={"Nom de l'objectif"} labelName={"Titre"}
+                            placeholder={"Nom de l'objectif"} labelName={"Titre"} semiBold
                             errorMessage={"Rentrez un titre valide"}/>
 
                         <TextInputCustom ref={descriptionRef} isWrong={isDescriptionWrong}
-                            placeholder={"Description de l'objectif"} labelName={"Description"} 
+                            placeholder={"Description de l'objectif"} labelName={"Description"}  semiBold
                             errorMessage={"Rentrez une description valide"}/>
                     </View>
+                    
                     <Separator/>
 
-                    <View style={[styles.displayColumn, {alignItems: "center"}]}>
-                        <DatePicker label={"Date de début"} date={startingDate} onPress={changeStartingDate}/>
-                        <DatePicker label={"Date de fin"} date={endingDate} onPress={changeEndingDate}/>
+                    <View style={[styles.displayColumn, {alignItems: "center", marginTop: 10}]}>
+                        <MultiDatePicker label={"Date de début et de fin"} semiBoldLabel
+                            startDate={startingDate} endDate={endingDate} 
+                            onPress={handleOpenCalendar}/>
                     </View>
 
                 </View>
             </View>
 
             
-        <SelectDateBottomScreen 
-          selectedDate={dateToChange}
-          setSelectedDate={handleSetDateToChange}
+        <SelectMultipleDateBottomScreen 
+          startingDate={startingDate}
+          setStartingDate={setStartingDate}
+          endingDate={endingDate}
+          setEndingDate={setEndingDate}
           bottomSheetModalRef={bottomSheetModalRef_Calendar} 
           snapPoints={snapPoints_Calendar} 
           handleSheetChanges={handleSheetChangesCalendar}/>
@@ -164,15 +144,13 @@ const styles = StyleSheet.create({
 
     header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        flexDirection: "column", 
+        gap: 30
     },
     
     body: {
         flex: 1, 
         gap: 20,
-        justifyContent: "center"
     },
 
     displayColumn: {

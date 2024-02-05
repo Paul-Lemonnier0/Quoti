@@ -1,37 +1,70 @@
 import { View, StyleSheet } from "react-native"
-import { HugeText, LittleNormalText, NormalGrayText, NormalText, SubText, SubTitleGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubText, SubTitleGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
 import { useRef, useMemo, useCallback, useState } from "react"
 import { useThemeColor } from "../../components/Themed"
 import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
 import AchievementBox from "../../components/Achievements/AchievementBox"
-import { CircleBorderIconButton, NavigationButton } from "../../components/Buttons/IconButtons"
+import { CircleBorderIconButton, IconButton, NavigationButton } from "../../components/Buttons/IconButtons"
 import { ProfilButton } from "../../components/Profil/ProfilButton"
 import { Image } from "react-native"
 import { useContext } from "react"
 import { HabitsContext } from "../../data/HabitContext"
+import { signOut } from "@firebase/auth"
+import { auth } from "../../firebase/InitialisationFirebase"
+import { BorderTextButton } from "../../components/Buttons/UsualButton"
+import { UserContext } from "../../data/UserContext"
+import { FlatList } from "react-native"
+import ProfilItem from "../../components/Profil/ProfilItem"
+import { useEffect } from "react"
+import { Database_getUsersInfo } from "../../firebase/Database_User_Primitives"
+import RequestFriendItem from "../../components/Profil/RequestFriendItem"
+import { TouchableOpacity } from "react-native"
 
 const ProfilDetailsScreen = () => {
     // renders
 
     const {Habits, Objectifs} = useContext(HabitsContext)
+    const {user} = useContext(UserContext)
 
-    const user = {
-      nom: "Lemonnier",
-      prenom: "Paul",
-      userID: "userID_1",
-      image: require("../../img/TestVrai.png")
-    }
+    const secondary = useThemeColor({}, "Secondary")
+
+    const navigation = useNavigation()
+
+    const [friendRequestsUsers, setFriendRequestsUsers] = useState([])
+    const [userFriends, setUserFriends] = useState([])
 
     const nb_habits = Object.keys(Habits).length
     const nb_objectifs = Object.keys(Objectifs).length
-    const friends = 4
+    const nb_friends = user.friends.length
+
+    const handleSeeHabits = () => {
+      // navigation.navigate("DisplayUsersScreen", {users: user.friends})
+    }
+
+    const handleSeeObjectifs = () => {
+      // navigation.navigate("DisplayUsersScreen", {users: user.friends})
+    }
+
+    const handleSeeFriends = () => {
+      navigation.navigate("DisplayUsersScreen", {users: userFriends})
+    }
 
     const user_data = [
-      {titre: "Habitudes", value: nb_habits},
-      {titre: "Objectifs", value: nb_objectifs},
-      {titre: "Amis", value: friends},
+      {titre: "Habitudes", value: nb_habits, onPress: handleSeeHabits},
+      {titre: "Objectifs", value: nb_objectifs, onPress: handleSeeObjectifs},
+      {titre: "Amis", value: nb_friends, onPress: handleSeeFriends},
     ]
+
+    const handleSignOut = async() => {
+      await signOut(auth)
+      console.log("déconnecté")
+    }
+
+    const handleOpenSettings = () => {
+      navigation.navigate("ProfilSettingsScreen")
+    }
+
 
     const RenderUserData = () => {
       return(
@@ -39,14 +72,47 @@ const ProfilDetailsScreen = () => {
           {
               user_data.map((data, index) => {
                 return(
-                  <View key={index} style={{ flex: 1, gap: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
+                  <TouchableOpacity onPress={data.onPress} key={index} style={{ flex: 1, gap: 5, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"}}>
                     <SubTitleText text={data.value}/>
                     <NormalText text={data.titre}/>
-                  </View>
+                  </TouchableOpacity>
                 )
               })
           }
         </View>
+      )
+    }
+
+    useEffect(() => {
+
+      const getRequestFriendsUserInfo = async() => {
+        setFriendRequestsUsers(await Database_getUsersInfo(user.friendRequests))
+      }
+
+
+      getRequestFriendsUserInfo()
+    }, [user.friendRequests])
+
+    useEffect(() => {
+      const getUsersFriendsInfo = async() => {
+        setUserFriends(await Database_getUsersInfo(user.friends))
+      }
+
+      getUsersFriendsInfo()
+    }, [user.friends])
+
+
+    const renderUser = ({item}) => {
+      return <RequestFriendItem friend={item}/>
+    }
+
+    const RenderPlaceholderProfilPicture = () => {
+      const firstUsernameLetter = user.displayName.substr(0,1)
+
+      return(
+          <View style={[styles.imageStyle, {justifyContent: "center", alignItems: "center", backgroundColor: secondary }]}>
+              <MassiveText text={firstUsernameLetter}/>
+          </View>
       )
     }
 
@@ -56,8 +122,8 @@ const ProfilDetailsScreen = () => {
           <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
-                        <CircleBorderIconButton name={"settings"} provider={"Feather"} onPress={() => {}}/>
+                        <NavigationButton noPadding action={"goBack"}/>
+                        <IconButton noPadding name={"settings"} provider={"Feather"} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 
@@ -65,15 +131,24 @@ const ProfilDetailsScreen = () => {
 
                   <View style={{display: "flex", flexDirection: "column", gap: 20, alignItems: "center"}}>
                     <View style={styles.imageContainerStyle}>
-                      <Image style={styles.imageStyle} source={user.image}/>
+                      {
+                        user.photoURL ?
+                        <Image style={styles.imageStyle} source={user.photoURL ? {uri: user.photoURL} : require("../../img/TestVrai.png")}/>
+                        :
+                        <RenderPlaceholderProfilPicture/>
+                      }
                     </View>
                     
                     <View style={{display: "flex", flexDirection: "row"}}>
-                      <TitleText text={user.prenom + " " + user.nom}/>
+                      <TitleText text={"@" + user.displayName}/>
                     </View>
 
                   </View>
                   <RenderUserData/>
+
+                  <FlatList contentContainerStyle={{gap: 20}} data={friendRequestsUsers} renderItem={renderUser}/>
+
+                  <BorderTextButton text={"Déconnexion"} onPress={handleSignOut} bold/>
 
 
                 </View>
@@ -89,7 +164,7 @@ const ProfilDetailsScreen = () => {
       flexDirection: "column", 
       gap: 20, 
       flex: 1, 
-      marginBottom: 0    
+      marginBottom: 0,
     },
 
     header: {

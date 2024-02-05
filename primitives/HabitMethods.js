@@ -3,7 +3,7 @@ import { displayTree } from "./BasicsMethods";
 import { calculateNextScheduledDate, isHabitPlannedThisMonth, isHabitScheduledForDate } from "./HabitudesReccurence";
 import { getStepLog } from "./StepMethods";
 
-export const filterHabits = async (date, habits, setIsFetchingHabit) => {
+export const filterHabits = async (date, userID, habits, setIsFetchingHabit) => {
   setIsFetchingHabit(true)
 
   let habitsScheduledForDate = { 
@@ -12,7 +12,7 @@ export const filterHabits = async (date, habits, setIsFetchingHabit) => {
       Mensuel: {Habitudes: {}, Objectifs: {}} 
   };
 
-  const doneSteps = await getDateLogs(date)
+  const doneSteps = await getDateLogs(date, userID)
 
   for(let habitID in habits){
 
@@ -20,7 +20,7 @@ export const filterHabits = async (date, habits, setIsFetchingHabit) => {
     const habitPlannedForThisDate = isHabitScheduledForDate(habit, date)
 
     if(habitPlannedForThisDate){
-      const habitStepsID = Object.keys(habit.steps);
+      const habitStepsID = Object.keys(getValidHabitsStepsForDate(Object.values(habit.steps), habitID, date));
       const stepsWithLogsArray = habitStepsID.map(habitStepID => {
 
         const habitStep = habit.steps[habitStepID]
@@ -197,4 +197,33 @@ export const getUpdatedStreakOfHabit = (habit, currentDate) => {
   }
 
   return newStreakValues
+}
+
+export const getValidHabitsStepsForDate = (steps, habitID, currentDate) => {
+  const validSteps = {}
+
+  steps.forEach((step) => {
+    if(step.created && step.stepID !== habitID){
+      const createdDate = new Date(step.created)
+
+      if(currentDate >= createdDate){
+        if(step.deleted){
+          const deletedDate = new Date(step.deleted)
+  
+          if(currentDate < deletedDate){
+            validSteps[step.stepID] = {...step}
+          }
+        }
+  
+        else validSteps[step.stepID] = {...step}
+      }
+    }
+  })
+
+  if(Object.keys(validSteps).length === 0){
+    const placeholderStep = steps.filter((step) => (step.stepID) === habitID)[0]
+    validSteps[habitID] = {...placeholderStep}
+  }
+
+  return validSteps
 }

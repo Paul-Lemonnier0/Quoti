@@ -9,7 +9,8 @@ export default ProgressBar = ({progress, color, inactiveColor, withPourcentage})
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
     const tertiary = useThemeColor({}, "Tertiary")
-    const unfilledColor = inactiveColor ? tertiary : tertiary
+    const primary = useThemeColor({}, "Primary")
+    const unfilledColor = inactiveColor ? inactiveColor : primary
     const finalColor = color ? color : font
 
     const final_progress = progress === undefined || progress === null || isNaN(progress) ? 1 : progress

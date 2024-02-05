@@ -14,7 +14,7 @@ import { BottomSheetModalMethodsContextProvider } from "../../../data/BottomShee
 
 const AddHabitStack = createNativeStackNavigator()
 
-export default AddHabitToObjectifNav = ({bottomSheetModalRef, snapPoints, handleSheetChanges, addHabitForObjectif}) => {
+export default AddHabitToObjectifNav = ({bottomSheetModalRef, snapPoints, handleSheetChanges, addHabitForObjectif, isForModifyingHabit, isForCreateObjectiveHabit, habit}) => {
 
 
     return(
@@ -24,8 +24,8 @@ export default AddHabitToObjectifNav = ({bottomSheetModalRef, snapPoints, handle
                         <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
                                 <AddHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="AddBasicsHabitDetailsObj">
-                                    <AddHabitStack.Screen name="AddBasicsHabitDetailsObj" component={AddBasicDetailsHabitObjectif}/>
-                                    <AddHabitStack.Screen name="CreateObjectifHabitDetails" component={CreateObjectifHabitDetails}/>
+                                    <AddHabitStack.Screen name="AddBasicsHabitDetailsObj" component={AddBasicDetailsHabitObjectif} initialParams={{isForModifyingHabit, isForCreateObjectiveHabit, habit}}/>
+                                    <AddHabitStack.Screen name="CreateObjectifHabitDetails" component={CreateObjectifHabitDetails} initialParams={{isForModifyingHabit, isForCreateObjectiveHabit, habit}}/>
                                 </AddHabitStack.Navigator>
                             </NavigationContainer>
                         </BottomSheetModalMethodsContextProvider>

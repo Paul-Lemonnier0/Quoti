@@ -1,10 +1,13 @@
 import { View, StyleSheet } from "react-native"
-import { NormalText, SubText, SubTitleText } from "../../styles/StyledText"
-import { IncrementButtons } from "../Buttons/IncrementButtons"
-import { useState } from "react"
+import { FC } from "react"
 import { BorderRadioButton } from "../RadioButtons/RadioButton"
 
-export const SelectWeekDays = ({selectedDays, handleSelectDay}) => {
+interface SelectWeekDaysProps {
+    selectedDays: number[],
+    handleSelectDay: (day: number) => void
+}
+
+export const SelectWeekDays: FC<SelectWeekDaysProps> = ({selectedDays, handleSelectDay}) => {
 
     const weekDays = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"]
 
@@ -19,8 +22,6 @@ export const SelectWeekDays = ({selectedDays, handleSelectDay}) => {
         </View>
     )
 }
-
-
 
 const styles = StyleSheet.create({
     selectorDayContainer: {

@@ -8,7 +8,7 @@ import { useThemeColor } from "../../../components/Themed"
 import { ColorsList } from "../../../data/ColorsList"
 import StepIndicator from '../../../components/Other/StepIndicator.js'
 import CustomColorBottomScreen from "../../BottomScreens/CustomColorBottomScreen"
-import { NavigationButton } from "../../../components/Buttons/IconButtons.js"
+import { NavigationButton } from "../../../components/Buttons/IconButtons.tsx"
 import ColorListSelector from "../../../components/Other/ColorListSelector.js"
 
 export const ChooseColorScreenObjectif = () => {

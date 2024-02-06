@@ -14,7 +14,7 @@ import { doc, getDoc, setDoc } from "firebase/firestore"
 import { updateProfile } from "firebase/auth"
 import { useNavigation } from "@react-navigation/native"
 import { useColorScheme } from "react-native"
-import SocialButton from "../../components/Buttons/SocialButton"
+import SocialButton, { SocialConnectionWay } from "../../components/Buttons/SocialButton"
 import Separator from "../../components/Other/Separator"
 import { Error_Impact, Success_Impact } from "../../constants/Impacts"
 
@@ -79,14 +79,6 @@ export default SignUpScreen = () => {
      }
     }
 
-    const colorScheme = useColorScheme()
-
-    const Google_Icon = require("../../img/Auth/Google.png")
-    const Facebook_Icon = colorScheme === "dark" ? require("../../img/Auth/Facebook-white.png") : require("../../img/Auth/Facebook-blue.png")
-
-    const Apple_Icon = colorScheme === "dark" ? require("../../img/Auth/Apple-white.png") : require("../../img/Auth/Apple-black.png")
-    const handleAppleSignUp = () => {}
-
     const handleGoogleSignUp = () => {}
 
     const handleFacebookSignUp = () => {}
@@ -124,15 +116,10 @@ export default SignUpScreen = () => {
 
                     <View style={{flex: 1, alignItems: "center", display: "flex", flexDirection: "column", justifyContent: "space-between"}}>
 
-                        {/* <NormalText text={"Ou continuez avec :"} bold/> */}
-
                         <View style={{display: "flex", flexDirection: "row", gap: 20, alignItems: "center", justifyContent: "center", flex: 1}}>
-                            {/* <SocialButton image={Apple_Icon}/> */}
-                            <SocialButton image={Google_Icon} onPress={handleGoogleSignUp}/>
-                            <SocialButton image={Facebook_Icon} onPress={handleFacebookSignUp}/>
+                            <SocialButton provider={SocialConnectionWay.Google} onPress={handleGoogleSignUp}/>
+                            <SocialButton provider={SocialConnectionWay.Facebook} onPress={handleFacebookSignUp}/>
                         </View>
-
-
               
                     </View>
 

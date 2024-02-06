@@ -4,32 +4,55 @@ import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons, Oc
 import { NormalText } from "../../styles/StyledText";
 import { useNavigation } from "@react-navigation/native";
 import { getWidthResponsive, widthPixel } from "../../styles/UtilsStyles";
+import React, { ComponentProps, FC } from "react";
 
-export const Icon = ({name, provider, color, size}) => {
+type FeatherIconName = ComponentProps<typeof Feather>['name'];
+type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
+type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
+type AntDesignName = ComponentProps<typeof AntDesign>['name'];
+type IoniconsIconName = ComponentProps<typeof Ionicons>['name'];
+type OcticonsIconName = ComponentProps<typeof Octicons>['name'];
+
+export enum IconProvider {
+    Feather = "Feather",
+    MaterialCommunityIcons = "MaterialCommunityIcons",
+    MaterialIcons = "MaterialIcons",
+    AntDesign = "AntDesign",
+    IonIcons = "IonIcons",
+    Octicons = "Octicons",
+}
+
+interface IconProps {
+    name: string,
+    provider: IconProvider,
+    color?: string,
+    size?: number
+}
+export const Icon: FC<IconProps> = ({name, provider, color, size}) => {
 
     const font = useThemeColor({}, "Font")
     const iconBaseSize = size ? getWidthResponsive(size) : getWidthResponsive(24)
     
-    const iconProps = { name, color : color ? color : font, size: iconBaseSize };
+    const iconProps = { color : color ?? font, size: iconBaseSize };
 
     switch (provider){
-        case "Feather":
-            return <Feather {...iconProps}/>
+        case IconProvider.Feather:
+            return <Feather name={name as FeatherIconName} {...iconProps}/>
 
-        case "MaterialCommunityIcons":
-            return <MaterialCommunityIcons {...iconProps}/>
+        case IconProvider.MaterialCommunityIcons:
+            return <MaterialCommunityIcons name={name as MaterialCommunityIconName} {...iconProps}/>
 
-        case "MaterialIcons":
-            return <MaterialIcons {...iconProps}/>
+        case IconProvider.MaterialIcons:
+            return <MaterialIcons name={name as MaterialIconName} {...iconProps}/>
 
-        case "AntDesign":
-            return <AntDesign {...iconProps}/>
+        case IconProvider.AntDesign:
+            return <AntDesign name={name as AntDesignName} {...iconProps}/>
 
-        case "IonIcons":
-            return <Ionicons {...iconProps}/>
+        case IconProvider.IonIcons:
+            return <Ionicons name={name as IoniconsIconName} {...iconProps}/>
         
-        case "Octicons":
-            return <Octicons {...iconProps}/>
+        case IconProvider.Octicons:
+            return <Octicons name={name as OcticonsIconName} {...iconProps}/>
 
         default: {
             return <NormalText text="?"/>
@@ -37,7 +60,16 @@ export const Icon = ({name, provider, color, size}) => {
     }
 }
 
-export const IconButton = ({onPress, name, provider, color, size, disabled, noPadding}) => {
+interface BasicIconButtonProps extends IconProps {
+    onPress(): void,
+    disabled?: boolean,
+}
+
+interface IconButtonProps extends BasicIconButtonProps {
+    noPadding?: boolean    
+}
+
+export const IconButton: FC<IconButtonProps> = ({onPress, name, provider, color, size, disabled, noPadding}) => {
     const font = useThemeColor({}, "Font")
     const disabledButtonText = useThemeColor({}, "DisabledButtonText")
 
@@ -50,7 +82,11 @@ export const IconButton = ({onPress, name, provider, color, size, disabled, noPa
     );
 }
 
-export const BorderIconButton = ({onPress, name, provider, color, size, isTransparent, disabled}) => {
+interface BorderIconButtonProps extends BasicIconButtonProps {
+    isTransparent?: boolean    
+}
+
+export const BorderIconButton: FC<BorderIconButtonProps> = ({onPress, name, provider, color, size, isTransparent, disabled}) => {
 
     const secondary = useThemeColor({}, "Secondary")
     const contrast = useThemeColor({}, "Contrast")
@@ -66,39 +102,7 @@ export const BorderIconButton = ({onPress, name, provider, color, size, isTransp
     );
 }
 
-export const CircleBorderIconButton = ({onPress, name, provider, color, size, disabled}) => {
-
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
-    const contrast = useThemeColor({}, "Contrast")
-
-    const colorIconBase =  disabled ? disabledButtonText : (color ? color : contrast)
-    const borderColor = colorIconBase
-
-    return(
-        <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.circleBorderButton, {borderColor}]}>
-            <Icon name={name} provider={provider} size={size} color={colorIconBase}/>
-        </TouchableOpacity>
-    );
-}
-
-export const CircleBackgroundIconButton = ({onPress, name, provider, color, size, disabled}) => {
-
-    const font = useThemeColor({}, "Font")
-    const fontContrast = useThemeColor({}, "FontContrast")
-    const contrast = useThemeColor({}, "Contrast")
-    const disabledBackground = useThemeColor({}, "DisabledButtonBackground")
-
-    const colorIconBase = color ? color : fontContrast
-    const backgroundColor = disabled ? disabledBackground : contrast
-
-    return(
-        <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.circleBorderButton, {backgroundColor, borderColor: backgroundColor}]}>
-            <Icon name={name} provider={provider} size={size} color={colorIconBase}/>
-        </TouchableOpacity>
-    );
-}
-
-export const BackgroundIconButton = ({onPress, name, provider, color, size, disabled}) => {
+export const BackgroundIconButton: FC<BasicIconButtonProps> = ({onPress, name, provider, color, size, disabled}) => {
 
     const font = useThemeColor({}, "Font")
     const fontContrast = useThemeColor({}, "FontContrast")
@@ -115,7 +119,19 @@ export const BackgroundIconButton = ({onPress, name, provider, color, size, disa
     );
 }
 
-export const NavigationButton = ({action, methode, customProvider, customIconName, disabled, noPadding}) =>
+interface BasicNavigationButtonProps {
+    methode?: () => void,
+    customProvider?: IconProvider,
+    disabled?: boolean,
+    noPadding?: boolean
+}
+
+interface NavigationButtonProps extends BasicNavigationButtonProps {
+    action: string,
+    customIconName?: string,
+}
+
+export const NavigationButton: FC<NavigationButtonProps> = ({action, methode, customProvider, customIconName, disabled, noPadding}) =>
 {
     const font = useThemeColor({}, "Font")
     const contrast = useThemeColor({}, "Contrast")
@@ -146,11 +162,11 @@ export const NavigationButton = ({action, methode, customProvider, customIconNam
         <TouchableOpacity disabled={disabled} 
             style={[styles.navButton, {paddingVertical: noPadding ? 0 : 0}]}
             onPress={handlePress}>
-            <Icon name={iconName} provider={customProvider ? customProvider : "Feather"} color={colorBase}/>
+            <Icon name={iconName} provider={customProvider ?? IconProvider.Feather} color={colorBase}/>
         </TouchableOpacity>);
 }
 
-export const CloseButton = ({methode, customProvider, disabled, noPadding}) =>
+export const CloseButton: FC<BasicNavigationButtonProps> = ({methode, customProvider, disabled, noPadding}) =>
 {
     const contrast = useThemeColor({}, "Contrast")
     const disabledButtonText = useThemeColor({}, "DisabledButtonText")
@@ -167,7 +183,7 @@ export const CloseButton = ({methode, customProvider, disabled, noPadding}) =>
         <TouchableOpacity disabled={disabled} 
             style={[styles.navButton, {paddingVertical: noPadding ? 0 : 0}]}
             onPress={handlePress}>
-            <Icon name={iconName} provider={customProvider ? customProvider : "Feather"} color={colorBase}/>
+            <Icon name={iconName} provider={customProvider ?? IconProvider.Feather} color={colorBase}/>
         </TouchableOpacity>);
 }
 

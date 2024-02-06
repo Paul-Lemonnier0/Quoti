@@ -1,25 +1,12 @@
-import Calendar from "react-native-swipe-calendar";
-import CustomBottomSheet, { CustomStaticBottomSheet } from "../../components/BottomSheets/CustomBottomSheet"
-import CalendarCustom from "../../components/Calendars/CalendarCustom"
-import { useSharedValue } from "react-native-reanimated";
 import { Dimensions, StyleSheet, View } from "react-native";
-import { CalendarList, NewCalendarList } from "react-native-calendars";
-import CalendarListCustom from "../../components/Calendars/CalendarListCustom";
-import WeekCalendarCustom from "../../components/Calendars/WeekCalendarCustom";
-import { BottomTextInputCustom } from "../../components/TextFields/TextInput";
-import TestCalendar from "../../components/Calendars/TestCalendars";
 import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet";
 import { UsualScreen } from "../../components/View/Views";
 import { CloseButton } from "../../components/Buttons/IconButtons";
-import { NormalText, SubText, TitleText } from "../../styles/StyledText";
-import Separator from "../../components/Other/Separator";
-import { TextButton } from "../../components/Buttons/UsualButton";
+import { SubText, TitleText } from "../../styles/StyledText";
 import { BottomScreenOpen_Impact, Error_Impact } from "../../constants/Impacts";
 import { useMemo, useRef, useState } from "react";
-import { backgroundColor } from "react-native-calendars/src/style";
 import { useThemeColor } from "../../components/Themed";
 import MultipleSelectionCalendarListCustom from "../../components/Calendars/MultipleSelectionCalendarListCustom";
-import { addDays } from "date-fns";
 
 const SelectMultipleDateBottomScreen = ({bottomSheetModalRef, snapPoints, handleSheetChanges, 
     startingDate, endingDate, setStartingDate, setEndingDate}) => {

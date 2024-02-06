@@ -1,22 +1,23 @@
-import { BottomSheetBackdrop, BottomSheetModal, BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet"
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useThemeColor } from "../Themed"
-import { useState, useCallback } from "react";
+import { useState, useCallback, RefObject, ReactNode, FC } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
+import { SharedValue } from "react-native-reanimated";
+import { BackdropBehaviorType, BasicCustomBottomSheetProps } from "../../types/BottomScreenTypes";
 
-const CustomBottomSheet = (props) => {
+interface CustomBottomSheetProps extends BasicCustomBottomSheetProps {
+  noBackdrop?: boolean,
+}
+
+const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children}) => {
     
-    const {bottomSheetModalRef, snapPoints, handleSheetChanges} = props
-
-    const handleSheetChangesMethod = handleSheetChanges ? handleSheetChanges : () => {}
-
     const fontGray = useThemeColor({}, "FontGray")
     const popupColor = useThemeColor({}, "Popup")
 
-    const [backdropPressBehavior, setBackdropPressBehavior] = useState('close');
+    const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
 
-    const renderBackdrop = useCallback(
-      props => (
+    const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={backdropPressBehavior} />
       ),
       [backdropPressBehavior]
@@ -34,12 +35,11 @@ const CustomBottomSheet = (props) => {
             snapPoints={snapPoints}
             enablePanDownToClose={true}
             enableDynamicSizing={snapPoints === undefined}
-            onChange={handleSheetChangesMethod}
-            backdropComponent={props.noBackdrop ? null : renderBackdrop}>
+            backdropComponent={noBackdrop ? null : renderBackdrop}>
 
                 <BottomSheetScrollView scrollEnabled={false} style={styles.container}>
                     <View style={{flex: 1, marginBottom: 0}}>
-                      {props.children}
+                      {children}
                     </View>
                 </BottomSheetScrollView>
 
@@ -47,21 +47,14 @@ const CustomBottomSheet = (props) => {
   );
 };
 
-export const CustomStaticBottomSheet = (props) => {
+export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children}) => {
     
-  const {bottomSheetModalRef, snapPoints, handleSheetChanges} = props
-
-  const handleSheetChangesMethod = handleSheetChanges ? handleSheetChanges : () => {}
-
-  const fontGray = useThemeColor({}, "FontGray")
-  const popupColor = useThemeColor({}, "Popup")
   const secondary = useThemeColor({}, "Secondary")
-  const primary = useThemeColor({}, "Primary")
 
-  const [backdropPressBehavior, setBackdropPressBehavior] = useState('close');
 
-  const renderBackdrop = useCallback(
-    props => (
+  const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
+
+  const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => (
       <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={backdropPressBehavior} />
     ),
     [backdropPressBehavior]
@@ -80,11 +73,10 @@ export const CustomStaticBottomSheet = (props) => {
           snapPoints={snapPoints}
           enablePanDownToClose={true}
           enableDynamicSizing={snapPoints === undefined}
-          onChange={handleSheetChangesMethod}
-          backdropComponent={props.noBackdrop ? null : renderBackdrop}>
+          backdropComponent={noBackdrop ? null : renderBackdrop}>
 
-              <BottomSheetView scrollEnabled={false} style={[styles.container, {flex: snapPoints === undefined ? null : 1}]}>
-                    {props.children}
+              <BottomSheetView style={[styles.container, {flex: snapPoints ? undefined : 1}]}>
+                    {children}
               </BottomSheetView>
 
     </BottomSheetModal>

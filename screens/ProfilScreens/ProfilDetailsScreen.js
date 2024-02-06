@@ -4,8 +4,7 @@ import { useRef, useMemo, useCallback, useState } from "react"
 import { useThemeColor } from "../../components/Themed"
 import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
-import AchievementBox from "../../components/Achievements/AchievementBox"
-import { CircleBorderIconButton, IconButton, NavigationButton } from "../../components/Buttons/IconButtons"
+import { IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons"
 import { ProfilButton } from "../../components/Profil/ProfilButton"
 import { Image } from "react-native"
 import { useContext } from "react"
@@ -123,7 +122,7 @@ const ProfilDetailsScreen = () => {
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton noPadding action={"goBack"}/>
-                        <IconButton noPadding name={"settings"} provider={"Feather"} onPress={handleOpenSettings}/>
+                        <IconButton noPadding name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 

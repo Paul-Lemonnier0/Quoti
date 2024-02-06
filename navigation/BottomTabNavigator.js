@@ -6,10 +6,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { StatProfilScreen } from "../screens/ProfilScreens/StatsProfilScreen";
 
 import BottomMenuStyle from "../styles/StyledBottomMenu";
-import DayDetailScreen from "../screens/DayDetailScreen";
 import ProfilDetailsScreen from "../screens/ProfilScreens/ProfilDetailsScreen";
-import MultipleAchievementScreen from "../screens/MultipleAchievementScreen";
-import HabitudeScreen from "../screens/HabitudeScreen";
+import HabitudeScreen from "../screens/Habitude/HabitudeScreen";
 import NewsScreen from "../screens/NewsScreen";
 import HomeScreen from "../screens/HomeScreen";
 
@@ -27,7 +25,7 @@ import { ChooseIconScreenObjectif } from '../screens/AddScreen/Objectif/ChooseIc
 import { AddBasicDetailsHabitObjectif } from '../screens/AddScreen/Objectif/AddBasicDetailsHabitObjectif';
 import { CreateObjectifHabitDetails } from '../screens/AddScreen/Objectif/CreateObjectifHabitDetails';
 import AddHabitToObjectifNav from '../screens/AddScreen/Objectif/AddHabitToObjectifNav';
-import ComponentPresentation from '../screens/ComponentPresentation';
+import ComponentPresentation from '../screens/Test/ComponentPresentation';
 import ObjectifDetailsScreen from '../screens/Objectif/ObjectifDetailsScreen';
 import SpinnerView from '../components/Spinners/SpinnerView';
 import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
@@ -152,13 +150,11 @@ function HomeNavigator() {
       <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{}}/>
 
       <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{}}/>
-      <HomeStack.Screen name="DayDetailScreen" component={DayDetailScreen} options={{}}/>
 
       <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{}}/>
       <HomeStack.Screen name="ProfilSettingsScreen" component={ProfilSettingsScreen} options={{}}/>
       <HomeStack.Screen name="DisplayUsersScreen" component={DisplayUsersScreen} options={{}}/>
 
-      <HomeStack.Screen name="MultipleAchievementScreen" component={MultipleAchievementScreen} options={{}}/>
       <HomeStack.Screen name="StatProfilScreen" component={StatProfilScreen} options={{}}/>
     </HomeStack.Navigator>
   );

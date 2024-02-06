@@ -4,7 +4,7 @@ import { SubText, SubTitleText } from "../../styles/StyledText"
 import { StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { TouchableOpacity } from "react-native"
-import { BackgroundIconButton, BorderIconButton } from "../Buttons/IconButtons"
+import { BackgroundIconButton, BorderIconButton, IconProvider } from "../Buttons/IconButtons"
 import { acceptFriendInvitation } from "../../firebase/Firestore_User_Primitives"
 import { useContext } from "react"
 import { UserContext } from "../../data/UserContext"
@@ -27,7 +27,7 @@ export default RequestFriendItem = ({ friend }) => {
             </View>
             
             <View>
-                <BorderIconButton name="check" provider={"Feather"} onPress={handleAcceptFriendRequest}/>
+                <BorderIconButton name="check" provider={IconProvider.Feather} onPress={handleAcceptFriendRequest}/>
             </View>
         </View>
     )

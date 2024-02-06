@@ -1,14 +1,21 @@
 import { StyleSheet, View } from "react-native"
 import HabitsSkeletonList from "../../Habitudes/HabitsSkeletonList"
 import HabitudesList from "../../Habitudes/HabitudesList"
-import Objectifs_SkeletonList, { HelloWorld } from "../../Objectifs/Objectifs_SkeletonList"
+import Objectifs_SkeletonList from "../../Objectifs/Objectifs_SkeletonList"
 import HorizontalAnimatedFlatList from "../../FlatList/HorizontalAnimatedFlatList"
 import ObjectifsList from "../../Objectifs/ObjectifsList"
-import { memo } from "react"
+import { FC, memo } from "react"
 import { TitleText } from "../../../styles/StyledText"
 import { getHeightResponsive } from "../../../styles/UtilsStyles"
+import { HabitType } from "../../../types/HabitTypes"
 
-export const DisplayHabitsScreen = ({isSkeleton, displayedHabits, selectedDate}) => {
+interface DisplayHabitsScreenProps {
+  isSkeleton: Boolean,
+  displayedHabits: HabitType[],
+  selectedDate: Date,
+}
+
+export const DisplayHabitsScreen: FC<DisplayHabitsScreenProps> = ({isSkeleton, displayedHabits, selectedDate}) => {
     return(
       <>
           {
@@ -20,8 +27,14 @@ export const DisplayHabitsScreen = ({isSkeleton, displayedHabits, selectedDate})
     )
 }
 
+interface RenderHabitsProps {
+  habits: HabitType[],
+  selectedDate: Date,
+  isLoading: Boolean,
+  isFetched: Boolean,
+}
 
-export const RenderHabits = memo(({habits, selectedDate, isLoading, isFetched}) => {
+export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, selectedDate, isLoading, isFetched}) => {
 
   const isSkeleton = isLoading || !isFetched
 
@@ -42,8 +55,13 @@ export const RenderHabits = memo(({habits, selectedDate, isLoading, isFetched}) 
   )
 })
 
+interface DisplayObjectifsScreenProps {
+  isSkeleton: Boolean,
+  displayedObjectifs: TempObjectifsType[],
+  selectedDate: Date,
+}
 
-export const DisplayObjectifsScreen = ({isSkeleton, displayedObjectifs, selectedDate}) => {
+export const DisplayObjectifsScreen: FC<DisplayObjectifsScreenProps> = ({isSkeleton, displayedObjectifs, selectedDate}) => {
   
     return(
         <>
@@ -56,10 +74,23 @@ export const DisplayObjectifsScreen = ({isSkeleton, displayedObjectifs, selected
     )
 }
 
-export const RenderObjectifs = memo(({objectifs, selectedDate, selectedPeriode, isLoading, isFetched}) => {
+interface RenderObjectifsProps {
+  objectifs: string[],
+  selectedDate: Date,
+  selectedPeriode: string,
+  isLoading: Boolean,
+  isFetched: Boolean
+}
+
+interface TempObjectifsType {
+  objectifID: string,
+  frequency: string
+}
+
+export const RenderObjectifs: FC<RenderObjectifsProps> = memo(({objectifs, selectedDate, selectedPeriode, isLoading, isFetched}) => {
 
   const isSkeleton = isLoading || !isFetched
-  const displayedObjectifs_Array = objectifs.map(obj => ({objectifID: obj, frequency: selectedPeriode})) ?? []
+  const displayedObjectifs_Array: TempObjectifsType[] = objectifs.map(obj => ({objectifID: obj, frequency: selectedPeriode})) ?? []
   const isObjectifsEmpty = objectifs.length === 0
 
   if(displayedObjectifs_Array.length === 0 && !isSkeleton){

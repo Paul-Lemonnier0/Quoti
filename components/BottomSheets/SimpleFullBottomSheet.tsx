@@ -1,6 +1,6 @@
-import { BottomSheetBackdrop, BottomSheetFooter, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet"
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFooter, BottomSheetFooterProps, BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useThemeColor } from "../Themed"
-import { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, ReactNode, FC } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native";
@@ -8,22 +8,26 @@ import Separator from "../Other/Separator";
 import { TextButton } from "../Buttons/UsualButton";
 import { TitleText } from "../../styles/StyledText";
 import Animated, { useAnimatedStyle, useSharedValue, withSequence, withTiming } from "react-native-reanimated";
+import { BackdropBehaviorType, BasicCustomBottomSheetProps } from "../../types/BottomScreenTypes";
 
-const SimpleFullBottomSheet = (props) => {
+interface SimpleFullBottomSheetProps extends BasicCustomBottomSheetProps {
+  footerText?: string,
+  footerMethod?: () => void,
+  customFooterComponent?: ReactNode,
+  isError?: boolean,
+  setIsError?: (isError: boolean) => void,
+  isPrimary?: boolean
+}
+
+const SimpleFullBottomSheet: FC<SimpleFullBottomSheetProps> = 
+  ({bottomSheetModalRef, snapPoints, footerMethod, footerText, customFooterComponent, isPrimary, isError, setIsError, children}) => {
     
-    const {bottomSheetModalRef, snapPoints, handleSheetChanges, footerMethod, footerText, customFooterComponent, isPrimary,
-      isError, setIsError} = props
-
-    const handleSheetChangesMethod = handleSheetChanges ? handleSheetChanges : () => {}
-
-    const fontGray = useThemeColor({}, "FontGray")
-    const popupColor = useThemeColor({}, "Popup")
     const primary = useThemeColor({}, "Primary")
     const secondary = useThemeColor({}, "Secondary")
 
     const backgroundColor = isPrimary ? primary : secondary
 
-    const [backdropPressBehavior, setBackdropPressBehavior] = useState('close');
+    const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
     const shakeAnimation = useSharedValue(0)
 
     useEffect(() => {
@@ -36,7 +40,9 @@ const SimpleFullBottomSheet = (props) => {
           withTiming(0, {duration: 75})
         )
 
-        setIsError(false)
+        if(setIsError !== undefined){
+          setIsError(false)
+        }
       }
     }, [isError])
 
@@ -46,8 +52,7 @@ const SimpleFullBottomSheet = (props) => {
       })
     }, [])
 
-    const renderBackdrop = useCallback(
-      props => (
+    const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={backdropPressBehavior} />
       ),
       [backdropPressBehavior]
@@ -55,18 +60,19 @@ const SimpleFullBottomSheet = (props) => {
   
     const snapPoints_Default = useMemo(() => ['100%'], []);
 
-    const FooterComponent = useCallback((props) => (
-        customFooterComponent ??
-        <BottomSheetFooter {...props} bottomInset={0}>
-          <View style={[styles.footer, {backgroundColor, paddingBottom: 25}]}>
-              <Separator/>
-              <Animated.View style={[footerAnimatedStyle]}>
-                <TextButton bold extend onPress={footerMethod} text={footerText}/>
-              </Animated.View>
-          </View>
-        </BottomSheetFooter>
-      ),
-      []
+    const FooterComponent = (props: BottomSheetFooterProps) => (
+      (footerText && footerMethod) && (
+        customFooterComponent || (
+          <BottomSheetFooter {...props} bottomInset={0}>
+            <View style={[styles.footer, {backgroundColor, paddingBottom: 25}]}>
+                <Separator/>
+                <Animated.View style={[footerAnimatedStyle]}>
+                  <TextButton bold extend onPress={footerMethod} text={footerText}/>
+                </Animated.View>
+            </View>
+          </BottomSheetFooter>
+        )
+      )
     );
 
     // renders
@@ -76,37 +82,22 @@ const SimpleFullBottomSheet = (props) => {
             enableHandlePanningGesture={false}
             enableContentPanningGesture={false}
             backgroundStyle={{backgroundColor}}
-            footerComponent={footerText ? FooterComponent : undefined}
+            footerComponent={FooterComponent}
             handleIndicatorStyle={{backgroundColor: secondary}}
             index={0}
             enablePanDownToClose={true}
             enableDynamicSizing
             snapPoints={snapPoints ?? snapPoints_Default}
-            onChange={handleSheetChangesMethod}
             backdropComponent={renderBackdrop}>
 
                     <BottomSheetView style={[styles.container, {backgroundColor, paddingBottom: footerText ? 100 : 0}]}>
-                      {props.children}
+                      {children}
                     </BottomSheetView>
 
       </BottomSheetModal>
   );
 };
 
-// const FooterComponent = () => {
-
-//   const primary =  useThemeColor({}, "Primary")
-
-//   return(
-//     <BottomSheetFooter style={{position: "absolute", bottom: 30, right: 0, left: 0}}>
-//       <View style={[styles.footer, {backgroundColor: primary}]}>
-//           <Separator/>
-//           <TextButton bold extend onPress={() => {}} text={"Aujourd'hui"}/>
-//       </View>
-//     </BottomSheetFooter>
-//   )
-// }
- 
 const styles = StyleSheet.create({
     container: { 
       flex: 1,

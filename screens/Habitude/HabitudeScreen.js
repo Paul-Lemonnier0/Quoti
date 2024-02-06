@@ -1,33 +1,32 @@
 import React, { useCallback } from "react";
 import { View, StyleSheet, Image } from "react-native"
-import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../styles/StyledText"
-import { useThemeColor } from "../components/Themed"
+import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { useThemeColor } from "../../components/Themed"
 import { Feather } from '@expo/vector-icons'; 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState} from "react";
-import { CustomScrollView, UsualScreen } from "../components/View/Views";
-import { SubText } from "../styles/StyledText";
-import { SimpleButton, TextButton } from "../components/Buttons/UsualButton";
+import { CustomScrollView, UsualScreen } from "../../components/View/Views";
+import { SubText } from "../../styles/StyledText";
+import { SimpleButton, TextButton } from "../../components/Buttons/UsualButton";
 import { useContext } from "react";
-import { HabitsContext } from "../data/HabitContext";
-import { RenderStep } from "../components/Habitudes/EtapeItem";
-import HabitIcons from "../data/HabitIcons";
-import { CircleBorderIconButton, IconButton, NavigationButton } from "../components/Buttons/IconButtons";
-import ProgressBar from "../components/Progress/ProgressBar";
+import { HabitsContext } from "../../data/HabitContext";
+import { RenderStep } from "../../components/Habitudes/EtapeItem";
+import HabitIcons from "../../data/HabitIcons";
+import { IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons";
+import ProgressBar from "../../components/Progress/ProgressBar";
 import { Share } from "react-native";
 import { Alert } from "react-native";
-import StepsList from "../components/Habitudes/Step/StepsList";
-import cardStyle from "../styles/StyledCard";
+import StepsList from "../../components/Habitudes/Step/StepsList";
+import cardStyle from "../../styles/StyledCard";
 import { addDays } from "date-fns";
-import AchievementBox from "../components/Achievements/AchievementBox";
 import { FlatList } from "react-native";
-import Achievements from "../data/Achievements";
+import Achievements from "../../data/Achievements";
 import { useEffect } from "react";
-import { getLogsForHabitInDateRange } from "../firebase/Firestore_Step_Primitives";
-import RangeActivity from "../components/Calendars/RangeActivity";
-import { getHeightResponsive, getWidthResponsive } from "../styles/UtilsStyles";
-import { Success_Impact } from "../constants/Impacts";
-import HabitCompletedBottomScreen from "./BottomScreens/Habitudes/HabitCompletedBottomScreen";
+import { getLogsForHabitInDateRange } from "../../firebase/Firestore_Step_Primitives";
+import RangeActivity from "../../components/Calendars/RangeActivity";
+import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
+import { Success_Impact } from "../../constants/Impacts";
+import HabitCompletedBottomScreen from "../BottomScreens/Habitudes/HabitCompletedBottomScreen";
 import { useRef } from "react";
 
 const HabitudeScreen = () => {
@@ -131,18 +130,6 @@ const HabitudeScreen = () => {
     }, [logsReady, steps])
 
 
-    const ReturnAchievementList = ({}) => {
-        const renderAchievement = ({item}) => {
-            return <AchievementBox achievement={item}/>
-        }
-
-        return(
-            <FlatList data={Achievements} renderItem={renderAchievement}
-            horizontal={true} showsHorizontalScrollIndicator={false}
-            style={{marginHorizontal: getWidthResponsive(-30)}} contentContainerStyle={{gap: getWidthResponsive(15), paddingHorizontal: getWidthResponsive(30)}}/>
-        )
-    }
-
     const handleOpenSettings = useCallback(() => {
         bottomSheetModalRef_Settings.current?.present();
     }, []);
@@ -158,7 +145,7 @@ const HabitudeScreen = () => {
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton action={"goBack"}/>
-                        <IconButton noPadding name={"settings"} provider={"Feather"} onPress={handleOpenSettings}/>
+                        <IconButton noPadding name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 
@@ -196,7 +183,7 @@ const HabitudeScreen = () => {
 
                                     <View style={styles.streakHeader}>
                                         <View style={styles.streakLeftHeader}>
-                                            <IconButton name={"flame"} color={habit.color} provider={"IonIcons"} noPadding size={30}/>
+                                            <IconButton name={"flame"} color={habit.color} provider={IconProvider.IonIcons} noPadding size={30}/>
                                             <HugeText text={habit.currentStreak}/>
                                         </View>
 

@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 import ProfilItem from '../components/Profil/ProfilItem';
 import { SearchBarCustom } from '../components/TextFields/TextInput'
 import { AppContext } from '../data/AppContext';
-import { IconButton } from '../components/Buttons/IconButtons';
+import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 
 
 export default NewsScreen = () => {
@@ -24,13 +24,6 @@ export default NewsScreen = () => {
 
     const {setIsLoading} = useContext(AppContext)
 
-    // useEffect(() => {
-    //   const getAllUsers = async() => {
-    //     setUsers(await Database_getAllUsers())        
-    //   }
-
-    //   getAllUsers()
-    // }, [temp])
 
     const renderUser = ({item}) => {
       return <ProfilItem user={item}/>
@@ -59,7 +52,7 @@ export default NewsScreen = () => {
           <View style={styles.container}>
               <View style={styles.header}>
                 <HugeText text="Utilisateurs"/>
-                <IconButton name={"loader"} provider={"Feather"} onPress={handleSetIsLoading}/>
+                <IconButton name={"loader"} provider={IconProvider.Feather} onPress={handleSetIsLoading}/>
               </View>
 
             <View style={styles.body}>

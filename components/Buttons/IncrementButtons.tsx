@@ -5,9 +5,17 @@ import { NormalGrayText, NormalText } from "../../styles/StyledText"
 import { TouchableOpacity } from "react-native-gesture-handler"
 import { StyleSheet } from "react-native"
 import { TextInput } from "react-native"
-import { IconButton } from "./IconButtons"
+import { IconButton, IconProvider } from "./IconButtons"
+import React, { FC } from "react"
 
-export const IncrementButtons = ({value, setValue, isBorderHidden, suffixe}) => {
+interface BasicProps {
+    value: number,
+    setValue(value: number): void,
+    isBorderHidden?: boolean,
+    suffixe?: string
+}
+
+export const IncrementButtons: FC<BasicProps> = ({value, setValue, isBorderHidden, suffixe}) => {
 
     const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
@@ -19,18 +27,24 @@ export const IncrementButtons = ({value, setValue, isBorderHidden, suffixe}) => 
 
     return(
         <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
-            <IconButton noPadding onPress={handleDecrement} provider={"Feather"} name={"minus"} size={24}/>
+            <IconButton noPadding onPress={handleDecrement} provider={IconProvider.Feather} name={"minus"} size={24}/>
 
             <View style={[styles.valueContainer]}>
                 <NormalText text={displayedValue}/>
             </View>
 
-            <IconButton noPadding onPress={handleIncrement} provider={"Feather"} name={"plus"} size={24}/>
+            <IconButton noPadding onPress={handleIncrement} provider={IconProvider.Feather} name={"plus"} size={24}/>
         </View>
     )
 }
 
-export const IncrementTime = ({value, setValue, isDisabled, isMinutes, isBorderHidden}) => {
+
+interface IncrementTimeProps extends BasicProps{
+    isDisabled?: boolean,
+    isMinutes?: boolean
+}
+
+export const IncrementTime: FC<IncrementTimeProps> = ({value, setValue, isDisabled, isMinutes, isBorderHidden}) => {
 
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
@@ -48,13 +62,13 @@ export const IncrementTime = ({value, setValue, isDisabled, isMinutes, isBorderH
 
     return(
         <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
-            <IconButton noPadding onPress={handleDecrement} provider={"Feather"} name={"minus"} size={20}/>
+            <IconButton noPadding onPress={handleDecrement} provider={IconProvider.Feather} name={"minus"} size={20}/>
 
             <View style={[styles.valueContainer]}>
                 {isDisabled ? <NormalGrayText text={value + suffixe}/> : <NormalText text={value + suffixe}/>}
             </View>
 
-            <IconButton noPadding onPress={handleIncrement} provider={"Feather"} name={"plus"} size={20}/>
+            <IconButton noPadding onPress={handleIncrement} provider={IconProvider.Feather} name={"plus"} size={20}/>
         </View>
     )
 }

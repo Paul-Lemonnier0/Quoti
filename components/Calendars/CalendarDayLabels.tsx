@@ -3,16 +3,16 @@ import { NormalText } from "../../styles/StyledText"
 import { addDays } from "date-fns"
 import { useThemeColor } from "../Themed"
 
-export default CalendarDayLabels = () => {
+const CalendarDayLabels = () => {
 
     const fontGray = useThemeColor({}, "FontGray")
     const color = fontGray
 
-    const daysLabels = []
+    const daysLabels: string[] = []
     let currentDateTemp = new Date("2024-01-15")
     
     for(let i = 1; i<8; ++i){
-      const currentDayString = currentDateTemp.toLocaleDateString("fr", {weekday: "long"}).substring(0,1).toUpperCase()
+      const currentDayString: string = currentDateTemp.toLocaleDateString("fr", {weekday: "long"}).substring(0,1).toUpperCase()
       daysLabels.push(currentDayString)
 
       currentDateTemp = addDays(currentDateTemp, 1)
@@ -47,3 +47,5 @@ const styles = StyleSheet.create({
         alignItems: "center",
     }
 })
+
+export default CalendarDayLabels

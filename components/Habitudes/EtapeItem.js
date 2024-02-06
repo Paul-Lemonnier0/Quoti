@@ -4,7 +4,6 @@ import { useThemeColor } from "../Themed"
 import { CustomDurationIndicator } from "./Clock"
 import { durationToTimeString } from "../../primitives/BasicsMethods"
 import cardStyle from "../../styles/StyledCard"
-import { CircleBorderIconButton } from "../Buttons/IconButtons"
 
 export const AddEtapeItem = ({handleOpenAddStep}) => {
 
@@ -19,7 +18,6 @@ export const AddEtapeItem = ({handleOpenAddStep}) => {
             </View>
 
             <View style={styles.fullFlexEndContainer}>
-                <CircleBorderIconButton onPress={handleOpenAddStep} provider={"Feather"} name={"plus"}/>
             </View>
         </View>
     )
@@ -44,7 +42,6 @@ export const AddedEtapeItem = ({step, handleOpenAddStep}) => {
                 <CustomDurationIndicator duration={step.duration} />
 
                 <View style={styles.fullFlexEndContainer}>
-                    <CircleBorderIconButton onPress={handleOpenAddStep} provider={"Feather"} name={"trash-2"}/>
                 </View>
             </View>
         </TouchableOpacity>

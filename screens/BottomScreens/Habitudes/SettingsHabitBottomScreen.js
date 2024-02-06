@@ -1,6 +1,5 @@
 import { HugeText, NormalText, SubText, SubTitleText, TitleText } from "../../../styles/StyledText"
-import { AchievementBox } from "../../../components/Achievements/AchievementBox"
-import CustomBottomSheet, { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet"
+import CustomBottomSheet, { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet.tsx"
 import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets";
 import { Share, View } from "react-native";

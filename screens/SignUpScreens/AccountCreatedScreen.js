@@ -43,7 +43,6 @@ const AccountCreatedScreen = () => {
                         <SubMassiveText text={username + " !"}/>
                     </View>
 
-                    {/* <CircleBorderIconButton onPress={() => {}} provider={"Feather"} name={"share-2"}/> */}
                 </View>
 
 

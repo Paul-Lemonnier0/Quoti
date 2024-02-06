@@ -11,7 +11,6 @@ import { useNavigation } from "@react-navigation/native"
 import { generateUniqueID } from "../../../primitives/BasicsMethods"
 import { ContrastButton, NavigationButton } from "../../../components/Buttons/IconButtons"
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import SelectDateBottomScreen from "../../BottomScreens/SelectDateBottomScreen"
 import { useThemeColor } from "../../../components/Themed"
 import Separator from "../../../components/Other/Separator"
 import { DatePicker, MultiDatePicker } from "../../../components/TextFields/DatePicker"

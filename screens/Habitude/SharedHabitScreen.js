@@ -1,8 +1,8 @@
 import { useRoute } from "@react-navigation/native"
 import { useContext } from "react";
 import { HabitsContext } from "../../data/HabitContext";
-import { MainView } from "../../components/View/Views";
 import { HugeText } from "../../styles/StyledText";
+import { UsualScreen } from "../../components/View/Views";
 
 export default SharedHabitScreen = () => {
     const route = useRoute()
@@ -14,19 +14,19 @@ export default SharedHabitScreen = () => {
     
     if(!Habits.hasOwnProperty(habitID)){
         return(
-            <MainView>
+            <UsualScreen>
                 <HugeText text={"Habitude indisponible... id : " + habitID}/>
-            </MainView>
+            </UsualScreen>
         )
     }
 
     const habit = Habits[habitID]
 
     return(
-        <MainView>
+        <UsualScreen>
             <HugeText text={"Shared !"}/>
             <HugeText text={"habitID : " + habitID}/>
             <HugeText text={"UserID : " + userID}/>
-        </MainView>
+        </UsualScreen>
     )
 }

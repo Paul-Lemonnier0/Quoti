@@ -1,7 +1,4 @@
-import Calendar from "react-native-swipe-calendar";
-import CustomBottomSheet, { CustomStaticBottomSheet } from "../../components/BottomSheets/CustomBottomSheet"
-import CalendarCustom from "../../components/Calendars/CalendarCustom"
-import { useSharedValue } from "react-native-reanimated";
+
 import { StyleSheet, View } from "react-native";
 import { CalendarList, NewCalendarList } from "react-native-calendars";
 import CalendarListCustom from "../../components/Calendars/CalendarListCustom";
@@ -15,15 +12,21 @@ import { TitleText } from "../../styles/StyledText";
 import Separator from "../../components/Other/Separator";
 import { TextButton } from "../../components/Buttons/UsualButton";
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
-import { useMemo } from "react";
+import React, { Dispatch, FC, RefObject, useMemo } from "react";
 import { backgroundColor } from "react-native-calendars/src/style";
 import { useThemeColor } from "../../components/Themed";
 import MultipleSelectionCalendarListCustom from "../../components/Calendars/MultipleSelectionCalendarListCustom";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
-const SelectDateBottomScreen = ({bottomSheetModalRef, snapPoints, handleSheetChanges, 
-                                  selectedDate, setSelectedDate}) => {
+interface SelectDateBottomScreenProps {
+  bottomSheetModalRef: RefObject<BottomSheetModal>,
+  selectedDate: Date,
+  setSelectedDate: Dispatch<Date>
+}
 
-    const handleSelectDate = (date) => {
+const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetModalRef, selectedDate, setSelectedDate}) => {
+
+    const handleSelectDate = (date: Date) => {
       bottomSheetModalRef.current?.close();
       setSelectedDate(date)
     }
@@ -41,7 +44,7 @@ const SelectDateBottomScreen = ({bottomSheetModalRef, snapPoints, handleSheetCha
     const snapPoints_Default = useMemo(() => ['75%'], []);
 
     return (
-        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default} onChange={handleSheetChanges}
+        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default}
             footerText={"Aujourd'hui"} footerMethod={handleGoToday}>
 
           <UsualScreen secondaryBackground>

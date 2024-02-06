@@ -1,15 +1,15 @@
 import React, { useState, useRef, useMemo, useCallback } from 'react';
 import { StyleSheet, View} from 'react-native';
-import { TitleText } from '../styles/StyledText';
-import { UsualScreen } from '../components/View/Views';
-import { BackgroundIconButton, BorderIconButton, CircleBackgroundIconButton, CircleBorderIconButton, IconButton, NavigationButton } from '../components/Buttons/IconButtons';
+import { TitleText } from '../../styles/StyledText';
+import { UsualScreen } from '../../components/View/Views';
+import { BackgroundIconButton, BorderIconButton, IconButton, NavigationButton } from '../../components/Buttons/IconButtons';
 import { ScrollView } from 'react-native';
-import { BackgroundTextButton, BorderTextButton } from '../components/Buttons/UsualButton';
-import SelectDateBottomScreen from './BottomScreens/SelectDateBottomScreen';
-import { PasswordInputCustom, TextInputCustom } from '../components/TextFields/TextInput';
-import { DatePicker } from '../components/TextFields/DatePicker';
-import { IncrementButtons, IncrementTime } from '../components/Buttons/IncrementButtons';
-import { BackgroundRadioButton, BorderRadioButton } from '../components/RadioButtons/RadioButton';
+import { BackgroundTextButton, BorderTextButton } from '../../components/Buttons/UsualButton';
+import SelectDateBottomScreen from '../BottomScreens/SelectDateBottomScreen';
+import { PasswordInputCustom, TextInputCustom } from '../../components/TextFields/TextInput';
+import { DatePicker } from '../../components/TextFields/DatePicker';
+import { IncrementButtons, IncrementTime } from '../../components/Buttons/IncrementButtons';
+import { BackgroundRadioButton, BorderRadioButton } from '../../components/RadioButtons/RadioButton';
 import { FlatList } from 'react-native';
 
 const ComponentPresentation = () => {
@@ -117,14 +117,10 @@ const ComponentPresentation = () => {
                 <View style={[styles.displayRow, {gap: 15}]}>
                     <BorderIconButton onPress={() => {}} name="bar-chart" provider="Feather"/>
                     <BorderIconButton onPress={() => {}} name="bar-chart" provider="Feather" disabled/>
-                    <CircleBorderIconButton onPress={() => {}} name="bar-chart" provider="Feather" />
-                    <CircleBorderIconButton onPress={() => {}} name="bar-chart" provider="Feather" disabled/>
                 </View>
                 <View style={[styles.displayRow, {gap: 15}]}>
                     <BackgroundIconButton onPress={() => {}} name="bar-chart" provider="Feather"/>
                     <BackgroundIconButton onPress={() => {}} name="bar-chart" provider="Feather" disabled/>
-                    <CircleBackgroundIconButton onPress={() => {}} name="bar-chart" provider="Feather"/>
-                    <CircleBackgroundIconButton onPress={() => {}} name="bar-chart" provider="Feather" disabled/>
                 </View>
             
                 <View style={[styles.displayRow, {gap: 15}]}>

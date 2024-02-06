@@ -1,5 +1,4 @@
 import { ActivityIndicator, Modal, View } from "react-native"
-import { MainView } from "../View/Views"
 import { AnimatedCircularProgress } from "react-native-circular-progress"
 import { AnimatedBasicSpinner, AnimatedBasicSpinnerView } from "./AnimatedSpinner"
 import { useNavigation } from "@react-navigation/native"

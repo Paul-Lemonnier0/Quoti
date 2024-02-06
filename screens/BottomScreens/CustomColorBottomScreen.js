@@ -5,7 +5,7 @@ import { useThemeColor } from "../../components/Themed";
 import { TitleText } from "../../styles/StyledText";
 import { Feather } from '@expo/vector-icons'; 
 import Separator from '../../components/Other/Separator';
-import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet";
+import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet.tsx";
 
 const CustomColorBottomScreen = ({ bottomSheetModalRef, selectedColor, setSelectedColor }) => {
   const font = useThemeColor({}, "Font");

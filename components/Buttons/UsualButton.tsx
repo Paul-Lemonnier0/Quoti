@@ -1,8 +1,23 @@
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { useThemeColor } from "../Themed";
 import { NormalText, SubTitleText } from "../../styles/StyledText";
+import React, { FC } from "react";
 
-export const BorderTextButton = ({onPress, text, isTransparent, disabled, extend, bold}) => {
+interface BasicButtonProps {
+    onPress(): void,
+    text: string,
+    disabled?: boolean,
+    extend?: boolean,
+    bold?: boolean,
+}
+
+
+
+interface BackgroundTextButtonProps extends BasicButtonProps {
+    isTransparent?: boolean,
+}
+
+export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, isTransparent, disabled, extend, bold}) => {
     
     const font = useThemeColor({}, "Font")
     const contrast = useThemeColor({}, "Contrast")
@@ -21,7 +36,13 @@ export const BorderTextButton = ({onPress, text, isTransparent, disabled, extend
     </TouchableOpacity>);
 }
 
-export const BackgroundTextButton = ({onPress, text, color, bold, disabled, extend}) => {
+
+
+interface BackgroundTextButtonProps extends BasicButtonProps {
+    color?: string
+}
+
+export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, color, bold, disabled, extend}) => {
     
     const font = useThemeColor({}, "Font")
     const fontContrast = useThemeColor({}, "FontContrast")
@@ -41,7 +62,14 @@ export const BackgroundTextButton = ({onPress, text, color, bold, disabled, exte
     </TouchableOpacity>);
 }
 
-export const TextButton = ({onPress, text, bold, semiBold, disabled, extend, isGray, noPadding}) => {
+
+interface TextButtonProps extends BasicButtonProps {
+    semiBold?: boolean,
+    isGray?: boolean,
+    noPadding?: boolean
+}
+
+export const TextButton: FC<TextButtonProps> = ({onPress, text, bold, semiBold, disabled, extend, isGray, noPadding}) => {
     
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")

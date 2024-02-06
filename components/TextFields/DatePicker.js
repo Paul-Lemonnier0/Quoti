@@ -2,7 +2,7 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { useThemeColor } from "../Themed"
 import { MaterialCommunityIcons} from '@expo/vector-icons'; 
 import { NormalText, SubTitleText } from "../../styles/StyledText"
-import { Icon } from "../Buttons/IconButtons";
+import { Icon, IconProvider } from "../Buttons/IconButtons";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 
 export const DatePicker = ({onPress, date, label, boldLabel, semiBoldLabel}) => {
@@ -19,7 +19,7 @@ export const DatePicker = ({onPress, date, label, boldLabel, semiBoldLabel}) => 
                 <TouchableOpacity onPress={onPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
                     <NormalText text={date.toLocaleDateString('fr', dateStringOptions)}/>
 
-                    <Icon name="calendar-range-outline" provider={"MaterialCommunityIcons"}/>
+                    <Icon name="calendar-range-outline" provider={IconProvider.MaterialCommunityIcons}/>
 
                 </TouchableOpacity>
             </View>
@@ -65,7 +65,7 @@ export const MultiDatePicker = ({onPress, startDate, endDate, label, boldLabel, 
                 <TouchableOpacity onPress={onPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
                     <NormalText bold={semiBold} text={startDateString + " - " + endDateString}/>
 
-                    <Icon name="calendar-range-outline" provider={"MaterialCommunityIcons"}/>
+                    <Icon name="calendar-range-outline" provider={IconProvider.MaterialCommunityIcons}/>
 
                 </TouchableOpacity>
             </View>

@@ -2,9 +2,21 @@ import { StyleSheet, TouchableOpacity, View } from "react-native"
 import { useThemeColor } from "../Themed"
 import { NormalGrayText, NormalText, SubTitleGrayText, SubTitleText } from "../../styles/StyledText"
 import { Platform } from "react-native"
-import { androidPadding, getHeightResponsive, getWidthResponsive, pixelSizeHorizontal, pixelSizeVertical } from "../../styles/UtilsStyles"
+import { androidPadding, getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles"
+import { FC } from "react"
 
-export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number, bold, small, extend, disabled}) => {
+interface BasicRadioButtonProps {
+    text: string, 
+    handleOnClick(): void, 
+    number?: number,
+    isHighlight?: boolean, 
+    bold?: boolean, 
+    small?: boolean,  
+    extend?: boolean, 
+    disabled?: boolean,
+}
+
+export const BackgroundRadioButton: FC<BasicRadioButtonProps> = ({isHighlight, handleOnClick, text, number, bold, small, extend, disabled}) => {
    
     const secondary = useThemeColor({}, "Secondary")  
     const contrast = useThemeColor({}, "Contrast")  
@@ -25,7 +37,7 @@ export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number,
     return(
         <TouchableOpacity disabled={disabled}
             onPress={handleOnClick} 
-            style={[styles.radioButton, {borderColor: backgroundColor, backgroundColor, flex: extend ? 1 : null, ...normalizedPadding, borderRadius: 15}]}>
+            style={[styles.radioButton, {borderColor: backgroundColor, backgroundColor, flex: extend ? 1 : undefined, ...normalizedPadding, borderRadius: 15}]}>
 
             <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
 
@@ -37,7 +49,12 @@ export const BackgroundRadioButton = ({isHighlight, handleOnClick, text, number,
     )
 }
 
-export const BorderRadioButton = ({isHighlight, handleOnClick, text, number, bold, small, disabled, isTransparent, hideInactiveBorder, extend}) => {
+interface BorderRadioButtonProps extends BasicRadioButtonProps {
+    isTransparent?: boolean,
+    hideInactiveBorder?: boolean
+}
+
+export const BorderRadioButton: FC<BorderRadioButtonProps> = ({isHighlight, handleOnClick, text, number, bold, small, extend, disabled, isTransparent, hideInactiveBorder}) => {
 
     const secondary = useThemeColor({}, "Secondary")  
     const contrast = useThemeColor({}, "Contrast")  
@@ -58,7 +75,7 @@ export const BorderRadioButton = ({isHighlight, handleOnClick, text, number, bol
     return(
         <TouchableOpacity disabled={disabled}
             onPress={handleOnClick} 
-            style={[androidStyle, styles.radioButton, {borderColor, backgroundColor, flex: extend ? 1 : null, padding: paddingAndRadius, borderRadius: 15}]}>
+            style={[androidStyle, styles.radioButton, {borderColor, backgroundColor, flex: extend ? 1 : undefined, padding: paddingAndRadius, borderRadius: 15}]}>
                 <View style={{gap: 10, display: "flex", flexDirection: "row"}}>
                     {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/>}
                     {number ? (bold ? <SubTitleGrayText text={number}/> : (disabled && isHighlight ? <NormalText text={number} style={{color: fontContrast}}/> : <NormalGrayText  text={number}/>)) : null}

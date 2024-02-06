@@ -4,8 +4,7 @@ import { useRef, useMemo, useCallback, useState } from "react"
 import { useThemeColor } from "../../components/Themed"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
-import AchievementBox from "../../components/Achievements/AchievementBox"
-import { CircleBorderIconButton, NavigationButton } from "../../components/Buttons/IconButtons"
+import { NavigationButton } from "../../components/Buttons/IconButtons"
 import { ProfilButton } from "../../components/Profil/ProfilButton"
 import { Image } from "react-native"
 import { useContext } from "react"
@@ -69,7 +68,6 @@ export default UserDetailsScreen = () => {
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton action={"goBack"}/>
-                        <CircleBorderIconButton name={"settings"} provider={"Feather"} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 

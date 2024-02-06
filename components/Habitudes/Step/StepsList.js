@@ -1,8 +1,7 @@
 import { StyleSheet, View } from "react-native"
 import StepItem from "./StepItem"
-import { VerticalSeparator } from "../../Other/Separator"
 import { getHeightResponsive } from "../../../styles/UtilsStyles"
-import { Icon, IconButton } from "../../Buttons/IconButtons"
+import { Icon, IconButton, IconProvider } from "../../Buttons/IconButtons"
 
 export default StepsList = ({steps, onStepChecked, color, disabled, editable, setSteps}) => {
 
@@ -22,7 +21,7 @@ export default StepsList = ({steps, onStepChecked, color, disabled, editable, se
                         <View style={{flex: 1}}>
                             <StepItem disabled={disabled} isHighlight={editable} noPress={editable} color={color} step={step} index={index} isNextToBeChecked={isNextToBeChecked} onPress={() => onStepChecked(step, index)}/>
                         </View>
-                        {editable && <IconButton name={"x"} provider={"Feather"} onPress={handleRemoveStep}/>}
+                        {editable && <IconButton name={"x"} provider={IconProvider.Feather} onPress={handleRemoveStep}/>}
                     </View>
                     )
                 })

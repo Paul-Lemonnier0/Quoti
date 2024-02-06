@@ -3,7 +3,7 @@ import { useThemeColor } from "../Themed"
 import { TextInput, View } from "react-native"
 import { StyleSheet } from "react-native";
 import { NormalText, SubText, SubTitleText } from "../../styles/StyledText";
-import { Icon, IconButton } from "../Buttons/IconButtons";
+import { Icon, IconButton, IconProvider } from "../Buttons/IconButtons";
 import { fontPixel, getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 
@@ -48,7 +48,7 @@ export const TextInputCustom = forwardRef(({ startingValue, labelName, boldLabel
                     style={[styles.textInput, {paddingRight: isWrong ? 0 : getWidthResponsive(18), color: font,}]}
                 />
 
-                {isWrong && <IconButton onPress={() => {}} provider={"Feather"} name={"x-circle"} color={errorColor} noPadding/>}
+                {isWrong && <IconButton onPress={() => {}} provider={IconProvider.Feather} name={"x-circle"} color={errorColor} noPadding/>}
             </View>
 
             {errorMessage && <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>}
@@ -107,7 +107,7 @@ export const BottomTextInputCustom = forwardRef(({ startingValue, labelName, bol
                     style={[styles.textInput, {paddingRight: isWrong ? 0 : getWidthResponsive(18), color: font,}]}
                 />
 
-                {isWrong && <IconButton onPress={() => {}} provider={"Feather"} name={"x-circle"} color={errorColor} noPadding/>}
+                {isWrong && <IconButton onPress={() => {}} provider={IconProvider.Feather} name={"x-circle"} color={errorColor} noPadding/>}
             </View>
 
             {errorMessage && <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>}
@@ -168,7 +168,7 @@ export const PasswordInputCustom = forwardRef(({ startingValue, labelName, boldL
                     style={[styles.textInput, {paddingRight: 0, color: font}]}
                 />
 
-                <IconButton onPress={togglePasswordVisibility} provider={"Feather"} name={isPasswordHidden ? "eye" : "eye-off"}/>
+                <IconButton onPress={togglePasswordVisibility} provider={IconProvider.Feather} name={isPasswordHidden ? "eye" : "eye-off"}/>
             </View>            
     
             {errorMessage && <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>}
@@ -208,7 +208,7 @@ export const SearchBarCustom = forwardRef(({ onChangeText, startingValue, labelN
             {labelName !== undefined ? (boldLabel ? <SubTitleText text={labelName}/> : <NormalText text={labelName}/>) : null}
             <View style={[styles.searchInputContainer, {borderColor, backgroundColor, color: font}]}>
 
-                <Icon name={"search"} provider={"Feather"} size={20} color={fontGray}/>
+                <Icon name={"search"} provider={IconProvider.Feather} size={20} color={fontGray}/>
 
                 <TextInput {...props} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={handleChangeText} autoCorrect={false}

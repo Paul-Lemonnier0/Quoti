@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import cardStyle from "../../styles/StyledCard";
 import IconImage from "../Other/IconImage";
 import StepIndicator from "../Other/StepIndicator";
-import { BackgroundIconButton, Icon } from "../Buttons/IconButtons";
+import { BackgroundIconButton, Icon, IconProvider } from "../Buttons/IconButtons";
 import ProgressBar from "../Progress/ProgressBar";
 import { getHabitType } from "../../primitives/HabitMethods";
 import { RectButton } from "react-native-gesture-handler";
@@ -37,7 +37,7 @@ export const HabitudeListItemSkeleton =  ({habit}) => {
                     </View>
 
                     <View style={styles.pourcentageContainer}>
-                        <Icon name="chevron-right" provider={"Feather"}/>
+                        <Icon name="chevron-right" provider={IconProvider.Feather}/>
                     </View>
                 </View>
 

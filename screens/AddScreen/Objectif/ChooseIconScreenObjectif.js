@@ -6,15 +6,14 @@ import { Image } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useThemeColor } from "../../../components/Themed"
 import { FlatList } from "react-native-gesture-handler"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { StyleSheet } from "react-native"
 import { TouchableOpacity } from "react-native"
 import { CustomCarousel } from "../../../components/Carousel/CustomCarousel"
-import { HabitsContext } from "../../../data/HabitContext"
 import { splitArrayIntoChunks } from "../../../primitives/BasicsMethods"
 import StepIndicator from '../../../components/Other/StepIndicator.js'
 import HabitIcons from "../../../data/HabitIcons"
-import { NavigationButton } from "../../../components/Buttons/IconButtons.js"
+import { NavigationButton } from "../../../components/Buttons/IconButtons.tsx"
 
 
 export const ChooseIconScreenObjectif = () => {

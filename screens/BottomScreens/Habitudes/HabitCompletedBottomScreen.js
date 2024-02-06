@@ -1,18 +1,9 @@
 import { HugeText, MassiveText, NormalText, SubText, SubTitleText, TitleText } from "../../../styles/StyledText"
-import { AchievementBox } from "../../../components/Achievements/AchievementBox"
-import CustomBottomSheet from "../../../components/BottomSheets/CustomBottomSheet"
-import { useContext, useMemo } from "react";
-import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets";
-import { ScrollView, View } from "react-native";
+
+import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import { CloseButton, Icon } from "../../../components/Buttons/IconButtons";
-import { TouchableOpacity } from "react-native";
-import { useThemeColor } from "../../../components/Themed";
-import { HabitsContext } from "../../../data/HabitContext";
-import { getHabitType } from "../../../primitives/HabitMethods";
-import { Success_Impact } from "../../../constants/Impacts";
-import { BorderTextButton } from "../../../components/Buttons/UsualButton";
-import Confetti, { triggerConfetti } from "../../../components/Other/Confetti";
+import Confetti from "../../../components/Other/Confetti";
 import { useRef } from "react";
 import { useEffect } from "react";
 import { Image } from "react-native";

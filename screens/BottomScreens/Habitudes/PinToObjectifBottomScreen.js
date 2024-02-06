@@ -8,7 +8,7 @@ import { Success_Impact } from "../../../constants/Impacts";
 import ObjectifRadioItem from "../../../components/Objectifs/ObjectifRadioItem";
 import { HabitsContext } from "../../../data/HabitContext";
 import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets";
-import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
+import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet.tsx";
 import { useThemeColor } from "../../../components/Themed";
 import Separator from "../../../components/Other/Separator";
 import { AppContext } from "../../../data/AppContext";

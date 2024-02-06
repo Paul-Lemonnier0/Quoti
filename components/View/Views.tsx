@@ -1,40 +1,20 @@
 import { useThemeColor } from "../Themed";
 import { View, StyleSheet, SafeAreaView, KeyboardAvoidingView } from "react-native";
-import { Fragment } from "react";
+import React, { FC, Fragment, ReactNode } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
 
-export const MainView = (props) => {
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
-
-    return(
-        <Fragment>
-            <SafeAreaView style={[styles.container, { flex: 0, backgroundColor: secondary }]}/>
-            <SafeAreaView style={{ flex: 1, backgroundColor: primary }}>
-                <View style={[styles.container]}>
-                    {props.children}
-                </View>
-            </SafeAreaView>
-        </Fragment>
-    );
+interface BasicViewProps {
+    hideMenu?: boolean,
+    children: ReactNode
 }
 
-export const TopScreenView = (props) => {
-
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
-
-    return(
-        <View style={[styles.headerParentContainer, {backgroundColor:primary}]}>
-            <View style={[styles.headerContainer, {backgroundColor:secondary}]}>
-                {props.children}
-            </View>
-        </View>
-    );
+interface UsualScreenProps extends BasicViewProps {
+    secondaryBackground?: boolean
 }
 
-export const UsualScreen = (props) => {
+
+export const UsualScreen: FC<UsualScreenProps> = ({hideMenu, secondaryBackground, children}) => {
 
     const primary = useThemeColor({}, "Primary")
     const secondary = useThemeColor({}, "Secondary")
@@ -42,36 +22,25 @@ export const UsualScreen = (props) => {
 
     return(
         <View style={{flex: 1, backgroundColor: primary}}>
-            <SafeAreaView style={{ flex: 1, backgroundColor: props.secondaryBackground ? secondary : primary }}>
-                <View style={[styles.container, {paddingBottom: props.hideMenu ? 0 : 120}]}>
-                    {props.children}
+            <SafeAreaView style={{ flex: 1, backgroundColor: secondaryBackground ? secondary : primary }}>
+                <View style={[styles.container, {paddingBottom: hideMenu ? 0 : 120}]}>
+                    {children}
                 </View>
             </SafeAreaView>
-            {!props.hideMenu && <LinearGradient colors={linearGradientOpacity} style={styles.linearGradient}/>}
+            {!hideMenu && <LinearGradient colors={linearGradientOpacity} style={styles.linearGradient}/>}
         </View>
     )
 }
 
-export const BackgroundView = (props) => {
+export const CustomScrollView: FC<BasicViewProps> = ({hideMenu, children}) => {
 
-    const primary = useThemeColor({}, "Primary")
-
-    return(
-    <View style={[styles.AltBackgroundView, {backgroundColor: primary}, props.style]}>
-            {props.children}
-    </View>
-    );
-}
-
-export const CustomScrollView = ({hiddenMenu, ...props}) => {
-
-    const marginBottom = hiddenMenu ? 0 : -100
+    const marginBottom = hideMenu ? 0 : -100
     const marginHorizontal = -25
 
     return(
-        <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom, marginHorizontal}} {...props}>
+        <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom, marginHorizontal}}>
             <KeyboardAvoidingView style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}>
-                {props.children}
+                {children}
             </KeyboardAvoidingView>
         </ScrollView>
     )

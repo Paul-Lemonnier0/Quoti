@@ -3,7 +3,7 @@ import { auth, db } from "../../firebase/InitialisationFirebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { Alert, View } from "react-native";
 import { UsualScreen } from "../../components/View/Views";
-import { Icon, NavigationButton } from "../../components/Buttons/IconButtons";
+import { Icon, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons";
 import { HugeText, NormalText, SubTitleText } from "../../styles/StyledText";
 import { BackgroundTextButton } from "../../components/Buttons/UsualButton";
 import { StyleSheet } from "react-native";
@@ -82,7 +82,7 @@ export default ChooseProfilPictureScreen = () => {
             <View style={styles.subBodyContainer}>
                 <TouchableOpacity onPress={handleUploadImage} 
                     style={[styles.image, {backgroundColor: secondary}]}>
-                    <Icon name={"camera"} provider={"Feather"} size={40}/>
+                    <Icon name={"camera"} provider={IconProvider.Feather} size={40}/>
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={handleUploadImage}>           

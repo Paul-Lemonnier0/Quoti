@@ -12,7 +12,10 @@ import SelectDateBottomScreen from './BottomScreens/SelectDateBottomScreen';
 import { NothingToDoScreen } from '../components/ScreenComponents/HomeScreenComponents/EmptyScreens';
 import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Periodes';
 import { DisplayHabitsScreen, DisplayObjectifsScreen, RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
-import { IconButton } from '../components/Buttons/IconButtons';
+import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
+import { PeriodeType } from '../types/HomeScreenTypes';
+import { HabitType } from '../types/HabitTypes';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 const HomeScreen = () => {
 
@@ -20,7 +23,7 @@ const HomeScreen = () => {
 
   const { changeDate, filteredHabitsByDate, isFetched, addHabit, addObjectif } = useContext(HabitsContext);
 
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const handleAddHabitsPlaceholder = async() => {
     try{
@@ -49,17 +52,18 @@ const HomeScreen = () => {
     }
   }
 
-  const [displayedHabits, setDisplayedHabits] = useState([])
-  const [displayedObjectifs, setDisplayedObjectifs] = useState([])
-  const [selectedPeriode, setSelectedPeriode] = useState("Quotidien")
+  const [displayedHabits, setDisplayedHabits] = useState<HabitType[]>([])
+  const [displayedObjectifs, setDisplayedObjectifs] = useState<string[]>([])
+  const [selectedPeriode, setSelectedPeriode] = useState<string>("Quotidien")
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
-  const initialPeriodes = [
+  const initialPeriodes: PeriodeType[] = [
     { frequency: "Quotidien", displayedText: "Jour", nbElements: 0 }, 
     { frequency: "Hebdo", displayedText: "Semaine", nbElements: 0 }, 
     { frequency: "Mensuel", displayedText: "Mois", nbElements: 0 }
   ]
 
-  const [periodes, setPeriodes] = useState(["Calendar", ...initialPeriodes]) 
+  const [periodes, setPeriodes] = useState<(string|PeriodeType)[]>(["Calendar", ...initialPeriodes]) 
 
   useEffect(() =>{
     //console.warn("filteredHabitByDate Refreshed");
@@ -79,7 +83,7 @@ const HomeScreen = () => {
         
   }, [filteredHabitsByDate, selectedDate])
 
-  const handleChangeSelectedPeriode = (newPeriode) => {
+  const handleChangeSelectedPeriode = (newPeriode: PeriodeType) => {
     if(isFetched) {
 
       setSelectedPeriode(newPeriode.frequency)
@@ -94,9 +98,8 @@ const HomeScreen = () => {
 
     //SELECTED DATE
 
-    const [selectedDate, setSelectedDate] = useState(new Date())
   
-    const periodeStrings = {
+    const periodeStrings: {[key: string]: string} = {
       "Quotidien": shortDateStringFormat(selectedDate),
       "Hebdo": shortWeekStringFormat(selectedDate),
       "Mensuel": getMonthString(selectedDate) ,
@@ -104,7 +107,7 @@ const HomeScreen = () => {
   
     const displayedDate = periodeStrings[selectedPeriode]
     
-    const handleChangeSelectedDate = async(date) =>  {
+    const handleChangeSelectedDate = async(date: Date) =>  {
       if(isFetched){
         setIsLoading(true)
   
@@ -117,7 +120,7 @@ const HomeScreen = () => {
 
   //BOTTOM SHEETS
 
-  const bottomSheetModalRef_Calendar = useRef(null);
+  const bottomSheetModalRef_Calendar = useRef<BottomSheetModal>(null);
 
   const handleOpenCalendar = useCallback(() => {
         bottomSheetModalRef_Calendar.current?.present();
@@ -137,7 +140,7 @@ const HomeScreen = () => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                <IconButton name={"plus"} provider={"Feather"} onPress={handleAddHabitsPlaceholder}/>
+                <IconButton name={"plus"} provider={IconProvider.Feather} onPress={handleAddHabitsPlaceholder}/>
 
                 <ProfilButton/>
             </View>

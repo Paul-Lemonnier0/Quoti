@@ -11,7 +11,7 @@ import { auth } from "../../firebase/InitialisationFirebase"
 import { Alert } from "react-native"
 import { NavigationButton } from "../../components/Buttons/IconButtons"
 import { useNavigation } from "@react-navigation/native"
-import SocialButton from "../../components/Buttons/SocialButton"
+import SocialButton, { SocialConnectionWay } from "../../components/Buttons/SocialButton"
 import { useColorScheme } from "react-native"
 import { Success_Impact } from "../../constants/Impacts"
 import { AuthContext } from "../../data/AuthContext"
@@ -74,16 +74,7 @@ export default LoginScreen = () => {
         }
     }
 
-    const colorScheme = useColorScheme()
-
-    const Google_Icon = require("../../img/Auth/Google.png")
-    const Facebook_Icon = colorScheme === "dark" ? require("../../img/Auth/Facebook-white.png") : require("../../img/Auth/Facebook-blue.png")
-
-    const Apple_Icon = colorScheme === "dark" ? require("../../img/Auth/Apple-white.png") : require("../../img/Auth/Apple-black.png")
-    const handleAppleSignUp = () => {}
-
     const handleGoogleSignUp = () => {}
-
     const handleFacebookSignUp = () => {}
 
     return (
@@ -115,9 +106,8 @@ export default LoginScreen = () => {
                         <NormalText text={"Ou continuez avec :"} bold/>
 
                         <View style={{display: "flex", flexDirection: "row", gap: 20, alignItems: "center", justifyContent: "center", flex: 1}}>
-                            {/* <SocialButton image={Apple_Icon}/> */}
-                            <SocialButton image={Google_Icon} onPress={handleGoogleSignUp}/>
-                            <SocialButton image={Facebook_Icon} onPress={handleFacebookSignUp}/>
+                            <SocialButton provider={SocialConnectionWay.Google} onPress={handleGoogleSignUp}/>
+                            <SocialButton provider={SocialConnectionWay.Facebook} onPress={handleFacebookSignUp}/>
                         </View>
 
 

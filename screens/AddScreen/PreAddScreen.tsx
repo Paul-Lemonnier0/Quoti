@@ -1,7 +1,7 @@
 import { Image, View } from "react-native"
 import { UsualScreen } from "../../components/View/Views"
 import { HugeText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { useState } from "react"
+import { FC, useState } from "react"
 import { StyleSheet } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import Separator from "../../components/Other/Separator"
@@ -10,10 +10,12 @@ import { NavigationButton } from "../../components/Buttons/IconButtons"
 import { BorderRadioButton } from "../../components/RadioButtons/RadioButton"
 import { BackgroundTextButton } from "../../components/Buttons/UsualButton"
 import { RadioButtonsBar } from "../../components/RadioButtons/RadioButtonsBar"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { AddScreenStackType } from "../../navigation/BottomTabNavigator"
 
-export const PreAddScreen = () => {
+type PreAddScreenProps = NativeStackScreenProps<AddScreenStackType, "PreAddScreen">
 
-    const navigation = useNavigation();
+export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
 
     const [selectedItem, setSelectedItem] = useState("AddBasicDetails")
     const [totalSteps, setTotalSteps] = useState(6)

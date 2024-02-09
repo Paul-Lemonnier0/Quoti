@@ -1,6 +1,8 @@
-import { addDays, isFirstDayOfMonth, startOfWeek } from "date-fns"
+import { startOfWeek } from "date-fns"
+import { Habit } from "../types/HabitTypes"
+import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes"
 
-function isHabitScheduledForDate(habit, currentDate) {
+function isHabitScheduledForDate(habit: Habit, currentDate: Date): boolean {
     if(habit.startingDate > currentDate) return false
 
     if(habit.startingDate.getFullYear() === currentDate.getFullYear()
@@ -18,33 +20,24 @@ function isHabitScheduledForDate(habit, currentDate) {
             return isHabitPlannedThisWeek(habit.startingDate, currentDate, habit.reccurence)
 
         case "Mensuel":
-            if(isFirstDayOfMonth(habit.startingDate) > currentDate) return false
+            if(getFirstDayOfMonth(habit.startingDate) > currentDate) return false
             return isHabitPlannedThisMonth(habit.startingDate, currentDate, habit.reccurence)
     }
+
+    return false
 }
 
-const isHabitPlannedThisWeek = (date, currentDate, reccurence) => {
-
+const isHabitPlannedThisWeek = (date: Date, currentDate: Date, reccurence: number): boolean => {
     return numberOfWeekBetweenDates(date, currentDate) % reccurence === 0
 }
 
-const isHabitPlannedThisMonth = (date, currentDate, reccurence) => {
-
+const isHabitPlannedThisMonth = (date: Date, currentDate: Date, reccurence: number): boolean => {
     return numberOfMonthBetweenDates(date, currentDate) % reccurence === 0
 }
 
-const weekNumber = (date) => {
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    
-    var days = Math.floor((date - firstDayOfYear) /
-    (24 * 60 * 60 * 1000));
- 
-    var weekNumber = Math.ceil(days / 7);
-}
+const isHabitPlannedThisDay = (daysOfActivity: number[], startingDate: Date, reccurence: number, date: Date): boolean => {
 
-const isHabitPlannedThisDay = (daysOfActivity, startingDate, reccurence, date) => {
-
-    let dayNumberInWeek = date.getDay() === 0 ? 6 : date.getDay() - 1
+    const dayNumberInWeek = date.getDay() === 0 ? 6 : date.getDay() - 1
 
     if(daysOfActivity.length === 0){
         return reccurence === 1 || (numberOfDayBetweenDates(startingDate, date) % reccurence == 0);
@@ -53,22 +46,24 @@ const isHabitPlannedThisDay = (daysOfActivity, startingDate, reccurence, date) =
     return daysOfActivity.includes(dayNumberInWeek)
 }
 
-const numberOfDayBetweenDates = (date1, date2) => {
-    return Math.floor(Math.abs((date1 - date2) / (1000 * 60 * 60 * 24)));
+const numberOfDayBetweenDates = (date1: Date, date2: Date): number => {
+    const differenceInMs = Math.abs(date1.getTime() - date2.getTime());
+
+    return Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
 }
 
-const numberOfWeekBetweenDates = (date1, date2) => {
+const numberOfWeekBetweenDates = (date1: Date, date2: Date): number => {
     const differenceEnJours = numberOfDayBetweenDates(date1, date2)
     const nombreSemaines = Math.floor(differenceEnJours / 7);
 
     return nombreSemaines
 }   
 
-const numberOfMonthBetweenDates = (date1, date2) => {
+const numberOfMonthBetweenDates = (date1: Date, date2: Date): number => {
     return Math.abs(date2.getFullYear() - date1.getFullYear()) * 12 + Math.abs(date2.getMonth() - date1.getMonth());    
 }
 
-const getNextDayInDaysOfActivity = (day, daysOfActivity) => {
+const getNextDayInDaysOfActivity = (day: number, daysOfActivity: number[]): number => {
     for(let i = 0; i<daysOfActivity.length; ++i){
         if(daysOfActivity[i] > day) {
             return daysOfActivity[i]
@@ -78,13 +73,13 @@ const getNextDayInDaysOfActivity = (day, daysOfActivity) => {
     return daysOfActivity[0]
 }
 
-const getFirstDayOfMonth = (date) => {
+const getFirstDayOfMonth = (date: Date): Date => {
     const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
     return firstDayOfMonth
 }
 
-export const calculateNextScheduledDate = (habit, startingDate) => {
-    let nextScheduledDate = new Date(startingDate);
+export const calculateNextScheduledDate = (habit: Habit | FirestoreHabit, startingDate: Date): Date => {
+    let nextScheduledDate = startingDate;
 
     switch (habit.frequency) {
         case "Quotidien":      
@@ -120,4 +115,4 @@ export const calculateNextScheduledDate = (habit, startingDate) => {
 
 
 
-export {weekNumber, numberOfWeekBetweenDates, isHabitPlannedThisMonth, isHabitScheduledForDate}
+export {numberOfWeekBetweenDates, isHabitPlannedThisMonth, isHabitScheduledForDate}

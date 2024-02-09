@@ -1,23 +1,32 @@
-import { HugeText, NormalText, SubText, SubTitleText, TitleText } from "../../../styles/StyledText"
-import CustomBottomSheet, { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet.tsx"
-import { useCallback, useContext, useMemo, useRef, useState } from "react";
+import { SubTitleText } from "../../../styles/StyledText"
+import { FC, RefObject, useCallback, useContext, useMemo, useRef, useState } from "react";
 import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets";
 import { Share, View } from "react-native";
 import { StyleSheet } from "react-native";
-import { CloseButton, Icon } from "../../../components/Buttons/IconButtons";
+import { CloseButton, Icon, IconProvider } from "../../../components/Buttons/IconButtons";
 import { TouchableOpacity } from "react-native";
 import { useThemeColor } from "../../../components/Themed";
 import { HabitsContext } from "../../../data/HabitContext";
 import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
 import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
-import Separator from "../../../components/Other/Separator";
-import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBottomSheet";
 import PinToObjectifBottomScreen from "./PinToObjectifBottomScreen";
-import AddHabitToObjectifNav from "../../AddScreen/Objectif/AddHabitToObjectifNav";
 import EditHabitNav from "../../EditScreens/Habits/EditHabitNav";
 import { AppContext } from "../../../data/AppContext";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { Habit } from "../../../types/HabitTypes";
+import { Alert } from "react-native";
+import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 
-export default SettingHabitBottomScreen = ({
+
+interface SettingHabitBottomScreenProps {
+    bottomSheetModalRef: RefObject<BottomSheetModal>,
+    habit: Habit,
+    attachToObjectifAdditionnalMethod?: () => void, 
+    deleteAdditionnalMethod?: () => void, 
+    modifyAdditionnalMethod?: () => void
+}
+
+const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     bottomSheetModalRef, 
     habit, 
     attachToObjectifAdditionnalMethod, 
@@ -29,13 +38,12 @@ export default SettingHabitBottomScreen = ({
     const {removeHabit, updateHabitRelationWithObjectif, Objectifs} = useContext(HabitsContext)
 
     const habitType = getHabitType(habit)
-    const snapPoints = habitType === "Objectifs" ? ["55%"] : ["50%"]    
 
-    const [displayedObjectifs, setDisplayedObjectifs] = useState(Object.values(Objectifs))
+    const displayedObjectifs = Object.values(Objectifs)
 
 
     const closeModal = () => bottomSheetModalRef.current?.close()
-    const bottomSheetModalRef_PinObjectifScreen = useRef(null)
+    const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
 
     const handleDelete = async() => {
         setIsLoading(true)
@@ -78,7 +86,7 @@ export default SettingHabitBottomScreen = ({
         }
 
         catch(e){
-            Alert.alert("Shared Error : ", e)
+            console.log("Shared Error : ", e)
         }
     }
 
@@ -91,10 +99,10 @@ export default SettingHabitBottomScreen = ({
     }
 
     const openPinObjectifScreen = () => {
-        bottomSheetModalRef_PinObjectifScreen.current?.present()
+        bottomSheetModalRef_PinObjectifScreen.current?.present() 
     }
 
-    const handleMakeObjectifRelation = async(habit, selectedPinObjectifID) => 
+    const handleMakeObjectifRelation = async(habit: Habit, selectedPinObjectifID: string | null) => 
     {
         attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
         await updateHabitRelationWithObjectif(habit, selectedPinObjectifID)
@@ -105,30 +113,38 @@ export default SettingHabitBottomScreen = ({
     const tertiary = useThemeColor({}, "Tertiary")
     const fontGray = useThemeColor({}, "FontGray")
 
-    const commands = [
-        {icon: "trending-up", text:"Passer pour aujourd'hui", method: handleSkip},
-        {icon: "edit-2", text:"Modifier l'habitude", method: handleOpenEdit},
-        {icon: "share", text:"Partager l'habitude", method: handleShare},
+    interface commandType {
+        icon: string,
+        provider: IconProvider,
+        text: string,
+        method: () => void,
+        color?: string
+    }
+
+    const commands: commandType[] = [
+        {icon: "trending-up", provider: IconProvider.Feather, text:"Passer pour aujourd'hui", method: handleSkip},
+        {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'habitude", method: handleOpenEdit},
+        {icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleShare},
     ]
 
     if(habitType === "Objectifs"){
-        commands.push({icon: "pin", provider: "Octicons", text:"Détacher de l'objectif", method: handleBreakObjectifRelation})
+        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Détacher de l'objectif", method: handleBreakObjectifRelation})
     }
 
     else {
-        commands.push({icon: "pin", provider: "Octicons", text:"Attacher à un objectif", method: openPinObjectifScreen})
+        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Attacher à un objectif", method: openPinObjectifScreen})
     }
 
-    commands.push({icon: "trash", text:"Supprimer l'habitude", method: handleDelete, color: error})
+    commands.push({icon: "trash", provider: IconProvider.Feather, text:"Supprimer l'habitude", method: handleDelete, color: error})
 
-    const bottomSheetModalRef_EditHabit = useRef(null);
+    const bottomSheetModalRef_EditHabit: RefObject<BottomSheetModal> = useRef(null);
   
     const handleOpenEditHabit = useCallback(() => {
         bottomSheetModalRef_EditHabit.current?.present();
       }, []);
   
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} onChange={() => {}}>
+        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
             <View style={styles.container}>
                 <View style={{}}>
                     {
@@ -183,4 +199,6 @@ const styles = StyleSheet.create({
         marginLeft: 5,
       },
 })
+
+export default SettingHabitBottomScreen
   

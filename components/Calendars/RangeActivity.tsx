@@ -4,20 +4,28 @@ import { LittleNormalText } from "../../styles/StyledText";
 import { addDays } from "date-fns";
 import { StyleSheet } from "react-native";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
+import { Step } from "../../types/HabitTypes";
+import { FC } from "react";
 
 
-export default RangeActivity = ({start, end, activity, activityColor, steps}) => {
+interface RangeActivityProps {
+    start: Date,
+    activity: {[key: string]: string[]}
+    activityColor: string,
+    totalSteps: number
+}
+
+const RangeActivity: FC<RangeActivityProps> = ({start, activity, activityColor, totalSteps}) => {
     
     const secondary = useThemeColor({}, "Secondary")
 
-    const history = [];
+    const history: Date[] = [];
     for(let i = 0; i < 7; ++i){
         const new_date = addDays(start, -i)
         history.unshift(new_date)
     }
 
     const dayWithLogs = Object.keys(activity)
-    const totalSteps = Object.keys(steps).length
 
     return(
         <View style={styles.container}>
@@ -70,3 +78,5 @@ const styles = StyleSheet.create({
         borderRadius: getWidthResponsive(10)
     },
 })
+
+export default RangeActivity

@@ -1,26 +1,17 @@
 import React, { useCallback } from "react";
 import { View, StyleSheet, Image } from "react-native"
-import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { HugeText, NormalGrayText, TitleText } from "../../styles/StyledText"
 import { useThemeColor } from "../../components/Themed"
-import { Feather } from '@expo/vector-icons'; 
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { useState} from "react";
 import { CustomScrollView, UsualScreen } from "../../components/View/Views";
-import { SubText } from "../../styles/StyledText";
-import { SimpleButton, TextButton } from "../../components/Buttons/UsualButton";
+import { TextButton } from "../../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../../data/HabitContext";
-import { RenderStep } from "../../components/Habitudes/EtapeItem";
 import HabitIcons from "../../data/HabitIcons";
-import { IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons";
+import { Icon, IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons";
 import ProgressBar from "../../components/Progress/ProgressBar";
-import { Share } from "react-native";
-import { Alert } from "react-native";
 import StepsList from "../../components/Habitudes/Step/StepsList";
-import cardStyle from "../../styles/StyledCard";
 import { addDays } from "date-fns";
-import { FlatList } from "react-native";
-import Achievements from "../../data/Achievements";
 import { useEffect } from "react";
 import { getLogsForHabitInDateRange } from "../../firebase/Firestore_Step_Primitives";
 import RangeActivity from "../../components/Calendars/RangeActivity";
@@ -28,24 +19,29 @@ import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyle
 import { Success_Impact } from "../../constants/Impacts";
 import HabitCompletedBottomScreen from "../BottomScreens/Habitudes/HabitCompletedBottomScreen";
 import { useRef } from "react";
+import { UserContext } from "../../data/UserContext";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
+import { Step } from "../../types/HabitTypes";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { auth } from "../../firebase/InitialisationFirebase";
+import SettingHabitBottomScreen from "../BottomScreens/Habitudes/SettingsHabitBottomScreen";
 
-const HabitudeScreen = () => {
+type HabitudeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HabitudeScreen">
 
-    const navigation = useNavigation()
+const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
+
+    const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
 
     const tertiary = useThemeColor({}, "Tertiary")
     const secondary = useThemeColor({}, "Secondary")
 
     const {getHabitFromFilteredHabits, handleCheckStep, Objectifs} = useContext(HabitsContext)
-    const route = useRoute()
-    const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
 
-    const bottomSheetModalRef_HabitCompleted = useRef(null)
-    const bottomSheetModalRef_Settings = useRef(null)
+    const bottomSheetModalRef_HabitCompleted = useRef<BottomSheetModal>(null)
+    const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
     
-    //POUR L'INSTANT : 
-
-    const currentDate = currentDateString === "none" ? new Date(currentDateString) : new Date(currentDateString)
+    const currentDate = new Date(currentDateString)
 
     const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID)
 
@@ -53,7 +49,7 @@ const HabitudeScreen = () => {
         habit["color"] = Objectifs[objectifID].color ?? habit.color
     }
 
-    const [steps, setSteps] = useState(Object.values(habit.steps))
+    const [steps, setSteps] = useState<Step[]>(Object.values(habit.steps))
 
     const doneSteps = steps.filter(step => step.isChecked).length
     const totalSteps = steps.length
@@ -87,16 +83,22 @@ const HabitudeScreen = () => {
 
     const imageSize = 35
 
-    const [lastSevenDaysLogs, setLastSevenDaysLogs] = useState({})
-    const [logsReady, setLogsReady] = useState(false)
+    const [lastSevenDaysLogs, setLastSevenDaysLogs] = useState<{[key: string]: string[]}>({})
+    const [logsReady, setLogsReady] = useState<boolean>(false)
+
+    // const {user} = useContext(UserContext)
+    const user = auth.currentUser
 
     useEffect(() => {
         const getLast7DaysLogs = async() => {
             const startingDate = addDays(currentDate, -7);
             const endingDate = currentDate;
 
-            const lastSevenDaysLogs_temp = await getLogsForHabitInDateRange(startingDate, endingDate, habitID)
-            setLastSevenDaysLogs(lastSevenDaysLogs_temp)
+            if(user){
+                const lastSevenDaysLogs_temp = await getLogsForHabitInDateRange(startingDate, endingDate, user.uid, habitID)
+                setLastSevenDaysLogs(lastSevenDaysLogs_temp)
+            }
+
             setLogsReady(true)
         }
 
@@ -183,14 +185,14 @@ const HabitudeScreen = () => {
 
                                     <View style={styles.streakHeader}>
                                         <View style={styles.streakLeftHeader}>
-                                            <IconButton name={"flame"} color={habit.color} provider={IconProvider.IonIcons} noPadding size={30}/>
+                                            <Icon name={"flame"} color={habit.color} provider={IconProvider.IonIcons} size={30}/>
                                             <HugeText text={habit.currentStreak}/>
                                         </View>
 
-                                        <TextButton text={"Voir plus"} isGray noPadding/>
+                                        <TextButton onPress={() => {}} text={"Voir plus"} isGray noPadding/>
                                     </View>
 
-                                    <RangeActivity start={currentDate} activity={lastSevenDaysLogs} steps={steps} activityColor={habit.color}/>
+                                    <RangeActivity start={currentDate} activity={lastSevenDaysLogs} totalSteps={steps.length} activityColor={habit.color}/>
                                 </View>
                             </View>
                         </View>

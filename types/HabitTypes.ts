@@ -1,40 +1,105 @@
+export enum FrequencyTypes {
+    Quotidien = "Quotidien",
+    Hebdo = "Hebdo",
+    Mensuel = "Mensuel",
+}
+
+export interface StreakValues {
+    currentStreak: number,
+    lastCompletionDate: string,
+    bestStreak: number
+}
+
 interface ItemType {
     titre: string,
     description: string,
     color: string,
     icon: string,
-    id: string
 }
 
-interface ObjectifType extends ItemType {
+interface BaseObjectif extends ItemType {
+    objectifID: string
+}
+
+interface Objectif extends BaseObjectif {
     startingDate: Date,
     endingDate: Date,
 }
 
-interface HabitType extends ItemType {
-    habitID?: string,
+interface SeriazableObjectif extends BaseObjectif {
+    startingDate: string,
+    endingDate: string,
+}
+
+interface BaseHabit extends ItemType, StreakValues {
+    habitID: string,
     alertTime?: string,
-    frequency: string,
-    bestStreak?: number,
-    currentStreak?: number,
+    frequency: FrequencyTypes,
     occurence: number,
     reccurence: number,
     daysOfWeek: number[],
-    startingDate?: Date,
-    lastCompletionDate?: Date,
     notificationEnabled?: boolean,
-    objectifID: string | null
-    steps: {[key: string]: StepType}[]
+    objectifID: string | undefined
+    steps: StepList,
 }
 
-interface StepType extends ItemType {
+interface Habit extends BaseHabit {
+    startingDate: Date,
+}
+
+interface SeriazableHabit extends BaseHabit {
+    startingDate: string,
+}
+
+interface Step {
+    titre: string,
+    description: string,
     duration: number,
     numero: number,
     habitID: string,
     stepID: string,
-    isChecked: boolean,
-    created: Date,
-    deleted?: Date,
+    created: string,
+    deleted?: string,
+    isChecked?: boolean
 }
 
-export {ObjectifType, HabitType, StepType}
+interface HabitList {
+    [habitID: string]: Habit
+}
+
+interface ObjectifList {
+    [objectifID: string]: Objectif
+}
+
+interface StepList {
+    [stepID: string]: Step
+}
+
+interface FilteredHabitsType {
+    Quotidien: {
+        Habitudes?: HabitList,
+        Objectifs?: ObjectifList,
+    }
+
+    Hebdo: {
+        Habitudes?: HabitList,
+        Objectifs?: ObjectifList,
+    }
+
+    Mensuel: {
+        Habitudes?: HabitList,
+        Objectifs?: ObjectifList,
+    }
+}
+
+export {
+    Objectif, 
+    SeriazableObjectif, 
+    Habit, 
+    SeriazableHabit, 
+    Step, 
+    HabitList, 
+    ObjectifList, 
+    StepList, 
+    FilteredHabitsType
+}

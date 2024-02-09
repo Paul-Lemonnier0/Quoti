@@ -1,12 +1,11 @@
 import { getDateLogs } from "../firebase/Firestore_Step_Primitives";
-import { displayTree } from "./BasicsMethods";
-import { calculateNextScheduledDate, isHabitPlannedThisMonth, isHabitScheduledForDate } from "./HabitudesReccurence";
-import { getStepLog } from "./StepMethods";
+import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
+import { FilteredHabitsType, FrequencyTypes, HabitList, Habit, StreakValues, StepList, Step, SeriazableHabit } from "../types/HabitTypes";
+import { calculateNextScheduledDate, isHabitScheduledForDate } from "./HabitudesReccurence";
 
-export const filterHabits = async (date, userID, habits, setIsFetchingHabit) => {
-  setIsFetchingHabit(true)
+export const filterHabits = async (date: Date, userID: string, habits: HabitList) => {
 
-  let habitsScheduledForDate = { 
+  let habitsScheduledForDate: FilteredHabitsType = { 
       Quotidien: {Habitudes: {}, Objectifs: {}}, 
       Hebdo: {Habitudes: {}, Objectifs: {}}, 
       Mensuel: {Habitudes: {}, Objectifs: {}} 
@@ -16,12 +15,13 @@ export const filterHabits = async (date, userID, habits, setIsFetchingHabit) => 
 
   for(let habitID in habits){
 
-    const habit = habits[habitID]
+    const habit: Habit = habits[habitID]
     const habitPlannedForThisDate = isHabitScheduledForDate(habit, date)
 
     if(habitPlannedForThisDate){
       const habitStepsID = Object.keys(getValidHabitsStepsForDate(Object.values(habit.steps), habitID, date));
       const stepsWithLogsArray = habitStepsID.map(habitStepID => {
+
 
         const habitStep = habit.steps[habitStepID]
         const isChecked = doneSteps.includes(habitStepID)
@@ -37,12 +37,10 @@ export const filterHabits = async (date, userID, habits, setIsFetchingHabit) => 
     }
   }
 
-  setIsFetchingHabit(false)
-
   return habitsScheduledForDate;
 };
 
-export const getHabitType = (habit) => {
+export const getHabitType = (habit: Habit | FirestoreHabit): "Objectifs" | "Habitudes" => {
   const isObjective = habit.objectifID !== undefined && habit.objectifID !== null
   const habitType = isObjective ? "Objectifs" : "Habitudes";
 
@@ -50,48 +48,53 @@ export const getHabitType = (habit) => {
 }
 
 
-export const removeHabitFromHabits = (Habits, habitID) => {
+export const removeHabitFromHabits = (Habits: HabitList, habitID: string): HabitList => {
   const habits = {...Habits}
   delete habits[habitID]
 
   return habits;
 }
 
-export const removeHabitFromFilteredHabits = (FilteredHabits, habit) => {
+export const removeHabitFromFilteredHabits = (FilteredHabits: FilteredHabitsType, habit: Habit): FilteredHabitsType => {
 
   const habitType = getHabitType(habit)
   const frequency = habit.frequency
   const updatedFilteredHabits  = {...FilteredHabits}
 
   if(updatedFilteredHabits[frequency] && updatedFilteredHabits[frequency][habitType]){
-    if(habitType === "Objectifs" && updatedFilteredHabits[frequency][habitType][habit.objectifID]){
+    if(habit.objectifID && updatedFilteredHabits[frequency].Objectifs){
+      if(updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]){
       
-      delete updatedFilteredHabits[frequency][habitType][habit.objectifID][habit.habitID]
-      const isObjectifEmpty = Object.keys(updatedFilteredHabits[frequency][habitType][habit.objectifID]).length === 0
-      if(isObjectifEmpty){
-        delete updatedFilteredHabits[frequency][habitType][habit.objectifID]
+        delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID][habit.habitID]
+
+        let objectifArray = updatedFilteredHabits[frequency]?.Objectifs?.[habit.objectifID] ?? {} 
+        const isObjectifEmpty = Object.keys(objectifArray).length === 0
+
+        if(isObjectifEmpty){
+          delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]  
+        }
+
+        else delete updatedFilteredHabits[frequency].Habitudes?.[habit.habitID]
       }
     }
-
-    else delete updatedFilteredHabits[frequency][habitType][habit.habitID]
   }
 
   return {...updatedFilteredHabits} ;
 }
 
-const addPlannedHabitsToFilteredHabits = (filteredHabits, habit) => {
+const addPlannedHabitsToFilteredHabits = (filteredHabits: FilteredHabitsType, habit: Habit): FilteredHabitsType => {
   const habitType = getHabitType(habit)
   const frequency = habit.frequency
   const habitID = habit.habitID
   const objectifID = habit.objectifID
 
-  if(habitType === "Habitudes"){
+  if(!objectifID){
     return {
       ...filteredHabits,
       [frequency]: {
         ...filteredHabits[frequency],
         [habitType]: {
-          ...filteredHabits[frequency][habitType],
+          ...filteredHabits[frequency].Habitudes,
           [habitID]: habit
         }
       }
@@ -103,9 +106,9 @@ const addPlannedHabitsToFilteredHabits = (filteredHabits, habit) => {
     [frequency]: {
       ...filteredHabits[frequency],
       [habitType]: {
-        ...filteredHabits[frequency][habitType],
+        ...filteredHabits[frequency].Objectifs,
         [objectifID]: {
-          ...filteredHabits[frequency][habitType][objectifID],
+          ...filteredHabits[frequency].Objectifs?.[objectifID],
           [habitID]: habit
         }
       }
@@ -114,7 +117,7 @@ const addPlannedHabitsToFilteredHabits = (filteredHabits, habit) => {
 }
 
 
-export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabit, currentDate) => {
+export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits: FilteredHabitsType, newHabit: Habit, currentDate: Date): FilteredHabitsType => {
 
   if(isHabitScheduledForDate(newHabit, currentDate))
     return addPlannedHabitsToFilteredHabits(previousFilteredHabits, newHabit)
@@ -123,7 +126,7 @@ export const updateFilteredHabitsWithNewHabit = (previousFilteredHabits, newHabi
 }
 
 
-export const updateHabitsWithNewHabit = (previousHabits, newHabit) => {
+export const updateHabitsWithNewHabit = (previousHabits: HabitList, newHabit: Habit): HabitList => {
   const habitID = newHabit.habitID
 
   return {
@@ -132,7 +135,7 @@ export const updateHabitsWithNewHabit = (previousHabits, newHabit) => {
   }
 }
 
-export const getSeriazableHabit = (habit) => {
+export const getSeriazableHabit = (habit: Habit): SeriazableHabit => {
   const startingDate = habit.startingDate.toDateString()
   
   return({
@@ -141,7 +144,7 @@ export const getSeriazableHabit = (habit) => {
     })
 }
 
-export const convertBackSeriazableHabit = (habit) => {
+export const convertBackSeriazableHabit = (habit: SeriazableHabit): Habit => {
   const startingDate = new Date(habit.startingDate)
   
   return({
@@ -150,30 +153,10 @@ export const convertBackSeriazableHabit = (habit) => {
   })
 }
 
-
-export const getObjectifHabitFromFilteredHabitsMethod = (filteredHabitsByDate, frequency, objectifID, habitID) => {
-  if(habitID){
-    return filteredHabitsByDate[frequency]["Objectifs"][objectifID][habitID]
-  }
-
-  else return Object.values(filteredHabitsByDate[frequency]["Objectifs"][objectifID]);
-}
-
-export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate, frequency, objectifID, habitID) => {
-  if(objectifID !== null && objectifID !== undefined){
-    return getObjectifHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
-  }
-
-  if(habitID !== null && habitID !== undefined){
-    return filteredHabitsByDate[frequency]["Habitudes"][habitID]
-  }
-
-  else return Object.values(filteredHabitsByDate[frequency]["Habitudes"]);
-}
-
-export const getUpdatedStreakOfHabit = (habit, currentDate) => {
+export const getUpdatedStreakOfHabit = (habit: Habit | FirestoreHabit, currentDate: Date): StreakValues => {
 
   const completedDateString = currentDate.toDateString()
+
   let streakStopped = false;
   if(habit.lastCompletionDate !== "none"){
     const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
@@ -186,7 +169,7 @@ export const getUpdatedStreakOfHabit = (habit, currentDate) => {
   const lastCompletionDate = completedDateString
   const bestStreak = newStreak > habit.bestStreak ? newStreak : habit.bestStreak
 
-  let newStreakValues = {
+  const newStreakValues: StreakValues = {
       currentStreak,
       lastCompletionDate,
       bestStreak
@@ -199,8 +182,8 @@ export const getUpdatedStreakOfHabit = (habit, currentDate) => {
   return newStreakValues
 }
 
-export const getValidHabitsStepsForDate = (steps, habitID, currentDate) => {
-  const validSteps = {}
+export const getValidHabitsStepsForDate = (steps: Step[], habitID: string, currentDate: Date): StepList  => {
+  const validSteps: StepList = {}
 
   steps.forEach((step) => {
     if(step.created && step.stepID !== habitID){
@@ -226,4 +209,30 @@ export const getValidHabitsStepsForDate = (steps, habitID, currentDate) => {
   }
 
   return validSteps
+}
+
+export const stringToFrequencyType = (str: string): FrequencyTypes => {
+  switch (str.toLowerCase()) {
+
+      case "quotidien":
+          return FrequencyTypes.Quotidien;
+
+      case "hebdo":
+          return FrequencyTypes.Hebdo;
+
+      case "mensuel":
+          return FrequencyTypes.Mensuel;
+
+      default:
+          return FrequencyTypes.Quotidien;
+  }
+}
+
+
+export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate: FilteredHabitsType, frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => {
+  if(objectifID){
+    return filteredHabitsByDate[frequency].Objectifs?.[objectifID]?.[habitID]
+  }
+
+  return filteredHabitsByDate[frequency].Habitudes?.[habitID]
 }

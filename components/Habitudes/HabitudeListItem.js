@@ -19,6 +19,7 @@ import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { getHeightResponsive, getWidthResponsive, pixelSizeHorizontal, pixelSizeVertical } from "../../styles/UtilsStyles";
 import ItemIcon from "../Icons/ItemIcon";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen";
 
 export const HabitudeListItem =  ({habitude, currentDateString, index}) => {
     const primary = useThemeColor({}, "Primary")

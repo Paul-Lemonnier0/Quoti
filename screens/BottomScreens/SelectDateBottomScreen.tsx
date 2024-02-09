@@ -5,7 +5,6 @@ import CalendarListCustom from "../../components/Calendars/CalendarListCustom";
 import WeekCalendarCustom from "../../components/Calendars/WeekCalendarCustom";
 import { BottomTextInputCustom } from "../../components/TextFields/TextInput";
 import TestCalendar from "../../components/Calendars/TestCalendars";
-import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet";
 import { UsualScreen } from "../../components/View/Views";
 import { CloseButton } from "../../components/Buttons/IconButtons";
 import { TitleText } from "../../styles/StyledText";
@@ -17,6 +16,7 @@ import { backgroundColor } from "react-native-calendars/src/style";
 import { useThemeColor } from "../../components/Themed";
 import MultipleSelectionCalendarListCustom from "../../components/Calendars/MultipleSelectionCalendarListCustom";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet";
 
 interface SelectDateBottomScreenProps {
   bottomSheetModalRef: RefObject<BottomSheetModal>,

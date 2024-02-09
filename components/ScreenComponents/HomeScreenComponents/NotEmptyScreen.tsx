@@ -7,11 +7,11 @@ import ObjectifsList from "../../Objectifs/ObjectifsList"
 import { FC, memo } from "react"
 import { TitleText } from "../../../styles/StyledText"
 import { getHeightResponsive } from "../../../styles/UtilsStyles"
-import { HabitType } from "../../../types/HabitTypes"
+import { Habit } from "../../../types/HabitTypes"
 
 interface DisplayHabitsScreenProps {
   isSkeleton: Boolean,
-  displayedHabits: HabitType[],
+  displayedHabits: Habit[],
   selectedDate: Date,
 }
 
@@ -28,7 +28,7 @@ export const DisplayHabitsScreen: FC<DisplayHabitsScreenProps> = ({isSkeleton, d
 }
 
 interface RenderHabitsProps {
-  habits: HabitType[],
+  habits: Habit[],
   selectedDate: Date,
   isLoading: Boolean,
   isFetched: Boolean,

@@ -1,7 +1,7 @@
 import "react-native-get-random-values";
 import { v4 as uuidv4 } from 'uuid';
 
-export function displayTree(node, indent = 0) {
+export function displayTree(node: any, indent = 0) {
   const spaces = '  '.repeat(indent);
 
   for (const key in node) {
@@ -14,19 +14,28 @@ export function displayTree(node, indent = 0) {
   }
 }
 
-const generateUniqueID = () => {
+const generateUniqueID = (): string => {
     return uuidv4()
 }
 
-const listKeyIDfromArray = (array, idName, habitID = null) => {
+interface KeyValueList {
+  [key: string]: any
+}
+
+const listKeyIDfromArray = (array: Array<Object>, idName: string, habitID: string | undefined): KeyValueList => {
 
   return array.reduce((newList, item) => {
-    newList[item[idName]] = { ...item, idName: item[idName], ...(habitID && { habitID }) };
+    if(habitID){
+      newList[item[idName]] = { ...item, habitID };
+      return newList
+    }
+
+    newList[item[idName]] = { ...item };
     return newList;
   }, {});
 }
 
-const durationToTimeString = (duration) => {
+const durationToTimeString = (duration: number): string => {
 
   const hours = Math.floor(duration / 60)
   const remainingMinutes = duration % 60
@@ -39,8 +48,9 @@ const durationToTimeString = (duration) => {
   return formatedDuration
 }
 
-const splitArrayIntoChunks = (arr, chunkSize) => {
-  const chunkedArray = [];
+
+const splitArrayIntoChunks = <T>(arr: T[], chunkSize: number): T[][] => {
+  const chunkedArray: T[][] = [];
   for (let i = 0; i < arr.length; i += chunkSize) {
     chunkedArray.push(arr.slice(i, i + chunkSize));
   }

@@ -1,6 +1,11 @@
-import { deleteStepLogs, fetchStepLog } from "../firebase/Firestore_Step_Primitives";
+import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
+import { FilteredHabitsType, Habit, Step, StepList, StreakValues } from "../types/HabitTypes";
 
-export const updateHabitStepState = (previousHabits, habit, habitType, stepID, isChecked, newStreakValues) => {
+export const updateHabitStepState = (
+  previousHabits: FilteredHabitsType, habit: Habit,
+  habitType: string, stepID: string, 
+  isChecked: boolean, newStreakValues: StreakValues
+): FilteredHabitsType => {
     
     const frequency = habit.frequency
     const objectifID = habit.objectifID
@@ -8,7 +13,7 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
     const habitSteps = habit.steps
     const step = habitSteps[stepID]
     
-    if(habitType === "Habitudes"){
+    if(!objectifID){
 
       return {
         ...previousHabits,
@@ -17,10 +22,10 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
           [habitType]: {
             ...previousHabits[frequency][habitType],
             [habitID]: {
-              ...previousHabits[frequency][habitType][habitID],
+              ...previousHabits[frequency][habitType]?.[habitID], 
               ...newStreakValues,
               steps: {
-                ...previousHabits[frequency][habitType][habitID]["steps"],
+                ...previousHabits[frequency][habitType]?.[habitID]["steps"],
                 [stepID]: {...step, isChecked}
               }
             }
@@ -53,43 +58,30 @@ export const updateHabitStepState = (previousHabits, habit, habitType, stepID, i
     }
 }
 
-export const createDefaultStepFromHabit = (habit, habitID, listFormat) => {
+export const createDefaultStepFromHabit = (habit: FirestoreHabit | Habit, habitID: string): Step => {
 
-    const defaultStep = {
+    const defaultStep: Step = {
         numero: 0,
         titre: habit.titre, 
         description: habit.description, 
         duration: 30, 
         stepID: habitID,
         habitID,
-        // created: habit.startingDate
         created: "Sun Jan 31 2024"
-    }
-    
-    if(listFormat){
-        return {[habitID]: {...defaultStep}}
     }
 
     return defaultStep;
 }
 
-export const setHabitWithDefaultStep = (habit) => {
-  let finalHabit = {...habit}
+export const setHabitWithDefaultStep = (habit: Habit): Habit => {
+  let finalHabit: Habit = {...habit}
 
   if(Object.values(habit.steps).length === 0){
-    const placeholderStep = [createDefaultStepFromHabit(habit, habit.habitID)];
+    const habitID = habit.habitID
+    
+    const placeholderStep: StepList = {[habitID]: createDefaultStepFromHabit(habit, habitID)};
     finalHabit = {...finalHabit, steps: placeholderStep}
   }
 
   return finalHabit
-}
-
-export const removeStepLogs = async(stepsID) => {
-    console.log("Deleting steps logs in firestore...")
-
-    await Promise.all(stepsID.map(async(stepID) => {
-         await deleteStepLogs(stepID);
-    }))
-
-    console.log("Steps Logs successfully deleted in firestore !")
 }

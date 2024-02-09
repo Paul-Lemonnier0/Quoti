@@ -6,12 +6,12 @@ import { useNavigation } from "@react-navigation/native";
 import { getWidthResponsive, widthPixel } from "../../styles/UtilsStyles";
 import React, { ComponentProps, FC } from "react";
 
-type FeatherIconName = ComponentProps<typeof Feather>['name'];
-type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
-type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
-type AntDesignName = ComponentProps<typeof AntDesign>['name'];
-type IoniconsIconName = ComponentProps<typeof Ionicons>['name'];
-type OcticonsIconName = ComponentProps<typeof Octicons>['name'];
+export type FeatherIconName = ComponentProps<typeof Feather>['name'];
+export type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
+export type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
+export type AntDesignName = ComponentProps<typeof AntDesign>['name'];
+export type IoniconsIconName = ComponentProps<typeof Ionicons>['name'];
+export type OcticonsIconName = ComponentProps<typeof Octicons>['name'];
 
 export enum IconProvider {
     Feather = "Feather",

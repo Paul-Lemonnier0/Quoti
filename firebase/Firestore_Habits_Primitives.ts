@@ -1,43 +1,41 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { displayTree, listKeyIDfromArray } from "../primitives/BasicsMethods"
-import { createDefaultStepFromHabit, removeStepLogs } from "../primitives/StepMethods"
+import { createDefaultStepFromHabit } from "../primitives/StepMethods"
 import { removeHabitLogs } from "./Firestore_Step_Primitives"
-import { getUpdatedStreakOfHabit } from "../primitives/HabitMethods"
-import { useAuthentification } from "../primitives/useAuthentification"
+import { getUpdatedStreakOfHabit, stringToFrequencyType } from "../primitives/HabitMethods"
+import { FormDetailledHabit } from "../types/FormHabitTypes"
+import { FirestoreHabit, FirestoreStep } from "../types/FirestoreTypes/FirestoreHabitTypes"
+import { FrequencyTypes, Habit, HabitList, Step, StepList, StreakValues } from "../types/HabitTypes"
 
-const setupHabit = (habit) => {
+const setupHabit = (habit: FormDetailledHabit): FirestoreHabit => {
+
     const todayDateString = new Date().toDateString()
-    const startingDate = habit.startingDate === undefined ? todayDateString : habit.startingDate
+    const startingDate = habit.startingDate ?? todayDateString
 
-    const bestStreak = 0;
-    const currentStreak = 0;
-    const lastCompletionDate = "none"
-
-    const settedUpHabit = { 
+    const settedUpHabit: FirestoreHabit = { 
         ...habit, 
         startingDate, 
-        bestStreak,
-        currentStreak, 
-        lastCompletionDate,
+        bestStreak: 0,
+        currentStreak: 0, 
+        lastCompletionDate: "none",
         steps: habit.steps.map((step) => ({...step, created: todayDateString}))
     }
 
     return settedUpHabit
 }
 
-const addHabitToFireStore = async(habit, userID) => {
+const addHabitToFireStore = async(habit: FormDetailledHabit, userID: string): Promise<Habit> => {
     console.log("adding habit to firestore...")
-    const today = new Date().toISOString()
 
     const userDoc = doc(db, "Users", userID)
 
-    const habitToAdd = setupHabit(habit)
+    const habitToAdd: FirestoreHabit = setupHabit(habit)
 
     const habitRef = await addDoc(collection(userDoc, "Habits"), habitToAdd)
     const habitID = habitRef.id
 
-    let oldSteps;
+    let oldSteps: FirestoreStep[];
 
     if(habitToAdd.steps[0].numero === -1)
         oldSteps = [createDefaultStepFromHabit(habitToAdd, habitID)]   
@@ -46,50 +44,53 @@ const addHabitToFireStore = async(habit, userID) => {
 
     oldSteps = oldSteps.map(step => ({...step, created: "Sun Jan 21 2024"}))
 
-    const steps = listKeyIDfromArray(oldSteps, "stepID", habitID)
+    const steps: StepList  = listKeyIDfromArray(oldSteps, "stepID", habitID)
       
     console.log("Habit well added to firestore with id : ", habitID)
 
+    const frequency: FrequencyTypes = stringToFrequencyType(habitToAdd.frequency)
     const startingDate =  new Date(habitToAdd.startingDate)
-    return {...habitToAdd, startingDate, habitID, steps}
+
+    return {...habitToAdd, startingDate, habitID, steps, frequency}
 }
 
-const getAllOwnHabits = async(userID) => {
+const getAllOwnHabits = async(userID: string): Promise<HabitList> => {
 
     const today = new Date()
-
-
     const userDoc = doc(db, "Users", userID)
 
     const qry = query(collection(userDoc, "Habits"));
     const querySnapshot = await getDocs(qry)
 
-    const habitArray = await Promise.all(
+    const habitArray: Habit[] = await Promise.all(
         querySnapshot.docs.map(async (habit) => {
         const habitID = habit.id;
 
-        const data = habit.data();
-        let steps = {}
+        const data = habit.data() as FirestoreHabit;
+        let steps: StepList = {}
 
-        const notPlaceholderSteps = data.steps.filter((step) => (step.numero !== -1))
+        const notPlaceholderSteps = data.steps.filter((step: FirestoreStep) => (step.numero !== -1))
         steps = listKeyIDfromArray(notPlaceholderSteps, "stepID", habitID)
  
         if(notPlaceholderSteps.length < data.steps.length){
             steps[habitID] = createDefaultStepFromHabit(data, habitID)
         }
 
-        const daysOfWeek = data.daysOfWeek == [7] ? [0,1,2,3,4,5,6] : data.daysOfWeek
+        const isAllDays = data.daysOfWeek.length === 0 && data.daysOfWeek.includes(7)
+        const daysOfWeek = isAllDays ? [0,1,2,3,4,5,6] : data.daysOfWeek
+
         const startingDate = new Date(data.startingDate)
+        const frequency = stringToFrequencyType(data.frequency)
 
-        const newStreakValues = getUpdatedStreakOfHabit(data, today);
+        const newStreakValues: StreakValues = getUpdatedStreakOfHabit(data, today);
 
-        return  {...data, habitID, startingDate, steps, daysOfWeek, newStreakValues};
+        return  {...data, habitID, startingDate, steps, daysOfWeek, newStreakValues, frequency};
     }));
 
     return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});
 }
 
-const removeHabitInFirestore = async(habit, userID) => {
+const removeHabitInFirestore = async(habit: Habit, userID: string) => {
 
     const userDoc = doc(db, "Users", userID)
     console.log("Deleting habit in firestore with id : ", habit.habitID, "...")
@@ -101,7 +102,7 @@ const removeHabitInFirestore = async(habit, userID) => {
     await removeHabitLogs(userID, habit.habitID)
 }
 
-const updateHabitInFirestore = async(userID, oldHabit, newValues) => {
+const updateHabitInFirestore = async(userID: string, oldHabit: Habit, newValues: {[key: string]: any}) => {
 
     const userDoc = doc(db, "Users", userID)
 
@@ -112,7 +113,7 @@ const updateHabitInFirestore = async(userID, oldHabit, newValues) => {
     console.log("Habit successfully updated in firestore !")
 } 
 
-const updateCompletedHabit = async(userID, habitID, newStreakValues) => {
+const updateCompletedHabit = async(userID: string, habitID: string, newStreakValues: StreakValues) => {
     const userDoc = doc(db, "Users", userID)
 
     console.log("Updating habit streak...")

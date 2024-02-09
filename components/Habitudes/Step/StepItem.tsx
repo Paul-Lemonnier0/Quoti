@@ -5,8 +5,22 @@ import CustomCheckBox from "../../CheckBox/CustomCheckBox"
 import { StyleSheet } from "react-native"
 import { durationToTimeString } from "../../../primitives/BasicsMethods"
 import { getWidthResponsive } from "../../../styles/UtilsStyles"
+import { Step } from "../../../types/HabitTypes"
+import { FC } from "react"
 
-export default StepItem = ({color, isNextToBeChecked, step, onPress, index, disabled, noPress, isHighlight}) => {
+interface StepItemProps {
+    step: Step,
+    onPress(step: Step, index: number): void,
+    color: string,
+    index: number,
+    isNextToBeChecked: boolean,
+    disabled?: boolean,
+    noPress?: boolean,
+    isHighlight?: boolean,
+    
+}
+
+const StepItem: FC<StepItemProps> = ({color, isNextToBeChecked, step, onPress, index, disabled, noPress, isHighlight}) => {
 
     const borderHidden = !step.isChecked && !isNextToBeChecked && !isHighlight
     const duration = step.duration ? durationToTimeString(step.duration) :  "--"
@@ -48,3 +62,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 })
+
+export default StepItem

@@ -2,11 +2,16 @@ import { createStackNavigator } from "@react-navigation/stack";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import BottomTabNavigator from "./BottomTabNavigator";
 
+export type RootStackParamList = {
+  Root: undefined;
+  NotFound: undefined;
+};
+
 const Navigation = () => {
   return <RootNavigator/>;
 }
 
-const Stack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (

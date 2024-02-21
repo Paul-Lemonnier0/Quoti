@@ -1,4 +1,4 @@
-import { FC, forwardRef, useImperativeHandle, useState } from "react"
+import { FC, Ref, forwardRef, useImperativeHandle, useState } from "react"
 import { useThemeColor } from "../Themed"
 import { TextInput, View } from "react-native"
 import { StyleSheet } from "react-native";
@@ -12,15 +12,19 @@ interface TextInputCustomProps {
     labelName?: string,
     boldLabel?: boolean,
     semiBold?: boolean,
-    onFocus: () => void,
-    onBlur: () => void,
+    onFocus?: () => void,
+    onBlur?: () => void,
     disabled?: boolean,
     isWrong?: boolean,
     errorMessage?: string
 }
 
+export interface CustomTextInputRefType {
+    getValue: () => string
+}
 
-export const TextInputCustom: FC<TextInputCustomProps> = forwardRef(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, ...props }, ref) => {
+
+export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage}, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
@@ -50,7 +54,7 @@ export const TextInputCustom: FC<TextInputCustomProps> = forwardRef(({ startingV
             : null}
             
             <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
-                <TextInput {...props} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
+                <TextInput editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
                     
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
@@ -67,7 +71,7 @@ export const TextInputCustom: FC<TextInputCustomProps> = forwardRef(({ startingV
     )
 })
 
-export const BottomTextInputCustom: FC<TextInputCustomProps> = forwardRef(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, ...props }, ref) => {
+export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage }, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
@@ -100,7 +104,7 @@ export const BottomTextInputCustom: FC<TextInputCustomProps> = forwardRef(({ sta
             
             <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
                 <BottomSheetTextInput
-                    {...props} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
+                    editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
                     
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
@@ -118,7 +122,7 @@ export const BottomTextInputCustom: FC<TextInputCustomProps> = forwardRef(({ sta
 })
 
 
-export const PasswordInputCustom: FC<TextInputCustomProps> = forwardRef(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, ...props }, ref) => {
+export const PasswordInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage }, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState(false)
 
@@ -159,7 +163,7 @@ export const PasswordInputCustom: FC<TextInputCustomProps> = forwardRef(({ start
             : null}
 
             <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
-                <TextInput {...props} value={value} onChangeText={handlePasswordChange}
+                <TextInput value={value} onChangeText={handlePasswordChange}
                     secureTextEntry={!isPasswordHidden} 
                     editable={!disabled}
                     placeholderTextColor={fontGray} 
@@ -184,13 +188,13 @@ interface SearchBarCustomProps {
     startingValue?: string,
     labelName?: string,
     boldLabel?: string,
-    onFocus: () => void,
-    onBlur: () => void,
+    onFocus?: () => void,
+    onBlur?: () => void,
     disabled?: boolean,
+    placeholder?: string
 }
 
-
-export const SearchBarCustom: FC<SearchBarCustomProps> = forwardRef(({ onChangeText, startingValue, labelName, boldLabel, onFocus, disabled, onBlur, ...props }, ref) => {
+export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCustomProps>(({ onChangeText, startingValue, labelName, boldLabel, onFocus, disabled, onBlur, placeholder }, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
@@ -205,9 +209,12 @@ export const SearchBarCustom: FC<SearchBarCustomProps> = forwardRef(({ onChangeT
     const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : "transparent"
 
     const [value, setValue] = useState<string>(startingValue ? startingValue : "");
+    const getValue = () => {
+        return value;
+    };
 
     useImperativeHandle(ref, () => ({
-        getValue: () => value,
+        getValue,
     }));
 
     const handleChangeText = (text: string) => {
@@ -223,7 +230,7 @@ export const SearchBarCustom: FC<SearchBarCustomProps> = forwardRef(({ onChangeT
 
                 <Icon name={"search"} provider={IconProvider.Feather} size={20} color={fontGray}/>
 
-                <TextInput {...props} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
+                <TextInput placeholder={placeholder ?? ""} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={handleChangeText} autoCorrect={false}
                     
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}

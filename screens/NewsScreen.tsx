@@ -1,4 +1,4 @@
-import {FlatList, StyleSheet, Image, View} from 'react-native';
+import {FlatList, StyleSheet, Image, View, TextInput} from 'react-native';
 import { UsualScreen } from '../components/View/Views';
 import { HugeText, NormalText } from '../styles/StyledText';
 import { BorderTextButton } from '../components/Buttons/UsualButton';
@@ -7,7 +7,7 @@ import { useContext, useRef, useState } from 'react';
 import { Database_getAllUsers } from '../firebase/Database_User_Primitives';
 import { useEffect } from 'react';
 import ProfilItem from '../components/Profil/ProfilItem';
-import { SearchBarCustom } from '../components/TextFields/TextInput'
+import { CustomTextInputRefType, SearchBarCustom } from '../components/TextFields/TextInput'
 import { AppContext } from '../data/AppContext';
 import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { User } from 'firebase/auth';
@@ -20,7 +20,7 @@ const NewsScreen = () => {
     const [users, setUsers] = useState<User[]>([])
     const [searchValue, setSearchValue] = useState("")
 
-    const searchValueRef = useRef(null)
+    const searchValueRef = useRef<CustomTextInputRefType>(null)
 
     const {setIsLoading} = useContext(AppContext)
 

@@ -1,5 +1,7 @@
+import { FrequencyTypes } from "./HabitTypes";
+
 export interface PeriodeType {
-    frequency: string,
+    frequency: FrequencyTypes,
     displayedText: string,
     nbElements: number
 }

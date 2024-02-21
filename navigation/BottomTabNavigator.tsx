@@ -32,8 +32,15 @@ import ValidationScreenObjectif from '../screens/AddScreen/Objectif/ValidationSc
 import React from 'react';
 import { AntDesignName, FeatherIconName } from '../components/Buttons/IconButtons';
 import { FrequencyTypes } from '../types/HabitTypes';
+import { User } from 'firebase/auth';
 
-const BottomTab = createBottomTabNavigator();
+export type BottomTabParamList = {
+  Home: undefined;
+  Add: undefined;
+  Notifs: undefined;
+};
+
+const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 const hideStyle = {display: 'none'}
 
 function BottomTabNavigator() {
@@ -42,7 +49,7 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
-      initialRouteName="HomeScreen"
+      initialRouteName="Home"
       screenOptions={{ tabBarStyle: bottomMenuStyle, tabBarInactiveTintColor: fontGray, tabBarActiveTintColor: "white",
         tabBarHideOnKeyboard: false, headerShown: false, tabBarShowLabel: false}}>
 
@@ -141,13 +148,15 @@ function HomeNavigator() {
   );
 }
 
-export type AddScreenStackType {
+export type AddScreenStackType  = {
+  Home: undefined,
   PreAddScreen: undefined,
 
   AddBasicDetails: undefined,
   ChooseColorScreen: undefined,
   ChooseIconScreen: undefined,
   AddHabitSteps: undefined,
+  CreateHabitDetails: undefined,
   ValidationScreenHabit: undefined,
 
   AddBasicDetailsObjectif: undefined,
@@ -186,13 +195,20 @@ function AddScreenNavigator() {
   );
 }
 
-const NewsScreenStack = createNativeStackNavigator();
+export type NewsScreenStackType = {
+  NewsScreen: undefined,
+  UserDetailsScreen: {
+    detailledUser: User
+  }
+}
+
+const NewsScreenStack = createNativeStackNavigator<NewsScreenStackType>();
 
 function NewsScreenNavigator() {
   return (
     <NewsScreenStack.Navigator screenOptions={{ headerShown: false }}>
       <NewsScreenStack.Screen name="NewsScreen" component={NewsScreen}/>   
-      <NewsScreenStack.Screen name="UserDetailsScreen" component={UserDetailsScreen} options={{}}/>
+      <NewsScreenStack.Screen name="UserDetailsScreen" component={UserDetailsScreen}/>
     </NewsScreenStack.Navigator>
   );
 }

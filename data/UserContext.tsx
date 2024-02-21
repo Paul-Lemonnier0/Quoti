@@ -22,7 +22,6 @@ export interface UserContextType {
 const UserContext = createContext<UserContextType>({
     user: null,
     setUser: () => {}
-    // setUser: (user: React.SetStateAction<UserType>) => {}
 })
 
 interface UserContextProviderProps {
@@ -119,8 +118,8 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
         }
 
         handleLoadProfilPicture()
-        subscribeToFriendRequests(user.email, setUserFriendRequest)
-        subscribeToFriends(user.email, setUserFriends)
+        subscribeToFriendRequests(user.email ?? "", setUserFriendRequest)
+        subscribeToFriends(user.email ?? "", setUserFriends)
     }, [])
 
     return(

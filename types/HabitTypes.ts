@@ -4,6 +4,8 @@ export enum FrequencyTypes {
     Mensuel = "Mensuel",
 }
 
+
+
 export interface StreakValues {
     currentStreak: number,
     lastCompletionDate: string,
@@ -75,22 +77,17 @@ interface StepList {
     [stepID: string]: Step
 }
 
-interface FilteredHabitsType {
-    Quotidien: {
-        Habitudes?: HabitList,
-        Objectifs?: ObjectifList,
-    }
-
-    Hebdo: {
-        Habitudes?: HabitList,
-        Objectifs?: ObjectifList,
-    }
-
-    Mensuel: {
-        Habitudes?: HabitList,
-        Objectifs?: ObjectifList,
-    }
+interface HabitOrObjectif {
+    Habitudes?: HabitList;
+    Objectifs?: ObjectifList;
 }
+
+interface FilteredHabitsType {
+    [FrequencyTypes.Quotidien]: HabitOrObjectif;
+    [FrequencyTypes.Hebdo]: HabitOrObjectif;
+    [FrequencyTypes.Mensuel]: HabitOrObjectif;
+}
+
 
 export {
     Objectif, 

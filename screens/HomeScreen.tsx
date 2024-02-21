@@ -1,7 +1,6 @@
 import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
 import { StyleSheet, View} from 'react-native';
 import { HugeText, SubTitleGrayText, NormalText, TitleText } from '../styles/StyledText';
-import { ProfilButton } from '../components/Profil/ProfilButton';
 import { CustomScrollView, UsualScreen } from '../components/View/Views';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
@@ -14,7 +13,7 @@ import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Pe
 import { DisplayHabitsScreen, DisplayObjectifsScreen, RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
 import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { PeriodeType } from '../types/HomeScreenTypes';
-import { HabitType } from '../types/HabitTypes';
+import { FrequencyTypes, Habit } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 
 const HomeScreen = () => {
@@ -34,12 +33,16 @@ const HomeScreen = () => {
       const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
 
       const objectifWithID_Semi = await addObjectif(obj_hab_SemiMarathon["objectif"]) 
-      const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
-      await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
+      if(objectifWithID_Semi?.objectifID){
+        const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
+        await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
+      }
 
       const objectifWithID_BienEtre = await addObjectif(obj_hab_BienEtre["objectif"]) 
-      const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
-      await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
+      if(objectifWithID_BienEtre?.objectifID){
+        const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
+        await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
+      }
 
       await Promise.all(habitsPlaceholder.map(addHabit));
 
@@ -52,34 +55,33 @@ const HomeScreen = () => {
     }
   }
 
-  const [displayedHabits, setDisplayedHabits] = useState<HabitType[]>([])
+  const [displayedHabits, setDisplayedHabits] = useState<Habit[]>([])
   const [displayedObjectifs, setDisplayedObjectifs] = useState<string[]>([])
-  const [selectedPeriode, setSelectedPeriode] = useState<string>("Quotidien")
+  const [selectedPeriode, setSelectedPeriode] = useState<FrequencyTypes>(FrequencyTypes.Quotidien)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
   const initialPeriodes: PeriodeType[] = [
-    { frequency: "Quotidien", displayedText: "Jour", nbElements: 0 }, 
-    { frequency: "Hebdo", displayedText: "Semaine", nbElements: 0 }, 
-    { frequency: "Mensuel", displayedText: "Mois", nbElements: 0 }
+    { frequency: FrequencyTypes.Quotidien, displayedText: "Jour", nbElements: 0 }, 
+    { frequency: FrequencyTypes.Hebdo, displayedText: "Semaine", nbElements: 0 }, 
+    { frequency: FrequencyTypes.Mensuel, displayedText: "Mois", nbElements: 0 }
   ]
 
-  const [periodes, setPeriodes] = useState<(string|PeriodeType)[]>(["Calendar", ...initialPeriodes]) 
+  const [periodes, setPeriodes] = useState<("Calendar" | PeriodeType)[]>(["Calendar", ...initialPeriodes]) 
 
   useEffect(() =>{
     //console.warn("filteredHabitByDate Refreshed");
 
-    const updatedPeriodes = initialPeriodes.map(initPeriode => {
-
-      const nbElements = Object.keys(filteredHabitsByDate[initPeriode.frequency]["Habitudes"]).length + 
-      Object.keys(filteredHabitsByDate[initPeriode.frequency]["Objectifs"]).length
+    const updatedPeriodes = initialPeriodes.map(initPeriode => {      
+      const nbElements = Object.keys(filteredHabitsByDate[initPeriode.frequency].Habitudes ?? {}).length +
+      Object.keys(filteredHabitsByDate[initPeriode.frequency].Objectifs ?? {}).length
 
       return({ ...initPeriode, nbElements })
     })
 
     setPeriodes(["Calendar", ...updatedPeriodes])
 
-    setDisplayedHabits(Object.values(filteredHabitsByDate[selectedPeriode]["Habitudes"]))
-    setDisplayedObjectifs(Object.keys(filteredHabitsByDate[selectedPeriode]["Objectifs"]))
+    setDisplayedHabits(Object.values(filteredHabitsByDate[selectedPeriode].Habitudes ?? {}))
+    setDisplayedObjectifs(Object.keys(filteredHabitsByDate[selectedPeriode].Objectifs ?? {}))
         
   }, [filteredHabitsByDate, selectedDate])
 
@@ -89,8 +91,8 @@ const HomeScreen = () => {
       setSelectedPeriode(newPeriode.frequency)
       const data = filteredHabitsByDate[newPeriode.frequency]
 
-      setDisplayedHabits(Object.values(data["Habitudes"]))
-      setDisplayedObjectifs(Object.keys(data["Objectifs"]))
+      setDisplayedHabits(Object.values(data.Habitudes ?? {}))
+      setDisplayedObjectifs(Object.keys(data.Objectifs ?? {}))
     }
 
     setSelectedPeriode(newPeriode.frequency)
@@ -142,7 +144,6 @@ const HomeScreen = () => {
 
                 <IconButton name={"plus"} provider={IconProvider.Feather} onPress={handleAddHabitsPlaceholder}/>
 
-                <ProfilButton/>
             </View>
 
             <Periodes 

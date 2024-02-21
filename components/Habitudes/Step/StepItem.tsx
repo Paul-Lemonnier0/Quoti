@@ -10,7 +10,7 @@ import { FC } from "react"
 
 interface StepItemProps {
     step: Step,
-    onPress(step: Step, index: number): void,
+    onPress(): void,
     color: string,
     index: number,
     isNextToBeChecked: boolean,

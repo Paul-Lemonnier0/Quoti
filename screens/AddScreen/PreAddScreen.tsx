@@ -12,20 +12,23 @@ import { BackgroundTextButton } from "../../components/Buttons/UsualButton"
 import { RadioButtonsBar } from "../../components/RadioButtons/RadioButtonsBar"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AddScreenStackType } from "../../navigation/BottomTabNavigator"
+import IllustrationsList from "../../data/IllustrationsList"
 
 type PreAddScreenProps = NativeStackScreenProps<AddScreenStackType, "PreAddScreen">
 
 export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
 
-    const [selectedItem, setSelectedItem] = useState("AddBasicDetails")
+    const [selectedItem, setSelectedItem] = useState<string>("AddBasicDetails")
     const [totalSteps, setTotalSteps] = useState(6)
 
-    const radios = [
+    type RadioType = { key: string, text: string }
+
+    const radios: RadioType[] = [
         {key: "AddBasicDetails", text: "Habitude" },
         {key: "AddBasicDetailsObjectif", text: "Objectif"},
     ];
 
-    const handleSetSelectedItem = (item) => {
+    const handleSetSelectedItem = (item: string) => {
         setSelectedItem(item)
 
         if(item === "AddBasicDetails"){
@@ -33,12 +36,17 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
         }
 
         else setTotalSteps(5)
-
     }
 
-    const handleClose = () => navigation.navigate("Home")
-    const handleGoNext = () => navigation.navigate(selectedItem)
+    const handleClose = () => {
+        navigation.navigate("Home")
+    }
 
+    const handleGoNext = () => {
+        if (selectedItem === "AddBasicDetails" || selectedItem === "AddBasicDetailsObjectif") {
+            navigation.navigate(selectedItem);
+        }
+    }
     return(
         <UsualScreen hideMenu>
             <View style={styles.container}>

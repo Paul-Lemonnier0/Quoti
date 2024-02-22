@@ -7,33 +7,43 @@ import StepIndicator from "../Other/StepIndicator"
 import { HugeText } from "../../styles/StyledText"
 import { NavigationButton } from "../Buttons/IconButtons"
 import { UsualScreen } from "../View/Views"
-import { getAddHabitStepsDetails } from "../../constants/BasicConstants"
-import { useCallback, useMemo, useRef, useState } from "react"
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants"
+import { FC, useCallback, useMemo, useRef, useState } from "react"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useThemeColor } from "../Themed"
 import { ColorsList } from "../../data/ColorsList"
+import { FormBasicHabit, FormColoredHabit, FormColoredHabitValues } from "../../types/FormHabitTypes"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import { SeriazableHabit } from "../../types/HabitTypes"
 
-export default ChooseColorForm = ({
+interface ChooseColorFormProps {
+    isForModifyingHabit?: boolean,
+    habit: FormBasicHabit | SeriazableHabit,
+    handleGoNext: (coloredHabit: FormColoredHabitValues) => void,
+}
+
+const ChooseColorForm: FC<ChooseColorFormProps> = ({
     isForModifyingHabit,
     habit,
     handleGoNext,
 }) => {
 
     const font = useThemeColor({}, "Font")
+    const baseColor = 'color' in habit ? (habit as SeriazableHabit).color : ColorsList[0];
 
-    const [selectedColor, setSelectedColor] = useState(habit?.color ?? ColorsList[0])
+    const [selectedColor, setSelectedColor] = useState<string>(baseColor)
 
     const handleValidation = () => {
         handleGoNext({color: selectedColor})
     }
 
-    const bottomSheetModalRef_CustomColor = useRef(null);
+    const bottomSheetModalRef_CustomColor = useRef<BottomSheetModal>(null);
     const handleOpenCustomColor = useCallback(() => {
         bottomSheetModalRef_CustomColor.current?.present();
       }, []);
   
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID, "ChooseColorScreen")
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit?.objectifID ?? null, AddHabitScreenType.ChooseColorScreen)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
@@ -142,3 +152,5 @@ const styles = StyleSheet.create({
 
     }
 })
+
+export default ChooseColorForm

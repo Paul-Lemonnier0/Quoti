@@ -1,34 +1,34 @@
 import { View } from "react-native"
-import { useContext } from "react"
+import { FC, useContext } from "react"
 import { BottomSheetModalMethodsContext, BottomSheetModalMethodsContextProvider } from "../../data/BottomSheetModalContext"
 import { useRef } from "react"
 import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen"
 import { FlatList } from "react-native"
 import ObjectifBlock from "./ObjectifBlock"
 import { HabitsContext } from "../../data/HabitContext"
+import { InnerLogicObjectifType } from "../ScreenComponents/HomeScreenComponents/NotEmptyScreen"
+import { Step } from "../../types/HabitTypes"
 
-export default ObjectifsList = ({objectifs, selectedDate}) => {
+interface ObjectifListProps {
+    objectifs: InnerLogicObjectifType[],
+}
 
-    const currentDateString = selectedDate.toDateString()
+const ObjectifsList: FC<ObjectifListProps> = ({objectifs}) => {
 
     const {filteredHabitsByDate} = useContext(HabitsContext)
 
-    let doneObjectifs = []
-
-    if(!objectifs){
-        return null;
-    }
+    let doneObjectifs: InnerLogicObjectifType[] = []
 
     if(objectifs){
         
         doneObjectifs = objectifs.filter(objectif => {
-            let steps = []
+            let steps: Step[] = []
 
-            if(!filteredHabitsByDate[objectif.frequency]["Objectifs"].hasOwnProperty(objectif.objectifID)){
+            if(!filteredHabitsByDate[objectif.frequency]?.Objectifs?.hasOwnProperty(objectif.objectifID)){
                 return false
             }
 
-            const habits = Object.values(filteredHabitsByDate[objectif.frequency]["Objectifs"][objectif.objectifID])
+            const habits = Object.values(filteredHabitsByDate[objectif.frequency]?.Objectifs?.[objectif.objectifID] ?? {})
             for(const habit of habits){
                 steps = steps.concat(Object.values(habit.steps))
 
@@ -48,8 +48,7 @@ export default ObjectifsList = ({objectifs, selectedDate}) => {
         const frequency = item.frequency
 
         return (
-            <ObjectifBlock key={objectifID} objectifID={objectifID} frequency={frequency} index={index}
-                currentDateString={currentDateString}/>
+            <ObjectifBlock key={objectifID} objectifID={objectifID} frequency={frequency} index={index}/>
         )
     }
 
@@ -64,3 +63,5 @@ export default ObjectifsList = ({objectifs, selectedDate}) => {
         />
     )
 }
+
+export default ObjectifsList

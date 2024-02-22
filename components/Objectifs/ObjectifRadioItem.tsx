@@ -9,7 +9,7 @@ import { FC } from "react"
 interface ObjectifRadioItem {
     objectif: Objectif,
     isSelected: boolean,
-    onPress?: () => {},
+    onPress?: () => void,
     backgroundColor?: string, 
     borderColor?: string
 }

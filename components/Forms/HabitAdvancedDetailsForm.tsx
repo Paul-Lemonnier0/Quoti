@@ -8,27 +8,49 @@ import Separator from "../Other/Separator";
 import StepIndicator from "../Other/StepIndicator";
 import { NavigationButton } from "../Buttons/IconButtons";
 import { UsualScreen } from "../View/Views";
-import { getAddHabitStepsDetails } from "../../constants/BasicConstants";
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import { getSeriazableHabit } from "../../primitives/HabitMethods";
-import { useContext, useState } from "react";
+import { FC, useContext, useState } from "react";
 import { HabitsContext } from "../../data/HabitContext";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { FormDetailledHabitValues, FormIconedHabit, FormStepsHabit } from "../../types/FormHabitTypes";
+import { FrequencyTypes, SeriazableHabit } from "../../types/HabitTypes";
 
-export default HabitAdvancedDetailsForm = ({
+interface HabitAdvancedDetailsFormProps {
+    isForModifyingHabit?: boolean,
+    habit: FormStepsHabit | SeriazableHabit,
+    handleGoNext: (detailledHabit: FormDetailledHabitValues) => void
+}
+
+const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     isForModifyingHabit,
     habit,
     handleGoNext,
 }) => {
 
+    interface FrequenciesCustomType {
+        key: FrequencyTypes,
+        suffixe: string
+    }
 
-    const frequencies = [{key: "Quotidien", suffixe: "jours"}, {key: "Hebdo", suffixe: "sem."}, {key: "Mensuel", suffixe: "mois"}]
+    const frequencies: FrequenciesCustomType[]  = [
+        {key: FrequencyTypes.Quotidien, suffixe: "jours"}, 
+        {key: FrequencyTypes.Hebdo, suffixe: "sem."}, 
+        {key: FrequencyTypes.Mensuel, suffixe: "mois"}
+    ]
     
-    const frequency_default = habit?.frequency ? frequencies.filter((freq) => freq.key === habit.frequency)[0] : frequencies[0]
+    const frequency_default = "frequency" in habit ? frequencies.filter((freq) => freq.key === (habit as SeriazableHabit).frequency)[0] : frequencies[0]
 
-    const [selectedDays, setSelectedDays] = useState(habit?.daysOfWeek ?? []);
-    const [selectedFrequency, setSelectedFrequency] = useState(frequency_default)
-    const [occurences, setOccurences] = useState(habit?.occurence ?? 1)
-    const [reccurence, setReccurence] = useState(habit?.reccurence ?? 1)
+    const baseDaysOfWeek = "daysOfWeek" in habit ? (habit as SeriazableHabit).daysOfWeek ?? [] : []
+    const [selectedDays, setSelectedDays] = useState<number[]>(baseDaysOfWeek);
+
+    const [selectedFrequency, setSelectedFrequency] = useState<FrequenciesCustomType>(frequency_default)
+    
+    const baseOccurence = "occurence" in habit ? (habit as SeriazableHabit).occurence ?? 1 : 1
+    const [occurences, setOccurences] = useState<number>(baseOccurence)
+
+    const baseReccurence = "reccurence" in habit ? (habit as SeriazableHabit).reccurence ?? 1 : 1
+    const [reccurence, setReccurence] = useState<number>(baseReccurence)
 
     const handleValidation = async() => {
 
@@ -44,7 +66,7 @@ export default HabitAdvancedDetailsForm = ({
           handleGoNext(newValues)
     }
 
-    const handleSelectDay = (dayIndex) => {
+    const handleSelectDay = (dayIndex: number) => {
         if(selectedDays.includes(dayIndex)){
             const indexOfElement = selectedDays.indexOf(dayIndex)
             setSelectedDays(previousSelectedDays => previousSelectedDays.filter(day => day !== dayIndex))
@@ -54,7 +76,7 @@ export default HabitAdvancedDetailsForm = ({
         else setSelectedDays(previousSelectedDays => [...previousSelectedDays, dayIndex])
       };
 
-    const handleChangeFrequency = (frequency) => {
+    const handleChangeFrequency = (frequency: FrequenciesCustomType) => {
         setSelectedFrequency(frequency)
     } 
 
@@ -66,7 +88,7 @@ export default HabitAdvancedDetailsForm = ({
 
     else isRecurrenceIncrementBorderHidden = reccurence === 1
 
-    const handleSetReccurence = (rec) => {
+    const handleSetReccurence = (rec: number) => {
         if(selectedFrequency.key === "Quotidien"){
             setSelectedDays([])
         }
@@ -74,7 +96,7 @@ export default HabitAdvancedDetailsForm = ({
         setReccurence(rec)
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID, "CreateHabitDetails")
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID ?? null, AddHabitScreenType.CreateHabitDetails)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
@@ -126,7 +148,7 @@ export default HabitAdvancedDetailsForm = ({
                                     <SelectWeekDays selectedDays={selectedDays} handleSelectDay={handleSelectDay}/> :
 
                                     <BorderRadioButton hideInactiveBorder isHighlight={reccurence === 1} handleOnClick={() => setReccurence(1)}
-                                        text={selectedFrequency.key === "Mois" ? "Tous les mois" : "Toutes les semaines"} />
+                                        text={selectedFrequency.key === FrequencyTypes.Mensuel ? "Tous les mois" : "Toutes les semaines"} />
                             }
                         </View>
 
@@ -211,3 +233,5 @@ const styles = StyleSheet.create({
     footer: {
     }
 })
+
+export default HabitAdvancedDetailsForm

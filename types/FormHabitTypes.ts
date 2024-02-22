@@ -1,13 +1,14 @@
-import { FrequencyTypes } from "./HabitTypes"
+import { FrequencyTypes, Step } from "./HabitTypes"
 
 interface FormPlaceholderStep {
-    numero: number
+    numero: number,
 }
 
 interface FormFullStep extends FormPlaceholderStep {
     titre: string,
     description: string,
     duration: number | undefined,
+    stepID: string
 }
 
 type FormStep = FormPlaceholderStep | FormFullStep
@@ -16,23 +17,21 @@ interface FormBasicHabit {
     titre: string,
     description: string,
     objectifID: string | undefined,
-    startingDate?: string,
-    endingDate?: string,
 }
 
-interface FormColoredHabit extends FormBasicHabit {
+export interface FormColoredHabitValues {
     color: string
 }
 
-interface FormIconedHabit extends FormColoredHabit {
+export interface FormIconedHabitValues {
     icon: string
 }
 
-interface FormStepsHabit extends FormIconedHabit {
-    steps: FormStep[]
+export interface FormStepsHabitValues {
+    steps: (FormStep | Step)[]
 }
 
-interface FormDetailledHabit extends FormStepsHabit {
+export interface FormDetailledHabitValues {
     frequency: FrequencyTypes,
     occurence: number,
     reccurence: number,
@@ -40,6 +39,11 @@ interface FormDetailledHabit extends FormStepsHabit {
     notificationEnabled: boolean,
     alertTime: string
 }
+
+interface FormColoredHabit extends FormBasicHabit, FormColoredHabitValues {}
+interface FormIconedHabit extends FormColoredHabit, FormIconedHabitValues {}
+interface FormStepsHabit extends FormIconedHabit, FormStepsHabitValues {}
+interface FormDetailledHabit extends FormStepsHabit, FormDetailledHabitValues {}
 
 export {
     FormPlaceholderStep,

@@ -10,7 +10,7 @@ import {  getMonthString, shortDateStringFormat, shortWeekStringFormat } from '.
 import SelectDateBottomScreen from './BottomScreens/SelectDateBottomScreen';
 import { NothingToDoScreen } from '../components/ScreenComponents/HomeScreenComponents/EmptyScreens';
 import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Periodes';
-import { DisplayHabitsScreen, DisplayObjectifsScreen, RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
+import { RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
 import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { PeriodeType } from '../types/HomeScreenTypes';
 import { FrequencyTypes, Habit } from '../types/HabitTypes';
@@ -165,8 +165,8 @@ const HomeScreen = () => {
               
               <CustomScrollView>
                 <View style={styles.subBody}>
-                  <RenderObjectifs objectifs={displayedObjectifs} selectedDate={selectedDate} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched}/>
-                  <RenderHabits habits={displayedHabits} selectedDate={selectedDate} isLoading={isLoading} isFetched={isFetched}/>
+                  <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched}/>
+                  <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched}/>
                 </View>
               </CustomScrollView>
             }

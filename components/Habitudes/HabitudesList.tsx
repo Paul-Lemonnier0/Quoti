@@ -1,20 +1,13 @@
-import { View } from "react-native"
 import { HabitudeListItem } from "./HabitudeListItem"
-import { FC, useContext } from "react"
-import { BottomSheetModalMethodsContext, BottomSheetModalMethodsContextProvider } from "../../data/BottomSheetModalContext"
-import { useRef } from "react"
-import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen"
+import { FC } from "react"
 import Animated from "react-native-reanimated"
 import { Habit } from "../../types/HabitTypes"
 
 interface HabitudesListProps {
   habits: Habit[],
-  selectedDate: Date
 }
 
-const HabitudesList: FC<HabitudesListProps> = ({habits, selectedDate}) => {
-
-    const currentDateString = selectedDate.toDateString()
+const HabitudesList: FC<HabitudesListProps> = ({habits}) => {
 
     const doneHabits = habits.filter(habit => {
       const steps = Object.values(habit.steps)
@@ -31,11 +24,8 @@ const HabitudesList: FC<HabitudesListProps> = ({habits, selectedDate}) => {
     return(
           <Animated.View style={{gap: 20, paddingBottom: 20}}>
             {
-              sortedHabits.map((habit, index) => {
-                  return(
-                      <HabitudeListItem habitude={habit} key={habit.habitID} index={index}
-                            currentDateString={currentDateString}/>
-                  )}
+              sortedHabits.map((habit, index) => 
+                  <HabitudeListItem habitude={habit} key={habit.habitID} index={index}/>
               )
             }
           </Animated.View>

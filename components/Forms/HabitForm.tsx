@@ -2,17 +2,28 @@ import { View } from "react-native"
 import { TextButton } from "../Buttons/UsualButton"
 import { HugeText, SubTitleText } from "../../styles/StyledText"
 import Separator from "../Other/Separator"
-import { TextInputCustom } from "../TextFields/TextInput"
+import { CustomTextInputRefType, TextInputCustom } from "../TextFields/TextInput"
 import { CustomScrollView, UsualScreen } from "../View/Views"
 import StepIndicator from "../Other/StepIndicator"
 import { NavigationButton } from "../Buttons/IconButtons"
 import { StyleSheet } from "react-native"
-import { useContext, useRef, useState } from "react"
-import { getAddHabitStepsDetails } from "../../constants/BasicConstants"
+import { FC, useContext, useRef, useState } from "react"
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants"
 import ObjectifRadioItem from "../Objectifs/ObjectifRadioItem"
 import { HabitsContext } from "../../data/HabitContext"
+import { Objectif, SeriazableHabit } from "../../types/HabitTypes"
+import { FormBasicHabit } from "../../types/FormHabitTypes"
 
-export default HabitForm = ({
+interface HabitFormProps {
+    isForModifyingHabit?: boolean,
+    isForCreateObjectiveHabit?: boolean,
+    closeModal?: () => void,
+    baseHabit?: SeriazableHabit,
+    handleGoNext: (basicHabit: FormBasicHabit | SeriazableHabit) => void,
+    currentStep?: number
+}
+
+const HabitForm: FC<HabitFormProps> = ({
     isForModifyingHabit,
     isForCreateObjectiveHabit,
     closeModal,
@@ -23,18 +34,18 @@ export default HabitForm = ({
 
     const {Objectifs} = useContext(HabitsContext)
 
-    const titreRef = useRef(null)
-    const descriptionRef = useRef(null)
+    const titreRef = useRef<CustomTextInputRefType>(null)
+    const descriptionRef = useRef<CustomTextInputRefType>(null)
 
-    const [isTitleWrong, setIsTitleWrong] = useState(false)
-    const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
+    const [isTitleWrong, setIsTitleWrong] = useState<boolean>(false)
+    const [isDescriptionWrong, setIsDescriptionWrong] = useState<boolean>(false)
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, "AddBasicDetails")
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, AddHabitScreenType.AddBasicDetails)
 
     const [totalSteps, setTotalSteps] = useState(isForCreateObjectiveHabit ? 2 : CURRENT_STEP_DETAILS.TOTAL_STEPS)
 
-    const [displayedObjectifs, setDisplayedObjectifs] = useState(Object.values(Objectifs))
-    const [selectedObjectif, setSelectedObjectif] = useState(isForModifyingHabit && baseHabit.objectifID ? baseHabit.objectifID : null)
+    const [displayedObjectifs, setDisplayedObjectifs] = useState<Objectif[]>(Object.values(Objectifs))
+    const [selectedObjectif, setSelectedObjectif] = useState<string | undefined>(isForModifyingHabit && baseHabit?.objectifID ? baseHabit.objectifID : undefined)
 
 
 
@@ -42,7 +53,7 @@ export default HabitForm = ({
         const onPress = () => {
 
             if(!isForModifyingHabit){
-                const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(item.objectifID, "AddBasicDetails")
+                const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(item.objectifID, AddHabitScreenType.AddBasicDetails)
                         
                 if(!isForCreateObjectiveHabit){
                     setTotalSteps(CURRENT_STEP_DETAILS.TOTAL_STEPS)
@@ -53,16 +64,16 @@ export default HabitForm = ({
         }
 
         return (
-            <ObjectifRadioItem onPress={onPress}objectif={item} 
+            <ObjectifRadioItem onPress={onPress} objectif={item} 
                         isSelected={selectedObjectif === item.objectifID}/>
         )
     }
 
     const handleDissocier = () => {
-        const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, "AddBasicDetails")
+        const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, AddHabitScreenType.AddBasicDetails)
         setTotalSteps(CURRENT_STEP_DETAILS.TOTAL_STEPS)
 
-        setSelectedObjectif(null)
+        setSelectedObjectif(undefined)
     }
 
     const handleValidation = () => {
@@ -70,25 +81,26 @@ export default HabitForm = ({
 
         const titre = titreRef.current?.getValue();
         const description = descriptionRef.current?.getValue();
+        if(titre && description){
+            if(titre.trim().length === 0 || description.trim().length === 0)
+            {
+                description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
+                titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
+    
+                canGoNext = false
+            }
+    
+            else {
+                setIsTitleWrong(false)
+                setIsDescriptionWrong(false)
+            }
+    
+            if(canGoNext) 
+            {
+                const newValues: FormBasicHabit = {titre, description, objectifID: selectedObjectif}
 
-        if(titre.trim().length === 0 || description.trim().length === 0) 
-        {
-            description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-            titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
-
-            canGoNext = false
-        }
-
-        else {
-            setIsTitleWrong(false)
-            setIsDescriptionWrong(false)
-        }
-
-        if(canGoNext) 
-        {
-            const newValues = {titre, description, objectifID: selectedObjectif}
-
-            handleGoNext(newValues)
+                handleGoNext(newValues)
+            }
         }
     }
 
@@ -97,7 +109,7 @@ export default HabitForm = ({
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        {isForCreateObjectiveHabit || isForModifyingHabit ?
+                        {(isForCreateObjectiveHabit || isForModifyingHabit) && closeModal ?
                             <NavigationButton noPadding methode={closeModal} action={"close"}/>
                             :
                             <NavigationButton noPadding action={"goBack"}/>
@@ -180,3 +192,5 @@ const styles = StyleSheet.create({
     footer: {
     }
 })
+
+export default HabitForm

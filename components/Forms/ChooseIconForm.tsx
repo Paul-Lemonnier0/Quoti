@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { getAddHabitStepsDetails } from "../../constants/BasicConstants";
+import { FC, useState } from "react";
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import HabitIcons from "../../data/HabitIcons";
 import { splitArrayIntoChunks } from "../../primitives/BasicsMethods";
 import { useThemeColor } from "../Themed";
@@ -9,8 +9,16 @@ import { NavigationButton } from "../Buttons/IconButtons";
 import { HugeText } from "../../styles/StyledText";
 import StepIndicator from "../Other/StepIndicator";
 import { CustomCarousel } from "../Carousel/CustomCarousel";
+import { FormColoredHabit, FormIconedHabitValues } from "../../types/FormHabitTypes";
+import { SeriazableHabit } from "../../types/HabitTypes";
 
-export default ChooseIconForm = ({
+interface ChooseIconFormProps {
+    isForModifyingHabit?: boolean,
+    habit: FormColoredHabit | SeriazableHabit,
+    handleGoNext: (iconedHabit: FormIconedHabitValues) => void,
+}
+
+const ChooseIconForm: FC<ChooseIconFormProps> = ({
     isForModifyingHabit,
     habit,
     handleGoNext,
@@ -19,17 +27,24 @@ export default ChooseIconForm = ({
     const secondary = useThemeColor({}, "Secondary")
     const font = useThemeColor({}, "Font")
 
-    const habitsIconsData = Object.keys(HabitIcons).map((key) => ({id: key, icon: HabitIcons[key], title: key}));
+    interface IconType {
+        id: string,
+        icon: string,
+        title: string
+    }
+
+    const habitsIconsData: IconType[] = Object.keys(HabitIcons).map((key) => ({id: key, icon: HabitIcons[key], title: key}));
 
     const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 20);
-
-    const [selectedIcon, setSelectedIcon] = useState(habit?.icon ?? splitHabitsIconsData[0][0].id)
+    
+    const baseIcon = 'icon' in habit ? (habit as SeriazableHabit).icon : splitHabitsIconsData[0][0].id;
+    const [selectedIcon, setSelectedIcon] = useState<string>(baseIcon)
 
     const handleValidation = () => {
         handleGoNext({icon: selectedIcon})
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID, "ChooseIconScreen")
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
@@ -133,3 +148,5 @@ const styles = StyleSheet.create({
         flex:1
     }
 })
+
+export default ChooseIconForm

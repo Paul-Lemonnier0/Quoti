@@ -1,6 +1,6 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useMemo, useRef, useState } from "react";
 import { generateUniqueID } from "../../primitives/BasicsMethods";
-import { getAddHabitStepsDetails } from "../../constants/BasicConstants";
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import { Image, View } from "react-native";
 import { HugeText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText";
 import IllustrationsList from "../../data/IllustrationsList";
@@ -11,16 +11,30 @@ import StepIndicator from "../Other/StepIndicator";
 import { TextButton } from "../Buttons/UsualButton";
 import AddStepBottomScreen from "../../screens/BottomScreens/AddStepBottomScreen";
 import { StyleSheet } from "react-native";
+import { FormIconedHabit, FormStep, FormStepsHabitValues } from "../../types/FormHabitTypes";
+import { SeriazableHabit, Step } from "../../types/HabitTypes";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
-export default HabitStepsForm = ({
+interface HabitStepsForm {
+    isForModifyingHabit?: boolean,
+    habit: FormIconedHabit | SeriazableHabit,
+    handleGoNext: (coloredHabit: FormStepsHabitValues) => void,
+}
+
+const HabitStepsForm: FC<HabitStepsForm> = ({
     isForModifyingHabit,
     habit,
     handleGoNext,
 }) =>  {
 
-    const [steps, setSteps] = useState(habit?.steps ? Object.values(habit.steps)[0].stepID === habit.habitID ? [] : Object.values(habit.steps) : [])
+    const baseHabitID = "habitID" in habit ? (habit as SeriazableHabit).habitID : ""
+    const baseSteps = "steps" in habit ? Object.values((habit as SeriazableHabit).steps) : []
 
-    const bottomSheetModalRefAddStep = useRef(null);
+    const isStepPlaceholder = baseSteps.length === 1 && baseSteps[0].stepID === baseHabitID 
+
+    const [steps, setSteps] = useState<(FormStep | Step)[]>(isStepPlaceholder ? [] : baseSteps)
+
+    const bottomSheetModalRefAddStep = useRef<BottomSheetModal>(null);
 
     const handleOpenAddStep = useCallback(() => {
         bottomSheetModalRefAddStep.current?.present();
@@ -28,10 +42,12 @@ export default HabitStepsForm = ({
 
     const handleValidation = () => {
 
-        const newValues = {}
+        const newValues: FormStepsHabitValues = {
+            steps: []
+        }
 
         if(steps.length === 0){
-            newValues["steps"] = [{numero: -1}]
+            newValues.steps = [{numero: -1}]
         }
 
         else {
@@ -43,13 +59,13 @@ export default HabitStepsForm = ({
                 return {...step}
             })
 
-            newValues["steps"] = stepsWithID
+            newValues.steps = stepsWithID
         }
 
         handleGoNext(newValues)
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID, "AddHabitSteps")
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID ?? null, AddHabitScreenType.AddHabitSteps)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
@@ -172,3 +188,5 @@ const styles = StyleSheet.create({
         gap: 5
     },
 })
+
+export default HabitStepsForm

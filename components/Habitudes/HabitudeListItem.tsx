@@ -25,11 +25,10 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 interface HabitudeListItemProps {
     habitude: Habit,
-    currentDateString: string,
     index: number
 }
 
-export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, currentDateString, index}) => {
+export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index}) => {
     const primary = useThemeColor({}, "Primary")
     const stylesCard = cardStyle()
 

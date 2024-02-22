@@ -20,8 +20,6 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({route}) => {
         )
     }
 
-    const habit = Habits[habitID]
-
     return(
         <UsualScreen>
             <HugeText text={"Shared !"}/>

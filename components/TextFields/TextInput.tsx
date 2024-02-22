@@ -16,7 +16,8 @@ interface TextInputCustomProps {
     onBlur?: () => void,
     disabled?: boolean,
     isWrong?: boolean,
-    errorMessage?: string
+    errorMessage?: string,
+    placeholder?: string,
 }
 
 export interface CustomTextInputRefType {
@@ -24,7 +25,7 @@ export interface CustomTextInputRefType {
 }
 
 
-export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage}, ref) => {
+export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, placeholder}, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
@@ -54,7 +55,7 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
             : null}
             
             <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
-                <TextInput editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
+                <TextInput editable={!disabled} placeholder={placeholder ?? ""} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
                     
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
@@ -71,7 +72,7 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
     )
 })
 
-export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage }, ref) => {
+export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, placeholder }, ref) => {
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
@@ -104,6 +105,7 @@ export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInpu
             
             <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
                 <BottomSheetTextInput
+                    placeholder={placeholder}
                     editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
                     

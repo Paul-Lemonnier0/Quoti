@@ -1,12 +1,20 @@
 import { StyleSheet, Dimensions, View } from "react-native"
-import { useState } from "react"
+import { FC, ReactNode, useState } from "react"
 import Pagination from "./Pagination"
-import Carousel from "react-native-reanimated-carousel"
+import Carousel, { CarouselRenderItem } from "react-native-reanimated-carousel"
 
-export const CustomCarousel = ({data, doneSteps, renderItem, defaultIndex, pagination = true}) => {
+interface CustomCarouselProps {
+    data: Array<any>,
+    renderItem: CarouselRenderItem<any>,
+    doneSteps?: number,
+    defaultIndex?: number,
+    pagination?: boolean
+}
+
+export const CustomCarousel: FC<CustomCarouselProps> = ({data, doneSteps, renderItem, defaultIndex = 0, pagination = true}) => {
 
     const SLIDER_WIDTH = Dimensions.get('window').width
-    const [currentIndex, setCurrentIndex] = useState(doneSteps ? doneSteps : (defaultIndex ? defaultIndex : 0))
+    const [currentIndex, setCurrentIndex] = useState(doneSteps ? doneSteps : defaultIndex)
 
     return(
         <View style={styles.container}>

@@ -1,44 +1,45 @@
 import { View, StyleSheet } from "react-native"
 import { TitleText, SubTitleText } from "../../styles/StyledText"
-import { useMemo, useState } from "react"
+import React, { Dispatch, FC, RefObject, useMemo, useState } from "react"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../../components/Themed"
-import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet.tsx"
-import { BottomTextInputCustom, TextInputCustom } from "../../components/TextFields/TextInput"
+import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet"
+import { BottomTextInputCustom, CustomTextInputRefType } from "../../components/TextFields/TextInput"
 import { IncrementTime } from "../../components/Buttons/IncrementButtons"
-import { BackgroundTextButton, BigCircleBorderButton, TextButton } from "../../components/Buttons/UsualButton"
+import { TextButton } from "../../components/Buttons/UsualButton"
 import { Keyboard } from "react-native"
 import { TouchableWithoutFeedback } from "react-native"
 import { useRef } from "react"
-import { CloseButton, NavigationButton } from "../../components/Buttons/IconButtons"
+import { CloseButton } from "../../components/Buttons/IconButtons"
 import Separator from "../../components/Other/Separator"
-import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet"
-import { UsualScreen } from "../../components/View/Views"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import { Step } from "../../types/HabitTypes"
+import { FormStep } from "../../types/FormHabitTypes"
 
-const AddStepBottomScreen = ({bottomSheetModalRef, setSteps, noBackdrop}) => {
+interface AddStepBottomScreenProps {
+    bottomSheetModalRef: RefObject<BottomSheetModal>,
+    setSteps: Dispatch<React.SetStateAction<FormStep[]>>,
+    noBackdrop?: boolean
+}
+
+const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef, setSteps, noBackdrop}) => {
 
     const snapPoints = useMemo(() => ['85%'], [])
 
-    const font = useThemeColor({}, "Font")
     const popupColor = useThemeColor({}, "Popup")
 
-    let titreRef = useRef(null)
-    let descriptionRef = useRef(null)
+    let titreRef = useRef<CustomTextInputRefType>(null)
+    let descriptionRef = useRef<CustomTextInputRefType>(null)
 
-    const handleSetTitre = (text) => titre = text
-    const handleSetDescription = (text) => description = text
+    const [isTitleWrong, setIsTitleWrong] = useState<boolean>(false)
+    const [isDescriptionWrong, setIsDescriptionWrong] = useState<boolean>(false)
 
-    const [isTitleWrong, setIsTitleWrong] = useState(false)
-    const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
-
-    const [hourDuration, setHourDuration] = useState(0)
-    const [minutesDuration, setMinutesDuration] = useState(0)
+    const [hourDuration, setHourDuration] = useState<number>(0)
+    const [minutesDuration, setMinutesDuration] = useState<number>(0)
 
 
     const clearAll = () => {
-        handleSetTitre("")
         setIsTitleWrong(false)
-        handleSetDescription("")
         setIsDescriptionWrong(false)
         setHourDuration(0)
         setMinutesDuration(0)
@@ -51,30 +52,33 @@ const AddStepBottomScreen = ({bottomSheetModalRef, setSteps, noBackdrop}) => {
         let titre = titreRef.current?.getValue();
         let description = descriptionRef.current?.getValue();
 
-        if(titre.trim().length <= 0 || description.trim().length <= 0) 
-        {
-            description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-            titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
-
-            canClose = false
-        }
-
-        if(canClose)
-        {
-            const stepDuration = hourDuration !== 0 || minutesDuration !== 0 ? hourDuration * 60 + minutesDuration : null
-
-            const newStep = {
-                titre: titre,
-                description: description,
-                duration: stepDuration
+        if(titre && description){
+            if(titre.trim().length <= 0 || description.trim().length <= 0) 
+            {
+                setIsDescriptionWrong(description.trim().length <= 0)
+                setIsTitleWrong(titre.trim().length <= 0)
+    
+                canClose = false
             }
-
-            setSteps((previousSteps) => 
-                ([...previousSteps, newStep]))
-
-            clearAll()
-            closeModal()  
+    
+            if(canClose)
+            {
+                const stepDuration = hourDuration !== 0 || minutesDuration !== 0 ? hourDuration * 60 + minutesDuration : null
+    
+                const newStep = {
+                    titre: titre,
+                    description: description,
+                    duration: stepDuration
+                }
+    
+                setSteps((previousSteps) => 
+                    ([...previousSteps, newStep] as FormStep[]))
+    
+                clearAll()
+                closeModal()  
+            }
         }
+
     }
   
     const closeModal = () => {
@@ -87,7 +91,7 @@ const AddStepBottomScreen = ({bottomSheetModalRef, setSteps, noBackdrop}) => {
     }
 
     return (
-            <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} handleSheetChanges={() => {}} noBackdrop={noBackdrop}>
+            <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} noBackdrop={noBackdrop}>
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={{flex: 1}}>
 
                         <View style={styles.contentContainer}>

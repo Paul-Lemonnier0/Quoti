@@ -7,23 +7,26 @@ import { durationToTimeString } from "../../../primitives/BasicsMethods"
 import { getWidthResponsive } from "../../../styles/UtilsStyles"
 import { Step } from "../../../types/HabitTypes"
 import { FC } from "react"
+import { FormFullStep, FormStep } from "../../../types/FormHabitTypes"
 
 interface StepItemProps {
-    step: Step,
-    onPress(): void,
+    step: Step | FormStep,
+    onPress?: () => void,
     color: string,
     index: number,
     isNextToBeChecked: boolean,
     disabled?: boolean,
     noPress?: boolean,
     isHighlight?: boolean,
-    
 }
 
 const StepItem: FC<StepItemProps> = ({color, isNextToBeChecked, step, onPress, index, disabled, noPress, isHighlight}) => {
 
-    const borderHidden = !step.isChecked && !isNextToBeChecked && !isHighlight
-    const duration = step.duration ? durationToTimeString(step.duration) :  "--"
+    const isChecked = "isChecked" in step ? step.isChecked : false
+    const hasDuration = "duration" in step
+
+    const borderHidden = !isChecked && !isNextToBeChecked && !isHighlight
+    const duration = hasDuration ? durationToTimeString((step as Step).duration) :  "--"
 
     return(
         <View style={[styles.renderStepContainer, {opacity: disabled ? 0.5 : 1}]}>
@@ -31,11 +34,12 @@ const StepItem: FC<StepItemProps> = ({color, isNextToBeChecked, step, onPress, i
                 <SubText text={duration}/>
             </View>
 
-            <CustomCheckBox disabled={disabled} color={color} isChecked={step.isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} onPress={onPress}/>
+            <CustomCheckBox disabled={disabled} color={color} isChecked={isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} 
+                onPress={onPress}/>
 
             <View style={styles.titreEtDescriptionContainer}>
-                <SubTitleText text={step.titre}/>
-                <SubText text={step.description}/>
+                <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>
+                <SubText text={(step as FormFullStep | Step).description ?? ""}/>
             </View>
         </View>
     )

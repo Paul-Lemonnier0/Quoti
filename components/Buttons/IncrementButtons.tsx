@@ -12,10 +12,11 @@ interface BasicProps {
     value: number,
     setValue(value: number): void,
     isBorderHidden?: boolean,
-    suffixe?: string
+    suffixe?: string,
+    customBackgroundColor?: string
 }
 
-export const IncrementButtons: FC<BasicProps> = ({value, setValue, isBorderHidden, suffixe}) => {
+export const IncrementButtons: FC<BasicProps> = ({value, setValue, isBorderHidden, suffixe, customBackgroundColor}) => {
 
     const font = useThemeColor({}, "Font")
     const secondary = useThemeColor({}, "Secondary")
@@ -26,7 +27,7 @@ export const IncrementButtons: FC<BasicProps> = ({value, setValue, isBorderHidde
     const handleDecrement = () => { if(value > 1) setValue(--value) }
 
     return(
-        <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
+        <View style={[styles.container, {backgroundColor: customBackgroundColor ?? secondary, borderColor: isBorderHidden ? secondary : font}]}>
             <IconButton noPadding onPress={handleDecrement} provider={IconProvider.Feather} name={"minus"} size={24}/>
 
             <View style={[styles.valueContainer]}>
@@ -44,7 +45,7 @@ interface IncrementTimeProps extends BasicProps{
     isMinutes?: boolean
 }
 
-export const IncrementTime: FC<IncrementTimeProps> = ({value, setValue, isDisabled, isMinutes, isBorderHidden}) => {
+export const IncrementTime: FC<IncrementTimeProps> = ({value, setValue, isDisabled, isMinutes, isBorderHidden, customBackgroundColor}) => {
 
     const font = useThemeColor({}, "Font")
     const fontGray = useThemeColor({}, "FontGray")
@@ -61,7 +62,7 @@ export const IncrementTime: FC<IncrementTimeProps> = ({value, setValue, isDisabl
     }
 
     return(
-        <View style={[styles.container, {backgroundColor: secondary, borderColor: isBorderHidden ? secondary : font}]}>
+        <View style={[styles.container, {backgroundColor: customBackgroundColor ?? secondary, borderColor: isBorderHidden ? secondary : font}]}>
             <IconButton noPadding onPress={handleDecrement} provider={IconProvider.Feather} name={"minus"} size={20}/>
 
             <View style={[styles.valueContainer]}>

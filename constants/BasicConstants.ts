@@ -1,6 +1,6 @@
 import * as ImageManipulator from 'expo-image-manipulator';
 
-enum ScreenType {
+export enum AddHabitScreenType {
     PreAddScreen = "PreAddScreen",
     AddBasicDetails = "AddBasicDetails",
     ChooseColorScreen = "ChooseColorScreen",
@@ -9,10 +9,10 @@ enum ScreenType {
     CreateHabitDetails = "CreateHabitDetails"
 }
 
-const ADD_HABIT_WITHOUT_ASSOCIATED_OBJ_STEP_ORDER: ScreenType[] = [ScreenType.PreAddScreen, ScreenType.AddBasicDetails, ScreenType.ChooseColorScreen, ScreenType.ChooseIconScreen, ScreenType.AddHabitSteps, ScreenType.CreateHabitDetails]
-const ADD_HABIT_WITH_ASSOCIATED_OBJ_STEP_ORDER: ScreenType[] = [ScreenType.PreAddScreen, ScreenType.AddBasicDetails, ScreenType.ChooseIconScreen, ScreenType.AddHabitSteps, ScreenType.CreateHabitDetails]
+const ADD_HABIT_WITHOUT_ASSOCIATED_OBJ_STEP_ORDER: AddHabitScreenType[] = [AddHabitScreenType.PreAddScreen, AddHabitScreenType.AddBasicDetails, AddHabitScreenType.ChooseColorScreen, AddHabitScreenType.ChooseIconScreen, AddHabitScreenType.AddHabitSteps, AddHabitScreenType.CreateHabitDetails]
+const ADD_HABIT_WITH_ASSOCIATED_OBJ_STEP_ORDER: AddHabitScreenType[] = [AddHabitScreenType.PreAddScreen, AddHabitScreenType.AddBasicDetails, AddHabitScreenType.ChooseIconScreen, AddHabitScreenType.AddHabitSteps, AddHabitScreenType.CreateHabitDetails]
 
-export function getAddHabitStepsDetails(objectifID: string, currentScreen: ScreenType){
+export function getAddHabitStepsDetails(objectifID: string | null, currentScreen: AddHabitScreenType){
 
     return objectifID === null || objectifID === undefined ?
         {

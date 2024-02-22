@@ -6,7 +6,7 @@ import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyle
 import { FC } from "react"
 
 interface CustomCheckBoxProps {
-    onPress: () => void,
+    onPress?: () => void,
     color: string,
     number: number,
     isChecked: boolean | undefined,

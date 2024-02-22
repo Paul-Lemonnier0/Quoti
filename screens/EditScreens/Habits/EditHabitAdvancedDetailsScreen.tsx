@@ -1,14 +1,19 @@
 import HabitAdvancedDetailsForm from "../../../components/Forms/HabitAdvancedDetailsForm"
-import { useRoute } from "@react-navigation/native";
-import { useContext } from "react";
+import { FC, useContext } from "react";
 import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext";
 import { HabitsContext } from "../../../data/HabitContext";
 import { convertBackSeriazableHabit } from "../../../primitives/HabitMethods";
 import { AppContext } from "../../../data/AppContext";
 import { Success_Impact } from "../../../constants/Impacts";
 import { EditHabitContext } from "./EditHabitContext";
+import { FormDetailledHabitValues, FormFullStep, FormPlaceholderStep, FormStep } from "../../../types/FormHabitTypes";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { EditHabitStackProps } from "./EditHabitNav";
+import { SeriazableHabit, Step } from "../../../types/HabitTypes";
 
-export default EditHabitAdvancedDetailsScreen = () => {
+type EditHabitAdvancedDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditHabitAdvancedDetailsScreen">
+
+const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = ({route, navigation}) => {
 
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
     const {setIsLoading} = useContext(AppContext)
@@ -16,10 +21,9 @@ export default EditHabitAdvancedDetailsScreen = () => {
 
     const {updateHabit} = useContext(HabitsContext)
 
-    const route = useRoute()
     const {newValues, oldHabit} = route.params
 
-    const notSameHabit = (newHabit) => {
+    const notSameHabit = (newHabit: SeriazableHabit) => {
 
         for(let oldKey of Object.keys(oldHabit)){
             if(oldKey !== "steps" && (!newHabit.hasOwnProperty(oldKey) || newHabit[oldKey] !== oldHabit[oldKey])){
@@ -74,8 +78,8 @@ export default EditHabitAdvancedDetailsScreen = () => {
         return false
     }
 
-    const handleGoNext = async(values) => {
-        const updatedHabit = {...oldHabit, ...values, ...newValues}
+    const handleGoNext = async(values: FormDetailledHabitValues) => {
+        const updatedHabit = {...oldHabit, ...values, ...newValues, steps: {}}
 
         if(notSameHabit(updatedHabit)){
             setIsLoading(true)
@@ -88,13 +92,15 @@ export default EditHabitAdvancedDetailsScreen = () => {
 
                 const steps = {}
 
-                updatedHabit.steps.forEach((step) => {
-                    if(!step.stepID){
+                newValues.steps.forEach((step) => {
+                    if(step as FormPlaceholderStep){
                         steps[oldHabit.habitID] = {...step}
                     }
         
                     else {
-                        steps[step.stepID] = {...step}
+                        if(step as Step | FormFullStep){
+                            steps[(step as Step | FormFullStep).stepID] = {...step}
+                        }
                     }
                 })
 
@@ -126,3 +132,5 @@ export default EditHabitAdvancedDetailsScreen = () => {
         />
     )
 }
+
+export default EditHabitAdvancedDetailsScreen

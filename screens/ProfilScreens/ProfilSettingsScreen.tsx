@@ -1,25 +1,16 @@
 import { View, StyleSheet } from "react-native"
-import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubText, SubTitleGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { useRef, useMemo, useCallback, useState } from "react"
+import { MassiveText, SubTitleText } from "../../styles/StyledText"
+import { useRef, useState, FC } from "react"
 import { useThemeColor } from "../../components/Themed"
-import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
 import { NavigationButton } from "../../components/Buttons/IconButtons"
-import { ProfilButton } from "../../components/Profil/ProfilButton"
 import { Image } from "react-native"
 import { useContext } from "react"
-import { HabitsContext } from "../../data/HabitContext"
-import { signOut, updateProfile } from "@firebase/auth"
 import { auth } from "../../firebase/InitialisationFirebase"
-import { BackgroundTextButton, BorderTextButton, TextButton } from "../../components/Buttons/UsualButton"
-import { UserContext } from "../../data/UserContext"
+import { UserContext, UserType } from "../../data/UserContext"
 import { TouchableOpacity } from "react-native"
 import * as ImagePicker from 'expo-image-picker';
-import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
-import { onSnapshot } from "firebase/firestore"
-import { useAuthentification } from "../../primitives/useAuthentification"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import { TextInputCustom } from "../../components/TextFields/TextInput"
+import { CustomTextInputRefType, TextInputCustom } from "../../components/TextFields/TextInput"
 import Separator from "../../components/Other/Separator"
 import { Error_Impact, Success_Impact } from "../../constants/Impacts"
 import { Database_setUser } from "../../firebase/Database_User_Primitives"
@@ -27,22 +18,23 @@ import { saveProfilPicture } from "../../firebase/Storage_Primitives"
 import { IMAGE_COMPRESSION, IMAGE_DIMENSIONS, IMAGE_FORMAT } from "../../constants/BasicConstants"
 import * as ImageManipulator from 'expo-image-manipulator';
 import { AppContext } from "../../data/AppContext"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
+import { updateProfile } from "firebase/auth"
 
+type ProfilSettingsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilSettingsScreen">
 
-
-const ProfilSettingsScreen = () => {
+const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
 
     const {setIsLoading} = useContext(AppContext)
     const {user, setUser} = useContext(UserContext)
 
-    const navigation = useNavigation()
-
-    const displayNameRef = useRef()
+    const displayNameRef = useRef<CustomTextInputRefType>(null)
 
     const secondary = useThemeColor({}, "Secondary")
 
     const [isDisplayNameWrong, setIsDisplayNameWrong] = useState(false)
-    const [profilPicture, setProfilPicture] = useState(user.photoURL)
+    const [profilPicture, setProfilPicture] = useState(user?.photoURL ?? "")
 
 
 
@@ -71,20 +63,28 @@ const ProfilSettingsScreen = () => {
         }
     }
 
+    interface newValuesProps {
+        photoUrl: string | undefined,
+        displayName: string | undefined,
+    }
+
     const handleModificationValidation = async() => {
-
-
         const newDisplayName = displayNameRef.current?.getValue()
 
-        if(newDisplayName !== ""){
+        if(newDisplayName !== "" && user){
             setIsLoading(true)
             setIsDisplayNameWrong(false)
-            let newValues = {}
+            const newValues: newValuesProps = {
+                photoUrl: user?.photoURL ?? undefined,
+                displayName: user?.displayName ?? undefined
+            }
 
-            if(profilPicture !== user.photoURL){
+            if(profilPicture !== user?.photoURL){
                 try{
-                    const photoURL = await saveProfilPicture(user.uid, profilPicture)
-                    newValues = {...newValues, photoURL}
+                    if(user?.uid){
+                        const photoURL = await saveProfilPicture(user.uid, profilPicture)
+                        newValues.photoUrl = photoURL
+                    }
                 }
     
                 catch(e){
@@ -92,14 +92,23 @@ const ProfilSettingsScreen = () => {
                 }
             }
 
-            if(user.displayName !== newDisplayName){
-                newValues = {...newValues, displayName: newDisplayName}
+            if(user?.displayName !== newDisplayName){
+                newValues.displayName = newDisplayName
             }
 
             try{
-                await updateProfile(auth.currentUser, {...newValues})
-                setUser((prevUser) => ({...prevUser, ...newValues}))
-                await Database_setUser({...user, ...newValues})
+                if(auth.currentUser){
+                    await updateProfile(auth.currentUser, {...newValues})
+                }
+
+                const updatedUser: UserType = {
+                    ...newValues,
+                    ...user
+                }
+
+                setUser(updatedUser)
+
+                await Database_setUser(updatedUser);
 
                 Success_Impact()
                 navigation.goBack()
@@ -120,7 +129,7 @@ const ProfilSettingsScreen = () => {
     }    
 
     const RenderPlaceholderProfilPicture = () => {
-        const firstUsernameLetter = user.displayName.substr(0,1)
+        const firstUsernameLetter = user?.displayName?.substring(0,1) ?? "A"
   
         return(
             <View style={[styles.imageStyle, {justifyContent: "center", alignItems: "center", backgroundColor: secondary }]}>
@@ -158,7 +167,7 @@ const ProfilSettingsScreen = () => {
                     <Separator/>
 
                     <TextInputCustom ref={displayNameRef} isWrong={isDisplayNameWrong} errorMessage={"Entrez un nom d'utilisateur valide"} 
-                        labelName={"Nom d'utilisateur"} boldLabel startingValue={user.displayName}/>
+                        labelName={"Nom d'utilisateur"} boldLabel startingValue={user?.displayName ?? ""}/>
                 </View>
           </View>
         </UsualScreen>

@@ -1,6 +1,8 @@
 import { child, equalTo, get, limitToFirst, orderByChild, query, ref, set, startAt, endAt } from "firebase/database"
 import { database } from "./InitialisationFirebase"
 import { User, UserInfo } from "firebase/auth";
+import { UserType } from "../data/UserContext";
+import { UserFirestoreType } from "../types/FirestoreTypes/UserTypes";
 
 async function Database_setUser(user: User){
     await set(ref(database, "Users/" + user.uid), {
@@ -31,14 +33,14 @@ async function Database_GetSpecificUser(userID: string){
     }
 }
 
-async function Database_getUsersInfo(usersIDs: string[]){
+async function Database_getUsersInfo(usersIDs: string[]): Promise<(UserFirestoreType | null)[]>{
     try{
         const promises = usersIDs.map(async(userID) => {
             const userRef = ref(database, `Users/${userID}`);
             const userSnapshot = await get(userRef)
 
             if(userSnapshot.exists()){
-                return {uid: userID, ...userSnapshot.val()}
+                return {uid: userID, ...userSnapshot.val() } as UserFirestoreType
             }
 
             else{
@@ -53,7 +55,7 @@ async function Database_getUsersInfo(usersIDs: string[]){
 
     catch(e){
         console.log("Error while getting bunch of specifics users : ", e)
-        return null
+        return []
     }
 }
 

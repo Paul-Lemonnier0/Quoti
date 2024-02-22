@@ -1,15 +1,15 @@
 import { useRoute } from "@react-navigation/native"
-import { useContext } from "react";
+import { FC, useContext } from "react";
 import { HabitsContext } from "../../data/HabitContext";
 import { HugeText } from "../../styles/StyledText";
 import { UsualScreen } from "../../components/View/Views";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
 
-export default SharedHabitScreen = () => {
-    const route = useRoute()
+type SharedHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "SharedHabitScreen">
 
-    if(!route.params) return null;
+const SharedHabitScreen: FC<SharedHabitScreenProps> = ({route}) => {
     const {habitID, userID} = route.params;
-
     const {Habits} = useContext(HabitsContext)
     
     if(!Habits.hasOwnProperty(habitID)){
@@ -30,3 +30,5 @@ export default SharedHabitScreen = () => {
         </UsualScreen>
     )
 }
+
+export default SharedHabitScreen

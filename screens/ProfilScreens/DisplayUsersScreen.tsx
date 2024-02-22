@@ -1,56 +1,46 @@
-import {FlatList, StyleSheet, Image, View} from 'react-native';
+import {FlatList, StyleSheet, View} from 'react-native';
 import { UsualScreen } from '../../components/View/Views';
-import { HugeText, NormalText } from '../../styles/StyledText';
-import { BorderTextButton } from '../../components/Buttons/UsualButton';
-import * as ImagePicker from 'expo-image-picker';
-import { useRef, useState } from 'react';
-import { Database_getAllUsers } from '../../firebase/Database_User_Primitives';
-import { useEffect } from 'react';
+import { HugeText } from '../../styles/StyledText';
+import { FC, useRef, useState } from 'react';
 import ProfilItem from '../../components/Profil/ProfilItem';
-import { SearchBarCustom } from '../../components/TextFields/TextInput'
-import { useRoute } from '@react-navigation/native';
+import { CustomTextInputRefType, SearchBarCustom } from '../../components/TextFields/TextInput'
+import { HomeStackParamsList } from '../../navigation/BottomTabNavigator';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { auth } from '../../firebase/InitialisationFirebase';
+import { User } from 'firebase/auth';
+import { UserFirestoreType } from '../../types/FirestoreTypes/UserTypes';
 
+type DisplayUsersScreenProps = NativeStackScreenProps<HomeStackParamsList, "DisplayUsersScreen">
 
-export default DisplayUsersScreen = () => {
-
-    const route = useRoute()
+const DisplayUsersScreen: FC<DisplayUsersScreenProps> = ({route, navigation}) => {
     const {users} = route.params
 
-    const [usersToDisplay, setUsersToDisplay] = useState(users)
-    const [searchValue, setSearchValue] = useState("")
 
-    const searchValueRef = useRef(null)
+    const [usersToDisplay, setUsersToDisplay] = useState<(UserFirestoreType | null)[]>([])
+    const [searchValue, setSearchValue] = useState<string>("")
 
-
-
-    // useEffect(() => {
-    //   const getAllUsers = async() => {
-    //     setUsers(await Database_getAllUsers())        
-    //   }
-
-    //   getAllUsers()
-    // }, [temp])
+    const searchValueRef = useRef<CustomTextInputRefType>(null)
 
     const renderUser = ({item}) => {
-      return <ProfilItem user={item}/>
+      return <ProfilItem user={item} onPress={() => {}}/>
     }
 
-    const updateList = (text) => {
+    const updateList = (text: string) => {
       setSearchValue(text)
       const getAllUsers = async() => {
 
         const filteredUsers = users.filter((user) => {
-            return user.displayName.startsWith(text)
+            return user?.displayName.startsWith(text)
         })
 
-        setUsersToDisplay([...filteredUsers])        
+        setUsersToDisplay(filteredUsers)        
       }
 
       getAllUsers()
     }
 
     return(
-        <UsualScreen style={[styles.storiesContainer]}>
+        <UsualScreen>
           <View style={styles.container}>
               <View style={styles.header}>
                 <HugeText text="Amis"/>
@@ -95,3 +85,5 @@ const styles = StyleSheet.create({
         gap: 30,
     },
   });
+
+  export default DisplayUsersScreen

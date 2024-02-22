@@ -9,10 +9,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { subscribeToFriendRequests, subscribeToFriends } from "../firebase/Firestore_User_Primitives";
 
 interface UserFullType extends User {
-    friendRequests?: Array<any>
+    friendRequests?: string[],
+    friends?: string[]
 } 
 
-type UserType = UserFullType | null
+export type UserType = UserFullType | null
 
 export interface UserContextType {
     user: UserType | null,
@@ -54,7 +55,7 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
         })
     }
 
-    const setUserFriends = (friends: Array<any>) => {
+    const setUserFriends = (friends: Array<string>) => {
         setUser((prevUser: UserType) => {
             if(prevUser){
                 return {

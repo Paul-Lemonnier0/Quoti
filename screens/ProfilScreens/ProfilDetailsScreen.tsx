@@ -1,11 +1,10 @@
 import { View, StyleSheet } from "react-native"
 import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubText, SubTitleGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { useRef, useMemo, useCallback, useState } from "react"
+import { useRef, useMemo, useCallback, useState, FC } from "react"
 import { useThemeColor } from "../../components/Themed"
 import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
 import { IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons"
-import { ProfilButton } from "../../components/Profil/ProfilButton"
 import { Image } from "react-native"
 import { useContext } from "react"
 import { HabitsContext } from "../../data/HabitContext"
@@ -19,23 +18,25 @@ import { useEffect } from "react"
 import { Database_getUsersInfo } from "../../firebase/Database_User_Primitives"
 import RequestFriendItem from "../../components/Profil/RequestFriendItem"
 import { TouchableOpacity } from "react-native"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
+import { UserFirestoreType } from "../../types/FirestoreTypes/UserTypes"
 
-const ProfilDetailsScreen = () => {
-    // renders
+type ProfilDetailsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilDetailsScreen">
+
+const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
 
     const {Habits, Objectifs} = useContext(HabitsContext)
     const {user} = useContext(UserContext)
 
     const secondary = useThemeColor({}, "Secondary")
 
-    const navigation = useNavigation()
-
-    const [friendRequestsUsers, setFriendRequestsUsers] = useState([])
-    const [userFriends, setUserFriends] = useState([])
+    const [friendRequestsUsers, setFriendRequestsUsers] = useState<(UserFirestoreType | null)[]>([])
+    const [userFriends, setUserFriends] = useState<(UserFirestoreType | null)[]>([])
 
     const nb_habits = Object.keys(Habits).length
     const nb_objectifs = Object.keys(Objectifs).length
-    const nb_friends = user.friends.length
+    const nb_friends = user?.friends?.length ?? 0
 
     const handleSeeHabits = () => {
       // navigation.navigate("DisplayUsersScreen", {users: user.friends})
@@ -85,20 +86,20 @@ const ProfilDetailsScreen = () => {
     useEffect(() => {
 
       const getRequestFriendsUserInfo = async() => {
-        setFriendRequestsUsers(await Database_getUsersInfo(user.friendRequests))
+        setFriendRequestsUsers(await Database_getUsersInfo(user?.friendRequests ?? []))
       }
 
 
       getRequestFriendsUserInfo()
-    }, [user.friendRequests])
+    }, [user?.friendRequests])
 
     useEffect(() => {
       const getUsersFriendsInfo = async() => {
-        setUserFriends(await Database_getUsersInfo(user.friends))
+        setUserFriends(await Database_getUsersInfo(user?.friends ?? []))
       }
 
       getUsersFriendsInfo()
-    }, [user.friends])
+    }, [user?.friends])
 
 
     const renderUser = ({item}) => {
@@ -106,7 +107,7 @@ const ProfilDetailsScreen = () => {
     }
 
     const RenderPlaceholderProfilPicture = () => {
-      const firstUsernameLetter = user.displayName.substr(0,1)
+      const firstUsernameLetter = user?.displayName?.substring(0,1) ?? ""
 
       return(
           <View style={[styles.imageStyle, {justifyContent: "center", alignItems: "center", backgroundColor: secondary }]}>
@@ -131,7 +132,7 @@ const ProfilDetailsScreen = () => {
                   <View style={{display: "flex", flexDirection: "column", gap: 20, alignItems: "center"}}>
                     <View style={styles.imageContainerStyle}>
                       {
-                        user.photoURL ?
+                        user?.photoURL ?
                         <Image style={styles.imageStyle} source={user.photoURL ? {uri: user.photoURL} : require("../../img/TestVrai.png")}/>
                         :
                         <RenderPlaceholderProfilPicture/>
@@ -139,7 +140,7 @@ const ProfilDetailsScreen = () => {
                     </View>
                     
                     <View style={{display: "flex", flexDirection: "row"}}>
-                      <TitleText text={"@" + user.displayName}/>
+                      <TitleText text={"@" + (user?.displayName ?? "unknown")}/>
                     </View>
 
                   </View>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, FC } from "react";
 import { View, StyleSheet } from "react-native";
 import { CommonActions, useNavigation, useRoute } from "@react-navigation/native";
 import { CustomScrollView, UsualScreen } from "../../components/View/Views";
@@ -8,17 +8,20 @@ import HabitudesList from "../../components/Habitudes/HabitudesList";
 import ProgressBar from "../../components/Progress/ProgressBar";
 import { useThemeColor } from "../../components/Themed";
 import { HabitsContext } from "../../data/HabitContext";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
+import { Habit } from "../../types/HabitTypes";
 
-export default ObjectifDetailsScreen = () => {
+type ObjectifDetailsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ObjectifDetailsScreen">
+
+const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigation}) => {
 
   const secondary = useThemeColor({}, "Secondary");
-  const route = useRoute();
-  const navigation = useNavigation();
   const { filteredHabitsByDate } = useContext(HabitsContext);
   const { seriazableObjectif, frequency, currentDateString } = route.params;
 
   const [isObjectifValid, setIsObjectifValid] = useState(false);
-  const [displayedHabits, setDisplayedHabits] = useState([]);
+  const [displayedHabits, setDisplayedHabits] = useState<Habit[]>([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -26,9 +29,7 @@ export default ObjectifDetailsScreen = () => {
     const validateObjectif = async () => {
       if (seriazableObjectif?.objectifID) {
         const isObjectifVide =
-            !filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(
-                seriazableObjectif.objectifID
-            );
+            !filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(seriazableObjectif.objectifID);
 
         if (frequency === undefined || frequency === null || isObjectifVide) {
           if (isMounted) {
@@ -67,9 +68,7 @@ export default ObjectifDetailsScreen = () => {
     if (seriazableObjectif?.objectifID && filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(seriazableObjectif.objectifID)) {
 
       const habits_temp = Object.values(
-        filteredHabitsByDate[frequency].Objectifs[
-          seriazableObjectif.objectifID
-        ]
+        filteredHabitsByDate[frequency]?.Objectifs?.[seriazableObjectif.objectifID] ?? {}
       )
 
       setDisplayedHabits(habits_temp.map((habit) => ({...habit, color: objectif.color})));
@@ -159,3 +158,5 @@ const styles = StyleSheet.create({
     gap: 15,
   },
 });
+
+export default ObjectifDetailsScreen

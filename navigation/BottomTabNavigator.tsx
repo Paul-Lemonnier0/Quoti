@@ -31,8 +31,10 @@ import { TouchableOpacity } from 'react-native';
 import ValidationScreenObjectif from '../screens/AddScreen/Objectif/ValidationScreenObjectif';
 import React from 'react';
 import { AntDesignName, FeatherIconName } from '../components/Buttons/IconButtons';
-import { FrequencyTypes } from '../types/HabitTypes';
+import { FrequencyTypes, SeriazableObjectif } from '../types/HabitTypes';
 import { User } from 'firebase/auth';
+import { UserType } from '../data/UserContext';
+import { UserFirestoreType } from '../types/FirestoreTypes/UserTypes';
 
 export type BottomTabParamList = {
   Home: undefined;
@@ -117,11 +119,20 @@ export type HomeStackParamsList = {
     objectifID: string,
     currentDateString: string,
   },
-  SharedHabitScreen: undefined,
-  ObjectifDetailsScreen: undefined,
+  SharedHabitScreen: {
+    habitID: string,
+    userID: string
+  },
+  ObjectifDetailsScreen: {
+    seriazableObjectif: SeriazableObjectif,
+    frequency: FrequencyTypes,
+    currentDateString: string
+  },
   ProfilDetailsScreen: undefined,
   ProfilSettingsScreen: undefined,
-  DisplayUsersScreen: undefined,
+  DisplayUsersScreen: {
+    users: (UserFirestoreType | null)[]
+  },
   StatProfilScreen: undefined,
 }
 

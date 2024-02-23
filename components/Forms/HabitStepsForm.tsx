@@ -3,7 +3,7 @@ import { generateUniqueID } from "../../primitives/BasicsMethods";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import { Image, View } from "react-native";
 import { HugeText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText";
-import IllustrationsList from "../../data/IllustrationsList";
+import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList";
 import { CustomScrollView, UsualScreen } from "../View/Views";
 import StepsList from "../Habitudes/Step/StepsList";
 import { NavigationButton } from "../Buttons/IconButtons";
@@ -79,7 +79,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
             <View style={{flex: 1, flexGrow: 1}}>
                 <View style={styles.emptySreenContainer}>
 
-                    <Image style={styles.emptyScreenImageContainer} source={IllustrationsList["Education"]}/>
+                    <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Education]}/>
 
                     <View style={styles.emptyScreenSubContainer}>
                         <NormalText text={"Pour plus d'efficacité"}/>

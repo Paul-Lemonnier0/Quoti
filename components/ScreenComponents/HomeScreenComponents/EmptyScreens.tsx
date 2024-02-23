@@ -1,5 +1,5 @@
 import { Image, StyleSheet, View } from "react-native"
-import IllustrationsList from "../../../data/IllustrationsList"
+import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
 import { getHeightResponsive, getWidthResponsive } from "../../../styles/UtilsStyles"
 import { NormalGrayText, NormalText, SubText, SubTitleText } from "../../../styles/StyledText"
 import { PeriodeType } from "../../../types/HomeScreenTypes"
@@ -29,7 +29,7 @@ const NothingToDoScreen: FC<NothingToDoScreenProps> = ({selectedPeriode}) => {
     return(
         <View style={styles.loadingAndEmptyScreenContainer}>
             <View style={styles.emptySreenContainer}>
-                <Image style={styles.emptyScreenImageContainer} source={IllustrationsList["NothingPlanned"]}/>
+                <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.NothingPlanned]}/>
                 <View style={styles.emptyScreenSubContainer}>
                     <SubTitleText text={sentence}/>
                     <NormalGrayText text="Profitez en pour vous reposer !"/>

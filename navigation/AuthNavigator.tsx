@@ -5,17 +5,26 @@ import LoginScreen from "../screens/SignUpScreens/LoginScreen"
 import ChooseProfilPictureScreen from "../screens/SignUpScreens/ChooseProfilPictureScreen"
 import AccountCreatedScreen from "../screens/SignUpScreens/AccountCreatedScreen"
 
+export type AuthNavigatorStackProps = {
+    WelcomeScreen: undefined,
+    LoginScreen: undefined,
+    SignUpScreen: undefined,
+    AccountCreatedScreen: undefined,
+    ChooseProfilPictureScreen: undefined,
+}
+
+const AuthentificationStack = createNativeStackNavigator<AuthNavigatorStackProps>()
+
 const AuthNavigator = () => {
-    const AuthentificationNavigator = createNativeStackNavigator()
 
     return(
-        <AuthentificationNavigator.Navigator screenOptions={{ headerShown: false}}>
-            <AuthentificationNavigator.Screen name="WelcomeScreen" component={WelcomeScreen}/>
-            <AuthentificationNavigator.Screen name="LoginScreen" component={LoginScreen}/>
-            <AuthentificationNavigator.Screen name="SignUpScreen" component={SignUpScreen}/>
-            <AuthentificationNavigator.Screen name="AccountCreatedScreen" component={AccountCreatedScreen}/>
-            <AuthentificationNavigator.Screen name="ChooseProfilPictureScreen" component={ChooseProfilPictureScreen}/>
-        </AuthentificationNavigator.Navigator>
+        <AuthentificationStack.Navigator screenOptions={{ headerShown: false}}>
+            <AuthentificationStack.Screen name="WelcomeScreen" component={WelcomeScreen}/>
+            <AuthentificationStack.Screen name="LoginScreen" component={LoginScreen}/>
+            <AuthentificationStack.Screen name="SignUpScreen" component={SignUpScreen}/>
+            <AuthentificationStack.Screen name="AccountCreatedScreen" component={AccountCreatedScreen}/>
+            <AuthentificationStack.Screen name="ChooseProfilPictureScreen" component={ChooseProfilPictureScreen}/>
+        </AuthentificationStack.Navigator>
     )
 }
 

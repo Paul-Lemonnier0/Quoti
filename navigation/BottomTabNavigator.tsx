@@ -16,7 +16,6 @@ import { ChooseIconScreen } from "../screens/AddScreen/Habit/ChooseIconScreen";
 import CreateHabitDetails from "../screens/AddScreen/Habit/CreateHabitDetails";
 import ValidationScreenHabit from "../screens/AddScreen/Habit/ValidationScreenHabit";
 import AddBasicDetailsObjectif from '../screens/AddScreen/Objectif/AddBasicDetailsObjectif';
-import AddBasicDetailsDefi from '../screens/AddScreen/Défi/AddBasicDetailsDefi';
 import AddHabitsToObjectif from '../screens/AddScreen/Objectif/AddHabitsToObjectif';
 import { ChooseColorScreenObjectif } from '../screens/AddScreen/Objectif/ChooseColorScreenObjectif';
 import { ChooseIconScreenObjectif } from '../screens/AddScreen/Objectif/ChooseIconScreenObjectif';
@@ -31,10 +30,11 @@ import { TouchableOpacity } from 'react-native';
 import ValidationScreenObjectif from '../screens/AddScreen/Objectif/ValidationScreenObjectif';
 import React from 'react';
 import { AntDesignName, FeatherIconName } from '../components/Buttons/IconButtons';
-import { FrequencyTypes, SeriazableObjectif } from '../types/HabitTypes';
+import { FrequencyTypes, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
 import { User } from 'firebase/auth';
 import { UserType } from '../data/UserContext';
 import { UserFirestoreType } from '../types/FirestoreTypes/UserTypes';
+import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from '../types/FormHabitTypes';
 
 export type BottomTabParamList = {
   Home: undefined;
@@ -164,19 +164,27 @@ export type AddScreenStackType  = {
   PreAddScreen: undefined,
 
   AddBasicDetails: undefined,
-  ChooseColorScreen: undefined,
-  ChooseIconScreen: undefined,
-  AddHabitSteps: undefined,
-  CreateHabitDetails: undefined,
-  ValidationScreenHabit: undefined,
+  ChooseColorScreen: {
+    habit: FormBasicHabit
+  },
+  ChooseIconScreen: {
+    habit: FormColoredHabit
+  },
+  AddHabitSteps: {
+    habit: FormIconedHabit
+  },
+  CreateHabitDetails: {
+    habit: FormStepsHabit
+  },
+  ValidationScreenHabit: {
+    habit: SeriazableHabit
+  },
 
   AddBasicDetailsObjectif: undefined,
   AddHabitsToObjectif: undefined,
   ChooseColorScreenObjectif: undefined,
   ChooseIconScreenObjectif: undefined,
   ValidationScreenObjectif: undefined,
-
-  AddBasicDetailsDefi: undefined,
 }
 
 const AddScreenStack = createNativeStackNavigator<AddScreenStackType>();
@@ -199,8 +207,6 @@ function AddScreenNavigator() {
       <AddScreenStack.Screen name="ChooseColorScreenObjectif" component={ChooseColorScreenObjectif}/>   
       <AddScreenStack.Screen name="ChooseIconScreenObjectif" component={ChooseIconScreenObjectif}/>   
       <AddScreenStack.Screen name="ValidationScreenObjectif" component={ValidationScreenObjectif}/>   
-
-      <AddScreenStack.Screen name="AddBasicDetailsDefi" component={AddBasicDetailsDefi}/>   
 
     </AddScreenStack.Navigator>
   );

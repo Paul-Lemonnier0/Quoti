@@ -1,11 +1,13 @@
-interface IllustrationsList {
-    NothingPlanned: any;
-    Validation: any;
-    Education: any;
-    Creative: any;
-    WorkingFullSpeed: any;
-    Traveler: any;
+export enum IllustrationsType {
+    NothingPlanned = "NothingPlanned",
+    Validation = "Validation",
+    Education = "Education",
+    Creative = "Creative",
+    WorkingFullSpeed = "WorkingFullSpeed",
+    Traveler = "Traveler"
 }
+
+type IllustrationsList = {[illustration in IllustrationsType]: any}
 
 const IllustrationsList: IllustrationsList = {
     NothingPlanned: require('../img/Illustration/Light_theme/Workout_Break.png'),

@@ -1,15 +1,20 @@
-import { View, StyleSheet } from "react-native"
-import { TitleText, NormalText, SubTitleText, MassiveText } from "../../../styles/StyledText"
-import { useNavigation } from "@react-navigation/native"
-import { UsualScreen } from "../../../components/View/Views"
-import { Image } from "react-native"
-import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
-import { BackgroundTextButton } from "../../../components/Buttons/UsualButton"
-import { useEffect } from "react"
+import { useNavigation } from "@react-navigation/native";
+import { UsualScreen } from "../../components/View/Views";
+import { Image, StyleSheet, View } from "react-native";
+import { MassiveText, NormalText, SubMassiveText, SubTitleText, TitleText } from "../../styles/StyledText";
+import { BackgroundTextButton, TextButton } from "../../components/Buttons/UsualButton";
+import { FC, useContext, useEffect } from "react";
+import { auth } from "../../firebase/InitialisationFirebase";
+import { AuthContext, AuthStates } from "../../data/AuthContext";
+import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator";
 
-const ValidationScreenObjectif = () => {
+type AccountCreatedScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "AccountCreatedScreen">
 
-    const navigation = useNavigation();
+const AccountCreatedScreen: FC<AccountCreatedScreenProps> = ({navigation}) => {
+
+    const {setUserAuthState} = useContext(AuthContext)
 
     useEffect(() => {
 
@@ -22,19 +27,25 @@ const ValidationScreenObjectif = () => {
         disableGestures()
     }, [])
 
-    const handleGoHome = () => {
-        navigation.reset({index: 0, routes: [{ name: 'Home' }]})
-        // navigation.navigate("Home")
+    const handleGoToProfilPicture = () => {
+        navigation.navigate("ChooseProfilPictureScreen")
     }
+
+    const handleSkipSteps = () => {
+        setUserAuthState(AuthStates.Ready)
+    }
+
+    const username = auth.currentUser?.displayName ?? "unknown"
 
     return (
         <UsualScreen hideMenu>   
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
-                        <MassiveText text="Bravo !"/>
-                        <TitleText text="Nouvel objectif ajouté"/>
+                    <View style={{width: "100%"}}>
+                        <TitleText text="Bienvenue,"/>
+                        <SubMassiveText text={username + " !"}/>
                     </View>
+
                 </View>
 
 
@@ -44,14 +55,15 @@ const ValidationScreenObjectif = () => {
                         <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Validation]}/>
 
                         <View style={styles.emptyScreenSubContainer}>
-                            <NormalText text={"Continuez comme ça! "}/>
-                            <SubTitleText text={"vous êtes sur la bonne voie !"}/>
+                            <SubTitleText text={"Votre compte à bien été créé !"}/>
+                            <NormalText text={"Plus que quelques étapes..."}/>
                         </View>
                     </View>
                 </View>
 
                 <View style={styles.footer}>
-                    <BackgroundTextButton text={"Retour à l'accueil"} onPress={handleGoHome} bold/>
+                    <BackgroundTextButton text={"Choisir une photo de profil"} onPress={handleGoToProfilPicture} bold/>
+                    <TextButton text={"Passer les étapes"} onPress={handleSkipSteps} bold/>
                 </View>
 
             </View>
@@ -126,8 +138,9 @@ const ValidationScreenObjectif = () => {
 
     emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
-        alignItems: "center"
+        alignItems: "center",
+        gap: 5
     },
   });
   
-  export default ValidationScreenObjectif;
+  export default AccountCreatedScreen;

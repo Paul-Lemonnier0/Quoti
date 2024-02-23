@@ -12,7 +12,7 @@ import { BackgroundTextButton } from "../../components/Buttons/UsualButton"
 import { RadioButtonsBar } from "../../components/RadioButtons/RadioButtonsBar"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AddScreenStackType } from "../../navigation/BottomTabNavigator"
-import IllustrationsList from "../../data/IllustrationsList"
+import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList"
 
 type PreAddScreenProps = NativeStackScreenProps<AddScreenStackType, "PreAddScreen">
 
@@ -66,7 +66,7 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
                     <View style={{flex: 1, flexGrow: 1, marginTop: 20}}>
                         <View style={styles.emptySreenContainer}>
                         
-                            <Image style={styles.emptyScreenImageContainer} source={IllustrationsList["Creative"]}/>
+                            <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Creative]}/>
 
                             <View style={styles.emptyScreenSubContainer}>
                                 <HugeText text={"Créer une habitude ou un objectif ?"} style={{textAlign: "center"}}/>

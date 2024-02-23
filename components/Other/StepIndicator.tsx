@@ -1,7 +1,8 @@
 import { ImageStyle, StyleSheet, TextStyle, View, ViewStyle } from "react-native"
 import { useThemeColor } from "../Themed"
-import Animated, { AnimatedStyleProp, SharedValue, useAnimatedStyle, useDerivedValue, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
+import Animated, { AnimatableValue, AnimatedStyleProp, SharedValue, useAnimatedStyle, useDerivedValue, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
 import { FC, useEffect } from "react"
+import { DimensionValue } from "react-native"
 
 interface StepIndicatorProps {
     totalSteps: number,
@@ -24,14 +25,14 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
 
     const justDoneStepWidth = useSharedValue(0)
 
-    const justDoneStepWidthString = useDerivedValue(() => {
-        return justDoneStepWidth.value.toString() + "%";
-    });
+    // const justDoneStepWidthString = useDerivedValue(() => {
+    //     return justDoneStepWidth.value.toString() + "%";
+    // });
 
 
-    const justDoneStepWidthAnimatedStyle = useAnimatedStyle(() => {
+    const justDoneStepWidthAnimatedStyle = useAnimatedStyle((): AnimatedStyleProp<ViewStyle | TextStyle | ImageStyle> => {
         return {
-            width: justDoneStepWidthString
+            width: justDoneStepWidth.value as DimensionValue | SharedValue<AnimatableValue> | undefined
         }
     })
 

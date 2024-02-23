@@ -1,19 +1,15 @@
-import { TouchableOpacity, View } from "react-native"
+import { View } from "react-native"
 import { UsualScreen } from "../../../components/View/Views"
-import { GoNextButton } from "../../../components/Buttons/UsualButton"
-import { HugeText, NormalText, SubTitleText } from "../../../styles/StyledText"
+import { HugeText } from "../../../styles/StyledText"
 import { useCallback, useMemo, useState } from "react"
 import { StyleSheet } from "react-native"
 import { TextInputCustom } from "../../../components/TextFields/TextInput"
 import { useRef } from "react"
-import { RenderAddStepCarouselItem } from '../../../components/Habitudes/Step/StepCarouselItem'
 import { useNavigation } from "@react-navigation/native"
-import { generateUniqueID } from "../../../primitives/BasicsMethods"
-import { ContrastButton, NavigationButton } from "../../../components/Buttons/IconButtons"
-import { MaterialCommunityIcons } from '@expo/vector-icons'; 
+import { NavigationButton } from "../../../components/Buttons/IconButtons"
 import { useThemeColor } from "../../../components/Themed"
 import Separator from "../../../components/Other/Separator"
-import { DatePicker, MultiDatePicker } from "../../../components/TextFields/DatePicker"
+import { MultiDatePicker } from "../../../components/TextFields/DatePicker"
 import SelectMultipleDateBottomScreen from "../../BottomScreens/SelectMultipleDateBottomScreen"
 
 export default AddBasicDetailsObjectif = () => {

@@ -11,9 +11,9 @@ import { StyleSheet } from "react-native"
 import { TouchableOpacity } from "react-native"
 import { CustomCarousel } from "../../../components/Carousel/CustomCarousel"
 import { splitArrayIntoChunks } from "../../../primitives/BasicsMethods"
-import StepIndicator from '../../../components/Other/StepIndicator.js'
 import HabitIcons from "../../../data/HabitIcons"
 import { NavigationButton } from "../../../components/Buttons/IconButtons.tsx"
+import StepIndicator from "../../../components/Other/StepIndicator"
 
 
 export const ChooseIconScreenObjectif = () => {

@@ -1,15 +1,15 @@
 import { useState, useRef, useMemo, useCallback } from "react"
-import { View, StyleSheet, TouchableOpacity, FlatList } from "react-native"
-import { BorderTextButton, GoNextButton } from "../../../components/Buttons/UsualButton"
+import { View, StyleSheet } from "react-native"
+import { BorderTextButton } from "../../../components/Buttons/UsualButton"
 import { UsualScreen } from "../../../components/View/Views"
 import { HugeText, SubTitleText } from "../../../styles/StyledText"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useThemeColor } from "../../../components/Themed"
 import { ColorsList } from "../../../data/ColorsList"
-import StepIndicator from '../../../components/Other/StepIndicator.js'
 import CustomColorBottomScreen from "../../BottomScreens/CustomColorBottomScreen"
 import { NavigationButton } from "../../../components/Buttons/IconButtons.tsx"
-import ColorListSelector from "../../../components/Other/ColorListSelector.js"
+import StepIndicator from "../../../components/Other/StepIndicator"
+import ColorListSelector from "../../../components/Other/ColorListSelector"
 
 export const ChooseColorScreenObjectif = () => {
 

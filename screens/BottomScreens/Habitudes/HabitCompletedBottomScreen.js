@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { Image } from "react-native";
 import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBottomSheet";
 import { UsualScreen } from "../../../components/View/Views";
-import IllustrationsList from "../../../data/IllustrationsList";
+import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList";
 import { HabitudeListItem, HabitudeListItemPresentation } from "../../../components/Habitudes/HabitudeListItem";
 import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
@@ -54,7 +54,7 @@ export default HabitCompletedBottomScreen = ({bottomSheetModalRef, habit}) => {
                     <View style={{flex: 0.75, flexGrow: 0.75}}>
                         <View style={styles.emptySreenContainer}>
 
-                            <Image style={styles.emptyScreenImageContainer} source={IllustrationsList["WorkingFullSpeed"]}/>
+                            <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.WorkingFullSpeed]}/>
 
                             <View style={styles.emptyScreenSubContainer}>
                                 <MassiveText text={"Bravo !"}/>

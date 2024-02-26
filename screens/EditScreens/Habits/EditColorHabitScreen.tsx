@@ -18,7 +18,7 @@ const EditColorHabitScreen: FC<EditColorHabitScreenProps> = ({route, navigation}
         })
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, AddHabitScreenType.CreateHabitDetails)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(oldHabit.objectifID ?? null, AddHabitScreenType.ChooseColorScreen)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP

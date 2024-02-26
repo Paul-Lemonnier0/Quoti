@@ -13,10 +13,11 @@ import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Pe
 import { RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
 import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { PeriodeType } from '../types/HomeScreenTypes';
-import { FrequencyTypes, Habit } from '../types/HabitTypes';
+import { FrequencyTypes, Habit, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamsList } from '../navigation/BottomTabNavigator';
+import { displayTree } from '../primitives/BasicsMethods';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HomeScreen">
 
@@ -73,11 +74,14 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
   const [periodes, setPeriodes] = useState<("Calendar" | PeriodeType)[]>(["Calendar", ...initialPeriodes]) 
 
   useEffect(() =>{
-    //console.warn("filteredHabitByDate Refreshed");
-
     const updatedPeriodes = initialPeriodes.map(initPeriode => {      
-      const nbElements = Object.keys(filteredHabitsByDate[initPeriode.frequency].Habitudes ?? {}).length +
-      Object.keys(filteredHabitsByDate[initPeriode.frequency].Objectifs ?? {}).length
+      let nbElements = 0;
+
+      for (const [objID, habitList] of Object.entries(filteredHabitsByDate[initPeriode.frequency].Objectifs ?? {})) {
+        nbElements += Object.keys(habitList).length
+      }
+
+      nbElements += Object.keys(filteredHabitsByDate[initPeriode.frequency].Habitudes ?? {}).length
 
       return({ ...initPeriode, nbElements })
     })
@@ -136,6 +140,10 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
     navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
   }
 
+  const handlePressOnObjectif = (seriazableObjectif: SeriazableObjectif, frequency: FrequencyTypes, currentDateString: string) => {
+    navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
+  }
+
   //JSX
 
   return (
@@ -172,7 +180,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
               
               <CustomScrollView>
                 <View style={styles.subBody}>
-                  <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched}/>
+                  <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnObjectif} currentDateString={selectedDate.toDateString()}/>
                   <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnHabit} currentDateString={selectedDate.toDateString()}/>
                 </View>
               </CustomScrollView>

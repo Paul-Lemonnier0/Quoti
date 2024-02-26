@@ -18,7 +18,7 @@ import { Habit, Objectif } from "../../../types/HabitTypes";
 interface PinToObjectifBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     displayedObjectifs: Objectif[],
-    updateHabitRelationWithObjectif: (habit: Habit, selectedPinObjectifID: string | undefined) => void,
+    updateHabitRelationWithObjectif: (habit: Habit, selectedPinObjectifID: string | null) => Promise<void>,
     habit: Habit
 }
 
@@ -38,7 +38,7 @@ const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> =
     const handleChooseObjectif = async() => {
         if(habit.objectifID !== selectedPinObjectifID){
             setIsLoading(true)
-            await updateHabitRelationWithObjectif(habit, selectedPinObjectifID)         
+            await updateHabitRelationWithObjectif(habit, selectedPinObjectifID ?? null)         
             setIsLoading(false)
         }
 
@@ -65,29 +65,29 @@ const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> =
 
     return(
         <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints}>
-                <View style={styles.container}>
-                    <View style={styles.pageTitleContainer}>
-                        <View style={{flex: 1}}>
-                            <TitleText text="Choisissez un objectif"/>
-                        </View>
-                        <CloseButton noPadding methode={closeModal}/>
+            <View style={styles.container}>
+                <View style={styles.pageTitleContainer}>
+                    <View style={{flex: 1}}>
+                        <TitleText text="Choisissez un objectif"/>
                     </View>
-
-                    <ScrollView style={{display: "flex", flexDirection: "column", gap: 0}} showsVerticalScrollIndicator={false}>
-                        <View style={{gap: 15, marginBottom: 30}}>
-                        {
-                            displayedObjectifs.map((obj, index) => (
-                                <View key={index} style={{gap: 15}}>
-                                    <RenderObjectif key={index} item={obj} index={index}/>
-                                    { index !== displayedObjectifs.length - 1 && <Separator/> }
-                                </View>
-                            )) 
-                        }
-                        </View>
-                    </ScrollView>  
-
-                    <FooterBottomSheets text={"Valider"} onPress={handleChooseObjectif}/>
+                    <CloseButton noPadding methode={closeModal}/>
                 </View>
+
+                <ScrollView style={{display: "flex", flexDirection: "column", gap: 0}} showsVerticalScrollIndicator={false}>
+                    <View style={{gap: 15, marginBottom: 30}}>
+                    {
+                        displayedObjectifs.map((obj, index) => (
+                            <View key={index} style={{gap: 15}}>
+                                <RenderObjectif key={index} item={obj} index={index}/>
+                                { index !== displayedObjectifs.length - 1 && <Separator/> }
+                            </View>
+                        )) 
+                    }
+                    </View>
+                </ScrollView>  
+
+                <FooterBottomSheets text={"Valider"} onPress={handleChooseObjectif}/>
+            </View>
         </CustomStaticBottomSheet>
     )
 }

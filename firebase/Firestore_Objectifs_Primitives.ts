@@ -1,4 +1,4 @@
-import { addDoc, collection, doc, getDocs, query, where } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { Objectif, ObjectifList } from "../types/HabitTypes"
 import { FirestoreObjectif } from "../types/FirestoreTypes/FirestoreHabitTypes"
@@ -54,5 +54,16 @@ const fetchAllObjectifs = async(userID: string): Promise<ObjectifList> => {
     {});
 }
 
+const removeObjectifInFirestore = async(objectifID: string, userID: string): Promise<void> => {
 
-export {addObjectifToFirestore, fetchAllObjectifs}
+    const userDoc = doc(db, "Users", userID)
+    console.log("Deleting objectif in firestore with id : ", objectifID, "...")
+    const docRef = doc(collection(userDoc, 'Objectifs'), objectifID)
+
+    await deleteDoc(docRef);
+    console.log("Objectif successfully deleted in firestore !")
+}
+
+
+
+export {addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore}

@@ -75,7 +75,7 @@ export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheet
           enableDynamicSizing={snapPoints === undefined}
           backdropComponent={noBackdrop ? null : renderBackdrop}>
 
-              <BottomSheetView style={[styles.container, {flex: snapPoints ? undefined : 1}]}>
+              <BottomSheetView style={[styles.container, {flex: snapPoints ? 1 : undefined}]}>
                     {children}
               </BottomSheetView>
 

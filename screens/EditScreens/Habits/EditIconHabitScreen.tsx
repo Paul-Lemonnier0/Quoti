@@ -4,6 +4,7 @@ import { EditHabitStackProps } from "./EditHabitNav";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { FC } from "react";
 import { FormIconedHabitValues } from "../../../types/FormHabitTypes";
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../../constants/BasicConstants";
 
 type EditIconHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditIconHabitScreen">
 
@@ -17,11 +18,17 @@ const EditIconHabitScreen: FC<EditIconHabitScreenProps> = ({route, navigation}) 
         })
     }
 
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(oldHabit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)
+
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
+
     return(
         <ChooseIconForm
-            isForModifyingHabit
             handleGoNext={handleGoNext}
-            habit={{...oldHabit, ...newValues}}
+            defaultIcon={oldHabit.icon}
+            totalSteps={totalSteps}
+            currentStep={currentStep}
         />
     )
 }

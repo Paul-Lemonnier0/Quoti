@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { EditHabitStackProps } from "./EditHabitNav";
 import { Habit } from "../../../types/HabitTypes";
 import { FormBasicHabit } from "../../../types/FormHabitTypes";
+import { getAddHabitStepsDetails } from "../../../constants/BasicConstants";
 
 type EditHabitDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditHabitDetailsScreen">
 
@@ -23,6 +24,7 @@ const EditHabitDetailsScreen: FC<EditHabitDetailsScreenProps> = ({route, navigat
             baseHabit={habit}
             handleGoNext={handleGoNext}
             closeModal={closeModal}
+            
         />
     )
 }

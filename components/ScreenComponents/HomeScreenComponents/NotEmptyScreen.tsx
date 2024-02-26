@@ -6,7 +6,7 @@ import ObjectifsList from "../../Objectifs/ObjectifsList"
 import { FC, memo } from "react"
 import { TitleText } from "../../../styles/StyledText"
 import { getHeightResponsive } from "../../../styles/UtilsStyles"
-import { FrequencyTypes, Habit } from "../../../types/HabitTypes"
+import { FrequencyTypes, Habit, SeriazableObjectif } from "../../../types/HabitTypes"
 
 interface DisplayHabitsScreenProps {
   isSkeleton: Boolean,
@@ -64,16 +64,22 @@ export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, isLoading, isF
 interface DisplayObjectifsScreenProps {
   isSkeleton: Boolean,
   displayedObjectifs: InnerLogicObjectifType[],
+  handleOnPress: (
+    seriazableObjectif: SeriazableObjectif,
+    frequency: FrequencyTypes,
+    currentDateString: string
+  ) => void,
+  currentDateString: string
 }
 
-export const DisplayObjectifsScreen: FC<DisplayObjectifsScreenProps> = ({isSkeleton, displayedObjectifs}) => {
+export const DisplayObjectifsScreen: FC<DisplayObjectifsScreenProps> = ({isSkeleton, displayedObjectifs, handleOnPress, currentDateString}) => {
   
     return(
         <>
           {
             isSkeleton ?
             <Objectifs_SkeletonList/> :
-            <ObjectifsList objectifs={displayedObjectifs}/>
+            <ObjectifsList objectifs={displayedObjectifs} handleOnPress={handleOnPress} currentDateString={currentDateString}/>
           }
         </>  
     )
@@ -83,7 +89,13 @@ interface RenderObjectifsProps {
   objectifs: string[],
   selectedPeriode: FrequencyTypes,
   isLoading: Boolean,
-  isFetched: Boolean
+  isFetched: Boolean,
+  handleOnPress: (
+    seriazableObjectif: SeriazableObjectif,
+    frequency: FrequencyTypes,
+    currentDateString: string
+  ) => void,
+  currentDateString: string
 }
 
 export interface InnerLogicObjectifType {
@@ -91,7 +103,7 @@ export interface InnerLogicObjectifType {
   frequency: FrequencyTypes
 }
 
-export const RenderObjectifs: FC<RenderObjectifsProps> = memo(({objectifs, selectedPeriode, isLoading, isFetched}) => {
+export const RenderObjectifs: FC<RenderObjectifsProps> = memo(({objectifs, selectedPeriode, isLoading, isFetched, handleOnPress, currentDateString}) => {
 
   const isSkeleton = isLoading || !isFetched
   const displayedObjectifs_Array: InnerLogicObjectifType[] = objectifs.map(obj => ({objectifID: obj, frequency: selectedPeriode})) ?? []
@@ -107,6 +119,8 @@ export const RenderObjectifs: FC<RenderObjectifsProps> = memo(({objectifs, selec
       <DisplayObjectifsScreen
         isSkeleton={isSkeleton}
         displayedObjectifs={displayedObjectifs_Array}
+        currentDateString={currentDateString}
+        handleOnPress={handleOnPress}
       />
     </View>
   )

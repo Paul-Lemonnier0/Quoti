@@ -69,6 +69,10 @@ interface HabitList {
     [habitID: string]: Habit
 }
 
+interface ObjectifHabitList {
+    [objectifID: string]: HabitList
+}
+
 interface ObjectifList {
     [objectifID: string]: Objectif
 }
@@ -79,7 +83,7 @@ interface StepList {
 
 interface HabitOrObjectif {
     Habitudes?: HabitList;
-    Objectifs?: ObjectifList;
+    Objectifs?: ObjectifHabitList;
 }
 
 interface FilteredHabitsType {

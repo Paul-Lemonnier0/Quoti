@@ -1,46 +1,36 @@
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import { FC, RefObject, useCallback, useContext, useRef } from "react"
+import { Share, TouchableOpacity, View } from "react-native"
+import { Objectif } from "../../../types/HabitTypes"
+import { StyleSheet } from "react-native"
+import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet"
+import { Icon, IconProvider } from "../../../components/Buttons/IconButtons"
 import { SubTitleText } from "../../../styles/StyledText"
-import { FC, RefObject, useCallback, useContext, useMemo, useRef, useState } from "react";
-import FooterBottomSheet from "../../../components/BottomSheets/FooterBottomSheets";
-import { Share, View } from "react-native";
-import { StyleSheet } from "react-native";
-import { Icon, IconProvider } from "../../../components/Buttons/IconButtons";
-import { TouchableOpacity } from "react-native";
-import { useThemeColor } from "../../../components/Themed";
-import { HabitsContext } from "../../../data/HabitContext";
-import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
-import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
-import PinToObjectifBottomScreen from "./PinToObjectifBottomScreen";
-import EditHabitNav from "../../EditScreens/Habits/EditHabitNav";
-import { AppContext } from "../../../data/AppContext";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { Habit } from "../../../types/HabitTypes";
-import { Alert } from "react-native";
-import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
+import FooterBottomSheet from "../../../components/BottomSheets/FooterBottomSheets"
+import { useThemeColor } from "../../../components/Themed"
+import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts"
+import { AppContext } from "../../../data/AppContext"
+import { HabitsContext } from "../../../data/HabitContext"
 
-
-interface SettingHabitBottomScreenProps {
+interface SettingsObjectifBottomSheetProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
-    habit: Habit,
-    attachToObjectifAdditionnalMethod?: () => void, 
+    objectif: Objectif,
+    addHabitAdditionnalMethod?: () => void, 
+    removeHabitAdditionnalMethod?: () => void, 
     deleteAdditionnalMethod?: () => void, 
     modifyAdditionnalMethod?: () => void
 }
 
-const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
-    bottomSheetModalRef, 
-    habit, 
-    attachToObjectifAdditionnalMethod, 
+const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
+    bottomSheetModalRef,
+    objectif,
+    addHabitAdditionnalMethod,
+    removeHabitAdditionnalMethod,
     deleteAdditionnalMethod,
     modifyAdditionnalMethod
 }) => {
-    
     const {setIsLoading} = useContext(AppContext)
-    const {removeHabit, updateHabitRelationWithObjectif, Objectifs} = useContext(HabitsContext)
-
-    const habitType = getHabitType(habit)
-
-    const displayedObjectifs = Object.values(Objectifs)
-
+    const {removeObjectif} = useContext(HabitsContext)
 
     const closeModal = () => bottomSheetModalRef.current?.close()
     const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
@@ -48,13 +38,13 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     const handleDelete = async() => {
         setIsLoading(true)
         deleteAdditionnalMethod ? deleteAdditionnalMethod() : null
-        await removeHabit(habit);
-        setIsLoading(false)
-        closeModal()
-        Success_Impact()
-    }
 
-    const handleSkip = () => {
+        const deletePinnedHabits = false
+        await removeObjectif(objectif.objectifID, deletePinnedHabits);
+
+        setIsLoading(false)
+        
+        closeModal()
         Success_Impact()
     }
 
@@ -72,7 +62,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
 
         try{
             const result = await Share.share({
-                message: habit.titre + " : " + habit.description,
+                message: objectif.titre + " : " + objectif.description,
                 url: `exp://172.20.10.2:8081/--/SharedHabitScreen?habitID='50'&userID='Paul'`,
             })
 
@@ -90,27 +80,12 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         }
     }
 
-    const handleBreakObjectifRelation = async() => {
-        setIsLoading(true)
-        attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
-        await updateHabitRelationWithObjectif(habit, null)
-        setIsLoading(false)
-        Success_Impact()
-    }
-
     const openPinObjectifScreen = () => {
         bottomSheetModalRef_PinObjectifScreen.current?.present() 
     }
 
-    const handleMakeObjectifRelation = async(habit: Habit, selectedPinObjectifID: string | null) => 
-    {
-        attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
-        await updateHabitRelationWithObjectif(habit, selectedPinObjectifID)
-    }
-
     const error = useThemeColor({}, "Error")
     const font = useThemeColor({}, "Font")
-    const tertiary = useThemeColor({}, "Tertiary")
     const fontGray = useThemeColor({}, "FontGray")
 
     interface commandType {
@@ -122,20 +97,13 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     }
 
     const commands: commandType[] = [
-        {icon: "trending-up", provider: IconProvider.Feather, text:"Passer pour aujourd'hui", method: handleSkip},
-        {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'habitude", method: handleOpenEdit},
-        {icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleShare},
+        {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'objectif", method: handleOpenEdit},
+        {icon: "share", provider: IconProvider.Feather, text:"Partager l'objectif", method: handleShare},
     ]
 
-    if(habitType === "Objectifs"){
-        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Détacher de l'objectif", method: handleBreakObjectifRelation})
-    }
+    commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Modifier la composition", method: openPinObjectifScreen})
 
-    else {
-        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Attacher à un objectif", method: openPinObjectifScreen})
-    }
-
-    commands.push({icon: "trash", provider: IconProvider.Feather, text:"Supprimer l'habitude", method: handleDelete, color: error})
+    commands.push({icon: "trash", provider: IconProvider.Feather, text:"Supprimer l'objectif", method: handleDelete, color: error})
 
     const bottomSheetModalRef_EditHabit: RefObject<BottomSheetModal> = useRef(null);
   
@@ -160,7 +128,9 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 <FooterBottomSheet text={"Terminer"} onPress={() => bottomSheetModalRef.current?.close()}/>
             </View>
             
-            <PinToObjectifBottomScreen
+            {
+            
+            /* <PinToObjectifBottomScreen
                 bottomSheetModalRef={bottomSheetModalRef_PinObjectifScreen}
                 displayedObjectifs={displayedObjectifs}
                 updateHabitRelationWithObjectif={handleMakeObjectifRelation}
@@ -170,7 +140,9 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 bottomSheetModalRef={bottomSheetModalRef_EditHabit}
                 habit={getSeriazableHabit(habit)}
                 validationAdditionnalMethod={handleEdit}
-            />
+            /> */
+
+            }
         </CustomStaticBottomSheet>
     );
 };
@@ -198,7 +170,6 @@ const styles = StyleSheet.create({
         gap: 20,
         marginLeft: 5,
       },
-})
+})  
 
-export default SettingHabitBottomScreen
-  
+export default SettingsObjectifBottomSheet

@@ -7,13 +7,19 @@ import { FlatList } from "react-native"
 import ObjectifBlock from "./ObjectifBlock"
 import { HabitsContext } from "../../data/HabitContext"
 import { InnerLogicObjectifType } from "../ScreenComponents/HomeScreenComponents/NotEmptyScreen"
-import { Step } from "../../types/HabitTypes"
+import { FrequencyTypes, SeriazableObjectif, Step } from "../../types/HabitTypes"
 
 interface ObjectifListProps {
     objectifs: InnerLogicObjectifType[],
+    handleOnPress: (
+        seriazableObjectif: SeriazableObjectif,
+        frequency: FrequencyTypes,
+        currentDateString: string
+    ) => void,
+    currentDateString: string
 }
 
-const ObjectifsList: FC<ObjectifListProps> = ({objectifs}) => {
+const ObjectifsList: FC<ObjectifListProps> = ({objectifs, handleOnPress, currentDateString}) => {
 
     const {filteredHabitsByDate} = useContext(HabitsContext)
 
@@ -48,7 +54,9 @@ const ObjectifsList: FC<ObjectifListProps> = ({objectifs}) => {
         const frequency = item.frequency
 
         return (
-            <ObjectifBlock key={objectifID} objectifID={objectifID} frequency={frequency} index={index}/>
+            <ObjectifBlock key={objectifID} index={index}
+                objectifID={objectifID} frequency={frequency}
+                currentDateString={currentDateString} handleOnPress={handleOnPress}/>
         )
     }
 

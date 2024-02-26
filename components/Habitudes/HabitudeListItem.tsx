@@ -38,8 +38,6 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
     const habitDoneSteps = steps.filter(step => step.isChecked).length
     const totalSteps = steps.length
 
-    const pourcentage = (habitDoneSteps * 100 / totalSteps)
-
     const isFinished = habitDoneSteps === steps.length
 
     const handleLongPress = () => {
@@ -52,8 +50,6 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
     const openModal = useCallback(() => {
         bottomSheetModalRef.current?.present();
     }, []);
-
-
 
     return(
         <>

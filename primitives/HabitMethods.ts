@@ -55,31 +55,33 @@ export const removeHabitFromHabits = (Habits: HabitList, habitID: string): Habit
   return habits;
 }
 
-export const removeHabitFromFilteredHabits = (FilteredHabits: FilteredHabitsType, habit: Habit): FilteredHabitsType => {
+export const removeHabitFromFilteredHabits = (filteredHabits: FilteredHabitsType, habit: Habit): FilteredHabitsType => {
 
-  const habitType = getHabitType(habit)
   const frequency = habit.frequency
-  const updatedFilteredHabits  = {...FilteredHabits}
+  const updatedFilteredHabits  = {...filteredHabits}
 
-  if(updatedFilteredHabits[frequency] && updatedFilteredHabits[frequency][habitType]){
-    if(habit.objectifID && updatedFilteredHabits[frequency].Objectifs){
-      if(updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]){
-      
-        delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID][habit.habitID]
+  if(habit.objectifID){
+    if(updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]){
+    
+      delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID][habit.habitID]
 
-        let objectifArray = updatedFilteredHabits[frequency]?.Objectifs?.[habit.objectifID] ?? {} 
-        const isObjectifEmpty = Object.keys(objectifArray).length === 0
+      let objectifArray = updatedFilteredHabits[frequency]?.Objectifs?.[habit.objectifID] ?? {} 
+      const isObjectifEmpty = Object.keys(objectifArray).length === 0
 
-        if(isObjectifEmpty){
-          delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]  
-        }
-
-        else delete updatedFilteredHabits[frequency].Habitudes?.[habit.habitID]
+      if(isObjectifEmpty){
+        delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]  
       }
+
+      else delete updatedFilteredHabits[frequency].Habitudes?.[habit.habitID]
     }
   }
 
-  return {...updatedFilteredHabits} ;
+  else {
+    delete updatedFilteredHabits[frequency].Habitudes?.[habit.habitID]
+  }
+  
+
+  return {...updatedFilteredHabits};
 }
 
 const addPlannedHabitsToFilteredHabits = (filteredHabits: FilteredHabitsType, habit: Habit): FilteredHabitsType => {
@@ -229,7 +231,7 @@ export const stringToFrequencyType = (str: string): FrequencyTypes => {
 }
 
 
-export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate: FilteredHabitsType, frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => {
+export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate: FilteredHabitsType, frequency: FrequencyTypes, objectifID: string | undefined, habitID: string): Habit | undefined => {
   if(objectifID){
     return filteredHabitsByDate[frequency].Objectifs?.[objectifID]?.[habitID]
   }

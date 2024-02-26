@@ -85,9 +85,9 @@ const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigatio
   const totalSteps = steps.length;
   const pourcentage_value = (doneSteps * 100) / totalSteps;
 
-  const RenderHabits = () => {
-    return <HabitudesList habits={displayedHabits} selectedDate={currentDate} />;
-  };
+  const handlePressOnHabit = (habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
+    navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
+  }
 
   return (
     <UsualScreen>
@@ -121,7 +121,7 @@ const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigatio
               </View>
 
               <View style={{ flex: 1 }}>
-                <RenderHabits />
+                <HabitudesList habits={displayedHabits} currentDateString={currentDateString} handleOnPress={handlePressOnHabit}/>
               </View>
             </View>
           </CustomScrollView>

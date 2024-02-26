@@ -20,7 +20,7 @@ const ProgressBar: FC<ProgressBarProps> = ({progress, color, inactiveColor, with
     const unfilledColor = inactiveColor ?? primary
     const finalColor = color ?? font
 
-    const final_progress = progress ?? 1
+    const final_progress = progress ?? 0
     const pourcentage = Math.round(final_progress*100)
     
     if(withPourcentage){
@@ -36,7 +36,7 @@ const ProgressBar: FC<ProgressBarProps> = ({progress, color, inactiveColor, with
         )
     }
     return(
-        <Progress.Bar progress={final_progress} color={color ? color : font} width={null} borderWidth={0} unfilledColor={unfilledColor} height={3}/>
+        <Progress.Bar progress={final_progress} color={finalColor} width={null} borderWidth={0} height={3} unfilledColor={unfilledColor}/>
     )
 }
 

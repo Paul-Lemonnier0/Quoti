@@ -3,9 +3,10 @@ import { HabitudeListItemPresentation } from "./HabitudeListItem"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { Habit } from "../../types/HabitTypes"
 import { FC } from "react"
+import { FormDetailledHabit } from "../../types/FormHabitTypes"
 
 interface PresentationHabitListProps {
-    habits: Habit[]
+    habits: (Habit | FormDetailledHabit)[]
 }
 
 const PresentationHabitList: FC<PresentationHabitListProps> = ({habits}) => {

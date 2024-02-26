@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useCallback, useEffect, memo } from 'react';
+import React, { useState, useRef, useMemo, useCallback, useEffect, memo, FC } from 'react';
 import { StyleSheet, View} from 'react-native';
 import { HugeText, SubTitleGrayText, NormalText, TitleText } from '../styles/StyledText';
 import { CustomScrollView, UsualScreen } from '../components/View/Views';
@@ -15,8 +15,12 @@ import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { PeriodeType } from '../types/HomeScreenTypes';
 import { FrequencyTypes, Habit } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { HomeStackParamsList } from '../navigation/BottomTabNavigator';
 
-const HomeScreen = () => {
+type HomeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HomeScreen">
+
+const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
 
   //IMPORTS
 
@@ -128,6 +132,9 @@ const HomeScreen = () => {
         bottomSheetModalRef_Calendar.current?.present();
   }, []);
 
+  const handlePressOnHabit = (habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
+    navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
+  }
 
   //JSX
 
@@ -166,7 +173,7 @@ const HomeScreen = () => {
               <CustomScrollView>
                 <View style={styles.subBody}>
                   <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched}/>
-                  <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched}/>
+                  <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnHabit} currentDateString={selectedDate.toDateString()}/>
                 </View>
               </CustomScrollView>
             }

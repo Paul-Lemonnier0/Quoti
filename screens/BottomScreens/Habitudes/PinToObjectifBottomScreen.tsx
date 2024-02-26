@@ -1,4 +1,4 @@
-import { useCallback, useContext, useMemo, useState } from "react";
+import { FC, RefObject, useCallback, useContext, useMemo, useState } from "react";
 import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBottomSheet"
 import { HugeText, TitleText } from "../../../styles/StyledText"
 import { UsualScreen } from "../../../components/View/Views";
@@ -8,12 +8,22 @@ import { Success_Impact } from "../../../constants/Impacts";
 import ObjectifRadioItem from "../../../components/Objectifs/ObjectifRadioItem";
 import { HabitsContext } from "../../../data/HabitContext";
 import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets";
-import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet.tsx";
+import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import { useThemeColor } from "../../../components/Themed";
 import Separator from "../../../components/Other/Separator";
 import { AppContext } from "../../../data/AppContext";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { Habit, Objectif } from "../../../types/HabitTypes";
 
-export default PinToObjectifBottomScreen = ({bottomSheetModalRef, displayedObjectifs, updateHabitRelationWithObjectif, habit}) => {
+interface PinToObjectifBottomScreenProps {
+    bottomSheetModalRef: RefObject<BottomSheetModal>,
+    displayedObjectifs: Objectif[],
+    updateHabitRelationWithObjectif: (habit: Habit, selectedPinObjectifID: string | undefined) => void,
+    habit: Habit
+}
+
+const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> = 
+    ({bottomSheetModalRef, displayedObjectifs, updateHabitRelationWithObjectif, habit}) => {
     
     const {setIsLoading} = useContext(AppContext)
 
@@ -23,7 +33,7 @@ export default PinToObjectifBottomScreen = ({bottomSheetModalRef, displayedObjec
         bottomSheetModalRef.current?.close()
     }
 
-    const [selectedPinObjectifID, setSelectedPinObjectifID] = useState(null)
+    const [selectedPinObjectifID, setSelectedPinObjectifID] = useState(undefined)
 
     const handleChooseObjectif = async() => {
         if(habit.objectifID !== selectedPinObjectifID){
@@ -40,7 +50,7 @@ export default PinToObjectifBottomScreen = ({bottomSheetModalRef, displayedObjec
 
         const onPress = () => {
             if(item.objectifID === selectedPinObjectifID){
-                setSelectedPinObjectifID(null)
+                setSelectedPinObjectifID(undefined)
             }
 
             else setSelectedPinObjectifID(item.objectifID)
@@ -107,3 +117,5 @@ const styles = StyleSheet.create({
       gap: 10,
     },
 })
+
+export default PinToObjectifBottomScreen

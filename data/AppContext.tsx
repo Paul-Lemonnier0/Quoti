@@ -1,5 +1,5 @@
 import React, { Dispatch, createContext, useState } from "react";
-import { CustomSpinnerView } from "../components/Spinners/SpinnerView";
+import { CustomSpinnerView } from "../components/Spinners/CustomSpinnerView";
 
 interface AppContextType {
     setIsLoading: Dispatch<React.SetStateAction<boolean>>

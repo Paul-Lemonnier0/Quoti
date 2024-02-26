@@ -19,7 +19,6 @@ import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyle
 import { Success_Impact } from "../../constants/Impacts";
 import HabitCompletedBottomScreen from "../BottomScreens/Habitudes/HabitCompletedBottomScreen";
 import { useRef } from "react";
-import { UserContext } from "../../data/UserContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
 import { Step } from "../../types/HabitTypes";

@@ -9,11 +9,8 @@ import StepIndicator from "../Other/StepIndicator";
 import { NavigationButton } from "../Buttons/IconButtons";
 import { UsualScreen } from "../View/Views";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
-import { getSeriazableHabit } from "../../primitives/HabitMethods";
-import { FC, useContext, useState } from "react";
-import { HabitsContext } from "../../data/HabitContext";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { FormDetailledHabitValues, FormIconedHabit, FormStepsHabit } from "../../types/FormHabitTypes";
+import { FC, useState } from "react";
+import { FormDetailledHabitValues, FormStepsHabit } from "../../types/FormHabitTypes";
 import { FrequencyTypes, SeriazableHabit } from "../../types/HabitTypes";
 
 interface HabitAdvancedDetailsFormProps {

@@ -4,6 +4,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { FormColoredHabitValues } from "../../../types/FormHabitTypes";
 import { EditHabitStackProps } from "./EditHabitNav";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../../constants/BasicConstants";
 
 type EditColorHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditColorHabitScreen">
 
@@ -17,11 +18,17 @@ const EditColorHabitScreen: FC<EditColorHabitScreenProps> = ({route, navigation}
         })
     }
 
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, AddHabitScreenType.CreateHabitDetails)
+
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
+
     return(
         <ChooseColorForm
-            isForModifyingHabit
             handleGoNext={handleGoNext}
-            habit={{...oldHabit, ...newValues}}
+            defaultColor={oldHabit.color}
+            totalSteps={totalSteps}
+            currentStep={currentStep}
         />
     )
 }

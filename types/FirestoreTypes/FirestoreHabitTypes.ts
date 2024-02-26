@@ -30,7 +30,7 @@ interface FirestoreHabit extends FirestoreBaseItem {
     frequency: string,
     lastCompletionDate: string,
     notificationEnabled: boolean,
-    objectifID: string | undefined,
+    objectifID: string | null,
     occurence: number,
     reccurence: number,
     steps: FirestoreStep[]

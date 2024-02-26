@@ -1,24 +1,28 @@
-import { HugeText, MassiveText, NormalText, SubText, SubTitleText, TitleText } from "../../../styles/StyledText"
-
+import { MassiveText, TitleText } from "../../../styles/StyledText"
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
-import { CloseButton, Icon } from "../../../components/Buttons/IconButtons";
+import { CloseButton } from "../../../components/Buttons/IconButtons";
 import Confetti from "../../../components/Other/Confetti";
-import { useRef } from "react";
+import { FC, RefObject, useRef } from "react";
 import { useEffect } from "react";
 import { Image } from "react-native";
 import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBottomSheet";
 import { UsualScreen } from "../../../components/View/Views";
 import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList";
-import { HabitudeListItem, HabitudeListItemPresentation } from "../../../components/Habitudes/HabitudeListItem";
-import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
-import { useNavigation } from "@react-navigation/native";
+import { HabitudeListItemPresentation } from "../../../components/Habitudes/HabitudeListItem";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { Habit } from "../../../types/HabitTypes";
+import AnimatedLottieView from "lottie-react-native";
 
-export default HabitCompletedBottomScreen = ({bottomSheetModalRef, habit}) => {
+interface HabitCompletedBottomScreenProps {
+    bottomSheetModalRef: RefObject<BottomSheetModal>,
+    habit: Habit,
+    goBackHome?: () => void
+}
+
+const HabitCompletedBottomScreen: FC<HabitCompletedBottomScreenProps> = ({bottomSheetModalRef, habit, goBackHome}) => {
     
-    const snapPoints = ["55%"]
-
-    const confettiRef = useRef(null)
+    const confettiRef = useRef<AnimatedLottieView>(null)
 
     const triggerConfetti = () => {
         if(confettiRef.current){
@@ -34,15 +38,14 @@ export default HabitCompletedBottomScreen = ({bottomSheetModalRef, habit}) => {
         bottomSheetModalRef.current?.close()
     }
 
-    const navigation = useNavigation()
-
-    const goBackHome = () => {
-        navigation.navigate("HomeScreen")
+    const handleGoBackHome = () => {
+        //navigation.navigate("HomeScreen")
+        if(goBackHome) goBackHome()
     }
 
     return (
-        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} onChange={() => {}} isPrimary
-            footerText={"Retour à l'accueil"} footerMethod={goBackHome}>
+        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}  isPrimary
+            footerText={"Retour à l'accueil"} footerMethod={handleGoBackHome}>
             <UsualScreen hideMenu>
                 <View style={styles.container}>
                     <View style={styles.pageTitleContainer}>
@@ -65,7 +68,7 @@ export default HabitCompletedBottomScreen = ({bottomSheetModalRef, habit}) => {
 
                     <View style={styles.footer}>
                         {/* <Animated.View style={{position: "absolute", bottom: 0}} entering={FadeInDown.delay(200)}> */}
-                            <HabitudeListItemPresentation habitude={habit} currentDateString={new Date().toDateString()}/>
+                            <HabitudeListItemPresentation habitude={habit}/>
                         {/* </Animated.View> */}
                     </View>
                 </View>
@@ -128,3 +131,4 @@ const styles = StyleSheet.create({
     }
 })
   
+export default HabitCompletedBottomScreen

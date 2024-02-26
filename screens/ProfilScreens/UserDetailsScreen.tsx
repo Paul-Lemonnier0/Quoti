@@ -67,7 +67,7 @@ const UserDetailsScreen = ({ route, navigation }: UserDetailsScreenProps) => {
 
                   <View style={{display: "flex", flexDirection: "column", gap: 20, alignItems: "center"}}>
                     <View style={styles.imageContainerStyle}>
-                      <Image style={styles.imageStyle} source={detailledUser.photoURL ? {uri: detailledUser.photoURL} : require("../../img/TestVrai.png")}/>
+                      <Image style={styles.imageStyle} source={{uri: detailledUser.photoURL ?? ""}}/>
                     </View>
                     
                     <View style={{display: "flex", flexDirection: "row"}}>

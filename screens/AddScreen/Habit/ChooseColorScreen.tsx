@@ -3,6 +3,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import { FC } from "react"
 import {  FormColoredHabitValues } from "../../../types/FormHabitTypes"
+import { AddHabitScreenType, getAddHabitStepsDetails } from "../../../constants/BasicConstants"
 
 type ChooseColorScreenProps = NativeStackScreenProps<AddScreenStackType, "ChooseColorScreen">
 
@@ -14,9 +15,16 @@ export const ChooseColorScreen: FC<ChooseColorScreenProps> = ({navigation, route
         navigation.navigate("ChooseIconScreen", {habit: {...habit, ...values}})
     }
 
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(habit.objectifID ?? null, AddHabitScreenType.ChooseColorScreen)
+
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
+
     return(
         <ChooseColorForm 
-            habit={habit}
-            handleGoNext={handleGoNext}/>
+            handleGoNext={handleGoNext}
+            totalSteps={totalSteps}
+            currentStep={currentStep}
+        />
     )
 }

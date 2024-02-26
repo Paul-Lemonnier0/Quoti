@@ -13,15 +13,17 @@ import { FormColoredHabit, FormIconedHabitValues } from "../../types/FormHabitTy
 import { SeriazableHabit } from "../../types/HabitTypes";
 
 interface ChooseIconFormProps {
-    isForModifyingHabit?: boolean,
-    habit: FormColoredHabit | SeriazableHabit,
+    defaultIcon?: string,
     handleGoNext: (iconedHabit: FormIconedHabitValues) => void,
+    currentStep: number,
+    totalSteps: number
 }
 
 const ChooseIconForm: FC<ChooseIconFormProps> = ({
-    isForModifyingHabit,
-    habit,
+    defaultIcon,
     handleGoNext,
+    currentStep,
+    totalSteps
 }) => {
 
     const secondary = useThemeColor({}, "Secondary")
@@ -37,17 +39,12 @@ const ChooseIconForm: FC<ChooseIconFormProps> = ({
 
     const splitHabitsIconsData = splitArrayIntoChunks(habitsIconsData, 20);
     
-    const baseIcon = 'icon' in habit ? (habit as SeriazableHabit).icon : splitHabitsIconsData[0][0].id;
+    const baseIcon = defaultIcon ?? splitHabitsIconsData[0][0].id;
     const [selectedIcon, setSelectedIcon] = useState<string>(baseIcon)
 
     const handleValidation = () => {
         handleGoNext({icon: selectedIcon})
     }
-
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)
-
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
-    const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     const renderItem = ({ item }) => {
 

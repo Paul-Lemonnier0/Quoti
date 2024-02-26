@@ -11,7 +11,7 @@ import { HabitsContext } from "../../data/HabitContext";
 import ProgressBar from "../Progress/ProgressBar";
 import { getSeriazableObjectif } from "../../primitives/ObjectifMethods";
 import Animated, { FadeInRight } from "react-native-reanimated";
-import { FrequencyTypes, HabitList, Step } from "../../types/HabitTypes";
+import { FrequencyTypes, Habit, Step } from "../../types/HabitTypes";
 
 interface ObjectifBlockProps {
     objectifID: string,
@@ -25,7 +25,7 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index}) =
 
     try{
         const objectif = Objectifs[objectifID]
-        const habits: HabitList = Object.values(filteredHabitsByDate[frequency].Objectifs?.[objectifID] ?? {})
+        const habits: Habit[] = Object.values(filteredHabitsByDate[frequency].Objectifs?.[objectifID] ?? {})
 
         const stylesCard = cardStyle()
 

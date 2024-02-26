@@ -11,11 +11,13 @@ import { FrequencyTypes, Habit, HabitList, Step, StepList, StreakValues } from "
 const setupHabit = (habit: FormDetailledHabit): FirestoreHabit => {
 
     const todayDateString = new Date().toDateString()
-    const startingDate = habit.startingDate ?? todayDateString
+    const startingDate = todayDateString
+    const objectifID = habit.objectifID ?? null
 
     const settedUpHabit: FirestoreHabit = { 
         ...habit, 
         startingDate, 
+        objectifID,
         bestStreak: 0,
         currentStreak: 0, 
         lastCompletionDate: "none",
@@ -51,7 +53,7 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userID: string): Pr
     const frequency: FrequencyTypes = stringToFrequencyType(habitToAdd.frequency)
     const startingDate =  new Date(habitToAdd.startingDate)
 
-    return {...habitToAdd, startingDate, habitID, steps, frequency}
+    return {...habitToAdd, objectifID: habitToAdd.objectifID ?? undefined, startingDate, habitID, steps, frequency}
 }
 
 const getAllOwnHabits = async(userID: string): Promise<HabitList> => {
@@ -84,7 +86,7 @@ const getAllOwnHabits = async(userID: string): Promise<HabitList> => {
 
         const newStreakValues: StreakValues = getUpdatedStreakOfHabit(data, today);
 
-        return  {...data, habitID, startingDate, steps, daysOfWeek, newStreakValues, frequency};
+        return  {...data, habitID, startingDate, steps, daysOfWeek, newStreakValues, frequency, objectifID: data.objectifID ?? undefined};
     }));
 
     return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});

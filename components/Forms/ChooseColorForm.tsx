@@ -17,19 +17,21 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { SeriazableHabit } from "../../types/HabitTypes"
 
 interface ChooseColorFormProps {
-    isForModifyingHabit?: boolean,
-    habit: FormBasicHabit | SeriazableHabit,
+    defaultColor?: string,
     handleGoNext: (coloredHabit: FormColoredHabitValues) => void,
+    currentStep: number,
+    totalSteps: number
 }
 
 const ChooseColorForm: FC<ChooseColorFormProps> = ({
-    isForModifyingHabit,
-    habit,
+    defaultColor,
     handleGoNext,
+    currentStep,
+    totalSteps
 }) => {
 
     const font = useThemeColor({}, "Font")
-    const baseColor = 'color' in habit ? (habit as SeriazableHabit).color : ColorsList[0];
+    const baseColor = defaultColor ?? ColorsList[0];
 
     const [selectedColor, setSelectedColor] = useState<string>(baseColor)
 
@@ -41,12 +43,6 @@ const ChooseColorForm: FC<ChooseColorFormProps> = ({
     const handleOpenCustomColor = useCallback(() => {
         bottomSheetModalRef_CustomColor.current?.present();
       }, []);
-  
-
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit?.objectifID ?? null, AddHabitScreenType.ChooseColorScreen)
-
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
-    const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     return(
         <UsualScreen hideMenu>

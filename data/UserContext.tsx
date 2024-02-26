@@ -36,10 +36,6 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
         return null
     }
     
-    else {
-
-    }
-    const userBis = useAuthentification()
     const [isLoading, setIsLoading] = useState(false)
 
     const setUserFriendRequest = (friendRequests: Array<any>) => {

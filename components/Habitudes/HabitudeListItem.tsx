@@ -1,20 +1,10 @@
-import { View, StyleSheet, TouchableOpacity, Vibration} from "react-native";
-import { HugeText, LittleNormalText, NormalText, SubText, SubTitleText, TitleText} from "../../styles/StyledText";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { SubText, SubTitleText } from "../../styles/StyledText";
 import { useThemeColor } from "../Themed";
-import { useNavigation } from "@react-navigation/native";
 import cardStyle from "../../styles/StyledCard";
-import IconImage from "../Other/IconImage";
 import StepIndicator from "../Other/StepIndicator";
-import { BackgroundIconButton, Icon, IconProvider } from "../Buttons/IconButtons";
-import ProgressBar from "../Progress/ProgressBar";
-import { getHabitType } from "../../primitives/HabitMethods";
-import { RectButton } from "react-native-gesture-handler";
-import Swipeable from "react-native-gesture-handler/Swipeable";
-import { Alert } from "react-native";
+import { Icon, IconProvider } from "../Buttons/IconButtons";
 import { FC, useCallback, useRef } from "react";
-import { useContext } from "react";
-import { BottomSheetModalMethodsContext, BottomSheetModalMethodsContextProvider } from "../../data/BottomSheetModalContext";
-import * as Haptics from 'expo-haptics';
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import ItemIcon from "../Icons/ItemIcon";
@@ -22,20 +12,23 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen";
 import { Habit } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { FormDetailledHabit } from "../../types/FormHabitTypes";
 
 interface HabitudeListItemProps {
     habitude: Habit,
-    index: number
+    index: number,
+    handleOnPress: (habitude: Habit, 
+        objectifID: string | undefined,
+        currentDateString: string) => void,
+    currentDateString: string
 }
 
-export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index}) => {
+export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, handleOnPress, currentDateString}) => {
     const primary = useThemeColor({}, "Primary")
     const stylesCard = cardStyle()
 
-    const objectifID  = habitude.objectifID
-
-    const handlePress = () => {        
-        //navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
+    const handlePress = () => {  
+        handleOnPress(habitude, habitude.objectifID, currentDateString)      
     }
 
     const habit = habitude
@@ -92,14 +85,12 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index}) 
 
 
 interface HabitudeListItemPresentation {
-    habitude: Habit
+    habitude: Habit | FormDetailledHabit
 }
 
 export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  ({habitude}) => {
     const primary = useThemeColor({}, "Primary")
     const stylesCard = cardStyle()
-
-    const objectifID  = habitude.objectifID
 
     const habit = habitude
 
@@ -107,10 +98,6 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
     
     const habitDoneSteps = steps.length
     const totalSteps = steps.length
-
-    const pourcentage = (habitDoneSteps * 100 / totalSteps)
-
-    const isFinished = habitDoneSteps === steps.length
 
     return(
         <View style={[stylesCard.card, styles.container]}>

@@ -1,7 +1,7 @@
 import * as Progress from "react-native-progress";
 import { useThemeColor } from "../Themed";
 import { View } from "react-native";
-import { LittleNormalText, NormalText } from "../../styles/StyledText";
+import { NormalText } from "../../styles/StyledText";
 import { StyleSheet } from "react-native";
 import { FC } from "react";
 
@@ -20,7 +20,7 @@ const ProgressBar: FC<ProgressBarProps> = ({progress, color, inactiveColor, with
     const unfilledColor = inactiveColor ?? primary
     const finalColor = color ?? font
 
-    const final_progress = !progress || isNaN(progress) ? 1 : progress
+    const final_progress = progress ?? 1
     const pourcentage = Math.round(final_progress*100)
     
     if(withPourcentage){

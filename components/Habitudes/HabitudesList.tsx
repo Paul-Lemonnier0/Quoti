@@ -5,9 +5,13 @@ import { Habit } from "../../types/HabitTypes"
 
 interface HabitudesListProps {
   habits: Habit[],
+  handleOnPress: (habitude: Habit, 
+                  objectifID: string | undefined,
+                  currentDateString: string) => void,
+  currentDateString: string
 }
 
-const HabitudesList: FC<HabitudesListProps> = ({habits}) => {
+const HabitudesList: FC<HabitudesListProps> = ({habits, handleOnPress, currentDateString}) => {
 
     const doneHabits = habits.filter(habit => {
       const steps = Object.values(habit.steps)
@@ -25,7 +29,8 @@ const HabitudesList: FC<HabitudesListProps> = ({habits}) => {
           <Animated.View style={{gap: 20, paddingBottom: 20}}>
             {
               sortedHabits.map((habit, index) => 
-                  <HabitudeListItem habitude={habit} key={habit.habitID} index={index}/>
+                  <HabitudeListItem habitude={habit} key={habit.habitID} index={index} 
+                    handleOnPress={handleOnPress} currentDateString={currentDateString}/>
               )
             }
           </Animated.View>

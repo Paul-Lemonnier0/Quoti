@@ -28,6 +28,24 @@ export function getAddHabitStepsDetails(objectifID: string | null, currentScreen
         }
 }
 
+export enum AddObjectifScreenType {
+    PreAddScreen = "PreAddScreen",
+    AddBasicObjectifDetails = "AddBasicObjectifDetails",
+    ChooseColorScreenObjectif = "ChooseColorScreenObjectif",
+    ChooseIconScreenObjectif = "ChooseIconScreenObjectif",
+    AddHabitsToObjectif = "AddHabitsToObjectif"
+}
+
+const ADD_OBJECTIF_STEP_ORDER: AddObjectifScreenType[] = [AddObjectifScreenType.PreAddScreen, AddObjectifScreenType.AddBasicObjectifDetails, AddObjectifScreenType.ChooseColorScreenObjectif, AddObjectifScreenType.ChooseIconScreenObjectif, AddObjectifScreenType.AddHabitsToObjectif]
+
+export function getAddObjectifStepsDetails(currentScreen: AddObjectifScreenType){
+
+    return {
+            TOTAL_STEPS: ADD_OBJECTIF_STEP_ORDER.length,
+            CURRENT_STEP: ADD_OBJECTIF_STEP_ORDER.indexOf(currentScreen)
+        }
+}
+
 const IMAGE_DIMENSIONS = {width: 320, height: 320}          
 const IMAGE_FORMAT = ImageManipulator.SaveFormat.JPEG       
 const IMAGE_COMPRESSION = 0.5   

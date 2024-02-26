@@ -47,7 +47,7 @@ export const DatePicker: FC<DatePickerProps> = ({onPress, date, label, boldLabel
     )
 }
  
-interface MultiDatePickerProps extends DatePickerProps {
+interface MultiDatePickerProps extends DatePickerBasicProps {
     startDate: Date,
     endDate: Date
 }

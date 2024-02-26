@@ -1,8 +1,7 @@
 import { Pressable, StyleSheet, View } from "react-native"
 import { NormalText } from "../../styles/StyledText"
 import { useThemeColor } from "../Themed"
-import { TouchableOpacity } from "react-native"
-import Animated, { useAnimatedStyle, useDerivedValue, useSharedValue, withSpring, withTiming } from "react-native-reanimated"
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { Dispatch, FC } from "react"
 
 interface ItemType {
@@ -26,14 +25,10 @@ export const RadioButtonsBar: FC<RadioButtonsBarProps> = ({items, setSelectedIte
     const LEFT_PERCENTAGE = 100 / items.length
 
     const indicatorTranslateX = useSharedValue(0)
-    
-    const indicatorTranslateXString = useDerivedValue(() => {
-        return indicatorTranslateX.value.toString() + "%";
-    });
 
     const indicatorTranslateXstyle = useAnimatedStyle(() => {
         return {
-            left: indicatorTranslateXString
+            left: `${indicatorTranslateX.value}%`
         };
       });
     

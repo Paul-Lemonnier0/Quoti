@@ -11,15 +11,19 @@ import { FrequencyTypes, Habit } from "../../../types/HabitTypes"
 interface DisplayHabitsScreenProps {
   isSkeleton: Boolean,
   displayedHabits: Habit[],
+  handleOnPress: (habitude: Habit, 
+    objectifID: string | undefined,
+    currentDateString: string) => void,  
+  currentDateString: string
 }
 
-export const DisplayHabitsScreen: FC<DisplayHabitsScreenProps> = ({isSkeleton, displayedHabits}) => {
+export const DisplayHabitsScreen: FC<DisplayHabitsScreenProps> = ({isSkeleton, displayedHabits, handleOnPress, currentDateString}) => {
     return(
       <>
           {
             isSkeleton ?
             <HabitsSkeletonList/> :
-            <HabitudesList habits={displayedHabits}/>
+            <HabitudesList habits={displayedHabits} handleOnPress={handleOnPress} currentDateString={currentDateString}/>
           }
       </>
     )
@@ -29,9 +33,13 @@ interface RenderHabitsProps {
   habits: Habit[],
   isLoading: Boolean,
   isFetched: Boolean,
+  handleOnPress: (habitude: Habit, 
+    objectifID: string | undefined,
+    currentDateString: string) => void,   
+  currentDateString: string
 }
 
-export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, isLoading, isFetched}) => {
+export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, isLoading, isFetched, handleOnPress, currentDateString}) => {
 
   const isSkeleton = isLoading || !isFetched
 
@@ -46,6 +54,8 @@ export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, isLoading, isF
       <DisplayHabitsScreen 
         isSkeleton={isSkeleton}  
         displayedHabits={habits} 
+        handleOnPress={handleOnPress}
+        currentDateString={currentDateString}
       />
     </View>
   )

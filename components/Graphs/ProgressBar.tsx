@@ -1,6 +1,6 @@
 import {StyleSheet, View, ViewStyle} from 'react-native';
 import { useThemeColor } from '../../components/Themed';
-import Animated, { AnimatedStyleProp, useAnimatedStyle, useDerivedValue } from 'react-native-reanimated';
+import Animated, { useDerivedValue } from 'react-native-reanimated';
 import { FC } from 'react';
 
 interface ProgressBarProps {

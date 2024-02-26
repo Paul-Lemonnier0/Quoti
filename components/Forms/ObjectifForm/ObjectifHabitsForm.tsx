@@ -1,74 +1,38 @@
-import { View } from "react-native"
-import { CustomScrollView, UsualScreen } from "../../../components/View/Views"
 import { StyleSheet } from "react-native"
+import AddHabitToObjectifNav from "../../../screens/AddScreen/Objectif/AddHabitToObjectifNav"
+import { View } from "react-native"
+import { NavigationButton } from "../../Buttons/IconButtons"
 import { HugeText, NormalText, SubTitleText } from "../../../styles/StyledText"
-import { BorderTextButton } from "../../../components/Buttons/UsualButton"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import StepIndicator from "../../Other/StepIndicator"
+import { CustomScrollView, UsualScreen } from "../../View/Views"
+import PresentationHabitList from "../../Habitudes/PresentationHabitList"
+import { BorderTextButton } from "../../Buttons/UsualButton"
 import { Image } from "react-native"
-import { Touchable } from "react-native"
-import { TouchableOpacity } from "react-native"
-import { useThemeColor } from "../../../components/Themed"
-import { NavigationButton } from "../../../components/Buttons/IconButtons"
-import { useState } from "react"
-import { useMemo } from "react"
-import { useRef } from "react"
-import { useCallback } from "react"
-import AddHabitToObjectifNav from "./AddHabitToObjectifNav"
-import { useContext } from "react"
-import { HabitsContext } from "../../../data/HabitContext"
-import HabitudesList from "../../../components/Habitudes/HabitudesList"
-import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
+import { FC, useCallback, useContext, useRef, useState } from "react"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { Success_Impact } from "../../../constants/Impacts"
-import { AnimatedBasicSpinnerView } from "../../../components/Spinners/AnimatedSpinner"
-import { useEffect } from "react"
-import BottomMenuStyle from "../../../styles/StyledBottomMenu"
-import PresentationHabitList from "../../../components/Habitudes/PresentationHabitList"
+import { FormDetailledHabit } from "../../../types/FormHabitTypes"
 import { AppContext } from "../../../data/AppContext"
+import { HabitsContext } from "../../../data/HabitContext"
+import { FormDetailledObjectif } from "../../../types/FormObjectifTypes"
 
+interface ObjectifHabitsFormProps {
+    objectif: FormDetailledObjectif
+    handleGoNext: (habits: FormDetailledHabit[]) => Promise<void>
+}
 
-
-const AddHabitsToObjectif = () => {
+const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext}) => {
 
     const {setIsLoading} = useContext(AppContext)
     const {addObjectif, addHabit} = useContext(HabitsContext)
 
-    const route = useRoute()
-    const navigation = useNavigation()
-
-    const {objectif} = route.params
-    const deserializedObjectif = convertBackSeriazableObjectif(objectif)
-    
-
-    const [habitsForObjectif, setHabitsForObjectif] = useState([])
-
-    const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
-
-    function timeout(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    async function sleep() {
-        await timeout(3000);
-        return;
-    }
+    const [habitsForObjectif, setHabitsForObjectif] = useState<FormDetailledHabit[]>([])
 
     const handleValidate = async() => {
-
-        const startingDate = deserializedObjectif.startingDate
-        const endingDate = deserializedObjectif.endingDate
-
-        setIsLoading(true)
-        const objectifWithID = await addObjectif(deserializedObjectif) 
-
-        const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID, startingDate, endingDate}))
-        await Promise.all(updatedHabitsForObjectif.map(addHabit));
-        setIsLoading(false)
-
-        Success_Impact()
-        console.log("objectif and habit(s) well added")
-        navigation.navigate("ValidationScreenObjectif")
+        await handleGoNext(habitsForObjectif)
     }
 
-    const addHabitForObjectif = (habit) => {
+    const addHabitForObjectif = (habit: FormDetailledHabit) => {
         setHabitsForObjectif((prevHabits => {
             return [
                 ...prevHabits, 
@@ -85,15 +49,12 @@ const AddHabitsToObjectif = () => {
         handleOpenAddHabit()
     }
 
-    const bottomSheetModalRef_AddHabit = useRef(null);
-    const snapPoints_AddHabit = useMemo(() => ['100%'], []);
+    const bottomSheetModalRef_AddHabit = useRef<BottomSheetModal>(null);
   
     const handleOpenAddHabit = useCallback(() => {
         bottomSheetModalRef_AddHabit.current?.present();
       }, []);
   
-    const handleSheetChangesAddHabit = useCallback((index) => {}, []);
-
     const EmptyHabitsScreen = () => {
         return(
             <View style={styles.body}>
@@ -151,9 +112,10 @@ const AddHabitsToObjectif = () => {
 
             <AddHabitToObjectifNav
                 bottomSheetModalRef={bottomSheetModalRef_AddHabit}
-                snapPoints={snapPoints_AddHabit}
-                handleSheetChanges={handleSheetChangesAddHabit}
-                addHabitForObjectif={addHabitForObjectif}/>
+                addHabitForObjectif={addHabitForObjectif}
+                color={objectif.color}
+                icon={objectif.icon}
+            />
         </UsualScreen>
     )
 }
@@ -198,4 +160,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddHabitsToObjectif;
+export default ObjectifHabitsForm;

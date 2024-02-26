@@ -16,7 +16,7 @@ interface CustomTextProps {
 
 const CustomText: FC<CustomTextProps> = ({text, style, color = 'Font', fontSize = 16, fontFamily = 'fontLight', numberOfLines = undefined}) => {
     const mergedStyles = StyleSheet.flatten([
-      {color: useThemeColor({}, color), fontSize: fontPixel(fontSize)},
+      {color: useThemeColor({}, color), fontSize: fontPixel(fontSize), fontFamily},
       style
     ])
   

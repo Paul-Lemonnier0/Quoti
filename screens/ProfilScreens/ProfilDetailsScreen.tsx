@@ -1,8 +1,7 @@
 import { View, StyleSheet } from "react-native"
-import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubText, SubTitleGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { useRef, useMemo, useCallback, useState, FC } from "react"
+import { MassiveText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { useState, FC } from "react"
 import { useThemeColor } from "../../components/Themed"
-import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../components/View/Views"
 import { IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons"
 import { Image } from "react-native"
@@ -13,7 +12,6 @@ import { auth } from "../../firebase/InitialisationFirebase"
 import { BorderTextButton } from "../../components/Buttons/UsualButton"
 import { UserContext } from "../../data/UserContext"
 import { FlatList } from "react-native"
-import ProfilItem from "../../components/Profil/ProfilItem"
 import { useEffect } from "react"
 import { Database_getUsersInfo } from "../../firebase/Database_User_Primitives"
 import RequestFriendItem from "../../components/Profil/RequestFriendItem"
@@ -133,7 +131,7 @@ const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
                     <View style={styles.imageContainerStyle}>
                       {
                         user?.photoURL ?
-                        <Image style={styles.imageStyle} source={user.photoURL ? {uri: user.photoURL} : require("../../img/TestVrai.png")}/>
+                        <Image style={styles.imageStyle} source={{uri: user?.photoURL ?? ""}}/>
                         :
                         <RenderPlaceholderProfilPicture/>
                       }

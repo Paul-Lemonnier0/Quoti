@@ -1,80 +1,82 @@
-import { View } from "react-native"
-import { UsualScreen } from "../../../components/View/Views"
+import { View } from "moti"
+import { UsualScreen } from "../../View/Views"
+import { NavigationButton } from "../../Buttons/IconButtons"
 import { HugeText } from "../../../styles/StyledText"
-import { useCallback, useMemo, useState } from "react"
+import StepIndicator from "../../Other/StepIndicator"
+import { CustomTextInputRefType, TextInputCustom } from "../../TextFields/TextInput"
+import Separator from "../../Other/Separator"
+import { MultiDatePicker } from "../../TextFields/DatePicker"
 import { StyleSheet } from "react-native"
-import { TextInputCustom } from "../../../components/TextFields/TextInput"
-import { useRef } from "react"
-import { useNavigation } from "@react-navigation/native"
-import { NavigationButton } from "../../../components/Buttons/IconButtons"
-import { useThemeColor } from "../../../components/Themed"
-import Separator from "../../../components/Other/Separator"
-import { MultiDatePicker } from "../../../components/TextFields/DatePicker"
-import SelectMultipleDateBottomScreen from "../../BottomScreens/SelectMultipleDateBottomScreen"
+import SelectMultipleDateBottomScreen from "../../../screens/BottomScreens/SelectMultipleDateBottomScreen"
+import { useThemeColor } from "../../Themed"
+import { FC, useCallback, useMemo, useRef, useState } from "react"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import { Objectif } from "../../../types/HabitTypes"
+import { FormBasicObjectif } from "../../../types/FormObjectifTypes"
 
-export default AddBasicDetailsObjectif = () => {
+interface ObjectifBasicForm {
+    objectif?: Objectif,
+    handleGoNext: (newValues: FormBasicObjectif) => void,
+    totalSteps: number,
+    currentStep: number
+}
 
-    const navigation = useNavigation();
-
-    const font = useThemeColor({}, "Font")
-    const secondary = useThemeColor({}, "Secondary")
+export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext, totalSteps, currentStep}) => {
 
     let startingDateBase = new Date()
     let endingDateBase = new Date()
     endingDateBase.setDate(startingDateBase.getDate() + 3)
 
-    const [startingDate, setStartingDate] = useState(startingDateBase)
-    const [endingDate, setEndingDate] = useState(endingDateBase)
-    const [dateToChange, setDateToChange] = useState(new Date())
+    const [startingDate, setStartingDate] = useState<Date>(startingDateBase)
+    const [endingDate, setEndingDate] = useState<Date>(endingDateBase)
 
-    let titreRef = useRef(null)
-    let descriptionRef = useRef(null)
+    let titreRef = useRef<CustomTextInputRefType>(null)
+    let descriptionRef = useRef<CustomTextInputRefType>(null)
 
     const [isTitleWrong, setIsTitleWrong] = useState(false)
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
-    const handleGoNext = () => {
+    const handleValidation = () => {
 
         let canGoNext = true
 
-        let titre = titreRef.current?.getValue();
-        let description = descriptionRef.current?.getValue();
+        const titre = titreRef.current?.getValue();
+        const description = descriptionRef.current?.getValue();
 
-        if(titre.trim().length === 0 || description.trim().length === 0) 
-        {
-            description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-            titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
-
-            canGoNext = false
-        }
-
-        else {
-            setIsTitleWrong(false)
-            setIsDescriptionWrong(false)
-        }
-
-        if(canGoNext) 
-        { 
-            const detailledObjectif = {
-                titre, 
-                description, 
-                startingDate: startingDate.toDateString(), 
-                endingDate: endingDate.toDateString()
+        if(titre && description) {
+            if(titre.trim().length === 0 || description.trim().length === 0) 
+            {
+                setIsDescriptionWrong(description.trim().length <= 0)
+                setIsTitleWrong(titre.trim().length <= 0)
+    
+                canGoNext = false
             }
+    
+            else {
+                setIsTitleWrong(false)
+                setIsDescriptionWrong(false)
+            }
+    
+            if(canGoNext) 
+            { 
+                const detailledObjectif: FormBasicObjectif = {
+                    titre, 
+                    description, 
+                    startingDate: startingDate.toDateString(), 
+                    endingDate: endingDate.toDateString()
+                }
 
-            navigation.navigate("ChooseColorScreenObjectif", {detailledObjectif})
+                handleGoNext(detailledObjectif)
+                //navigation.navigate("ChooseColorScreenObjectif", {detailledObjectif})
+            }
         }
     }
 
-    const bottomSheetModalRef_Calendar = useRef(null);
-    const snapPoints_Calendar = useMemo(() => ['55%'], []);
+    const bottomSheetModalRef_Calendar = useRef<BottomSheetModal>(null);
   
     const handleOpenCalendar = useCallback(() => {
           bottomSheetModalRef_Calendar.current?.present();
       }, []);
-  
-    const handleSheetChangesCalendar = useCallback((index) => {
-    }, []);
 
     return(
         <UsualScreen hideMenu>
@@ -83,12 +85,12 @@ export default AddBasicDetailsObjectif = () => {
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
                         <NavigationButton noPadding action={"goBack"}/>
-                        <NavigationButton noPadding action={"goNext"} methode={handleGoNext}/>
+                        <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="Nouvel objectif"/>
 
-                    <StepIndicator totalSteps={5} currentStep={1}/>
+                    <StepIndicator totalSteps={totalSteps} currentStep={currentStep}/>
                 </View>
 
                 <View style={styles.body}>
@@ -114,16 +116,13 @@ export default AddBasicDetailsObjectif = () => {
             </View>
 
             
-        <SelectMultipleDateBottomScreen 
-          startingDate={startingDate}
-          setStartingDate={setStartingDate}
-          endingDate={endingDate}
-          setEndingDate={setEndingDate}
-          bottomSheetModalRef={bottomSheetModalRef_Calendar} 
-          snapPoints={snapPoints_Calendar} 
-          handleSheetChanges={handleSheetChangesCalendar}/>
+            <SelectMultipleDateBottomScreen
+                setStartingDate={setStartingDate}
+                setEndingDate={setEndingDate}
+                bottomSheetModalRef={bottomSheetModalRef_Calendar} 
+            />
 
-        </UsualScreen>
+        </UsualScreen>      
     )
 }
 

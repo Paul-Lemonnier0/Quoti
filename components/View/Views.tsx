@@ -18,16 +18,17 @@ export const UsualScreen: FC<UsualScreenProps> = ({hideMenu, secondaryBackground
 
     const primary = useThemeColor({}, "Primary")
     const secondary = useThemeColor({}, "Secondary")
-    const linearGradientOpacity = useThemeColor({}, "LinearGradientOpacity")
+    const linearGradientOpacityStart = useThemeColor({}, "LinearGradientOpacityStart")
+    const linearGradientOpacityEnd = useThemeColor({}, "LinearGradientOpacityEnd")
 
     return(
         <View style={{flex: 1, backgroundColor: primary}}>
             <SafeAreaView style={{ flex: 1, backgroundColor: secondaryBackground ? secondary : primary }}>
-                <View style={[styles.container, {paddingBottom: hideMenu ? 0 : 120}]}>
+                <View style={[styles.container, {paddingBottom: hideMenu ? 20 : 120}]}>
                     {children}
                 </View>
             </SafeAreaView>
-            {!hideMenu && <LinearGradient colors={linearGradientOpacity} style={styles.linearGradient}/>}
+            {!hideMenu && <LinearGradient colors={[linearGradientOpacityStart, linearGradientOpacityEnd]} style={styles.linearGradient}/>}
         </View>
     )
 }
@@ -48,48 +49,10 @@ export const CustomScrollView: FC<BasicViewProps> = ({hideMenu, children}) => {
 
 
 const styles = StyleSheet.create({
-
-    headerContainer: {
-      margin: -30, 
-      marginBottom:0, 
-      paddingHorizontal: 30, 
-      paddingVertical:15,
-      borderBottomLeftRadius: 40, 
-      borderBottomRightRadius: 40, 
-    },
-  
-    headerParentContainer: {
-      margin: -30, 
-      marginBottom:0, 
-      padding: 30, 
-        
-    },
-
-    backgroundView: {
-        gap: 5,
-        flex:1,
-        flexGrow:1,
-        borderBottomLeftRadius: 50,
-        borderBottomRightRadius: 50,
-        margin:-30, 
-        marginBottom:0, 
-        padding:30, 
-        paddingVertical: 15, 
-    },
-
-    AltBackgroundView: {
-        gap: 5,
-        flex:1,
-        flexGrow:1,
-        margin:-30, 
-        marginBottom:0, 
-        padding:30,  
-        paddingVertical: 15, paddingBottom: 0
-    },
-
     container: {
         padding: 30,
         paddingTop: 10,
+        marginBottom: -20,
         paddingBottom: 0,
         flex:1,
         gap: 0,

@@ -5,11 +5,13 @@ import { UsualScreen } from "../../../components/View/Views"
 import { Image } from "react-native"
 import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
 import { BackgroundTextButton } from "../../../components/Buttons/UsualButton"
-import { useEffect } from "react"
+import { FC, useEffect } from "react"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
+import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 
-const ValidationScreenObjectif = () => {
+type ValidationScreenObjectifProps = NativeStackScreenProps<AddScreenStackType, "ValidationScreenObjectif">
 
-    const navigation = useNavigation();
+const ValidationScreenObjectif: FC<ValidationScreenObjectifProps> = ({navigation}) => {
 
     useEffect(() => {
 
@@ -24,7 +26,6 @@ const ValidationScreenObjectif = () => {
 
     const handleGoHome = () => {
         navigation.reset({index: 0, routes: [{ name: 'Home' }]})
-        // navigation.navigate("Home")
     }
 
     return (

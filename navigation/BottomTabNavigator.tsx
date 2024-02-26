@@ -35,6 +35,7 @@ import { User } from 'firebase/auth';
 import { UserType } from '../data/UserContext';
 import { UserFirestoreType } from '../types/FirestoreTypes/UserTypes';
 import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from '../types/FormHabitTypes';
+import { FormBasicObjectif, FormColoredObjectif, FormDetailledObjectif } from '../types/FormObjectifTypes';
 
 export type BottomTabParamList = {
   Home: undefined;
@@ -66,7 +67,7 @@ function BottomTabNavigator() {
           options={{
             tabBarIcon: ({color}) => (<View><Feather name="plus" size={24} color={color} /></View>),
             tabBarButton: ({ onPress, children }) => (<AddButton onPress={onPress} children={children}/>),
-            ...(hideStyle ? {} : { tabBarStyle: hideStyle }),
+            tabBarStyle: {display: 'none'}
           }}/>
 
         <BottomTab.Screen name="Notifs" component={NewsScreenNavigator}
@@ -116,7 +117,7 @@ export type HomeStackParamsList = {
   HabitudeScreen: {
     habitID: string,
     habitFrequency: FrequencyTypes,
-    objectifID: string,
+    objectifID: string | undefined,
     currentDateString: string,
   },
   SharedHabitScreen: {
@@ -181,9 +182,15 @@ export type AddScreenStackType  = {
   },
 
   AddBasicDetailsObjectif: undefined,
-  AddHabitsToObjectif: undefined,
-  ChooseColorScreenObjectif: undefined,
-  ChooseIconScreenObjectif: undefined,
+  ChooseColorScreenObjectif: {
+    objectif: FormBasicObjectif
+  },
+  ChooseIconScreenObjectif: {
+    objectif: FormColoredObjectif
+  },
+  AddHabitsToObjectif: {
+    objectif: FormDetailledObjectif
+  },
   ValidationScreenObjectif: undefined,
 }
 

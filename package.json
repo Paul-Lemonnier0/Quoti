@@ -70,7 +70,8 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0"
+    "@babel/core": "^7.20.0",
+    "typedoc": "^0.25.12"
   },
   "private": true
 }

@@ -1,6 +1,6 @@
-import React, { useState, useRef, useMemo, useCallback, useEffect, memo, FC } from 'react';
+import React, { useState, useRef, FC, useEffect, useCallback } from 'react';
 import { StyleSheet, View} from 'react-native';
-import { HugeText, SubTitleGrayText, NormalText, TitleText } from '../styles/StyledText';
+import { HugeText, SubTitleGrayText } from '../styles/StyledText';
 import { CustomScrollView, UsualScreen } from '../components/View/Views';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
@@ -13,11 +13,10 @@ import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Pe
 import { RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
 import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { PeriodeType } from '../types/HomeScreenTypes';
-import { FrequencyTypes, Habit, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
+import { FrequencyTypes, Habit, SeriazableObjectif } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamsList } from '../navigation/BottomTabNavigator';
-import { displayTree } from '../primitives/BasicsMethods';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HomeScreen">
 

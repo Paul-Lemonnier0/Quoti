@@ -9,6 +9,7 @@ import React from "react"
 
 export  interface CustomBottomSheetProps extends BasicCustomBottomSheetProps {
   noBackdrop?: boolean,
+  onDismiss?: () => void
 }
 
 const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children}) => {
@@ -48,7 +49,7 @@ const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, sna
   );
 };
 
-export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children}) => {
+export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, onDismiss, children}) => {
     
   const secondary = useThemeColor({}, "Secondary")
 
@@ -72,6 +73,7 @@ export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheet
           handleIndicatorStyle={{backgroundColor}}
           index={0}
           snapPoints={snapPoints}
+          onDismiss={onDismiss ?? undefined}
           enablePanDownToClose={true}
           enableDynamicSizing={snapPoints === undefined}
           backdropComponent={noBackdrop ? null : renderBackdrop}>

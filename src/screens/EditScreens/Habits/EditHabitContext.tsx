@@ -5,8 +5,7 @@ export interface EditHabitContextProps {
     validationAdditionnalMethod?: () => void,
 }
 
-export interface EditHabitContextProviderProps {
-    validationAdditionnalMethod?: () => void,
+export interface EditHabitContextProviderProps extends EditHabitContextProps {
     children: ReactNode
 }
 

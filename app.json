@@ -4,7 +4,7 @@
     "slug": "Daily",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/DailyIcon.png",
+    "icon": "./src/assets/images/DailyIcon.png",
     "scheme": "Daily",
     "userInterfaceStyle": "automatic",
 
@@ -20,11 +20,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.arzakal.Daily",
       "splash": {
-        "image": "./assets/images/DailySplashDark.png",
+        "image": "./src/assets/images/DailySplashDark.png",
         "resizeMode": "cover",
         "backgroundColor": "#000000",
         "dark": {
-            "image": "./assets/images/DailySplashDark.png",
+            "image": "./src/assets/images/DailySplashDark.png",
             "resizeMode": "cover",
             "backgroundColor": "#000000"
         }
@@ -32,18 +32,18 @@
     },
     "android": {
       "splash": {
-        "image": "./assets/images/DailySplash.png",
+        "image": "./src/assets/images/DailySplash.png",
         "resizeMode": "cover",
         "backgroundColor": "#ffffff",
         "dark": {
-            "image": "./assets/images/DailySplash.png",
+            "image": "./src/assets/images/DailySplash.png",
             "resizeMode": "cover",
             "backgroundColor": "#000000"
         }
       },
 
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
 
@@ -65,7 +65,7 @@
       ]
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./src/assets/images/favicon.png"
     },
     "extra": {
       "eas": {

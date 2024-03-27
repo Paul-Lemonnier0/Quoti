@@ -12,6 +12,9 @@ import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impa
 import { AppContext } from "../../../data/AppContext"
 import { HabitsContext } from "../../../data/HabitContext"
 import React from "react"
+import EditHabitNav from "../../EditScreens/Habits/EditHabitNav"
+import { getSeriazableObjectif } from "../../../primitives/ObjectifMethods"
+import EditObjectifNav from "../../EditScreens/Objectifs/EditObjectifNav"
 
 export interface SettingsObjectifBottomSheetProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -50,7 +53,7 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
     }
 
     const handleOpenEdit = () => {
-        handleOpenEditHabit()
+        handleOpenEditObjectif()
     }
 
     const handleEdit = () => {
@@ -106,10 +109,10 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
 
     commands.push({icon: "trash", provider: IconProvider.Feather, text:"Supprimer l'objectif", method: handleDelete, color: error})
 
-    const bottomSheetModalRef_EditHabit: RefObject<BottomSheetModal> = useRef(null);
+    const bottomSheetModalRef_EditObjectif: RefObject<BottomSheetModal> = useRef(null);
   
-    const handleOpenEditHabit = useCallback(() => {
-        bottomSheetModalRef_EditHabit.current?.present();
+    const handleOpenEditObjectif = useCallback(() => {
+        bottomSheetModalRef_EditObjectif.current?.present();
       }, []);
   
     return (
@@ -129,21 +132,11 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
                 <FooterBottomSheet text={"Terminer"} onPress={() => bottomSheetModalRef.current?.close()}/>
             </View>
             
-            {
-            
-            /* <PinToObjectifBottomScreen
-                bottomSheetModalRef={bottomSheetModalRef_PinObjectifScreen}
-                displayedObjectifs={displayedObjectifs}
-                updateHabitRelationWithObjectif={handleMakeObjectifRelation}
-                habit={habit}/>
-
-            <EditHabitNav
-                bottomSheetModalRef={bottomSheetModalRef_EditHabit}
-                habit={getSeriazableHabit(habit)}
+            <EditObjectifNav
+                bottomSheetModalRef={bottomSheetModalRef_EditObjectif}
+                objectif={getSeriazableObjectif(objectif)}
                 validationAdditionnalMethod={handleEdit}
-            /> */
-
-            }
+            />
         </CustomStaticBottomSheet>
     );
 };

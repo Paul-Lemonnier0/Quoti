@@ -74,7 +74,7 @@ const getAllOwnHabits = async(userID: string): Promise<HabitList> => {
         const notPlaceholderSteps = data.steps.filter((step: FirestoreStep) => (step.numero !== -1))
         steps = listKeyIDfromArray(notPlaceholderSteps, "stepID", habitID)
  
-        if(notPlaceholderSteps.length < data.steps.length){
+        if(notPlaceholderSteps.length <= data.steps.length || notPlaceholderSteps.length === 0){
             steps[habitID] = createDefaultStepFromHabit(data, habitID)
         }
 

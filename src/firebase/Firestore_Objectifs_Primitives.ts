@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, query, where } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { Objectif, ObjectifList } from "../types/HabitTypes"
 import { FirestoreObjectif } from "../types/FirestoreTypes/FirestoreHabitTypes"
@@ -64,6 +64,17 @@ const removeObjectifInFirestore = async(objectifID: string, userID: string): Pro
     console.log("Objectif successfully deleted in firestore !")
 }
 
+const updateObjectifInFirestore = async(userID: string, oldObjectif: Objectif, newValues: {[key: string]: any}) => {
+    const userDoc= doc(db, "Users", userID)
+
+    console.log("Updating objectif in firestore with id : ", oldObjectif.objectifID, "...")
+
+    const docRef = doc(collection(userDoc, 'Objectifs'), oldObjectif.objectifID)
+    await updateDoc(docRef, {...newValues})
+
+    console.log("Objectif successfully updated in firestore !")
+}
 
 
-export {addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore}
+
+export {addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore, updateObjectifInFirestore}

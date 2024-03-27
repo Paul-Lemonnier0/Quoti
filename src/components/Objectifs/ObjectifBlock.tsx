@@ -8,7 +8,7 @@ import { LittleNormalText, NormalText, SubText, SubTitleText } from "../../style
 import { Dimensions } from "react-native";
 import { HabitsContext } from "../../data/HabitContext";
 import ProgressBar from "../Progress/ProgressBar";
-import Animated, { FadeInRight } from "react-native-reanimated";
+import Animated, { FadeInRight, useSharedValue, withSpring } from "react-native-reanimated";
 import { FrequencyTypes, Habit, SeriazableObjectif, Step } from "../../types/HabitTypes";
 import { getSeriazableObjectif } from "../../primitives/ObjectifMethods";
 import SettingsObjectifBottomSheet from "../../screens/BottomScreens/Objectifs/SettingsObjectifBottomScreen";
@@ -40,7 +40,13 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
         bottomSheetModalRef.current?.present();
     }, []);
 
+    const scale = useSharedValue(1);
+
     const handleLongPress = () => {
+        scale.value = withSpring(0.9, {}, () => {
+            scale.value = withSpring(1);
+        });
+
         BottomScreenOpen_Impact();
         openModal()
     }
@@ -74,7 +80,13 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
     return(
         <>
         <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, width}} onPress={handlePress} delayLongPress={750} onLongPress={handleLongPress}>
-            <Animated.View entering={FadeInRight.duration(400).delay(index * 200)} style={[stylesCard.card, styles.objectif]}>
+            <Animated.View entering={FadeInRight.duration(400).delay(index * 200)} 
+                style={[
+                    stylesCard.card, 
+                    styles.objectif,
+                    {transform: [{scale}]}
+                ]}>
+                    
                 <View style={styles.header}>
                     <View style={[styles.iconContainer, {borderColor: objectif.color}]}>
                         <IconImage image={objectif.icon}/>

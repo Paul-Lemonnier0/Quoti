@@ -15,18 +15,17 @@ import { AppContext } from "../../../data/AppContext"
 import { HabitsContext } from "../../../data/HabitContext"
 import { FormDetailledObjectif } from "../../../types/FormObjectifTypes"
 import React from "react"
+import { Habit } from "../../../types/HabitTypes"
 
 export interface ObjectifHabitsFormProps {
     objectif: FormDetailledObjectif
-    handleGoNext: (habits: FormDetailledHabit[]) => Promise<void>
+    handleGoNext: (habits: (FormDetailledHabit | Habit)[]) => Promise<void>,
+    baseHabits?: (FormDetailledHabit | Habit)[]
 }
 
-const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext}) => {
+const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext, baseHabits}) => {
 
-    const {setIsLoading} = useContext(AppContext)
-    const {addObjectif, addHabit} = useContext(HabitsContext)
-
-    const [habitsForObjectif, setHabitsForObjectif] = useState<FormDetailledHabit[]>([])
+    const [habitsForObjectif, setHabitsForObjectif] = useState<(FormDetailledHabit | Habit)[]>(baseHabits ?? [])
 
     const handleValidate = async() => {
         await handleGoNext(habitsForObjectif)

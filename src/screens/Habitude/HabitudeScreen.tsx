@@ -45,7 +45,6 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
     const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID) ?? Habits_Skeleton[0]
 
-
     if(objectifID){
         habit["color"] = Objectifs[objectifID].color ?? habit.color
     }

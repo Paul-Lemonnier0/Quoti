@@ -37,12 +37,13 @@ export const CustomScrollView: FC<BasicViewProps> = ({hideMenu, children}) => {
 
     const marginBottom = hideMenu ? 0 : -100
     const marginHorizontal = -25
-
+    /*KeyboardAvoidView => warn override anim*/
+    
     return(
         <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom, marginHorizontal}}>
-            <KeyboardAvoidingView style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}>
+            <View style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}> 
                 {children}
-            </KeyboardAvoidingView>
+            </View>
         </ScrollView>
     )
 }

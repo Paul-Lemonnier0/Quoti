@@ -10,25 +10,31 @@ import { StyleSheet } from "react-native"
 import SelectMultipleDateBottomScreen from "../../../screens/BottomScreens/SelectMultipleDateBottomScreen"
 import { FC, useCallback, useRef, useState } from "react"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
-import { Objectif } from "../../../types/HabitTypes"
+import { Objectif, SeriazableObjectif } from "../../../types/HabitTypes"
 import { FormBasicObjectif } from "../../../types/FormObjectifTypes"
 import React from "react"
+import { AddObjectifScreenType, getAddObjectifStepsDetails } from "../../../constants/BasicConstants"
+import { addDays } from "date-fns"
+import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 
 export interface ObjectifBasicForm {
-    objectif?: Objectif,
+    objectif?: SeriazableObjectif,
     handleGoNext: (newValues: FormBasicObjectif) => void,
-    totalSteps: number,
-    currentStep: number
+    closeModal?: () => void,
+    currentStep?: number
 }
 
-export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext, totalSteps, currentStep}) => {
+export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext, currentStep, closeModal}) => {
 
-    let startingDateBase = new Date()
-    let endingDateBase = new Date()
-    endingDateBase.setDate(startingDateBase.getDate() + 3)
+    const startingDateBase = objectif ? new Date(objectif.startingDate) : new Date()
+    const endingDateBase = objectif ? new Date(objectif.startingDate) : addDays(new Date(), 14)
 
     const [startingDate, setStartingDate] = useState<Date>(startingDateBase)
     const [endingDate, setEndingDate] = useState<Date>(endingDateBase)
+
+    const CURRENT_STEP_DETAILS = getAddObjectifStepsDetails(AddObjectifScreenType.AddBasicObjectifDetails)
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const current_step = currentStep ?? CURRENT_STEP_DETAILS.CURRENT_STEP
 
     let titreRef = useRef<CustomTextInputRefType>(null)
     let descriptionRef = useRef<CustomTextInputRefType>(null)
@@ -83,23 +89,30 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
             <View style={styles.container}>
 
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"goBack"}/>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}> 
+                       { closeModal ?
+                         <NavigationButton noPadding methode={closeModal} action={"close"}/>
+                            :
+                         <NavigationButton noPadding action={"goBack"}/> 
+                        }                       
+                        
                         <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="Nouvel objectif"/>
 
-                    <StepIndicator totalSteps={totalSteps} currentStep={currentStep}/>
+                    <StepIndicator totalSteps={totalSteps} currentStep={current_step}/>
                 </View>
 
                 <View style={styles.body}>
                     <View style={styles.displayColumn}>
-                        <TextInputCustom ref={titreRef} isWrong={isTitleWrong}
+                        <TextInputCustom ref={titreRef} startingValue={objectif?.titre}
+                            isWrong={isTitleWrong}
                             placeholder={"Nom de l'objectif"} labelName={"Titre"} semiBold
                             errorMessage={"Rentrez un titre valide"}/>
 
-                        <TextInputCustom ref={descriptionRef} isWrong={isDescriptionWrong}
+                        <TextInputCustom ref={descriptionRef} startingValue={objectif?.description}
+                            isWrong={isDescriptionWrong}
                             placeholder={"Description de l'objectif"} labelName={"Description"}  semiBold
                             errorMessage={"Rentrez une description valide"}/>
                     </View>

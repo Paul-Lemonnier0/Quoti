@@ -11,7 +11,7 @@ import EditHabitAdvancedDetailsScreen from "./EditHabitAdvancedDetailsScreen";
 import EditHabitStepsScreen from "./EditHabitStepsScreen";
 import { EditHabitContextProvider } from "./EditHabitContext";
 import { SeriazableHabit } from "../../../types/HabitTypes";
-import { FormBasicHabit, FormColoredHabit, FormDetailledHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
+import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
 
 export type EditHabitStackProps = {
     EditHabitDetailsScreen: {

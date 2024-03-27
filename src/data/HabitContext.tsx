@@ -3,7 +3,7 @@ import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCom
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
-import { addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore } from "../firebase/Firestore_Objectifs_Primitives";
+import { addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore, updateObjectifInFirestore } from "../firebase/Firestore_Objectifs_Primitives";
 import { UserContext, UserContextType } from "./UserContext";
 import { FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList, Step, StreakValues } from "../types/HabitTypes";
 import { FormDetailledHabit } from "../types/FormHabitTypes";
@@ -24,7 +24,9 @@ export interface HabitContextType {
   addObjectif: (objectif: FormDetailledObjectif) => Promise<Objectif | undefined>,
   handleCheckStep: (habitID: string, stepID: string, date: Date, isChecked: boolean, isHabitNowCompleted: boolean) => Promise<void>,
   getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => Habit | undefined,
-  removeObjectif: (objectifID: string, deletePinnedHabit?: boolean) => Promise<void>
+  removeObjectif: (objectifID: string, deletePinnedHabit?: boolean) => Promise<void>,
+  updateObjectif: (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => Promise<Objectif>,
+  retrieveHabitsLinkToObjectif: (objectifID: string) => Habit[]
 }
 
 const defaultHabitContext: HabitContextType = {
@@ -44,7 +46,9 @@ const defaultHabitContext: HabitContextType = {
   addObjectif: async (objectif: FormDetailledObjectif) => undefined,
   handleCheckStep: async (habitID: string, stepID: string, date: Date, isChecked: boolean, isHabitNowCompleted: boolean) => {},
   getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => DefaultHabit,
-  removeObjectif: async(objectifID: string, deletePinnedHabit?: boolean) => {}
+  removeObjectif: async(objectifID: string, deletePinnedHabit?: boolean) => {},
+  updateObjectif: async (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => oldObjectif,
+  retrieveHabitsLinkToObjectif: (objectifID: string) => []
 }
 
 const HabitsContext = createContext<HabitContextType>(defaultHabitContext);
@@ -303,6 +307,29 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
         await Promise.all(updatePromises)
     }
 
+    const updateObjectif = async(oldObjectif: Objectif, newValues: {[key: string]: any}, currentDate: Date = selectedDate): Promise<Objectif> => {
+      
+      console.log("Updating objectif...")
+
+      const updatedObjectif: Objectif = {...oldObjectif, ...newValues}
+      
+      setObjectifs((previousObjectifs) => {
+          previousObjectifs[oldObjectif.objectifID] = {...updatedObjectif}
+          return {...previousObjectifs}
+      })
+
+      await updateObjectifInFirestore(userID, oldObjectif, newValues)
+
+      console.log("Objectif updated")
+      return updatedObjectif
+    }
+
+
+    const retrieveHabitsLinkToObjectif = (objectifID: string): Habit[] => {
+      const habits = Object.values(Habits)
+      return habits.filter((habit) => habit.objectifID === objectifID)
+    }
+    
 
     const exportedValues: HabitContextType = {
       Habits,
@@ -317,7 +344,9 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       addObjectif,
       handleCheckStep,
       getHabitFromFilteredHabits,
-      removeObjectif
+      removeObjectif,
+      updateObjectif,
+      retrieveHabitsLinkToObjectif
     }
 
     return (

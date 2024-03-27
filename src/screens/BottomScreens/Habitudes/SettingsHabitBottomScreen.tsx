@@ -23,7 +23,8 @@ export interface SettingHabitBottomScreenProps {
     habit: Habit,
     attachToObjectifAdditionnalMethod?: () => void, 
     deleteAdditionnalMethod?: () => void, 
-    modifyAdditionnalMethod?: () => void
+    modifyAdditionnalMethod?: () => void,
+    additionnalClosedMethod?: () => void
 }
 
 const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
@@ -31,7 +32,8 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     habit, 
     attachToObjectifAdditionnalMethod, 
     deleteAdditionnalMethod,
-    modifyAdditionnalMethod
+    modifyAdditionnalMethod,
+    additionnalClosedMethod
 }) => {
     
     const {setIsLoading} = useContext(AppContext)
@@ -42,7 +44,11 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     const displayedObjectifs = Object.values(Objectifs)
 
 
-    const closeModal = () => bottomSheetModalRef.current?.close()
+    const closeModal = () => {
+        bottomSheetModalRef.current?.close()
+        // additionnalClosedMethod ? additionnalClosedMethod() : null
+    }
+
     const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
 
     const handleDelete = async() => {
@@ -144,7 +150,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
       }, []);
   
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
+        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} onDismiss={additionnalClosedMethod}>
             <View style={styles.container}>
                 <View style={{}}>
                     {

@@ -4,11 +4,11 @@ import { useThemeColor } from "../Themed";
 import cardStyle from "../../styles/StyledCard";
 import StepIndicator from "../Other/StepIndicator";
 import { Icon, IconProvider } from "../Buttons/IconButtons";
-import { FC, useCallback, useRef } from "react";
+import { FC, useCallback, useRef, useState } from "react";
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import ItemIcon from "../Icons/ItemIcon";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, { FadeInDown, useSharedValue, withDelay, withSpring } from "react-native-reanimated";
 import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen";
 import { Habit } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -41,9 +41,23 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
 
     const isFinished = habitDoneSteps === steps.length
 
+    const scale = useSharedValue(1);
+
     const handleLongPress = () => {
+        // scale.value = withSpring(0.9, {}, () => {
+        //     scale.value = withSpring(1);
+        // });
+
+        scale.value = withSpring(0.9, {}, () => {
+            scale.value = withSpring(1);
+        });
+
         BottomScreenOpen_Impact();
         openModal()
+    }
+
+    const rescaleAfterBottomScreenClosed = () => {
+        // scale.value = withSpring(1);
     }
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
@@ -55,7 +69,12 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
     return(
         <>
         <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1}} delayLongPress={750} onLongPress={handleLongPress} onPress={handlePress}>
-            <Animated.View entering={FadeInDown.duration(400).delay(index * 200)} style={[stylesCard.card, styles.container]}>
+            <Animated.View entering={FadeInDown.duration(400).delay(index * 200)} 
+                style={[
+                    stylesCard.card, 
+                    styles.container,
+                    {transform: [{scale}]}
+                ]}>
 
                 <View style={styles.habit}>
                     <ItemIcon icon={habit.icon} color={habit.color}/>
@@ -75,7 +94,7 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
             </Animated.View>
         </TouchableOpacity>
 
-        <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef} habit={habit}/>
+        <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef} habit={habit} additionnalClosedMethod={rescaleAfterBottomScreenClosed}/>
 
         </>
 )};

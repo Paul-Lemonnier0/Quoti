@@ -12,10 +12,11 @@ export interface ObjectifRadioItem {
     isSelected: boolean,
     onPress?: () => void,
     backgroundColor?: string, 
-    borderColor?: string
+    borderColor?: string,
+    isPressDisabled?: boolean
 }
 
-const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress, backgroundColor, borderColor}) => {
+const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress, backgroundColor, borderColor, isPressDisabled}) => {
 
     
     const bgColor = backgroundColor ?? useThemeColor({}, "Secondary")
@@ -26,7 +27,7 @@ const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress
     const stylesCard = cardStyle()
 
     return(
-        <TouchableOpacity onPress={onPress} style={[stylesCard.card, styles.container, {backgroundColor: bgColor, borderColor: brColor}]}>
+        <TouchableOpacity onPress={onPress} disabled={isPressDisabled} style={[stylesCard.card, styles.container, {backgroundColor: bgColor, borderColor: brColor}]}>
             <ItemIcon color={objectif.color} icon={objectif.icon}/>
 
             <View style={[styles.displayColumn, {justifyContent: "center"}]}>

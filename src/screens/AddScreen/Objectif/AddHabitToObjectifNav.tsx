@@ -13,7 +13,8 @@ import AddHabitStepsObj from "./AddHabitStepsObj";
 export type AddHabitToObjectifStackType = {
     AddBasicsHabitDetailsObj: {
         color: string,
-        icon: string
+        icon: string,
+        objectifID?: string
     },
     AddHabitStepsObj: {
         habit: FormIconedHabit
@@ -29,18 +30,19 @@ export interface AddHabitToObjectifNavProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     addHabitForObjectif: (habit: FormDetailledHabit) => void,
     color: string,
-    icon: string
+    icon: string,
+    objectifID?: string
 }
 
-const AddHabitToObjectifNav: FC<AddHabitToObjectifNavProps> = ({bottomSheetModalRef, addHabitForObjectif, color, icon}) => {
+const AddHabitToObjectifNav: FC<AddHabitToObjectifNavProps> = ({bottomSheetModalRef, addHabitForObjectif, color, icon, objectifID}) => {
     return(
-            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
+            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
                 <BottomSheetModalProvider>
                     <AddHabitToObjProvider addHabitForObjectif={addHabitForObjectif}>
                         <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
                                 <AddHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="AddBasicsHabitDetailsObj">
-                                    <AddHabitStack.Screen name="AddBasicsHabitDetailsObj" component={AddBasicDetailsHabitObjectif} initialParams={{color, icon}}/>
+                                    <AddHabitStack.Screen name="AddBasicsHabitDetailsObj" component={AddBasicDetailsHabitObjectif} initialParams={{color, icon, objectifID}}/>
                                     <AddHabitStack.Screen name="AddHabitStepsObj" component={AddHabitStepsObj}/>
                                     <AddHabitStack.Screen name="CreateObjectifHabitDetails" component={CreateObjectifHabitDetails}/>
                                 </AddHabitStack.Navigator>

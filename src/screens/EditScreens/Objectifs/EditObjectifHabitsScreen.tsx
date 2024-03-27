@@ -3,7 +3,7 @@ import React, { FC, useContext } from "react"
 import ObjectifHabitsForm from "../../../components/Forms/ObjectifForm/ObjectifHabitsForm"
 import { EditObjectifStackProps } from "./EditObjectifNav"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { FormDetailledHabit } from "../../../types/FormHabitTypes"
+import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../../types/FormHabitTypes"
 import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext"
 import { AppContext } from "../../../data/AppContext"
 import { EditHabitContext } from "../Habits/EditHabitContext"
@@ -20,39 +20,45 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
     const {setIsLoading} = useContext(AppContext)
     const {validationAdditionnalMethod} = useContext(EditHabitContext)
 
-    const {updateObjectif, retrieveHabitsLinkToObjectif, updateHabitRelationWithObjectif} = useContext(HabitsContext)
+    const {updateObjectif, retrieveHabitsLinkToObjectif, updateHabitRelationWithObjectif, addHabit} = useContext(HabitsContext)
 
     const {newValues, oldObjectif} = route.params
 
     const baseHabits = retrieveHabitsLinkToObjectif(oldObjectif.objectifID)
 
-    const handleGoNext = async(newHabits: (FormDetailledHabit | Habit)[]) => {
-
-        console.log(newValues)
+    const handleGoNext = async(newHabits: (FormDetailledObjectifHabit | Habit)[]) => {
 
         setIsLoading(true)
+        
+        const addedHabits: FormDetailledObjectifHabit[] = [];
+        const removedHabits: Habit[] = [];
 
-        // NOTE : Pour l'instant on ne pourra pas ajouter de nouvelle habitude directement de ce screen
-
-        const promises = newHabits.map(async (habit) => {
+        newHabits.map(async (habit) => {
             if(habit as Habit) {
                 if (!baseHabits.includes(habit as Habit)) {
-                    //On retire la relation de celles qui sont enlevées
-                    await updateHabitRelationWithObjectif(habit as Habit, null);
+                    const updatedHabit = {...habit, objectifID: oldObjectif.objectifID, startingDate}
+                    addedHabits.push(updatedHabit as FormDetailledObjectifHabit)
                 }
             }
         });
-        
-        await Promise.all(promises);
 
-        const unseriazableOldObjectif = convertBackSeriazableObjectif(oldObjectif)
+        baseHabits.map(async (baseHabit) => {
+            if(baseHabit as Habit) {
+                if (!newHabits.includes(baseHabit)) {
+                    removedHabits.push(baseHabit)
+                }
+            }
+        });
 
-        console.log()
+        await Promise.all(addedHabits.map(addHabit));
+        await Promise.all(removedHabits.map((habit) => updateHabitRelationWithObjectif(habit, null)));
+
+        const deseriazableOldObjectif = convertBackSeriazableObjectif(oldObjectif)
 
         const startingDate = new Date(newValues.startingDate)
         const endingDate = new Date(newValues.endingDate)
 
-        await updateObjectif(unseriazableOldObjectif, {...newValues, startingDate, endingDate})
+        await updateObjectif(deseriazableOldObjectif, {...newValues, startingDate, endingDate})
         
         closeModal()
 
@@ -67,7 +73,7 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
     return(
         <ObjectifHabitsForm
             handleGoNext={handleGoNext}
-            objectif={oldObjectif}
+            objectif={{...oldObjectif, ...newValues}}
             baseHabits={baseHabits}
         />
     )

@@ -43,7 +43,7 @@ export interface EditObjectifNavProps {
 
 const EditObjectifNav: FC<EditObjectifNavProps> = ({bottomSheetModalRef, objectif, validationAdditionnalMethod}) => {
     return(
-        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
+        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
             <EditObjectifContextProvider validationAdditionnalMethod={validationAdditionnalMethod}>
                 <BottomSheetModalProvider>
                     <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>

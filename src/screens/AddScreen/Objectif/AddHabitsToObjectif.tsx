@@ -8,6 +8,7 @@ import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import ObjectifHabitsForm from "../../../components/Forms/ObjectifForm/ObjectifHabitsForm"
 import { FormDetailledHabit } from "../../../types/FormHabitTypes"
 import React from "react"
+import { Habit } from "../../../types/HabitTypes"
 
 type AddHabitsToObjectifProps = NativeStackScreenProps<AddScreenStackType, "AddHabitsToObjectif">
 
@@ -18,16 +19,16 @@ const AddHabitsToObjectif: FC<AddHabitsToObjectifProps> = ({route, navigation}) 
     const {setIsLoading} = useContext(AppContext)
     const {addObjectif, addHabit} = useContext(HabitsContext)
     
-    const handleGoNext = async(habitsForObjectif: FormDetailledHabit[]) => {
+    const handleGoNext = async(habitsForObjectif: (Habit | FormDetailledHabit)[]) => {
 
-        const startingDate = objectif.startingDate
-        const endingDate = objectif.endingDate
+        // const startingDate = objectif.startingDate
+        // const endingDate = objectif.endingDate
 
         setIsLoading(true)
         const objectifWithID = await addObjectif(objectif) 
         
         if(objectifWithID){
-            const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID, startingDate, endingDate}))
+            const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID} as FormDetailledHabit))
             await Promise.all(updatedHabitsForObjectif.map(addHabit));
             setIsLoading(false)
     

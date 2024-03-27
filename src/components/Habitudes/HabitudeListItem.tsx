@@ -14,6 +14,7 @@ import { Habit } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { FormDetailledHabit } from "../../types/FormHabitTypes";
 import React from "react"
+import SettingNewObjectifHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsNewObjectifHabitBottomScreen";
 
 export interface HabitudeListItemProps {
     habitude: Habit,
@@ -101,11 +102,24 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
 
 
 export interface HabitudeListItemPresentation {
-    habitude: Habit | FormDetailledHabit
+    habitude: Habit | FormDetailledHabit,
+    isSelected?: boolean,
+    onPress?: () => void,
+    deleteHabit?: () => void,
+    editHabit?: () => void
 }
 
-export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  ({habitude}) => {
+export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  ({
+    habitude, 
+    onPress, 
+    isSelected,
+    deleteHabit,
+    editHabit
+}) => {
     const primary = useThemeColor({}, "Primary")
+    const secondary = useThemeColor({}, "Secondary")
+    const contrast = useThemeColor({}, "Contrast")
+
     const stylesCard = cardStyle()
 
     const habit = habitude
@@ -115,21 +129,67 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
     const habitDoneSteps = steps.length
     const totalSteps = steps.length
 
+    const borderColor = isSelected ? contrast : secondary
+
+    const scale = useSharedValue(1);
+    const handleLongPress = () => {
+        // scale.value = withSpring(0.9, {}, () => {
+        //     scale.value = withSpring(1);
+        // });
+
+        scale.value = withSpring(0.9, {}, () => {
+            scale.value = withSpring(1);
+        });
+
+        BottomScreenOpen_Impact();
+        openModal()
+    }
+
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+    const openModal = useCallback(() => {
+        bottomSheetModalRef.current?.present();
+    }, []);
+
     return(
-        <View style={[stylesCard.card, styles.container]}>
+        <>    
+            <TouchableOpacity disabled={onPress === undefined} onLongPress={onPress ? handleLongPress : undefined} 
+                style={[
+                    stylesCard.card, 
+                    styles.container,
+                    {
+                        borderWidth: 2,
+                        borderColor
+                    }
+                ]}>
 
-            <View style={styles.habit}>
-                <ItemIcon icon={habit.icon} color={habit.color}/>
+                <View style={styles.habit}>
+                    <ItemIcon icon={habit.icon} color={habit.color}/>
 
-                <View style={styles.habitTitleStateContainer}>
-                    <SubTitleText numberOfLines={1} text={habit.titre}/>
-                    <SubText numberOfLines={1} text={habit.description}/>
+                    <View style={styles.habitTitleStateContainer}>
+                        <SubTitleText numberOfLines={1} text={habit.titre}/>
+                        <SubText numberOfLines={1} text={habit.description}/>
+                    </View>
                 </View>
-            </View>
 
-            <StepIndicator height={3} inactiveColor={primary} color={habit.color}
-                currentStep={habitDoneSteps} totalSteps={totalSteps}/>
-        </View>
+                <StepIndicator height={3} inactiveColor={primary} color={habit.color}
+                    currentStep={habitDoneSteps} totalSteps={totalSteps}/>
+            </TouchableOpacity>
+
+            {
+                onPress && deleteHabit && editHabit &&
+
+                // TODO : faire un switch sur la méthode de fin en fonction de si l'habit passée est une nouvelle habit d'objectif
+                // NOTE : on pourra écrire un boolean qui le propose dans ce cas ou simplement passer une autre variable isNewObjectifHabit
+
+                <SettingNewObjectifHabitBottomScreen 
+                    bottomSheetModalRef={bottomSheetModalRef} 
+                    habit={habit} 
+                    deleteHabit={deleteHabit}
+                    editHabit={editHabit}
+                />       
+            }
+        </>
 )};
 
 const styles = StyleSheet.create(

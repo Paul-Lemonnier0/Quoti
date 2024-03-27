@@ -10,22 +10,24 @@ import { BorderTextButton } from "../../Buttons/UsualButton"
 import { Image } from "react-native"
 import { FC, useCallback, useContext, useRef, useState } from "react"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
-import { FormDetailledHabit } from "../../../types/FormHabitTypes"
+import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../../types/FormHabitTypes"
 import { AppContext } from "../../../data/AppContext"
 import { HabitsContext } from "../../../data/HabitContext"
 import { FormDetailledObjectif } from "../../../types/FormObjectifTypes"
 import React from "react"
-import { Habit } from "../../../types/HabitTypes"
+import { Habit, Objectif } from "../../../types/HabitTypes"
 
 export interface ObjectifHabitsFormProps {
-    objectif: FormDetailledObjectif
-    handleGoNext: (habits: (FormDetailledHabit | Habit)[]) => Promise<void>,
-    baseHabits?: (FormDetailledHabit | Habit)[]
+    objectif: (FormDetailledObjectif | Objectif)
+    handleGoNext: (habits: (FormDetailledObjectifHabit | Habit)[]) => Promise<void>,
+    baseHabits?: Habit[]
 }
 
 const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext, baseHabits}) => {
 
-    const [habitsForObjectif, setHabitsForObjectif] = useState<(FormDetailledHabit | Habit)[]>(baseHabits ?? [])
+    const [habitsForObjectif, setHabitsForObjectif] = useState<(FormDetailledObjectifHabit | Habit)[]>(baseHabits ?? [])
+
+    const [selectedHabitID, setSelectedHabitID] = useState<string | undefined>(undefined)
 
     const handleValidate = async() => {
         await handleGoNext(habitsForObjectif)
@@ -39,6 +41,7 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
                     ...habit, 
                     color: objectif.color, 
                     icon: objectif.icon,
+                    habitID: prevHabits.length.toString() + "-" + habit.titre
                 }
             ]
         }))
@@ -75,8 +78,6 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
         )
     }
 
-    const today = new Date()
-
     const DisplayHabitsScreen = () => {
         return(
             <View style={styles.body}>
@@ -84,7 +85,12 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
                 <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend/>
 
                 <CustomScrollView>
-                    <PresentationHabitList habits={habitsForObjectif}/>
+                    <PresentationHabitList baseColor={objectif.color} habits={habitsForObjectif} 
+                        onPress={(habit: Habit): void => {
+                            setSelectedHabitID(habit.habitID)
+                        }}
+                        selectedHabitID={selectedHabitID}
+                    />
                 </CustomScrollView>
 
             </View>
@@ -112,6 +118,7 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
             <AddHabitToObjectifNav
                 bottomSheetModalRef={bottomSheetModalRef_AddHabit}
                 addHabitForObjectif={addHabitForObjectif}
+                objectifID={(objectif as Objectif)?.objectifID}
                 color={objectif.color}
                 icon={objectif.icon}
             />

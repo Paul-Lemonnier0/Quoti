@@ -21,7 +21,8 @@ export interface HabitFormProps {
     closeModal?: () => void,
     baseHabit?: SeriazableHabit,
     handleGoNext: (basicHabit: FormBasicHabit | SeriazableHabit) => void,
-    currentStep?: number
+    currentStep?: number,
+    constObjectifID?: string
 }
 
 const HabitForm: FC<HabitFormProps> = ({
@@ -30,6 +31,7 @@ const HabitForm: FC<HabitFormProps> = ({
     closeModal,
     baseHabit,
     handleGoNext,
+    constObjectifID,
     currentStep = 1,
 }) => {
 
@@ -46,7 +48,8 @@ const HabitForm: FC<HabitFormProps> = ({
     const [totalSteps, setTotalSteps] = useState(isForCreateObjectiveHabit ? 2 : CURRENT_STEP_DETAILS.TOTAL_STEPS)
 
     const [displayedObjectifs, setDisplayedObjectifs] = useState<Objectif[]>(Object.values(Objectifs))
-    const [selectedObjectif, setSelectedObjectif] = useState<string | undefined>(isForModifyingHabit && baseHabit?.objectifID ? baseHabit.objectifID : undefined)
+
+    const [selectedObjectif, setSelectedObjectif] = useState<string | undefined>(constObjectifID ?? ((isForModifyingHabit && baseHabit?.objectifID) ? baseHabit.objectifID : undefined))
 
 
 
@@ -65,7 +68,7 @@ const HabitForm: FC<HabitFormProps> = ({
         }
 
         return (
-            <ObjectifRadioItem onPress={onPress} objectif={item} 
+            <ObjectifRadioItem onPress={onPress} objectif={item} isPressDisabled={constObjectifID !== undefined}
                         isSelected={selectedObjectif === item.objectifID}/>
         )
     }

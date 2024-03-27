@@ -83,7 +83,7 @@ const SimpleFullBottomSheet: FC<SimpleFullBottomSheetProps> =
             enableContentPanningGesture={false}
             backgroundStyle={{backgroundColor}}
             footerComponent={FooterComponent}
-            handleIndicatorStyle={{backgroundColor: secondary}}
+            handleIndicatorStyle={{backgroundColor}}
             index={0}
             enablePanDownToClose={true}
             enableDynamicSizing

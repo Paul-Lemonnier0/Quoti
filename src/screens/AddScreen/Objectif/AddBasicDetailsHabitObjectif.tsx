@@ -9,7 +9,7 @@ import React from "react"
 type AddBasicDetailsHabitObjectifProps = NativeStackScreenProps<AddHabitToObjectifStackType, "AddBasicsHabitDetailsObj">
 
 export const AddBasicDetailsHabitObjectif: FC<AddBasicDetailsHabitObjectifProps> = ({route, navigation}) => {
-    const {color, icon} = route.params
+    const {color, icon, objectifID} = route.params
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
 
     const handleGoNext = (values: FormBasicHabit) => {
@@ -18,8 +18,10 @@ export const AddBasicDetailsHabitObjectif: FC<AddBasicDetailsHabitObjectifProps>
 
     return(
         <HabitForm
+            isForCreateObjectiveHabit
             handleGoNext={handleGoNext}
             closeModal={closeModal}
+            constObjectifID={objectifID}
         />
     )
 }

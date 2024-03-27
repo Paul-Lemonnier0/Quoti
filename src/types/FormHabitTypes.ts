@@ -45,6 +45,10 @@ interface FormIconedHabit extends FormColoredHabit, FormIconedHabitValues {}
 interface FormStepsHabit extends FormIconedHabit, FormStepsHabitValues {}
 interface FormDetailledHabit extends FormStepsHabit, FormDetailledHabitValues {}
 
+interface FormDetailledObjectifHabit extends FormDetailledHabit {
+    habitID: string
+}
+
 export {
     FormPlaceholderStep,
     FormFullStep,
@@ -54,4 +58,5 @@ export {
     FormIconedHabit,
     FormStepsHabit,
     FormDetailledHabit,
+    FormDetailledObjectifHabit
 }

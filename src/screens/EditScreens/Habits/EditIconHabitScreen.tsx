@@ -10,12 +10,13 @@ import React from "react"
 type EditIconHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditIconHabitScreen">
 
 const EditIconHabitScreen: FC<EditIconHabitScreenProps> = ({route, navigation}) => {
-    const {newValues, oldHabit} = route.params
+    const {newValues, oldHabit, isNewObjectifHabit} = route.params
 
     const handleGoNext = (values: FormIconedHabitValues) => {
         navigation.navigate("EditHabitStepsScreen", {
             newValues: {...newValues, ...values}, 
-            oldHabit
+            oldHabit,
+            isNewObjectifHabit
         })
     }
 

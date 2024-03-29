@@ -46,6 +46,8 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
         getValue: () => value,
     }));
 
+    console.log(isWrong)
+
     return(
         <View style={styles.container}>
             {labelName !== undefined ? 

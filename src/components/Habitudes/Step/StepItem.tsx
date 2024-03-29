@@ -1,5 +1,5 @@
 import { View } from "react-native"
-import { SubText, SubTitleText } from "../../../styles/StyledText"
+import { NormalGrayText, SubText, SubTitleText } from "../../../styles/StyledText"
 import { TouchableOpacity } from "react-native"
 import CustomCheckBox from "../../CheckBox/CustomCheckBox"
 import { StyleSheet } from "react-native"
@@ -9,6 +9,8 @@ import { Step } from "../../../types/HabitTypes"
 import { FC } from "react"
 import { FormFullStep, FormStep } from "../../../types/FormHabitTypes"
 import React from "react"
+import { useThemeColor } from "../../Themed"
+import { IconButton, IconProvider } from "../../Buttons/IconButtons"
 
 export interface StepItemProps {
     step: Step | FormStep,
@@ -19,29 +21,58 @@ export interface StepItemProps {
     disabled?: boolean,
     noPress?: boolean,
     isHighlight?: boolean,
+    isEditable?: boolean,
+    onDelete?: () => void
 }
 
-const StepItem: FC<StepItemProps> = ({color, isNextToBeChecked, step, onPress, index, disabled, noPress, isHighlight}) => {
+const StepItem: FC<StepItemProps> = ({
+    color, 
+    isNextToBeChecked, 
+    step, 
+    onPress, 
+    index, 
+    disabled,
+    noPress, 
+    isHighlight,
+    isEditable,
+    onDelete
+}) => {
 
     const isChecked = "isChecked" in step ? step.isChecked : false
     const hasDuration = "duration" in step
 
+    const secondary = useThemeColor({}, "Secondary")
+
     const borderHidden = !isChecked && !isNextToBeChecked && !isHighlight
-    const duration = hasDuration ? durationToTimeString((step as Step).duration) :  "--"
+    let duration = hasDuration ? durationToTimeString((step as Step).duration) :  "--"
+    duration = duration === "0min" ? "--" : duration
 
     return(
-        <View style={[styles.renderStepContainer, {opacity: disabled ? 0.5 : 1}]}>
+        <View style={[styles.renderStepContainer, {opacity: disabled ? 0.5 : 1, 
+            backgroundColor: secondary
+        }]}>
+
+            <View style={{flexDirection: "row", gap: 20, alignItems: "center"}}>
+
+
+                <CustomCheckBox isPrimary disabled={disabled} color={color} isChecked={isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} 
+                    onPress={onPress}/>
+
+                <View style={styles.titreEtDescriptionContainer}>
+                    <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>
+                    <NormalGrayText text={duration}/>
+                </View>
+
+                {(isEditable && onDelete) && <IconButton name={"x"} provider={IconProvider.Feather} onPress={onDelete}/>}
+
+            </View>
+
+            {/* <SubText text={"L'informatique c'est super chouette, bientot c'est le master"}/> */}
+
+{/* 
             <View style={styles.stepDurationContainer}>
                 <SubText text={duration}/>
-            </View>
-
-            <CustomCheckBox disabled={disabled} color={color} isChecked={isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} 
-                onPress={onPress}/>
-
-            <View style={styles.titreEtDescriptionContainer}>
-                <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>
-                <SubText text={(step as FormFullStep | Step).description ?? ""}/>
-            </View>
+            </View> */}
         </View>
     )
 }
@@ -49,20 +80,22 @@ const StepItem: FC<StepItemProps> = ({color, isNextToBeChecked, step, onPress, i
 const styles = StyleSheet.create({
     renderStepContainer: {
         display: "flex", 
-        flexDirection: "row", 
+        flexDirection: "column", 
         justifyContent: "center", 
         alignItems: "center", 
         gap: getWidthResponsive(20),
+        padding: 15,
+        borderRadius: 20
     },
 
     stepDurationContainer: {
-        width: getWidthResponsive(65), 
         alignItems: "center", 
         justifyContent: "center"
     },
 
     titreEtDescriptionContainer:{
         display: "flex", flex: 1,
+        gap: 5,
         flexDirection: "column", 
         justifyContent: "center",
     },

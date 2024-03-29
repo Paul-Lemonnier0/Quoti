@@ -12,9 +12,10 @@ import Animated, { FadeInDown, useSharedValue, withDelay, withSpring } from "rea
 import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen";
 import { Habit } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { FormDetailledHabit } from "../../types/FormHabitTypes";
+import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../types/FormHabitTypes";
 import React from "react"
 import SettingNewObjectifHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsNewObjectifHabitBottomScreen";
+import HabitStepDetailsBottomScreen from "../../screens/BottomScreens/Habitudes/HabitStepDetailsBottomScreen";
 
 export interface HabitudeListItemProps {
     habitude: Habit,
@@ -96,40 +97,35 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
         </TouchableOpacity>
 
         <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef} habit={habit} additionnalClosedMethod={rescaleAfterBottomScreenClosed}/>
-
-        </>
+    </>
 )};
 
 
 export interface HabitudeListItemPresentation {
-    habitude: Habit | FormDetailledHabit,
+    habitude: Habit | FormDetailledHabit | FormDetailledObjectifHabit,
     isSelected?: boolean,
-    onPress?: () => void,
     deleteHabit?: () => void,
-    editHabit?: () => void
+    editHabit?: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void
 }
 
 export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  ({
     habitude, 
-    onPress, 
-    isSelected,
     deleteHabit,
     editHabit
 }) => {
     const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
 
     const stylesCard = cardStyle()
 
     const habit = habitude
 
-    const steps = Object.values(habit.steps)
+    const today = new Date()
+
+    const steps = Object.values(habit.steps).filter((step) => (!("deleted" in step)))
+
     
     const habitDoneSteps = steps.length
     const totalSteps = steps.length
-
-    const borderColor = isSelected ? contrast : secondary
 
     const scale = useSharedValue(1);
     const handleLongPress = () => {
@@ -151,44 +147,54 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
         bottomSheetModalRef.current?.present();
     }, []);
 
+    const bottomSheetModalRef_StepDetails = useRef<BottomSheetModal>(null);
+
+    const openModalStepsDetails = useCallback(() => {
+        bottomSheetModalRef_StepDetails.current?.present();
+    }, []);
+
     return(
         <>    
-            <TouchableOpacity disabled={onPress === undefined} onLongPress={onPress ? handleLongPress : undefined} 
-                style={[
-                    stylesCard.card, 
-                    styles.container,
-                    {
-                        borderWidth: 2,
-                        borderColor
-                    }
-                ]}>
+            <TouchableOpacity delayLongPress={750} onLongPress={handleLongPress} onPress={openModalStepsDetails}>
+                <Animated.View style={[ stylesCard.card, styles.container, {transform: [{scale}]}]}>
 
-                <View style={styles.habit}>
-                    <ItemIcon icon={habit.icon} color={habit.color}/>
+                    <View style={styles.habit}>
+                        <ItemIcon icon={habit.icon} color={habit.color}/>
 
-                    <View style={styles.habitTitleStateContainer}>
-                        <SubTitleText numberOfLines={1} text={habit.titre}/>
-                        <SubText numberOfLines={1} text={habit.description}/>
+                        <View style={styles.habitTitleStateContainer}>
+                            <SubTitleText numberOfLines={1} text={habit.titre}/>
+                            <SubText numberOfLines={1} text={habit.description}/>
+                        </View>
                     </View>
-                </View>
 
-                <StepIndicator height={3} inactiveColor={primary} color={habit.color}
-                    currentStep={habitDoneSteps} totalSteps={totalSteps}/>
+                    <StepIndicator height={3} inactiveColor={primary} color={habit.color}
+                        currentStep={habitDoneSteps} totalSteps={totalSteps}/>
+
+                </Animated.View>
             </TouchableOpacity>
 
             {
-                onPress && deleteHabit && editHabit &&
-
-                // TODO : faire un switch sur la méthode de fin en fonction de si l'habit passée est une nouvelle habit d'objectif
-                // NOTE : on pourra écrire un boolean qui le propose dans ce cas ou simplement passer une autre variable isNewObjectifHabit
-
+                deleteHabit && editHabit &&
+                <>
                 <SettingNewObjectifHabitBottomScreen 
                     bottomSheetModalRef={bottomSheetModalRef} 
-                    habit={habit} 
+                    habit={habit as FormDetailledObjectifHabit} 
                     deleteHabit={deleteHabit}
                     editHabit={editHabit}
+                    objectifColor={habitude.color}
                 />       
+
+                <HabitStepDetailsBottomScreen bottomSheetModalRef={bottomSheetModalRef_StepDetails} 
+                    steps={steps}
+                    editHabit={editHabit}
+                    color={habitude.color}
+                    icon={habitude.icon}
+                    habit={habitude}
+                />
+                </>
             }
+
+
         </>
 )};
 

@@ -12,15 +12,15 @@ import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/Bas
 import ObjectifRadioItem from "../Objectifs/ObjectifRadioItem"
 import { HabitsContext } from "../../data/HabitContext"
 import { Objectif, SeriazableHabit } from "../../types/HabitTypes"
-import { FormBasicHabit } from "../../types/FormHabitTypes"
+import { FormBasicHabit, FormDetailledObjectifHabit } from "../../types/FormHabitTypes"
 import React from "react"
 
 export interface HabitFormProps {
     isForModifyingHabit?: boolean,
     isForCreateObjectiveHabit?: boolean,
     closeModal?: () => void,
-    baseHabit?: SeriazableHabit,
-    handleGoNext: (basicHabit: FormBasicHabit | SeriazableHabit) => void,
+    baseHabit?: (SeriazableHabit | FormDetailledObjectifHabit),
+    handleGoNext: (basicHabit: FormBasicHabit | (SeriazableHabit | FormDetailledObjectifHabit)) => void,
     currentStep?: number,
     constObjectifID?: string
 }
@@ -45,7 +45,8 @@ const HabitForm: FC<HabitFormProps> = ({
 
     const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, AddHabitScreenType.AddBasicDetails)
 
-    const [totalSteps, setTotalSteps] = useState(isForCreateObjectiveHabit ? 2 : CURRENT_STEP_DETAILS.TOTAL_STEPS)
+    const baseTotalSteps = (baseHabit || isForCreateObjectiveHabit) ? CURRENT_STEP_DETAILS.TOTAL_STEPS - 1 : CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const [totalSteps, setTotalSteps] = useState(baseTotalSteps)
 
     const [displayedObjectifs, setDisplayedObjectifs] = useState<Objectif[]>(Object.values(Objectifs))
 
@@ -86,25 +87,23 @@ const HabitForm: FC<HabitFormProps> = ({
         const titre = titreRef.current?.getValue();
         const description = descriptionRef.current?.getValue();
         if(titre && description){
-            if(titre.trim().length === 0 || description.trim().length === 0)
+            if(titre.trim().length > 0 && description.trim().length > 0)
             {
-                description.trim().length <= 0 ? setIsDescriptionWrong(true) : setIsDescriptionWrong(false)
-                titre.trim().length <= 0 ? setIsTitleWrong(true) : setIsTitleWrong(false)
-    
-                canGoNext = false
-            }
-    
-            else {
-                setIsTitleWrong(false)
-                setIsDescriptionWrong(false)
-            }
-    
-            if(canGoNext) 
-            {
+                
                 const newValues: FormBasicHabit = {titre, description, objectifID: selectedObjectif}
 
                 handleGoNext(newValues)
             }
+
+            else {
+                console.log("hello")
+                setIsTitleWrong(true)
+            }
+        }
+        
+        else {
+            setIsTitleWrong(!titre)
+            setIsDescriptionWrong(!description)
         }
     }
 
@@ -121,7 +120,7 @@ const HabitForm: FC<HabitFormProps> = ({
                         <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
                     </View>
 
-                    <HugeText text="Nouvelle habitude"/>
+                    <HugeText text={baseHabit ? "Modifier cette habitude" : "Nouvelle habitude"}/>
 
                     <StepIndicator totalSteps={totalSteps} currentStep={currentStep}/>
                 </View>
@@ -141,7 +140,7 @@ const HabitForm: FC<HabitFormProps> = ({
 
                             <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                                 <SubTitleText text={"Objectif"}/>
-                                <TextButton text={"Dissocier"} semiBold noPadding onPress={handleDissocier}/>
+                                <TextButton text={"Dissocier"} disabled={constObjectifID !== undefined} semiBold noPadding onPress={handleDissocier}/>
                             </View>
 
                             <View style={{display: "flex", flexDirection: "column", gap: 20}}>

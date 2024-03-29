@@ -176,6 +176,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 bottomSheetModalRef={bottomSheetModalRef_EditHabit}
                 habit={getSeriazableHabit(habit)}
                 validationAdditionnalMethod={handleEdit}
+                editHabitCustomMethod={() => {}}
             />
         </CustomStaticBottomSheet>
     );

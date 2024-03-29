@@ -16,6 +16,8 @@ export interface StepsListProps {
     editable?: boolean,
 }
 
+//TODO: draggable, ...
+
 const StepsList: FC<StepsListProps> = ({steps, onStepChecked, color, disabled, editable, setSteps}) => {
 
     const isNotFormStep = steps.length > 0 && "isChecked" in steps[0]
@@ -35,10 +37,9 @@ const StepsList: FC<StepsListProps> = ({steps, onStepChecked, color, disabled, e
                     <View key={index} style={styles.displayRow}>
                         <View style={{flex: 1}}>
                             <StepItem disabled={disabled} isHighlight={editable} noPress={editable} color={color} step={step} index={index} 
-                            isNextToBeChecked={isNextToBeChecked} 
+                            isNextToBeChecked={isNextToBeChecked} isEditable={editable} onDelete={handleRemoveStep}
                                 onPress={onStepChecked ? () => onStepChecked(step, index) : undefined}/>
                         </View>
-                        {editable && <IconButton name={"x"} provider={IconProvider.Feather} onPress={handleRemoveStep}/>}
                     </View>
                     )
                 })
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
     displayColumn: {
         display: "flex",
         flexDirection: "column",
-        gap: getHeightResponsive(20)
+        gap: getHeightResponsive(15)
     },
 })
 

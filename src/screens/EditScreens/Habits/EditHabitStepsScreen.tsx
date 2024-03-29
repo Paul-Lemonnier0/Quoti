@@ -10,13 +10,13 @@ type EditHabitStepsScreenProps = NativeStackScreenProps<EditHabitStackProps, "Ed
 
 const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}) => {
 
-    const {newValues, oldHabit} = route.params
+    const {newValues, oldHabit, isNewObjectifHabit} = route.params
 
     const handleGoNext = (values: FormStepsHabitValues) => {
 
         let oldStepsArray = Object.values(oldHabit.steps)
 
-        let updatedStepsArray: (Step | FormStep)[] = oldStepsArray.filter((step) => step.stepID !== oldHabit.habitID)
+        let updatedStepsArray: (Step | FormStep)[] = oldStepsArray.filter((step) => (step as Step).stepID !== oldHabit.habitID)
 
         updatedStepsArray = updatedStepsArray.map((step) => {
             if(step as Step){
@@ -56,11 +56,29 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
             });
         }
 
-        navigation.navigate("EditHabitAdvancedDetailsScreen", {newValues: {...newValues, steps: updatedStepsArray}, oldHabit})
+        // values.steps.map((step) => {
+        //     if ("titre" in step) {
+        //         console.log(step.titre);
+        //     } else {
+        //         console.log("placeholder");
+        //     }
+        // });
+
+        navigation.navigate("EditHabitAdvancedDetailsScreen", {
+
+
+            newValues: {
+                ...newValues, 
+                steps: updatedStepsArray
+            }, 
+            oldHabit,
+            isNewObjectifHabit
+        })
     }
 
     return(
         <HabitStepsForm
+            isNewObjectifHabit
             isForModifyingHabit
             habit={{...oldHabit, ...newValues}}
             handleGoNext={handleGoNext}

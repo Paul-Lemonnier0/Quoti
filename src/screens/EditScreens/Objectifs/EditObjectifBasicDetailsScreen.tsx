@@ -12,7 +12,6 @@ const EditObjectifBasicDetailsScreen: FC<EditObjectifBasicDetailsScreenProps> = 
     const {objectif} = route.params
 
     const handleGoNext = (values: FormBasicObjectif) => {
-        console.log(values)
         navigation.navigate("EditObjectifColorScreen", {newValues: {...values}, oldObjectif: {...objectif}})
     }
 

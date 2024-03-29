@@ -62,10 +62,6 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
         
         closeModal()
 
-        if(validationAdditionnalMethod) {
-            validationAdditionnalMethod()
-        }
-
         setIsLoading(false)
         Success_Impact()
     }
@@ -74,7 +70,7 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
         <ObjectifHabitsForm
             handleGoNext={handleGoNext}
             objectif={{...oldObjectif, ...newValues}}
-            baseHabits={baseHabits}
+            baseHabits={baseHabits}  
         />
     )
 }

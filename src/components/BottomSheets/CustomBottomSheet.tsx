@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
       gap: 20, 
       padding:15,
       paddingHorizontal:30, 
+      paddingTop: 0,
       display:"flex",
     }
 });

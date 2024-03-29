@@ -22,10 +22,9 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
 
     const {updateHabit} = useContext(HabitsContext)
 
-    const {newValues, oldHabit} = route.params
+    const {newValues, oldHabit, isNewObjectifHabit} = route.params
 
     const notSameHabit = (newHabit: SeriazableHabit) => {
-
         for(let oldKey of Object.keys(oldHabit)){
             if(oldKey !== "steps" && (!newHabit.hasOwnProperty(oldKey) || newHabit[oldKey] !== oldHabit[oldKey])){
                 return true
@@ -33,7 +32,7 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
         }
 
         if(newValues.steps) {
-            let oldSteps = Object.values(oldHabit.steps)
+            let oldSteps = Object.values((oldHabit as SeriazableHabit).steps)
 
             const isOldStepPlaceholder = oldSteps.length === 1 && oldSteps[0].stepID === oldHabit.habitID
 
@@ -63,7 +62,6 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
             }
 
             for(let i = 0; i < oldSteps.length; ++i){
-
                 for(let oldStepKey of Object.keys(newValues.steps[i])){
                     if(!oldSteps[i].hasOwnProperty(oldStepKey)){
                         return true
@@ -80,55 +78,66 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
     }
 
     const handleGoNext = async(values: FormDetailledHabitValues) => {
-        const updatedHabit = {...oldHabit, ...values, ...newValues, steps: {}}
+        if(!isNewObjectifHabit) {
+            const updatedHabit = {...oldHabit, ...values, ...newValues, steps: {}} as SeriazableHabit
 
-        if(notSameHabit(updatedHabit)){
-            setIsLoading(true)
+            if(notSameHabit(updatedHabit)){
+                setIsLoading(true)
 
-            const convertedOldHabit = convertBackSeriazableHabit(oldHabit)
+                const convertedOldHabit = convertBackSeriazableHabit(oldHabit as SeriazableHabit)
 
-            try{
-                closeModal()
-                validationAdditionnalMethod ? validationAdditionnalMethod() : null
+                try{
+                    closeModal()
+                    validationAdditionnalMethod ? validationAdditionnalMethod({...oldHabit, ...values, ...newValues}) : null
 
-                const steps = {}
+                    const steps = {}
 
-                newValues.steps.forEach((step) => {
-                    if(step as FormPlaceholderStep){
-                        steps[oldHabit.habitID] = {...step}
-                    }
-        
-                    else {
-                        if(step as Step | FormFullStep){
-                            steps[(step as Step | FormFullStep).stepID] = {...step}
+                    newValues.steps.forEach((step) => {
+                        if(step as FormPlaceholderStep){
+                            steps[oldHabit.habitID] = {...step}
                         }
-                    }
-                })
+            
+                        else {
+                            if(step as Step | FormFullStep){
+                                steps[(step as Step | FormFullStep).stepID] = {...step}
+                            }
+                        }
+                    })
 
-                await updateHabit(convertedOldHabit, {...newValues, ...values, steps})
+                    await updateHabit(convertedOldHabit, {...newValues, ...values, steps})
+                    setIsLoading(false)
+                    Success_Impact()
+                }
+        
+                catch(e){
+                    console.log("Error while editing habit : ", e)
+                }
+        
                 setIsLoading(false)
+            }
+
+            else{
+                validationAdditionnalMethod ? validationAdditionnalMethod({...newValues, ...values, habitID: oldHabit.habitID}) : null
                 Success_Impact()
+                closeModal()
             }
-    
-            catch(e){
-                console.log("Error while editing habit : ", e)
-            }
-    
-            setIsLoading(false)
         }
 
-        else{
-            closeModal()
-            validationAdditionnalMethod ? validationAdditionnalMethod() : null
+        else {
+            console.log("EditAdvancedDetailsScreen : ", {...newValues, ...values, habitID: oldHabit.habitID})
+            console.log("EditAdvancedDetailsScreen (steps): ", {...newValues, ...values, habitID: oldHabit.habitID}.steps)
+
+            validationAdditionnalMethod ? validationAdditionnalMethod({...newValues, ...values, habitID: oldHabit.habitID}) : null
             Success_Impact()
+            closeModal()
         }
-
     }
 
     return(
         <HabitAdvancedDetailsForm
             isForModifyingHabit
             habit={oldHabit}
+            isNewObjectifHabit
             handleGoNext={handleGoNext}
         />
     )

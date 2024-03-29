@@ -7,14 +7,18 @@ import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBo
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import { AddHabitToObjProvider } from "./AddHabitToObjContext";
 import { BottomSheetModalMethodsContextProvider } from "../../../data/BottomSheetModalContext";
-import { FormBasicHabit, FormDetailledHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
+import { FormColoredHabit, FormDetailledHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
 import AddHabitStepsObj from "./AddHabitStepsObj";
+import { ChooseIconScreen } from "../Habit/ChooseIconScreen";
+import { ChooseIconScreenObj } from "./ChooseIconHabitObj";
 
 export type AddHabitToObjectifStackType = {
     AddBasicsHabitDetailsObj: {
         color: string,
-        icon: string,
         objectifID?: string
+    },
+    ChooseIconScreenObj: {
+        habit: FormColoredHabit
     },
     AddHabitStepsObj: {
         habit: FormIconedHabit
@@ -30,11 +34,10 @@ export interface AddHabitToObjectifNavProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     addHabitForObjectif: (habit: FormDetailledHabit) => void,
     color: string,
-    icon: string,
     objectifID?: string
 }
 
-const AddHabitToObjectifNav: FC<AddHabitToObjectifNavProps> = ({bottomSheetModalRef, addHabitForObjectif, color, icon, objectifID}) => {
+const AddHabitToObjectifNav: FC<AddHabitToObjectifNavProps> = ({bottomSheetModalRef, addHabitForObjectif, color, objectifID}) => {
     return(
             <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
                 <BottomSheetModalProvider>
@@ -42,7 +45,8 @@ const AddHabitToObjectifNav: FC<AddHabitToObjectifNavProps> = ({bottomSheetModal
                         <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
                                 <AddHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="AddBasicsHabitDetailsObj">
-                                    <AddHabitStack.Screen name="AddBasicsHabitDetailsObj" component={AddBasicDetailsHabitObjectif} initialParams={{color, icon, objectifID}}/>
+                                    <AddHabitStack.Screen name="AddBasicsHabitDetailsObj" component={AddBasicDetailsHabitObjectif} initialParams={{color, objectifID}}/>
+                                    <AddHabitStack.Screen name="ChooseIconScreenObj" component={ChooseIconScreenObj}/>
                                     <AddHabitStack.Screen name="AddHabitStepsObj" component={AddHabitStepsObj}/>
                                     <AddHabitStack.Screen name="CreateObjectifHabitDetails" component={CreateObjectifHabitDetails}/>
                                 </AddHabitStack.Navigator>

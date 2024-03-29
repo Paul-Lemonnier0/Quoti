@@ -9,17 +9,13 @@ import React from "react"
 export interface PresentationHabitListProps {
     habits: (Habit | FormDetailledObjectifHabit)[],
     baseColor?: string,
-    selectedHabitID?: string,
-    onPress: (habit: Habit | FormDetailledObjectifHabit) => void,
     deleteHabit: (habit: Habit | FormDetailledObjectifHabit) => void,
-    editHabit: (habit: Habit | FormDetailledObjectifHabit) => void,
+    editHabit: (habitID: string, newHabit: Habit | FormDetailledObjectifHabit) => void,
 }
 
 const PresentationHabitList: FC<PresentationHabitListProps> = ({
     habits, 
     baseColor, 
-    onPress, 
-    selectedHabitID,
     deleteHabit,
     editHabit
 }) => {
@@ -29,12 +25,9 @@ const PresentationHabitList: FC<PresentationHabitListProps> = ({
                 habits.map((habit, index) => (
                     <Animated.View key={index} entering={FadeInDown.duration(400).delay(200 * index)}>
                         <HabitudeListItemPresentation key={index} 
-                            habitude={baseColor ? {...habit, color: baseColor} : habit} 
-                            isSelected={selectedHabitID ? selectedHabitID === (habit as Habit).habitID : false}
-                            
-                            onPress={() => onPress(habit)} 
+                            habitude={baseColor ? {...habit, color: baseColor} : habit}                             
                             deleteHabit={() => deleteHabit(habit)}
-                            editHabit={() => editHabit(habit as Habit)}
+                            editHabit={editHabit}
                         />
                     </Animated.View>
                 ))

@@ -1,8 +1,10 @@
 import { FC, ReactNode, createContext } from "react"
 import React from "react"
+import { FormDetailledObjectifHabit } from "../../../types/FormHabitTypes"
+import { Habit } from "../../../types/HabitTypes"
 
 export interface EditHabitContextProps {
-    validationAdditionnalMethod?: () => void,
+    validationAdditionnalMethod?: (values: FormDetailledObjectifHabit) => void,
 }
 
 export interface EditHabitContextProviderProps extends EditHabitContextProps {
@@ -11,7 +13,7 @@ export interface EditHabitContextProviderProps extends EditHabitContextProps {
 
 
 export const EditHabitContext = createContext<EditHabitContextProps>({
-    validationAdditionnalMethod: () => {}
+    validationAdditionnalMethod: (values: FormDetailledObjectifHabit) => {}
 })
 
 export const EditHabitContextProvider: FC<EditHabitContextProviderProps> = ({validationAdditionnalMethod, children}) => {

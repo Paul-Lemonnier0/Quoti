@@ -99,7 +99,7 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
                                 style={[
                                     styles.singleBar,
                                     {
-                                        backgroundColor: index < currentStep -1 ? highlightColor : finalInactiveColor,
+                                        backgroundColor: index < currentStep ? highlightColor : finalInactiveColor,
                                         height: finalHeight
                                     },
                                 ]}

@@ -16,20 +16,22 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Habit } from "../../../types/HabitTypes";
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import React from "react"
-import { FormDetailledHabit } from "../../../types/FormHabitTypes";
+import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../../types/FormHabitTypes";
 
 
 export interface SettingNewObjectifHabitBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
-    habit: FormDetailledHabit,
+    habit: FormDetailledObjectifHabit,
     deleteHabit: () => void, 
-    editHabit: () => void,
-    additionnalClosedMethod?: () => void
+    editHabit: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void,
+    additionnalClosedMethod?: () => void,
+    objectifColor: string
 }
 
 const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScreenProps> = ({
     bottomSheetModalRef, 
     habit, 
+    objectifColor,
     deleteHabit,
     editHabit,
     additionnalClosedMethod
@@ -57,9 +59,9 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
         handleOpenEditHabit()
     }
 
-    const handleEdit = () => {
+    const handleEdit = (newHabit: (FormDetailledObjectifHabit | Habit)) => {
+        editHabit(habit.habitID, newHabit)
         closeModal()
-        editHabit()
     }
 
     const error = useThemeColor({}, "Error")
@@ -104,9 +106,11 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
 
             <EditHabitNav
                 bottomSheetModalRef={bottomSheetModalRef_EditHabit}
-                habit={getSeriazableHabit(habit)}
-                newObjectifHabit={habit}
-                validationAdditionnalMethod={handleEdit}
+                habit={habit}
+                objectifColor={objectifColor}
+                isNewObjectifHabit
+                validationAdditionnalMethod={() => {}}
+                editHabitCustomMethod={handleEdit}
             />
         </CustomStaticBottomSheet>
     );

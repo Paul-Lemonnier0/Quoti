@@ -10,12 +10,13 @@ import React from "react"
 type EditColorHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditColorHabitScreen">
 
 const EditColorHabitScreen: FC<EditColorHabitScreenProps> = ({route, navigation}) => {
-    const {newValues, oldHabit} = route.params
+    const {newValues, oldHabit, isNewObjectifHabit} = route.params
 
     const handleGoNext = (values: FormColoredHabitValues) => {
         navigation.navigate("EditIconHabitScreen", {
             newValues: {...newValues, ...values}, 
-            oldHabit
+            oldHabit,
+            isNewObjectifHabit
         })
     }
 
@@ -25,6 +26,7 @@ const EditColorHabitScreen: FC<EditColorHabitScreenProps> = ({route, navigation}
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     return(
+
         <ChooseColorForm
             handleGoNext={handleGoNext}
             defaultColor={oldHabit.color}

@@ -13,20 +13,33 @@ export interface CustomCheckBoxProps {
     isChecked: boolean | undefined,
     isBorderHidden: boolean | undefined,
     disabled: boolean | undefined,
-    noPress: boolean | undefined
+    noPress: boolean | undefined,
+    isPrimary?: boolean,
+    borderPrimary?: boolean
 }
 
-const CustomCheckBox: FC<CustomCheckBoxProps> = ({color, number, isChecked, isBorderHidden, onPress, disabled, noPress}) => {
+const CustomCheckBox: FC<CustomCheckBoxProps> = ({
+    color, 
+    number, 
+    isChecked, 
+    isBorderHidden, 
+    onPress, 
+    disabled, 
+    noPress, 
+    isPrimary, 
+    borderPrimary
+}) => {
 
     const secondary = useThemeColor({}, "Secondary")
+    const primary = useThemeColor({}, "Primary")
     const borderWidth = 2
-    const borderColor = isBorderHidden ? secondary : color
+    const borderColor = isBorderHidden ? (borderPrimary ? primary : secondary) : color
 
     return(
         <TouchableOpacity onPress={onPress} disabled={noPress || disabled}
             style={[styles.stepCheckBox,
             { 
-                backgroundColor: secondary,
+                backgroundColor: isPrimary ? primary :secondary,
                 borderColor, 
                 borderWidth
             }]}>

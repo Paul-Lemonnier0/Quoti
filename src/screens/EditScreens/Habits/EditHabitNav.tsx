@@ -10,32 +10,38 @@ import EditIconHabitScreen from "./EditIconHabitScreen";
 import EditHabitAdvancedDetailsScreen from "./EditHabitAdvancedDetailsScreen";
 import EditHabitStepsScreen from "./EditHabitStepsScreen";
 import { EditHabitContextProvider } from "./EditHabitContext";
-import { SeriazableHabit } from "../../../types/HabitTypes";
-import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
+import { Habit, SeriazableHabit } from "../../../types/HabitTypes";
+import { FormBasicHabit, FormColoredHabit, FormDetailledHabit, FormDetailledObjectifHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
 
 export type EditHabitStackProps = {
     EditHabitDetailsScreen: {
-        habit: SeriazableHabit
+        habit: (SeriazableHabit | FormDetailledObjectifHabit),
+        isNewObjectifHabit?: boolean,
+        objectifColor?: string
     },
 
     EditColorHabitScreen: {
         newValues:  FormBasicHabit,
-        oldHabit: SeriazableHabit
+        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
+        isNewObjectifHabit?: boolean
     },
 
     EditIconHabitScreen: {
         newValues:  FormColoredHabit,
-        oldHabit: SeriazableHabit
+        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
+        isNewObjectifHabit?: boolean
     },
 
     EditHabitStepsScreen: {
         newValues:  FormIconedHabit,
-        oldHabit: SeriazableHabit
+        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
+        isNewObjectifHabit?: boolean
     },
 
     EditHabitAdvancedDetailsScreen: {
         newValues:  FormStepsHabit,
-        oldHabit: SeriazableHabit
+        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
+        isNewObjectifHabit?: boolean
     },
 }
 
@@ -43,20 +49,27 @@ const EditHabitStack = createNativeStackNavigator<EditHabitStackProps>()
 
 export interface EditHabitNavProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
-    habit: SeriazableHabit,
-    validationAdditionnalMethod: () => void
+    habit: (SeriazableHabit | FormDetailledObjectifHabit),
+    validationAdditionnalMethod: () => void,
+    editHabitCustomMethod: (values: FormDetailledObjectifHabit) => void,
+    isNewObjectifHabit?: boolean,
+    objectifColor?: string
 }
 
-const EditHabitNav: FC<EditHabitNavProps> = ({bottomSheetModalRef, habit, validationAdditionnalMethod}) => {
+const EditHabitNav: FC<EditHabitNavProps> = ({bottomSheetModalRef, habit, validationAdditionnalMethod, editHabitCustomMethod, isNewObjectifHabit, objectifColor}) => {
 
     return(
-            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
-                <EditHabitContextProvider validationAdditionnalMethod={validationAdditionnalMethod}>
+            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+                <EditHabitContextProvider validationAdditionnalMethod={(values: FormDetailledObjectifHabit) => {
+                    console.log("validationAdditionnalMethod : ", values.titre)
+                    validationAdditionnalMethod()
+                    editHabitCustomMethod ? editHabitCustomMethod(values) : null
+                }}>
                     <BottomSheetModalProvider>
                         <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
                                 <EditHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="EditHabitDetailsScreen">
-                                    <EditHabitStack.Screen name="EditHabitDetailsScreen" component={EditHabitDetailsScreen} initialParams={{habit}}/>
+                                    <EditHabitStack.Screen name="EditHabitDetailsScreen" component={EditHabitDetailsScreen} initialParams={{habit, isNewObjectifHabit, objectifColor}}/>
                                     <EditHabitStack.Screen name="EditColorHabitScreen" component={EditColorHabitScreen}/>
                                     <EditHabitStack.Screen name="EditIconHabitScreen" component={EditIconHabitScreen}/>
                                     <EditHabitStack.Screen name="EditHabitStepsScreen" component={EditHabitStepsScreen}/>

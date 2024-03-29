@@ -18,11 +18,13 @@ import React from "react"
 
 export interface HabitStepsForm {
     isForModifyingHabit?: boolean,
+    isNewObjectifHabit?: boolean,
     habit: FormIconedHabit | SeriazableHabit,
     handleGoNext: (coloredHabit: FormStepsHabitValues) => void,
 }
 
 const HabitStepsForm: FC<HabitStepsForm> = ({
+    isNewObjectifHabit,
     isForModifyingHabit,
     habit,
     handleGoNext,
@@ -66,7 +68,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
         handleGoNext(newValues)
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID ?? null, AddHabitScreenType.AddHabitSteps)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails((isForModifyingHabit && !isNewObjectifHabit) ? null : habit.objectifID ?? null, AddHabitScreenType.AddHabitSteps)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP

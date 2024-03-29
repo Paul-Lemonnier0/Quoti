@@ -5,7 +5,6 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { EditHabitStackProps } from "./EditHabitNav";
 import { Habit } from "../../../types/HabitTypes";
 import { FormBasicHabit } from "../../../types/FormHabitTypes";
-import { getAddHabitStepsDetails } from "../../../constants/BasicConstants";
 import React from "react"
 
 type EditHabitDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditHabitDetailsScreen">
@@ -13,10 +12,18 @@ type EditHabitDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "
 const EditHabitDetailsScreen: FC<EditHabitDetailsScreenProps> = ({route, navigation}) => {
 
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
-    const {habit} = route.params
+    const {habit, isNewObjectifHabit, objectifColor} = route.params
 
     const handleGoNext = (values: FormBasicHabit | Habit) => {
-        navigation.navigate("EditColorHabitScreen", {newValues: {...values}, oldHabit: {...habit}})
+        if(!isNewObjectifHabit) {
+            navigation.navigate("EditColorHabitScreen", {newValues: {...values}, oldHabit: {...habit}, isNewObjectifHabit})
+        }
+
+        else if (objectifColor) {
+            navigation.navigate("EditIconHabitScreen", {newValues: {...values, color: objectifColor}, oldHabit: {...habit}, isNewObjectifHabit})
+        }
+
+        else console.log("Edit objectif without objectif color")
     }
 
     return(
@@ -25,7 +32,6 @@ const EditHabitDetailsScreen: FC<EditHabitDetailsScreenProps> = ({route, navigat
             baseHabit={habit}
             handleGoNext={handleGoNext}
             closeModal={closeModal}
-            
         />
     )
 }

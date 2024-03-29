@@ -15,6 +15,7 @@ import { FrequencyTypes, SeriazableHabit } from "../../types/HabitTypes";
 import React from "react"
 
 export interface HabitAdvancedDetailsFormProps {
+    isNewObjectifHabit?: boolean,
     isForModifyingHabit?: boolean,
     habit: FormStepsHabit | SeriazableHabit,
     handleGoNext: (detailledHabit: FormDetailledHabitValues) => void
@@ -23,6 +24,7 @@ export interface HabitAdvancedDetailsFormProps {
 const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     isForModifyingHabit,
     habit,
+    isNewObjectifHabit,
     handleGoNext,
 }) => {
 
@@ -94,7 +96,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
         setReccurence(rec)
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(isForModifyingHabit ? null : habit.objectifID ?? null, AddHabitScreenType.CreateHabitDetails)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails((isForModifyingHabit && !isNewObjectifHabit) ? null : habit.objectifID ?? null, AddHabitScreenType.CreateHabitDetails)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP

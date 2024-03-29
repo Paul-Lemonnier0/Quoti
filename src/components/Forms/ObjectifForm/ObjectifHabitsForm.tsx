@@ -2,11 +2,11 @@ import { StyleSheet } from "react-native"
 import AddHabitToObjectifNav from "../../../screens/AddScreen/Objectif/AddHabitToObjectifNav"
 import { View } from "react-native"
 import { NavigationButton } from "../../Buttons/IconButtons"
-import { HugeText, NormalText, SubTitleText } from "../../../styles/StyledText"
+import { HugeText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
 import StepIndicator from "../../Other/StepIndicator"
 import { CustomScrollView, UsualScreen } from "../../View/Views"
 import PresentationHabitList from "../../Habitudes/PresentationHabitList"
-import { BorderTextButton } from "../../Buttons/UsualButton"
+import { BorderTextButton, TextButton } from "../../Buttons/UsualButton"
 import { Image } from "react-native"
 import { FC, useCallback, useContext, useRef, useState } from "react"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
@@ -27,8 +27,6 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
 
     const [habitsForObjectif, setHabitsForObjectif] = useState<(FormDetailledObjectifHabit | Habit)[]>(baseHabits ?? [])
 
-    const [selectedHabitID, setSelectedHabitID] = useState<string | undefined>(undefined)
-
     const handleValidate = async() => {
         await handleGoNext(habitsForObjectif)
     }
@@ -39,7 +37,6 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
                 ...prevHabits, 
                 {
                     ...habit, 
-                    color: objectif.color, 
                     icon: objectif.icon,
                     habitID: prevHabits.length.toString() + "-" + habit.titre
                 }
@@ -60,20 +57,20 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
     const EmptyHabitsScreen = () => {
         return(
             <View style={styles.body}>
+                <View style={{flex: 1, marginBottom: 10}}>
+                    <View style={{flex: 1, flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
+                        <View style={styles.emptySreenContainer}>            
+                            <Image style={styles.emptyScreenImageContainer} source={require('../../../img/Illustration/Light_theme/Idea.png')}/>
 
-                <View style={{flex: 1, flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
-                    <View style={styles.emptySreenContainer}>            
-                        <Image style={styles.emptyScreenImageContainer} source={require('../../../img/Illustration/Light_theme/Idea.png')}/>
-
-                        <View style={styles.emptyScreenSubContainer}>
-                            <NormalText text={"Decrivez votre objectif !"}/>
-                            <SubTitleText text={"De quoi est-il composé ?"}/>
+                            <View style={[styles.emptyScreenSubContainer, {marginTop: 30, gap: 10}]}>
+                                <SubTitleText text={"Détaillez votre objectif"}/>
+                                <NormalText text={"Identifiez les clés pour atteinder votre but"} style={{textAlign: "center"}} />
+                            </View>
                         </View>
                     </View>
+
+                    <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend bold/>
                 </View>
-
-                <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend/>
-
             </View>
         )
     }
@@ -82,17 +79,32 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
         return(
             <View style={styles.body}>
 
-                <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend/>
+                <View style={{marginTop: -10, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
+                    <TitleText text={"Habitudes"}/>
+                    <TextButton text="Ajouter" onPress={handleAddHabit} semiBold/>
+                </View>
 
                 <CustomScrollView>
                     <PresentationHabitList baseColor={objectif.color} habits={habitsForObjectif} 
-                        onPress={(habit: Habit): void => {
-                            setSelectedHabitID(habit.habitID)
+                        editHabit={(habitID: string, newHabit: (Habit | FormDetailledObjectifHabit)): void => {                            
+                            setHabitsForObjectif((previousObjectifHabits) => (
+                                previousObjectifHabits.map((prevHab) => {
+                                    if(prevHab.habitID === habitID) {
+                                        return newHabit
+                                    }
+
+                                    return prevHab
+                                })
+                            ))
                         }}
-                        selectedHabitID={selectedHabitID}
+
+                        deleteHabit={(habit: (Habit | FormDetailledObjectifHabit)): void => {
+                            setHabitsForObjectif((previousObjectifHabits) => (
+                                previousObjectifHabits.filter((prevHab) => prevHab.habitID != habit.habitID)
+                            ))
+                        }}
                     />
                 </CustomScrollView>
-
             </View>
         )
     }
@@ -106,7 +118,7 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
                         <NavigationButton noPadding action={"validation"} methode={handleValidate}/>
                     </View>
 
-                    <HugeText text="Intégrez des habitudes"/>
+                    <HugeText text="Développer votre idée"/>
 
                     <StepIndicator totalSteps={5} currentStep={4}/>
                 </View>
@@ -116,11 +128,11 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
             </View>
 
             <AddHabitToObjectifNav
+
                 bottomSheetModalRef={bottomSheetModalRef_AddHabit}
                 addHabitForObjectif={addHabitForObjectif}
-                objectifID={(objectif as Objectif)?.objectifID}
+                objectifID={(objectif as Objectif)?.objectifID ?? "placeholder"}
                 color={objectif.color}
-                icon={objectif.icon}
             />
         </UsualScreen>
     )
@@ -162,7 +174,8 @@ const styles = StyleSheet.create({
 
     emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
-        alignItems: "center"
+        alignItems: "center",
+        gap: 5
     },
 });
 

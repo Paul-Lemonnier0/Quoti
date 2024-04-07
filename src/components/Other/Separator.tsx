@@ -1,7 +1,8 @@
 import { View } from "react-native"
 import { useThemeColor } from "../Themed"
-import { FC } from "react"
+import { FC, useContext } from "react"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 export interface SeparatorProps {
     color?: string,
@@ -11,8 +12,9 @@ export interface SeparatorProps {
 }
 
 const Separator: FC<SeparatorProps> = ({color, opacity = 0.25, height = 2, borderRadius = 2}) => {
-    
-    const tertiary = useThemeColor({}, "Tertiary")
+    const {theme} = useContext(AppContext)
+
+    const tertiary = useThemeColor(theme, "Tertiary")
     
     return(
         <View style={

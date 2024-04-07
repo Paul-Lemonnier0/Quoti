@@ -1,0 +1,1 @@
+export const EMAIL_SUPPORT = "support@quotiapp.fr"

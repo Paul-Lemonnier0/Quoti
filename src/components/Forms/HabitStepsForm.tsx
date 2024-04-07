@@ -6,15 +6,16 @@ import { HugeText, NormalText, SubTitleText, TitleText } from "../../styles/Styl
 import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList";
 import { CustomScrollView, UsualScreen } from "../View/Views";
 import StepsList from "../Habitudes/Step/StepsList";
-import { NavigationButton } from "../Buttons/IconButtons";
+import { NavigationActions, NavigationButton } from "../Buttons/IconButtons";
 import StepIndicator from "../Other/StepIndicator";
 import { TextButton } from "../Buttons/UsualButton";
 import AddStepBottomScreen from "../../screens/BottomScreens/AddStepBottomScreen";
 import { StyleSheet } from "react-native";
 import { FormIconedHabit, FormStep, FormStepsHabitValues } from "../../types/FormHabitTypes";
 import { SeriazableHabit, Step } from "../../types/HabitTypes";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React from "react"
+import Quoti from "../Other/Quoti";
 
 export interface HabitStepsForm {
     isForModifyingHabit?: boolean,
@@ -29,6 +30,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
     habit,
     handleGoNext,
 }) =>  {
+
 
     const baseHabitID = "habitID" in habit ? (habit as SeriazableHabit).habitID : ""
     const baseSteps = "steps" in habit ? Object.values((habit as SeriazableHabit).steps) : []
@@ -54,12 +56,12 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
         }
 
         else {
-            const stepsWithID = steps.map(step => {
+            const stepsWithID = steps.map((step, index) => {
                 if(!step.hasOwnProperty("stepID")){
-                    return {...step, stepID: generateUniqueID()}
+                    return {...step, stepID: generateUniqueID(), numero: index}
                 }
 
-                return {...step}
+                return {...step, numero: index}
             })
 
             newValues.steps = stepsWithID
@@ -80,7 +82,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
     const NoStepScreen = () => {
         return(
             <View style={{flex: 1, flexGrow: 1}}>
-                <View style={styles.emptySreenContainer}>
+                <View style={[styles.emptySreenContainer, {justifyContent: "space-evenly"}]}>
 
                     <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Education]}/>
 
@@ -95,9 +97,9 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
 
     const StepScreen = () => {
         return(
-            <CustomScrollView>
+            <View style={{flex: 1}}>
                 <StepsList steps={steps} editable color={habit.color} setSteps={setSteps}/>
-            </CustomScrollView>
+            </View>
         )
     }
 
@@ -107,8 +109,9 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
 
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"goBack"}/>
-                        <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
+                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
                     </View>            
 
                     

@@ -22,7 +22,7 @@ export interface MarkedMultipleDateType {
 const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
     const WIDTH = Dimensions.get("window").width - 40
 
-    const [selectedDates, setSelectedDates] = useState<Date[]>([])
+    const [selectedDates, setSelectedDates] = useState<[Date, Date | null]>([new Date(), null])
 
     useImperativeHandle(ref, () => ({
       getStartingDate: () => selectedDates[0],
@@ -34,7 +34,7 @@ const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
         const newDate = new Date(date);
 
         
-        setSelectedDates((previousSelected: SetStateAction<Date[]>) => {
+        setSelectedDates((previousSelected: SetStateAction<[Date, Date | null]>) => {
             if (!previousSelected[0]) {
                 return [newDate, null];
             } 
@@ -63,7 +63,7 @@ const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
     const markedDates = useMemo(() => {
         let markedDatesObject: {[dateString: string]: MarkedMultipleDateType} = {}
 
-        if(selectedDates.length === 0 || !selectedDates[0]) return markedDatesObject
+        //if(selectedDates.length === 0 || !selectedDates[0]) return markedDatesObject
 
         const startingDate_temp = selectedDates[0]
         const startingDateString = startingDate_temp.toISOString().slice(0, 10)

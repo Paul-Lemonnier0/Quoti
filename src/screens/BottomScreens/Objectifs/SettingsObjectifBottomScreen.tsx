@@ -28,12 +28,10 @@ export interface SettingsObjectifBottomSheetProps {
 const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
     bottomSheetModalRef,
     objectif,
-    addHabitAdditionnalMethod,
-    removeHabitAdditionnalMethod,
     deleteAdditionnalMethod,
     modifyAdditionnalMethod
 }) => {
-    const {setIsLoading} = useContext(AppContext)
+    const {setIsLoading, theme} = useContext(AppContext)
     const {removeObjectif} = useContext(HabitsContext)
 
     const closeModal = () => bottomSheetModalRef.current?.close()
@@ -88,9 +86,9 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
         bottomSheetModalRef_PinObjectifScreen.current?.present() 
     }
 
-    const error = useThemeColor({}, "Error")
-    const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
+    const error = useThemeColor(theme, "Error")
+    const font = useThemeColor(theme, "Font")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     interface commandType {
         icon: string,

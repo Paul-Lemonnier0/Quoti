@@ -5,14 +5,16 @@ import { View } from "react-native"
 import ColorListSelector from "../Other/ColorListSelector"
 import StepIndicator from "../Other/StepIndicator"
 import { HugeText } from "../../styles/StyledText"
-import { NavigationButton } from "../Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../Buttons/IconButtons"
 import { UsualScreen } from "../View/Views"
-import { FC, useCallback, useRef, useState } from "react"
+import { FC, useCallback, useContext, useRef, useState } from "react"
 import { useThemeColor } from "../Themed"
 import { ColorsList } from "../../data/ColorsList"
 import { FormColoredHabitValues } from "../../types/FormHabitTypes"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
 import React from "react"
+import Quoti from "../Other/Quoti"
+import { AppContext } from "../../data/AppContext"
 
 export interface ChooseColorFormProps {
     defaultColor?: string,
@@ -27,8 +29,9 @@ const ChooseColorForm: FC<ChooseColorFormProps> = ({
     currentStep,
     totalSteps
 }) => {
+    const {theme} = useContext(AppContext)
 
-    const font = useThemeColor({}, "Font")
+    const font = useThemeColor(theme, "Font")
     const baseColor = defaultColor ?? ColorsList[0];
 
     const [selectedColor, setSelectedColor] = useState<string>(baseColor)
@@ -47,8 +50,9 @@ const ChooseColorForm: FC<ChooseColorFormProps> = ({
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"goBack"}/>
-                        <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
+                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
                     </View>
                     <HugeText text="Choisissez une couleur"/>
 

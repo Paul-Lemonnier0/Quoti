@@ -1,11 +1,12 @@
 import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 import { useThemeColor } from "../Themed";
 import { NormalText } from "../../styles/StyledText";
-import React, { FC, memo } from "react";
+import React, { FC, memo, useContext } from "react";
 import { format, lastDayOfMonth } from "date-fns";
 import { DayProps } from "react-native-calendars/src/calendar/day";
 import { DateData } from "react-native-calendars";
 import { MarkedMultipleDateType } from "./MultipleSelectionCalendarListCustom";
+import { AppContext } from "../../data/AppContext";
 
 export interface MemoizedMultiSelectionDayComponentProps extends Omit<DayProps, 'date' | 'marking'> {
     date: DateData,
@@ -14,11 +15,12 @@ export interface MemoizedMultiSelectionDayComponentProps extends Omit<DayProps, 
 } 
 
 const MemoizedMultiSelectionDayComponent: FC<MemoizedMultiSelectionDayComponentProps> = memo(({ date, state, marking, onDayPress }) => {
+    const {theme} = useContext(AppContext)
 
-    const contrast = useThemeColor({}, "Contrast");
-    const fontContrast = useThemeColor({}, "FontContrast");
-    const font = useThemeColor({}, "Font");
-    const selection = useThemeColor({}, "Selection");
+    const contrast = useThemeColor(theme, "Contrast");
+    const fontContrast = useThemeColor(theme, "FontContrast");
+    const font = useThemeColor(theme, "Font");
+    const selection = useThemeColor(theme, "Selection");
 
     const isToday = state === "today";
     const isSelected = marking && marking.selected

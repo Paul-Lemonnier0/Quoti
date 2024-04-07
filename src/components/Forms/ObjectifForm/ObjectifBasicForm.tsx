@@ -1,6 +1,6 @@
 import { View } from "moti"
 import { UsualScreen } from "../../View/Views"
-import { NavigationButton } from "../../Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../Buttons/IconButtons"
 import { HugeText } from "../../../styles/StyledText"
 import StepIndicator from "../../Other/StepIndicator"
 import { CustomTextInputRefType, TextInputCustom } from "../../TextFields/TextInput"
@@ -16,15 +16,17 @@ import React from "react"
 import { AddObjectifScreenType, getAddObjectifStepsDetails } from "../../../constants/BasicConstants"
 import { addDays } from "date-fns"
 import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
+import Quoti from "../../Other/Quoti"
 
 export interface ObjectifBasicForm {
     objectif?: SeriazableObjectif,
     handleGoNext: (newValues: FormBasicObjectif) => void,
     closeModal?: () => void,
-    currentStep?: number
+    currentStep?: number,
+    totalSteps?: number
 }
 
-export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext, currentStep, closeModal}) => {
+export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext, currentStep, closeModal, totalSteps}) => {
 
     const startingDateBase = objectif ? new Date(objectif.startingDate) : new Date()
     const endingDateBase = objectif ? new Date(objectif.startingDate) : addDays(new Date(), 14)
@@ -33,7 +35,7 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
     const [endingDate, setEndingDate] = useState<Date>(endingDateBase)
 
     const CURRENT_STEP_DETAILS = getAddObjectifStepsDetails(AddObjectifScreenType.AddBasicObjectifDetails)
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const total_steps = totalSteps ?? CURRENT_STEP_DETAILS.TOTAL_STEPS
     const current_step = currentStep ?? CURRENT_STEP_DETAILS.CURRENT_STEP
 
     let titreRef = useRef<CustomTextInputRefType>(null)
@@ -43,28 +45,13 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
     const [isDescriptionWrong, setIsDescriptionWrong] = useState(false)
 
     const handleValidation = () => {
-
         let canGoNext = true
 
         const titre = titreRef.current?.getValue();
         const description = descriptionRef.current?.getValue();
-
-        if(titre && description) {
-            if(titre.trim().length === 0 || description.trim().length === 0) 
-            {
-                setIsDescriptionWrong(description.trim().length <= 0)
-                setIsTitleWrong(titre.trim().length <= 0)
-    
-                canGoNext = false
-            }
-    
-            else {
-                setIsTitleWrong(false)
-                setIsDescriptionWrong(false)
-            }
-    
-            if(canGoNext) 
-            { 
+        if(titre && description){
+            if(titre.trim().length > 0 && description.trim().length > 0)
+            {    
                 const detailledObjectif: FormBasicObjectif = {
                     titre, 
                     description, 
@@ -73,8 +60,17 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
                 }
 
                 handleGoNext(detailledObjectif)
-                //navigation.navigate("ChooseColorScreenObjectif", {detailledObjectif})
             }
+
+            else {
+                setIsTitleWrong(titre.trim().length <= 0)
+                setIsDescriptionWrong(description.trim().length <= 0)            
+            }
+        }
+        
+        else {
+            setIsTitleWrong(!titre)
+            setIsDescriptionWrong(!description)
         }
     }
 
@@ -91,17 +87,17 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}> 
                        { closeModal ?
-                         <NavigationButton noPadding methode={closeModal} action={"close"}/>
+                         <NavigationButton noPadding methode={closeModal} action={NavigationActions.close}/>
                             :
-                         <NavigationButton noPadding action={"goBack"}/> 
+                         <NavigationButton noPadding action={NavigationActions.goBack}/> 
                         }                       
-                        
-                        <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="Nouvel objectif"/>
 
-                    <StepIndicator totalSteps={totalSteps} currentStep={current_step}/>
+                    <StepIndicator totalSteps={total_steps} currentStep={current_step}/>
                 </View>
 
                 <View style={styles.body}>
@@ -109,12 +105,12 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
                         <TextInputCustom ref={titreRef} startingValue={objectif?.titre}
                             isWrong={isTitleWrong}
                             placeholder={"Nom de l'objectif"} labelName={"Titre"} semiBold
-                            errorMessage={"Rentrez un titre valide"}/>
+                            errorMessage={" "}/>
 
                         <TextInputCustom ref={descriptionRef} startingValue={objectif?.description}
                             isWrong={isDescriptionWrong}
-                            placeholder={"Description de l'objectif"} labelName={"Description"}  semiBold
-                            errorMessage={"Rentrez une description valide"}/>
+                            placeholder={"Description de l'objectif"} labelName={"Description"} semiBold
+                            errorMessage={" "}/>
                     </View>
                     
                     <Separator/>

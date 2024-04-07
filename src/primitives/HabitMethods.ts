@@ -138,12 +138,16 @@ export const updateHabitsWithNewHabit = (previousHabits: HabitList, newHabit: Ha
 }
 
 export const getSeriazableHabit = (habit: Habit): SeriazableHabit => {
-  const startingDate = habit.startingDate.toDateString()
+  if("startingDate" in habit) {
+    const startingDate = habit.startingDate.toDateString()
   
-  return({
-      ...habit,
-      startingDate
-    })
+    return({
+        ...habit,
+        startingDate
+      })
+  }
+
+  return habit
 }
 
 export const convertBackSeriazableHabit = (habit: SeriazableHabit): Habit => {

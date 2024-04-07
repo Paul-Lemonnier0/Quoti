@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native"
 import AddHabitToObjectifNav from "../../../screens/AddScreen/Objectif/AddHabitToObjectifNav"
 import { View } from "react-native"
-import { NavigationButton } from "../../Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../Buttons/IconButtons"
 import { HugeText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
 import StepIndicator from "../../Other/StepIndicator"
 import { CustomScrollView, UsualScreen } from "../../View/Views"
@@ -16,6 +16,8 @@ import { HabitsContext } from "../../../data/HabitContext"
 import { FormDetailledObjectif } from "../../../types/FormObjectifTypes"
 import React from "react"
 import { Habit, Objectif } from "../../../types/HabitTypes"
+import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
+import Quoti from "../../Other/Quoti"
 
 export interface ObjectifHabitsFormProps {
     objectif: (FormDetailledObjectif | Objectif)
@@ -56,20 +58,14 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
   
     const EmptyHabitsScreen = () => {
         return(
-            <View style={styles.body}>
-                <View style={{flex: 1, marginBottom: 10}}>
-                    <View style={{flex: 1, flexGrow: 1, justifyContent: "center", alignItems: "center"}}>
-                        <View style={styles.emptySreenContainer}>            
-                            <Image style={styles.emptyScreenImageContainer} source={require('../../../img/Illustration/Light_theme/Idea.png')}/>
-
-                            <View style={[styles.emptyScreenSubContainer, {marginTop: 30, gap: 10}]}>
-                                <SubTitleText text={"Détaillez votre objectif"}/>
-                                <NormalText text={"Identifiez les clés pour atteinder votre but"} style={{textAlign: "center"}} />
-                            </View>
-                        </View>
+            <View style={{flex: 1, flexGrow: 1}}>
+                <View style={[styles.emptySreenContainer, {justifyContent: "space-evenly"}]}>                
+                    <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Creative]}/>
+                    
+                    <View style={styles.emptyScreenSubContainer}>
+                        <NormalText text={"Pour plus d'efficacité"}/>
+                        <SubTitleText text={"Décomposez votre objectif"}/>
                     </View>
-
-                    <BorderTextButton text={"Ajouter une habitude"} onPress={handleAddHabit} extend bold/>
                 </View>
             </View>
         )
@@ -78,11 +74,6 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
     const DisplayHabitsScreen = () => {
         return(
             <View style={styles.body}>
-
-                <View style={{marginTop: -10, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
-                    <TitleText text={"Habitudes"}/>
-                    <TextButton text="Ajouter" onPress={handleAddHabit} semiBold/>
-                </View>
 
                 <CustomScrollView>
                     <PresentationHabitList baseColor={objectif.color} habits={habitsForObjectif} 
@@ -114,17 +105,31 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"goBack"}/>
-                        <NavigationButton noPadding action={"validation"} methode={handleValidate}/>
+                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.validation} methode={handleValidate}/>
                     </View>
-
+                    
                     <HugeText text="Développer votre idée"/>
 
                     <StepIndicator totalSteps={5} currentStep={4}/>
                 </View>
 
-                {habitsForObjectif.length === 0 ? <EmptyHabitsScreen/> : <DisplayHabitsScreen/>}
+                <View style={styles.body}>
+
+                    <View style={{marginTop: -10, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
+                        <TitleText text={"Habitudes"}/>
+                        <TextButton text="Ajouter" onPress={handleAddHabit} semiBold/>
+                    </View>
+
+                    {
+                    habitsForObjectif.length === 0 ? 
+                        <EmptyHabitsScreen/> 
+                        : 
+                        <DisplayHabitsScreen/>
+                    }
                     
+                </View>
             </View>
 
             <AddHabitToObjectifNav
@@ -169,13 +174,14 @@ const styles = StyleSheet.create({
     
     emptyScreenImageContainer: {
         resizeMode: 'contain', 
-        maxHeight: "45%",
+        maxWidth: "95%",
+        maxHeight: "45%"
     },
 
     emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
         alignItems: "center",
-        gap: 5
+        gap: 5,
     },
 });
 

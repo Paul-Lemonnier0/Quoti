@@ -12,7 +12,7 @@ type EditHabitDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "
 const EditHabitDetailsScreen: FC<EditHabitDetailsScreenProps> = ({route, navigation}) => {
 
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
-    const {habit, isNewObjectifHabit, objectifColor} = route.params
+    const {habit, isNewObjectifHabit, objectifColor, constObjectifID} = route.params
 
     const handleGoNext = (values: FormBasicHabit | Habit) => {
         if(!isNewObjectifHabit) {
@@ -32,6 +32,7 @@ const EditHabitDetailsScreen: FC<EditHabitDetailsScreenProps> = ({route, navigat
             baseHabit={habit}
             handleGoNext={handleGoNext}
             closeModal={closeModal}
+            constObjectifID={constObjectifID}
         />
     )
 }

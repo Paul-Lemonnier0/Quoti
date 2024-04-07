@@ -3,8 +3,9 @@ import { useThemeColor } from "../Themed";
 import { View } from "react-native";
 import { NormalText } from "../../styles/StyledText";
 import { StyleSheet } from "react-native";
-import { FC } from "react";
+import { FC, useContext } from "react";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export interface ProgressBarProps {
     progress: number,
@@ -14,9 +15,10 @@ export interface ProgressBarProps {
 }
 
 const ProgressBar: FC<ProgressBarProps> = ({progress, color, inactiveColor, withPourcentage}) => {
+    const {theme} = useContext(AppContext)
 
-    const font = useThemeColor({}, "Font")
-    const primary = useThemeColor({}, "Primary")
+    const font = useThemeColor(theme, "Font")
+    const primary = useThemeColor(theme, "Primary")
     
     const unfilledColor = inactiveColor ?? primary
     const finalColor = color ?? font

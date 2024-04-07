@@ -10,6 +10,8 @@ import { auth } from '../../firebase/InitialisationFirebase';
 import { User } from 'firebase/auth';
 import { UserFirestoreType } from '../../types/FirestoreTypes/UserTypes';
 import React from "react"
+import { NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons';
+import { TextButton } from '../../components/Buttons/UsualButton';
 
 type DisplayUsersScreenProps = NativeStackScreenProps<HomeStackParamsList, "DisplayUsersScreen">
 
@@ -43,10 +45,17 @@ const DisplayUsersScreen: FC<DisplayUsersScreenProps> = ({route, navigation}) =>
     return(
         <UsualScreen>
           <View style={styles.container}>
-              <View style={styles.header}>
+            <View style={styles.header}>  
+              <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>    
+                <NavigationButton noPadding action={NavigationActions.goBack}/>
+              </View>
+              <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>    
                 <HugeText text="Amis"/>
+                <TextButton noPadding text='Trier' onPress={() => {}} bold/>
+
               </View>
 
+            </View>
             <View style={styles.body}>
                 <SearchBarCustom ref={searchValueRef} placeholder={"Rechercher un utilisateur..."} onChangeText={updateList}/>
 

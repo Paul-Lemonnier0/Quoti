@@ -43,7 +43,7 @@ const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> =
         closeModal()
     }
 
-    const RenderObjectif = ({item, index}) => {
+    const RenderObjectif = ({item}) => {
 
         const onPress = () => {
             if(item.objectifID === selectedPinObjectifID){
@@ -75,7 +75,7 @@ const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> =
                     {
                         displayedObjectifs.map((obj, index) => (
                             <View key={index} style={{gap: 15}}>
-                                <RenderObjectif key={index} item={obj} index={index}/>
+                                <RenderObjectif key={index} item={obj}/>
                                 { index !== displayedObjectifs.length - 1 && <Separator/> }
                             </View>
                         )) 

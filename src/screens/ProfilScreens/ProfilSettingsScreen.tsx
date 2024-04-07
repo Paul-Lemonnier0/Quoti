@@ -1,175 +1,219 @@
-import { View, StyleSheet } from "react-native"
-import { MassiveText, SubTitleText } from "../../styles/StyledText"
-import { useRef, useState, FC } from "react"
+import { View, StyleSheet, Switch } from "react-native"
+import { HugeText, NormalGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
+import { useState, FC } from "react"
 import { useThemeColor } from "../../components/Themed"
-import { UsualScreen } from "../../components/View/Views"
-import { NavigationButton } from "../../components/Buttons/IconButtons"
-import { Image } from "react-native"
+import { CustomScrollView, UsualScreen } from "../../components/View/Views"
+import { Icon, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { useContext } from "react"
 import { auth } from "../../firebase/InitialisationFirebase"
-import { UserContext, UserType } from "../../data/UserContext"
+import { UserContext } from "../../data/UserContext"
 import { TouchableOpacity } from "react-native"
-import * as ImagePicker from 'expo-image-picker';
-import { CustomTextInputRefType, TextInputCustom } from "../../components/TextFields/TextInput"
-import Separator from "../../components/Other/Separator"
-import { Error_Impact, Success_Impact } from "../../constants/Impacts"
-import { Database_setUser } from "../../firebase/Database_User_Primitives"
-import { saveProfilPicture } from "../../firebase/Storage_Primitives"
-import { IMAGE_COMPRESSION, IMAGE_DIMENSIONS, IMAGE_FORMAT } from "../../constants/BasicConstants"
-import * as ImageManipulator from 'expo-image-manipulator';
+import { BottomScreenOpen_Impact } from "../../constants/Impacts"
 import { AppContext } from "../../data/AppContext"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
-import { updateProfile } from "firebase/auth"
+import { signOut } from "firebase/auth"
 import React from "react"
+import ProfilButton from "../../components/Profil/ProfilButton"
 
 type ProfilSettingsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilSettingsScreen">
 
-const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
+export interface RenderSettingsListItemProps {
+    icon: string,
+    provider: IconProvider,
+    text: string,
+    onPress: () => void,
+    noChevron?: boolean,
+    switchButton?: boolean,
+    switchButtonValue?: boolean,
+}
 
-    const {setIsLoading} = useContext(AppContext)
-    const {user, setUser} = useContext(UserContext)
+export const RenderSettingsListItem: FC<RenderSettingsListItemProps> = ({
+    icon, 
+    provider, 
+    text, 
+    onPress, 
+    noChevron, 
+    switchButton,
+    switchButtonValue,
+}) => {
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
+    const secondary = useThemeColor(theme, "Secondary")
 
-    const displayNameRef = useRef<CustomTextInputRefType>(null)
-
-    const secondary = useThemeColor({}, "Secondary")
-
-    const [isDisplayNameWrong, setIsDisplayNameWrong] = useState(false)
-    const [profilPicture, setProfilPicture] = useState(user?.photoURL ?? "")
-
-
-
-    const handleUploadImage = async() => {
-        let result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            quality: 1
-        })
-
-        if(!result.canceled){
-        
-            const {uri} = result.assets[0]
-            
-            const resizedImage = await ImageManipulator.manipulateAsync(uri, 
-                [{
-                    resize: IMAGE_DIMENSIONS
-                }],
-                {
-                    compress: IMAGE_COMPRESSION, 
-                    format: IMAGE_FORMAT
-                }
-            )
-
-            setProfilPicture(resizedImage.uri)
+    const handleOnPress = () => {
+        if(switchButton) {
+            BottomScreenOpen_Impact()
         }
+
+        onPress()
     }
-
-    interface newValuesProps {
-        photoUrl: string | undefined,
-        displayName: string | undefined,
-    }
-
-    const handleModificationValidation = async() => {
-        const newDisplayName = displayNameRef.current?.getValue()
-
-        if(newDisplayName !== "" && user){
-            setIsLoading(true)
-            setIsDisplayNameWrong(false)
-            const newValues: newValuesProps = {
-                photoUrl: user?.photoURL ?? undefined,
-                displayName: user?.displayName ?? undefined
-            }
-
-            if(profilPicture !== user?.photoURL){
-                try{
-                    if(user?.uid){
-                        const photoURL = await saveProfilPicture(user.uid, profilPicture)
-                        newValues.photoUrl = photoURL
-                    }
-                }
     
-                catch(e){
-                    console.log("Impossible de load l'image : ", e)
-                }
-            }
-
-            if(user?.displayName !== newDisplayName){
-                newValues.displayName = newDisplayName
-            }
-
-            try{
-                if(auth.currentUser){
-                    await updateProfile(auth.currentUser, {...newValues})
-                }
-
-                const updatedUser: UserType = {
-                    ...newValues,
-                    ...user
-                }
-
-                setUser(updatedUser)
-
-                await Database_setUser(updatedUser);
-
-                Success_Impact()
-                navigation.goBack()
-            }
-
-            catch(e){
-                console.log("Impossible de mettre à jour le profil : ", e)
-            }
-
-            Error_Impact()
-            setIsLoading(false)
-        }
-
-        else {
-            Error_Impact()
-            setIsDisplayNameWrong(true)
-        }
-    }    
-
-    const RenderPlaceholderProfilPicture = () => {
-        const firstUsernameLetter = user?.displayName?.substring(0,1) ?? "A"
-  
-        return(
-            <View style={[styles.imageStyle, {justifyContent: "center", alignItems: "center", backgroundColor: secondary }]}>
-                <MassiveText text={firstUsernameLetter}/>
+    return(
+        <TouchableOpacity disabled={switchButton} onPress={handleOnPress} style={{
+            flexDirection: "row", 
+            justifyContent: "space-between",
+            paddingVertical: 20
+        }}>
+            <View style={{flexDirection: "row", gap: 20, alignItems: "center", flex: 1}}>
+                <Icon name={icon} provider={provider} color={fontGray} size={26}/>
+                <SubTitleText text={text}/>
             </View>
-        )
-      }
+            <View>
+            {
+                !noChevron && !switchButton ?
+                    <Icon provider={IconProvider.Feather} name={"chevron-right"} color={fontGray}/>
+                    :
+                switchButton && 
+                    <Switch 
+                        value={switchButtonValue} 
+                        onValueChange={handleOnPress} 
+                        trackColor={{false: secondary, true: secondary}}/>
+            }
+            </View>
+        </TouchableOpacity>
+    )
+}
+
+export interface RenderSettingListProps {
+    commands: RenderSettingsListItemProps[],
+    sectionTitle: string
+}
+
+export const RenderSettingList: FC<RenderSettingListProps> = ({commands, sectionTitle}) => {
+    return(
+        <View key={sectionTitle} style={{gap: 20}}>
+            <TitleText text={sectionTitle}/>
+                                
+            <View style={{gap: 10}}>
+                {
+                    commands.map((command, index) => {
+                        return <RenderSettingsListItem key={index} {...command}/>
+                    })
+                }
+            </View>
+        </View>
+    )
+}
+
+const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
+    const {user, setUser} = useContext(UserContext)
+    const {theme, handleSetTheme} = useContext(AppContext)
+
+    const [notificationEnabled, setNotificationEnabled] = useState<boolean>(true)
+
+    const handleSignOut = async() => {
+        await signOut(auth)
+        console.log("déconnecté")
+    }   
+
+    const isDarkMode = theme.dark !== undefined
+
+    const generalCommands:  RenderSettingListProps = {
+        sectionTitle: "Général",
+        commands: [
+            {
+                icon: "user",
+                provider: IconProvider.Feather,
+                text: "Mon Profil",
+                onPress: () => navigation.navigate("ProfilDataSettingsScreen")
+            },
+            {
+                icon: "staro",
+                provider: IconProvider.AntDesign,
+                text: "Abonnement",
+                onPress: () => navigation.navigate("SubscriptionScreen")
+            },
+        ]
+    }
+
+    const preferencesCommands: RenderSettingListProps = {
+        sectionTitle: "Préférences",
+        commands: [
+            {
+                icon: "bell",
+                provider: IconProvider.Feather,
+                text: "Notifications",
+                onPress: () => setNotificationEnabled(!notificationEnabled),
+                switchButton: true,
+                switchButtonValue: notificationEnabled
+            },
+            {
+                icon: "moon",
+                provider: IconProvider.Feather,
+                text: "Mode sombre",
+                onPress: () => handleSetTheme(theme.light ? {dark: "dark"} : {light: "light"}),
+                switchButton: true,
+                switchButtonValue: isDarkMode
+            },
+            {
+                icon: "lock",
+                provider: IconProvider.Feather,
+                text: "Sécurité",
+                onPress: () => navigation.navigate("SecurityScreen")
+            },
+        ]
+    }
+
+    const otherCommands: RenderSettingListProps = {
+        sectionTitle: "Autre",
+        commands: [
+        
+        {
+            icon: "help-outline",
+            provider: IconProvider.MaterialIcons,
+            text: "Aide et support",
+            onPress: () => navigation.navigate("HelpAndSupportScreen")
+        },
+        {
+            icon: "info",
+            provider: IconProvider.Feather,
+            text: "Conditions d'utilisation",
+            onPress: () => navigation.navigate("ConditionUtilisationScreen")
+        },
+        {
+            icon: "log-out",
+            provider: IconProvider.Feather,
+            text: "Déconnexion",
+            onPress: handleSignOut,
+            noChevron: true
+        },
+    ]}
+
+    const commands = [generalCommands, preferencesCommands, otherCommands]
 
     return(
         <UsualScreen>
           <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
-                        <NavigationButton action={"validation"} noPadding methode={handleModificationValidation}/>
+                        <NavigationButton action={NavigationActions.goBack}/>
                     </View>
                 </View>
 
-                <View style={styles.body}>
-                    <View style={{display: "flex", flexDirection: "column", gap: 20, alignItems: "center"}}>
-                        <TouchableOpacity style={styles.imageContainerStyle} onPress={handleUploadImage}>
+                <CustomScrollView>
+                    <View style={styles.body}>
+                        <View style={styles.bodyHeader}>
+                            {user && <ProfilButton tall noBadge user={user} onPress={() => {}}/>}
+                            <View style={styles.titreEtDescriptionContainer}>
+                                <HugeText text={user?.displayName ?? "unknown"}/>
+                                <NormalGrayText text={user?.email ?? "unknown"} />
+                            </View>
+                        </View>
+
+                        <View style={styles.bodyCore}>
+                            <View style={{gap: 30}}>
                             {
-                                profilPicture ?
-                                <Image style={styles.imageStyle} source={{uri: profilPicture}}/>
-                                :
-                                <RenderPlaceholderProfilPicture/>
+                                commands.map((command, index) => 
+                                    <RenderSettingList key={index} {...command}/>
+                                )
                             }
-                        </TouchableOpacity>
-                        
-                        <TouchableOpacity onPress={handleUploadImage} style={{display: "flex", flexDirection: "row"}}>
-                            <SubTitleText text={"Modifier la photo de profil"}/>
-                        </TouchableOpacity>
-                    </View>
-                        
-                    <Separator/>
+                            </View>
 
-                    <TextInputCustom ref={displayNameRef} isWrong={isDisplayNameWrong} errorMessage={"Entrez un nom d'utilisateur valide"} 
-                        labelName={"Nom d'utilisateur"} boldLabel startingValue={user?.displayName ?? ""}/>
-                </View>
+                        </View>
+                    
+                    </View>
+                </CustomScrollView>
           </View>
         </UsualScreen>
     );
@@ -187,7 +231,16 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
     header: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 20
+        gap: 20,
+        marginBottom: 5
+    },
+
+    titreEtDescriptionContainer:{
+        display: "flex", 
+        flex: 1,
+        flexDirection: "column", 
+        justifyContent: "center",
+        gap: 0
     },
 
     subHeader: {
@@ -216,7 +269,16 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
       width: 120,
       alignItems: 'center',
       justifyContent: 'center', 
-  }
+    },
+
+    bodyHeader: {
+        flexDirection: "row",
+        gap: 20
+    },
+
+    bodyCore: {
+        gap: 20
+    }
 });
   
 export default ProfilSettingsScreen;

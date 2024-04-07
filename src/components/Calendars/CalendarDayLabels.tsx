@@ -2,11 +2,13 @@ import { StyleSheet, View } from "react-native"
 import { NormalText } from "../../styles/StyledText"
 import { addDays } from "date-fns"
 import { useThemeColor } from "../Themed"
-import React from "react"
+import React, { useContext } from "react"
+import { AppContext } from "../../data/AppContext"
 
 const CalendarDayLabels = () => {
+  const {theme} = useContext(AppContext)
 
-    const fontGray = useThemeColor({}, "FontGray")
+    const fontGray = useThemeColor(theme, "FontGray")
     const color = fontGray
 
     const daysLabels: string[] = []
@@ -38,8 +40,9 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: "row",
         justifyContent: "space-between",
-        paddingLeft: 10,
+        paddingLeft: 15,
         paddingRight: 5,
+        gap: 5
     },
 
     dayLabel: {

@@ -28,13 +28,23 @@ import AddHabitSteps from '../screens/AddScreen/Habit/AddHabitSteps';
 import { BottomScreenOpen_Impact } from '../constants/Impacts';
 import { TouchableOpacity } from 'react-native';
 import ValidationScreenObjectif from '../screens/AddScreen/Objectif/ValidationScreenObjectif';
-import React from 'react';
+import React, { useContext } from 'react';
 import { AntDesignName, FeatherIconName } from '../components/Buttons/IconButtons';
 import { FrequencyTypes, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
 import { User } from 'firebase/auth';
 import { UserFirestoreType } from '../types/FirestoreTypes/UserTypes';
 import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from '../types/FormHabitTypes';
 import { FormBasicObjectif, FormColoredObjectif, FormDetailledObjectif } from '../types/FormObjectifTypes';
+import { AppContext } from '../data/AppContext';
+import ProfilListHabitScreen from '../screens/ProfilScreens/ProfilListHabitScreen';
+import ProfilListObjectifScreen from '../screens/ProfilScreens/ProfilListObjectifScreen';
+import ProfilListSuccessScreen from '../screens/ProfilScreens/ProfilListSuccessScreen';
+import PresentationObjectifDetailsScreen from '../screens/Objectif/PresentationObjectifDetailsScreen';
+import ProfilDataSettingsScreen from '../screens/ProfilScreens/ProfilSettingsScreens/ProfilDataSettingsScreen';
+import ConditionUtilisationScreen from '../screens/ProfilScreens/ProfilSettingsScreens/ConditionUtilisationScreen';
+import HelpAndSupportScreen from '../screens/ProfilScreens/ProfilSettingsScreens/HelpAndSupportScreen';
+import SecurityScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SecurityScreen';
+import SubscriptionScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SubscriptionScreen';
 
 
 export type BottomTabParamList = {
@@ -47,8 +57,9 @@ const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 const hideStyle = {display: 'none'}
 
 function BottomTabNavigator() {
+  const {theme} = useContext(AppContext)
   const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
-  const fontGray = useThemeColor({}, "FontGray")
+  const fontGray = useThemeColor(theme, "FontGray")
 
   return (
     <BottomTab.Navigator
@@ -129,11 +140,24 @@ export type HomeStackParamsList = {
     frequency: FrequencyTypes,
     currentDateString: string
   },
+  PresentationObjectifDetailsScreen: {
+    seriazableObjectif: SeriazableObjectif,
+  },
   ProfilDetailsScreen: undefined,
+  ProfilListHabitScreen: undefined,
+  ProfilListObjectifScreen: undefined,
+  ProfilListSuccessScreen: undefined,
   ProfilSettingsScreen: undefined,
   DisplayUsersScreen: {
     users: (UserFirestoreType | null)[]
   },
+
+  ProfilDataSettingsScreen: undefined,
+  ConditionUtilisationScreen: undefined,
+  HelpAndSupportScreen: undefined,
+  SecurityScreen: undefined,
+  SubscriptionScreen: undefined,
+
   StatProfilScreen: undefined,
 }
 
@@ -150,10 +174,21 @@ function HomeNavigator() {
       <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{}}/>
 
       <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{}}/>
+      <HomeStack.Screen name="PresentationObjectifDetailsScreen" component={PresentationObjectifDetailsScreen} options={{}}/>
 
       <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{}}/>
       <HomeStack.Screen name="ProfilSettingsScreen" component={ProfilSettingsScreen} options={{}}/>
+
+      <HomeStack.Screen name="ProfilListHabitScreen" component={ProfilListHabitScreen} options={{}}/>
+      <HomeStack.Screen name="ProfilListObjectifScreen" component={ProfilListObjectifScreen} options={{}}/>
+      <HomeStack.Screen name="ProfilListSuccessScreen" component={ProfilListSuccessScreen} options={{}}/>
       <HomeStack.Screen name="DisplayUsersScreen" component={DisplayUsersScreen} options={{}}/>
+
+      <HomeStack.Screen name="ProfilDataSettingsScreen" component={ProfilDataSettingsScreen} options={{}}/>
+      <HomeStack.Screen name="ConditionUtilisationScreen" component={ConditionUtilisationScreen} options={{}}/>
+      <HomeStack.Screen name="HelpAndSupportScreen" component={HelpAndSupportScreen} options={{}}/>
+      <HomeStack.Screen name="SecurityScreen" component={SecurityScreen} options={{}}/>
+      <HomeStack.Screen name="SubscriptionScreen" component={SubscriptionScreen} options={{}}/>
 
       <HomeStack.Screen name="StatProfilScreen" component={StatProfilScreen} options={{}}/>
     </HomeStack.Navigator>

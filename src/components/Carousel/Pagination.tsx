@@ -1,8 +1,9 @@
 import { View } from "react-native"
 import AnimatedDotsCarousel from 'react-native-animated-dots-carousel';
 import { useThemeColor } from "../Themed"
-import { FC } from "react";
+import { FC, useContext } from "react";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export interface PaginationProps {
     length: number,
@@ -11,9 +12,10 @@ export interface PaginationProps {
 }
 
 const Pagination: FC<PaginationProps> = ({length, currentIndex, maxIndicator = 3}) => {
-    
-    const fontGray = useThemeColor({}, "FontGray")
-    const font = useThemeColor({}, "Font")
+    const {theme} = useContext(AppContext)
+
+    const fontGray = useThemeColor(theme, "FontGray")
+    const font = useThemeColor(theme, "Font")
 
     return(
         <View style={{height: 8, marginVertical: 0}}>

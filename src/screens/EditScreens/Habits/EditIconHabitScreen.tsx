@@ -11,7 +11,7 @@ type EditIconHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "Edi
 
 const EditIconHabitScreen: FC<EditIconHabitScreenProps> = ({route, navigation}) => {
     const {newValues, oldHabit, isNewObjectifHabit} = route.params
-
+    
     const handleGoNext = (values: FormIconedHabitValues) => {
         navigation.navigate("EditHabitStepsScreen", {
             newValues: {...newValues, ...values}, 

@@ -4,7 +4,12 @@ export enum FrequencyTypes {
     Mensuel = "Mensuel",
 }
 
-
+export enum PrioritesType {
+    None = "None",
+    Low = "Low",
+    Medium = "Medium",
+    High = "High",
+}
 
 export interface StreakValues {
     currentStreak: number,
@@ -62,7 +67,8 @@ interface Step {
     stepID: string,
     created: string,
     deleted?: string,
-    isChecked?: boolean
+    isChecked?: boolean,
+    priority?: PrioritesType
 }
 
 interface HabitList {

@@ -25,7 +25,8 @@ export interface SettingNewObjectifHabitBottomScreenProps {
     deleteHabit: () => void, 
     editHabit: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void,
     additionnalClosedMethod?: () => void,
-    objectifColor: string
+    objectifColor: string,
+    isNotObjectifIDConst?: boolean
 }
 
 const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScreenProps> = ({
@@ -34,10 +35,11 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
     objectifColor,
     deleteHabit,
     editHabit,
-    additionnalClosedMethod
+    additionnalClosedMethod,
+    isNotObjectifIDConst
 }) => {
     
-    const {setIsLoading} = useContext(AppContext)
+    const {setIsLoading, theme} = useContext(AppContext)
 
 
     const closeModal = () => {
@@ -63,10 +65,10 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
         editHabit(habit.habitID, newHabit)
         closeModal()
     }
-
-    const error = useThemeColor({}, "Error")
-    const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
+    
+    const error = useThemeColor(theme, "Error")
+    const font = useThemeColor(theme, "Font")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     interface commandType {
         icon: string,
@@ -111,6 +113,7 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
                 isNewObjectifHabit
                 validationAdditionnalMethod={() => {}}
                 editHabitCustomMethod={handleEdit}
+                constObjectifID={ isNotObjectifIDConst ? undefined : habit.objectifID }
             />
         </CustomStaticBottomSheet>
     );

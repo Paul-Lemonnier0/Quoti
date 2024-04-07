@@ -1,21 +1,27 @@
 import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useThemeColor } from "../Themed"
-import { useState, useCallback, RefObject, ReactNode, FC } from "react";
+import { useState, useCallback, RefObject, ReactNode, FC, useContext } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
 import { SharedValue } from "react-native-reanimated";
 import { BackdropBehaviorType, BasicCustomBottomSheetProps } from "../../types/BottomScreenTypes";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export  interface CustomBottomSheetProps extends BasicCustomBottomSheetProps {
   noBackdrop?: boolean,
-  onDismiss?: () => void
+  onDismiss?: () => void,
+  isPrimary?: boolean
 }
 
-const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children}) => {
-    
-    const fontGray = useThemeColor({}, "FontGray")
-    const popupColor = useThemeColor({}, "Popup")
+const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children, isPrimary}) => {
+    const {theme} = useContext(AppContext)
+
+    const fontGray = useThemeColor(theme, "FontGray")
+    const popupColor = useThemeColor(theme, "Popup")
+    const primary = useThemeColor(theme, "Secondary")
+
+    const backgroundColor = isPrimary ? primary : popupColor
 
     const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
 
@@ -31,7 +37,7 @@ const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, sna
         keyboardBlurBehavior="restore"
             ref={bottomSheetModalRef}
             style={{flex: 1}}
-            backgroundStyle={{backgroundColor: popupColor, borderRadius: 40}}
+            backgroundStyle={{backgroundColor: backgroundColor}}
             handleIndicatorStyle={{backgroundColor: fontGray}}
             index={0}
             snapPoints={snapPoints}
@@ -50,8 +56,10 @@ const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, sna
 };
 
 export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, onDismiss, children}) => {
-    
-  const secondary = useThemeColor({}, "Secondary")
+  
+  const {theme} = useContext(AppContext)
+
+  const secondary = useThemeColor(theme, "Secondary")
 
 
   const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');

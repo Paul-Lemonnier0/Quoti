@@ -8,7 +8,7 @@ import { TextButton } from "../../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../../data/HabitContext";
 import HabitIcons from "../../data/HabitIcons";
-import { Icon, IconButton, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons";
+import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
 import ProgressBar from "../../components/Progress/ProgressBar";
 import StepsList from "../../components/Habitudes/Step/StepsList";
 import { addDays } from "date-fns";
@@ -26,17 +26,22 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { auth } from "../../firebase/InitialisationFirebase";
 import SettingHabitBottomScreen from "../BottomScreens/Habitudes/SettingsHabitBottomScreen";
 import { Habits_Skeleton } from "../../constants/HabitsPlaceholder";
+import { FrequencyDetails } from "../../components/Habitudes/FrequencyDetails";
+import Separator from "../../components/Other/Separator";
+import Quoti from "../../components/Other/Quoti";
+import { AppContext } from "../../data/AppContext";
 
 type HabitudeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HabitudeScreen">
 
 const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
     const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
-
-    const tertiary = useThemeColor({}, "Tertiary")
-    const secondary = useThemeColor({}, "Secondary")
+    const {theme} = useContext(AppContext)
+    const tertiary = useThemeColor(theme, "Tertiary")
+    const secondary = useThemeColor(theme, "Secondary")
 
     const {getHabitFromFilteredHabits, handleCheckStep, Objectifs} = useContext(HabitsContext)
+
 
     const bottomSheetModalRef_HabitCompleted = useRef<BottomSheetModal>(null)
     const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
@@ -146,7 +151,8 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
             <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
+                        <NavigationButton action={NavigationActions.goBack}/>
+                        <Quoti/>
                         <IconButton noPadding name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
                     </View>
                 </View>
@@ -161,7 +167,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
                                 <View style={styles.titreEtDescriptionContainer}>
                                     <HugeText text={habit.titre}/>
-                                    <NormalGrayText text={habit.description}/>
+                                    <NormalGrayText bold text={habit.description}/>
                                 </View>
                             </View>
 
@@ -195,12 +201,19 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                                     <RangeActivity start={currentDate} activity={lastSevenDaysLogs} totalSteps={steps.length} activityColor={habit.color}/>
                                 </View>
                             </View>
+
+                            <Separator/>
+
+                            <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+                                <TitleText text={"Fréquence"}/>
+                                <FrequencyDetails frequency={habit.frequency} reccurence={habit.reccurence} occurence={habit.occurence}/>
+                            </View>
                         </View>
                     </View>
                 </CustomScrollView>
             </View>
 
-            <HabitCompletedBottomScreen bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} habit={habit}/>
+            <HabitCompletedBottomScreen bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} habit={habit} goBackHome={goBack}/>
             <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef_Settings} habit={habit} 
             deleteAdditionnalMethod={goBack} 
             attachToObjectifAdditionnalMethod={goBack}
@@ -222,7 +235,8 @@ const styles = StyleSheet.create({
     header: {
         display: "flex", 
         flexDirection: "column", 
-        gap: getHeightResponsive(20)
+        gap: getHeightResponsive(20),
+        marginBottom: 5
     },
     
     subHeader: {
@@ -266,7 +280,7 @@ const styles = StyleSheet.create({
     bodyCore: {
         display: "flex", 
         flexDirection: "column", 
-        gap: getHeightResponsive(40)
+        gap: getHeightResponsive(30)
     },
 
     groupContainer: {

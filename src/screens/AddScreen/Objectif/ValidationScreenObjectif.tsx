@@ -128,7 +128,8 @@ const ValidationScreenObjectif: FC<ValidationScreenObjectifProps> = ({navigation
 
     emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
-        alignItems: "center"
+        alignItems: "center",
+        gap: 5
     },
   });
   

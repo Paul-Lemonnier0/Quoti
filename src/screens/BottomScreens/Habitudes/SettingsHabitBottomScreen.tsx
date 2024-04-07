@@ -36,7 +36,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     additionnalClosedMethod
 }) => {
     
-    const {setIsLoading} = useContext(AppContext)
+    const {setIsLoading, theme} = useContext(AppContext)
     const {removeHabit, updateHabitRelationWithObjectif, Objectifs} = useContext(HabitsContext)
 
     const habitType = getHabitType(habit)
@@ -114,10 +114,11 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         await updateHabitRelationWithObjectif(habit, selectedPinObjectifID)
     }
 
-    const error = useThemeColor({}, "Error")
-    const font = useThemeColor({}, "Font")
-    const tertiary = useThemeColor({}, "Tertiary")
-    const fontGray = useThemeColor({}, "FontGray")
+
+    const error = useThemeColor(theme, "Error")
+    const font = useThemeColor(theme, "Font")
+    const tertiary = useThemeColor(theme, "Tertiary")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     interface commandType {
         icon: string,

@@ -100,7 +100,8 @@ const ValidationScreenHabit: FC<ValidationScreenHabitProps> = ({route, navigatio
 
     emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
-        alignItems: "center"
+        alignItems: "center",
+        gap: 5
     },
   });
   

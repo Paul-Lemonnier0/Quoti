@@ -3,7 +3,7 @@ import { auth, db } from "../../firebase/InitialisationFirebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { Alert, View } from "react-native";
 import { UsualScreen } from "../../components/View/Views";
-import { Icon, IconProvider, NavigationButton } from "../../components/Buttons/IconButtons";
+import { Icon, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
 import { HugeText, NormalText, SubTitleText } from "../../styles/StyledText";
 import { BackgroundTextButton } from "../../components/Buttons/UsualButton";
 import { StyleSheet } from "react-native";
@@ -27,9 +27,9 @@ type ChooseProfilPictureScreenProps = NativeStackScreenProps<AuthNavigatorStackP
 
 const ChooseProfilPictureScreen: FC<ChooseProfilPictureScreenProps> = () => {
 
-    const secondary = useThemeColor({}, "Secondary")
+    const {setIsLoading, theme} = useContext(AppContext)
+    const secondary = useThemeColor(theme, "Secondary")
 
-    const {setIsLoading} = useContext(AppContext)
     const {setUserAuthState} = useContext(AuthContext)
 
     const user = auth.currentUser
@@ -104,7 +104,7 @@ const ChooseProfilPictureScreen: FC<ChooseProfilPictureScreenProps> = () => {
 
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
+                        <NavigationButton action={NavigationActions.goBack}/>
                     </View>
                     <HugeText text={"Photo de profil"}/>
                 </View>

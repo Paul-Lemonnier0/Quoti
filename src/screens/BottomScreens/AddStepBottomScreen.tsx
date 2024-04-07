@@ -1,32 +1,34 @@
 import { View, StyleSheet } from "react-native"
-import { TitleText, SubTitleText } from "../../styles/StyledText"
+import { TitleText, SubTitleText, HugeText } from "../../styles/StyledText"
 import React, { Dispatch, FC, RefObject, useMemo, useState } from "react"
 import { Feather } from "@expo/vector-icons"
 import { useThemeColor } from "../../components/Themed"
 import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet"
-import { BottomTextInputCustom, CustomTextInputRefType } from "../../components/TextFields/TextInput"
+import { BottomTextInputCustom, CustomTextInputRefType, TextInputCustom } from "../../components/TextFields/TextInput"
 import { IncrementTime } from "../../components/Buttons/IncrementButtons"
-import { TextButton } from "../../components/Buttons/UsualButton"
+import { BackgroundTextButton, TextButton } from "../../components/Buttons/UsualButton"
 import { Keyboard } from "react-native"
 import { TouchableWithoutFeedback } from "react-native"
 import { useRef } from "react"
-import { CloseButton } from "../../components/Buttons/IconButtons"
+import { CloseButton, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import Separator from "../../components/Other/Separator"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
-import { Step } from "../../types/HabitTypes"
-import { FormStep } from "../../types/FormHabitTypes"
+import { PrioritesType, Step } from "../../types/HabitTypes"
+import { FormFullStep, FormStep } from "../../types/FormHabitTypes"
+import { generateUniqueID, getHoursFromDuration, getMinutesFromDuration } from "../../primitives/BasicsMethods"
+import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet"
+import { UsualScreen } from "../../components/View/Views"
+import { PriorityRadioButtons } from "../../components/Priority/PriotityIndicator"
+import FooterBottomSheet from "../../components/BottomSheets/FooterBottomSheets"
+import Quoti from "../../components/Other/Quoti"
 
 export interface AddStepBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
-    setSteps: Dispatch<React.SetStateAction<FormStep[]>>,
-    noBackdrop?: boolean
+    setSteps: Dispatch<React.SetStateAction<(FormStep | Step)[]>>,
+    baseStep?: Step | FormFullStep
 }
 
-const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef, setSteps, noBackdrop}) => {
-
-    const snapPoints = useMemo(() => ['85%'], [])
-
-    const popupColor = useThemeColor({}, "Popup")
+const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef, setSteps, baseStep}) => {
 
     let titreRef = useRef<CustomTextInputRefType>(null)
     let descriptionRef = useRef<CustomTextInputRefType>(null)
@@ -34,9 +36,11 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
     const [isTitleWrong, setIsTitleWrong] = useState<boolean>(false)
     const [isDescriptionWrong, setIsDescriptionWrong] = useState<boolean>(false)
 
-    const [hourDuration, setHourDuration] = useState<number>(0)
-    const [minutesDuration, setMinutesDuration] = useState<number>(0)
 
+    const [hourDuration, setHourDuration] = useState<number>(baseStep?.duration ? getHoursFromDuration(baseStep.duration) : 0)
+    const [minutesDuration, setMinutesDuration] = useState<number>(baseStep?.duration ? getMinutesFromDuration(baseStep.duration) : 0)
+
+    const [selectedPriority, setSelectedPriority] = useState<PrioritesType>(baseStep?.priority ?? PrioritesType.None)
 
     const clearAll = () => {
         setIsTitleWrong(false)
@@ -47,38 +51,49 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
 
     const handleValidate = () => {
 
-        let canClose = true
-
         let titre = titreRef.current?.getValue();
         let description = descriptionRef.current?.getValue();
 
         if(titre && description){
-            if(titre.trim().length <= 0 || description.trim().length <= 0) 
-            {
-                setIsDescriptionWrong(description.trim().length <= 0)
-                setIsTitleWrong(titre.trim().length <= 0)
-    
-                canClose = false
-            }
-    
-            if(canClose)
+            if(titre.trim().length > 0 && description.trim().length > 0) 
             {
                 const stepDuration = hourDuration !== 0 || minutesDuration !== 0 ? hourDuration * 60 + minutesDuration : null
-    
+                const stepID = baseStep?.stepID ?? generateUniqueID()
+
                 const newStep = {
                     titre: titre,
                     description: description,
-                    duration: stepDuration
+                    duration: stepDuration,
+                    priority: selectedPriority,
+                    stepID
                 }
-    
-                setSteps((previousSteps) => 
-                    ([...previousSteps, newStep] as FormStep[]))
-    
+                
+                if (baseStep) {
+                    setSteps((previousSteps) => (previousSteps.map((step) => {
+                        if ("stepID" in step) {
+                            return step.stepID === baseStep.stepID ? newStep : step;
+                        }
+                
+                        return step;
+                    }) as FormStep[]));
+                }
+                
+                else setSteps((previousSteps) => ([...previousSteps, {...newStep, numero: previousSteps.length}] as FormStep[]))
+
                 clearAll()
-                closeModal()  
+                closeModal() 
+            }
+
+            else {
+                setIsDescriptionWrong(description.trim().length <= 0)
+                setIsTitleWrong(titre.trim().length <= 0)
             }
         }
 
+        else {
+            setIsTitleWrong(!titre)
+            setIsDescriptionWrong(!description)
+        }
     }
   
     const closeModal = () => {
@@ -91,46 +106,63 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
     }
 
     return (
-            <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints} noBackdrop={noBackdrop}>
+            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+                <UsualScreen hideMenu>    
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={{flex: 1}}>
 
                         <View style={styles.contentContainer}>
-                            <View style={styles.pageTitleContainer}>
-                                <View style={{flex: 1}}>
-                                    <TitleText text="Nouvelle étape"/>
+                            <View style={styles.header}>
+                                <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                                    <NavigationButton noPadding methode={closeModal} action={NavigationActions.close}/>
+                                    <Quoti/>
+                                    <NavigationButton noPadding action={NavigationActions.validation} methode={handleValidate}/>
                                 </View>
-                                <CloseButton noPadding methode={closeModal}/>
-                            </View>
 
-                        
+                                <HugeText text={baseStep ? "Modifier cette étape" : "Nouvelle étape"}/>
+
+                            </View>
+                            
                             <View style={styles.body}>
 
                                 <View style={styles.subBodyContainer}>
-                                    <BottomTextInputCustom semiBold ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
-                                    <BottomTextInputCustom semiBold ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
+                                    <TextInputCustom startingValue={baseStep?.titre} semiBold ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
+                                    <TextInputCustom startingValue={baseStep?.description} semiBold ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
                                 </View>
 
-                                <View style={styles.subBodyContainer}>
-                                    <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                                        <SubTitleText text={"Durée"}/>
-                                        <TextButton text={"Aucune"} semiBold noPadding onPress={handleSetNoDuration}/>
-                                    </View>
-
-                                    <View style={styles.listContainer}>
-                                        <IncrementTime value={hourDuration} isBorderHidden={hourDuration === 0} setValue={setHourDuration} customBackgroundColor={popupColor}/>
-                                        <IncrementTime value={minutesDuration} isBorderHidden={minutesDuration === 0} setValue={setMinutesDuration} isMinutes={true} customBackgroundColor={popupColor}/>
-                                    </View>
-                                </View>
-                            </View>
-
-
-                            <View style={styles.footer}>
                                 <Separator/>
-                                <TextButton bold extend onPress={handleValidate} text={"Ajouter"}/>
+
+                                <View style={styles.subBody}>
+                                    <View style={styles.subBodyContainer}>
+                                        <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                                            <SubTitleText text={"Durée"}/>
+                                            <TextButton text={"Aucune"} semiBold noPadding onPress={handleSetNoDuration}/>
+                                        </View>
+
+                                        <View style={styles.listContainer}>
+                                            <IncrementTime value={hourDuration} isBorderHidden={hourDuration === 0} setValue={setHourDuration}/>
+                                            <IncrementTime value={minutesDuration} isBorderHidden={minutesDuration === 0} setValue={setMinutesDuration} isMinutes/>
+                                        </View>
+                                    </View>
+
+                                    <View style={styles.subBodyContainer}>
+                                        <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                                            <SubTitleText text={"Priorité"}/>
+                                            <TextButton text={"Aucune"} semiBold noPadding onPress={() => setSelectedPriority(PrioritesType.None)}/>
+                                        </View>
+
+                                        <View style={styles.listContainer}>
+                                            <PriorityRadioButtons selectedPriority={selectedPriority} setSelectedPriority={setSelectedPriority}/>
+                                        </View>
+                                    </View>
+                                </View>
                             </View>
+
+                            <FooterBottomSheet text={"Ajouter"} onPress={handleValidate}/>
+
                         </View>
                     </TouchableWithoutFeedback>
-        </CustomBottomSheet>
+                </UsualScreen>
+        </SimpleFullBottomSheet>
     );
   };
   
@@ -144,12 +176,10 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
         marginBottom: 30,
     },
 
-    pageTitleContainer: {
+    header: {
         display: "flex", 
-        flexDirection: "row", 
-        alignItems:"center", 
-        gap: 20,
-        marginLeft: 5
+        flexDirection: "column", 
+        gap: 30
     },
 
     body: {
@@ -159,9 +189,17 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
         gap: 30
     },
 
+    subBody: {
+        display: "flex", 
+        flexDirection: "column", 
+        flex: 1, 
+        gap: 15
+    },
+
     subBodyContainer: {
         display: 'flex', 
         flexDirection: "column",
+        justifyContent: "center",
         flex: 1,
         gap: 30
     },

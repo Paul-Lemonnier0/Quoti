@@ -9,12 +9,14 @@ import { Habits_Skeleton } from "../../constants/HabitsPlaceholder"
 import { Skeleton } from "moti/skeleton"
 import { useThemeColor } from "../Themed"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 const HabitudesSkeletonList = () => {
     const habits = Habits_Skeleton
+    const {theme} = useContext(AppContext)
 
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
+    const secondary = useThemeColor(theme, "Secondary")
 
     return(
         <Skeleton.Group show={true}>

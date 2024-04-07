@@ -46,7 +46,7 @@ const HabitCompletedBottomScreen: FC<HabitCompletedBottomScreenProps> = ({bottom
 
     return (
         <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}  isPrimary
-            footerText={"Retour à l'accueil"} footerMethod={handleGoBackHome}>
+            footerText={"Retour"} footerMethod={closeModal}>
             <UsualScreen hideMenu>
                 <View style={styles.container}>
                     <View style={styles.pageTitleContainer}>

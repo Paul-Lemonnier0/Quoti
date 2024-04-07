@@ -1,3 +1,5 @@
+import { PrioritesType } from "../HabitTypes"
+
 interface FirestoreBaseItem {
     titre: string,
     description: string,
@@ -18,6 +20,7 @@ interface FirestoreFullStep extends FirestorePlaceholderStep {
     habitID: string,
     stepID: string,
     duration: number,
+    priority?: PrioritesType
 }
 
 type FirestoreStep = FirestoreFullStep | FirestorePlaceholderStep

@@ -1,4 +1,4 @@
-import { FC, memo, useMemo, useRef } from "react"
+import { FC, memo, useContext, useMemo, useRef } from "react"
 import { FlatList, ListRenderItem } from "react-native"
 import { Skeleton } from "moti/skeleton"
 import { useThemeColor } from "../Themed"
@@ -8,12 +8,14 @@ import { MotiView } from "moti"
 import { Objectif } from "../../types/HabitTypes"
 import { FormDetailledObjectif } from "../../types/FormObjectifTypes"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 
 const Objectifs_SkeletonList = memo(() => {
+    const {theme} = useContext(AppContext)
 
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
+    const secondary = useThemeColor(theme, "Secondary")
 
     const renderObjectifs: ListRenderItem<FormDetailledObjectif> = ({item, index}) => {
 

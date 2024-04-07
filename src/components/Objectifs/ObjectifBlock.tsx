@@ -4,7 +4,7 @@ import { FC, useCallback, useContext, useRef } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import IconImage from "../Other/IconImage";
-import { LittleNormalText, NormalText, SubText, SubTitleText } from "../../styles/StyledText";
+import { LittleNormalText, NormalGrayText, NormalText, SubText, SubTitleText } from "../../styles/StyledText";
 import { Dimensions } from "react-native";
 import { HabitsContext } from "../../data/HabitContext";
 import ProgressBar from "../Progress/ProgressBar";
@@ -16,6 +16,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { useThemeColor } from "../Themed";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export interface ObjectifBlockProps {
     objectifID: string,
@@ -30,9 +31,10 @@ export interface ObjectifBlockProps {
 }
 
 const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, handleOnPress, currentDateString}) => {
+    const {theme} = useContext(AppContext)
 
     const {Objectifs, filteredHabitsByDate} = useContext(HabitsContext)
-    const font = useThemeColor({}, "Font")
+    const font = useThemeColor(theme, "Font")
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -95,7 +97,7 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
 
                 <View style={styles.titleDescriptionContainer}>
                     <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                    <SubText numberOfLines={1} text={objectif.description}/>
+                    <SubText bold numberOfLines={1} text={objectif.description}/>
                 </View>
 
                 <View style={styles.progressContainer}>
@@ -118,8 +120,99 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
     )
 }
 
+export interface PresentationObjectifBlockProps {
+    objectifID: string,
+    index: number,
+    handleOnPress: (seriazableObjectif: SeriazableObjectif) => void,
+    habits: Habit[]
+}
+
+export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({objectifID, index, handleOnPress, habits}) => {
+    
+    const {Objectifs} = useContext(HabitsContext)
+
+    const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+
+    const openModal = useCallback(() => {
+        bottomSheetModalRef.current?.present();
+    }, []);
+
+    const scale = useSharedValue(1);
+
+    const handleLongPress = () => {
+        scale.value = withSpring(0.9, {}, () => {
+            scale.value = withSpring(1);
+        });
+
+        BottomScreenOpen_Impact();
+        openModal()
+    }
+
+    const objectif = Objectifs[objectifID]
+
+    const stylesCard = cardStyle()
+
+    const handlePress = () => {
+        const seriazableObjectif = getSeriazableObjectif(objectif)
+        handleOnPress(seriazableObjectif)
+    }
+
+    const steps: Step[] = []
+    for(const habit of habits){
+        Object.values(habit.steps).map(step => steps.push(step))
+    }
+
+    const pourcentage_value = 100
+    const isFinished = false
+
+    if(!objectif) {
+        return null
+    }
+
+    return(
+        <>
+        <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, flex: 1}} onPress={handlePress} delayLongPress={750} onLongPress={handleLongPress}>
+            <Animated.View entering={FadeInRight.duration(400).delay(index * 200)} 
+                style={[
+                    stylesCard.card, 
+                    styles.objectif,
+                    {transform: [{scale}]}
+                ]}>
+                    
+                <View style={styles.header}>
+                    <View style={[styles.iconContainer, {borderColor: objectif.color}]}>
+                        <IconImage image={objectif.icon}/>
+                    </View>
+                </View>
+
+                <View style={styles.titleDescriptionContainer}>
+                    <SubTitleText numberOfLines={1} text={objectif.titre}/>
+                    <NormalGrayText bold numberOfLines={1} text={objectif.description}/>
+                </View>
+
+                <View style={styles.progressContainer}>
+
+
+                    <View style={{flex: 1}}>
+                        <ProgressBar progress={pourcentage_value/100} color={objectif.color}/>
+                    </View>
+
+                    <LittleNormalText text={pourcentage_value + "%"} bold/>
+                </View>
+
+
+            </Animated.View>
+        </TouchableOpacity>
+
+        <SettingsObjectifBottomSheet bottomSheetModalRef={bottomSheetModalRef} objectif={objectif}/>
+
+        </>
+    )
+}
+
 const styles = StyleSheet.create({
     objectif: {
+        flex: 1,
         gap: 20,
         display: "flex",
         flexDirection: "column",
@@ -138,7 +231,8 @@ const styles = StyleSheet.create({
         flex:1,
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-around"
+        justifyContent: "space-around",
+        gap: 5
     },
 
     footer: {

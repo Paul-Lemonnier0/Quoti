@@ -29,6 +29,9 @@ const AddHabitsToObjectif: FC<AddHabitsToObjectifProps> = ({route, navigation}) 
         
         if(objectifWithID){
             const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID} as FormDetailledHabit))
+            
+            console.log(updatedHabitsForObjectif[0])
+            
             await Promise.all(updatedHabitsForObjectif.map(addHabit));
             setIsLoading(false)
     

@@ -4,8 +4,9 @@ import { LittleNormalText } from "../../styles/StyledText";
 import { addDays } from "date-fns";
 import { StyleSheet } from "react-native";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
-import { FC } from "react";
+import { FC, useContext } from "react";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 
 export interface RangeActivityProps {
@@ -16,8 +17,9 @@ export interface RangeActivityProps {
 }
 
 const RangeActivity: FC<RangeActivityProps> = ({start, activity, activityColor, totalSteps}) => {
-    
-    const secondary = useThemeColor({}, "Secondary")
+    const {theme} = useContext(AppContext)
+
+    const secondary = useThemeColor(theme, "Secondary")
 
     const history: Date[] = [];
     for(let i = 0; i < 7; ++i){

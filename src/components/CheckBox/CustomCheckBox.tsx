@@ -3,17 +3,18 @@ import { SubTitleText } from "../../styles/StyledText"
 import { useThemeColor } from "../Themed"
 import { Feather } from "@expo/vector-icons"
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles"
-import { FC } from "react"
+import { FC, useContext } from "react"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 export interface CustomCheckBoxProps {
     onPress?: () => void,
     color: string,
     number: number,
-    isChecked: boolean | undefined,
-    isBorderHidden: boolean | undefined,
-    disabled: boolean | undefined,
-    noPress: boolean | undefined,
+    isChecked?: boolean,
+    isBorderHidden?: boolean,
+    disabled?: boolean,
+    noPress?: boolean,
     isPrimary?: boolean,
     borderPrimary?: boolean
 }
@@ -29,9 +30,10 @@ const CustomCheckBox: FC<CustomCheckBoxProps> = ({
     isPrimary, 
     borderPrimary
 }) => {
+    const {theme} = useContext(AppContext)
 
-    const secondary = useThemeColor({}, "Secondary")
-    const primary = useThemeColor({}, "Primary")
+    const secondary = useThemeColor(theme, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
     const borderWidth = 2
     const borderColor = isBorderHidden ? (borderPrimary ? primary : secondary) : color
 

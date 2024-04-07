@@ -1,10 +1,10 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { SubText, SubTitleText } from "../../styles/StyledText";
+import { NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText";
 import { useThemeColor } from "../Themed";
 import cardStyle from "../../styles/StyledCard";
 import StepIndicator from "../Other/StepIndicator";
 import { Icon, IconProvider } from "../Buttons/IconButtons";
-import { FC, useCallback, useRef, useState } from "react";
+import { FC, useCallback, useContext, useRef, useState } from "react";
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import ItemIcon from "../Icons/ItemIcon";
@@ -16,18 +16,30 @@ import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../types/Form
 import React from "react"
 import SettingNewObjectifHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsNewObjectifHabitBottomScreen";
 import HabitStepDetailsBottomScreen from "../../screens/BottomScreens/Habitudes/HabitStepDetailsBottomScreen";
+import { AppContext } from "../../data/AppContext";
+import { HabitsContext } from "../../data/HabitContext";
 
 export interface HabitudeListItemProps {
     habitude: Habit,
     index: number,
     handleOnPress: (habitude: Habit, 
-        objectifID: string | undefined,
-        currentDateString: string) => void,
-    currentDateString: string
+    objectifID: string | undefined,
+    currentDateString: string) => void,
+    currentDateString: string,
 }
 
-export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, handleOnPress, currentDateString}) => {
-    const primary = useThemeColor({}, "Primary")
+export const HabitudeListItem: FC<HabitudeListItemProps> =  ({
+    habitude, 
+    index, 
+    handleOnPress, 
+    currentDateString
+}) => {
+    const {theme} = useContext(AppContext)
+    const {Objectifs} = useContext(HabitsContext)
+
+    const color = habitude.objectifID ? Objectifs[habitude.objectifID].color : habitude.color
+
+    const primary = useThemeColor(theme, "Primary")
     const stylesCard = cardStyle()
 
     const handlePress = () => {  
@@ -65,6 +77,7 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
     const openModal = useCallback(() => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef.current?.present();
     }, []);
 
@@ -79,11 +92,11 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
                 ]}>
 
                 <View style={styles.habit}>
-                    <ItemIcon icon={habit.icon} color={habit.color}/>
+                    <ItemIcon icon={habit.icon} color={color}/>
 
                     <View style={styles.habitTitleStateContainer}>
                         <SubTitleText numberOfLines={1} text={habit.titre}/>
-                        <SubText numberOfLines={1} text={habit.description}/>
+                        <NormalGrayText bold numberOfLines={1} text={habit.description}/>
                     </View>
 
                     <View style={styles.pourcentageContainer}>
@@ -91,12 +104,16 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({habitude, index, h
                     </View>
                 </View>
 
-                <StepIndicator height={3} inactiveColor={primary} color={habit.color}
+                <StepIndicator height={3} inactiveColor={primary} color={color}
                     currentStep={habitDoneSteps} totalSteps={totalSteps}/>
             </Animated.View>
         </TouchableOpacity>
 
-        <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef} habit={habit} additionnalClosedMethod={rescaleAfterBottomScreenClosed}/>
+        <SettingHabitBottomScreen 
+            bottomSheetModalRef={bottomSheetModalRef} 
+            habit={habit} 
+            additionnalClosedMethod={rescaleAfterBottomScreenClosed}
+        />
     </>
 )};
 
@@ -105,15 +122,24 @@ export interface HabitudeListItemPresentation {
     habitude: Habit | FormDetailledHabit | FormDetailledObjectifHabit,
     isSelected?: boolean,
     deleteHabit?: () => void,
-    editHabit?: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void
+    editHabit?: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void,
+    isNotObjectifIDConst?: boolean,
+    isNotNewObjectifHabit?: boolean,
 }
 
 export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  ({
     habitude, 
     deleteHabit,
-    editHabit
-}) => {
-    const primary = useThemeColor({}, "Primary")
+    editHabit,
+    isNotObjectifIDConst,
+    isNotNewObjectifHabit
+}) => {    
+    const {theme} = useContext(AppContext)
+    const {Objectifs} = useContext(HabitsContext)
+
+    const color = habitude.objectifID ? Objectifs[habitude.objectifID].color : habitude.color
+
+    const primary = useThemeColor(theme, "Primary")
 
     const stylesCard = cardStyle()
 
@@ -150,6 +176,7 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
     const bottomSheetModalRef_StepDetails = useRef<BottomSheetModal>(null);
 
     const openModalStepsDetails = useCallback(() => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef_StepDetails.current?.present();
     }, []);
 
@@ -159,15 +186,15 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
                 <Animated.View style={[ stylesCard.card, styles.container, {transform: [{scale}]}]}>
 
                     <View style={styles.habit}>
-                        <ItemIcon icon={habit.icon} color={habit.color}/>
+                        <ItemIcon icon={habit.icon} color={color}/>
 
                         <View style={styles.habitTitleStateContainer}>
                             <SubTitleText numberOfLines={1} text={habit.titre}/>
-                            <SubText numberOfLines={1} text={habit.description}/>
+                            <NormalGrayText bold numberOfLines={1} text={habit.description}/>
                         </View>
                     </View>
 
-                    <StepIndicator height={3} inactiveColor={primary} color={habit.color}
+                    <StepIndicator height={3} inactiveColor={primary} color={color}
                         currentStep={habitDoneSteps} totalSteps={totalSteps}/>
 
                 </Animated.View>
@@ -176,21 +203,25 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
             {
                 deleteHabit && editHabit &&
                 <>
-                <SettingNewObjectifHabitBottomScreen 
-                    bottomSheetModalRef={bottomSheetModalRef} 
-                    habit={habit as FormDetailledObjectifHabit} 
-                    deleteHabit={deleteHabit}
-                    editHabit={editHabit}
-                    objectifColor={habitude.color}
-                />       
+                    <SettingNewObjectifHabitBottomScreen 
+                        bottomSheetModalRef={bottomSheetModalRef} 
+                        habit={habit as FormDetailledObjectifHabit} 
+                        deleteHabit={deleteHabit}
+                        editHabit={editHabit}
+                        objectifColor={habitude.color}
+                        isNotObjectifIDConst={isNotObjectifIDConst}
+                    />       
 
-                <HabitStepDetailsBottomScreen bottomSheetModalRef={bottomSheetModalRef_StepDetails} 
-                    steps={steps}
-                    editHabit={editHabit}
-                    color={habitude.color}
-                    icon={habitude.icon}
-                    habit={habitude}
-                />
+                    <HabitStepDetailsBottomScreen 
+                        bottomSheetModalRef={bottomSheetModalRef_StepDetails} 
+                        steps={steps}
+                        editHabit={editHabit}
+                        color={habitude.color}
+                        icon={habitude.icon}
+                        habit={habitude} 
+                        isNotObjectifIDConst={isNotObjectifIDConst}
+                        isNotNewObjectifHabit={isNotNewObjectifHabit}
+                    />
                 </>
             }
 
@@ -244,7 +275,8 @@ const styles = StyleSheet.create(
             flex:1,
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center"
+            justifyContent: "center",
+            gap: 5
         },     
     }
 )

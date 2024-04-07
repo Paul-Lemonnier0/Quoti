@@ -4,8 +4,9 @@ import { MaterialCommunityIcons} from '@expo/vector-icons';
 import { NormalText, SubTitleText } from "../../styles/StyledText"
 import { Icon, IconProvider } from "../Buttons/IconButtons";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
-import { FC } from "react";
+import { FC, useContext } from "react";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export interface DatePickerBasicProps {
     onPress: () => void,
@@ -27,9 +28,10 @@ export interface DateOptions {
 }
 
 export const DatePicker: FC<DatePickerProps> = ({onPress, date, label, boldLabel, semiBoldLabel, semiBold}) => {
+    const {theme} = useContext(AppContext)
 
     const dateStringOptions: DateOptions = {day: 'numeric', weekday: 'short', month: 'long', year: 'numeric'}
-    const secondary = useThemeColor({}, "Secondary") 
+    const secondary = useThemeColor(theme, "Secondary") 
 
     return(
         <View style={styles.dateSelectionHeader}>
@@ -54,8 +56,9 @@ export interface MultiDatePickerProps extends DatePickerBasicProps {
 }
 
 export const MultiDatePicker: FC<MultiDatePickerProps> = ({onPress, startDate, endDate, label, boldLabel, semiBoldLabel, semiBold}) => {
+    const {theme} = useContext(AppContext)
 
-    const secondary = useThemeColor({}, "Secondary") 
+    const secondary = useThemeColor(theme, "Secondary") 
 
     const startDateStringOptions: DateOptions = {day: 'numeric'}
 
@@ -104,7 +107,7 @@ const styles = StyleSheet.create({
         display: 'flex', 
         flexDirection: "column", 
         gap: 10, 
-        marginVertical: 10
+        marginTop: 0
     },
 
     dateSelectionButtonContainer: {

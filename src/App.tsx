@@ -22,6 +22,7 @@ import { UserContextProvider } from "./data/UserContext";
 import { HabitsProvider } from "./data/HabitContext";
 import Navigation from "./navigation";
 import React from "react"
+import { ThemeProps } from "./components/Themed";
 
 SplashScreen.preventAutoHideAsync();
 

@@ -1,5 +1,5 @@
 import { Animated, View, StyleSheet, TouchableOpacity, Vibration} from "react-native";
-import { HugeText, LittleNormalText, NormalText, SubText, SubTitleText, TitleText} from "../../styles/StyledText";
+import { HugeText, LittleNormalText, NormalGrayText, NormalText, SubText, SubTitleText, TitleText} from "../../styles/StyledText";
 import { useThemeColor } from "../Themed";
 import { useNavigation } from "@react-navigation/native";
 import cardStyle from "../../styles/StyledCard";
@@ -19,12 +19,14 @@ import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import ItemIcon from "../Icons/ItemIcon";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 
 
 export const HabitudeListItemSkeleton =  ({habit}) => {
-    
-    const primary = useThemeColor({}, "Primary")
+    const {theme} = useContext(AppContext)
+
+    const primary = useThemeColor(theme, "Primary")
     const stylesCard = cardStyle()
 
     return(
@@ -36,7 +38,7 @@ export const HabitudeListItemSkeleton =  ({habit}) => {
 
                     <View style={styles.habitTitleStateContainer}>
                         <SubTitleText numberOfLines={1} text={habit.titre}/>
-                        <SubText numberOfLines={1} text={habit.description}/>
+                        <NormalGrayText bold numberOfLines={1} text={habit.description}/>
                     </View>
 
                     <View style={styles.pourcentageContainer}>

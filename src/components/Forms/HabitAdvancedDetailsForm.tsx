@@ -6,13 +6,14 @@ import { BorderRadioButton } from "../RadioButtons/RadioButton";
 import { SelectWeekDays } from "../AddHabits/FrequencySelection";
 import Separator from "../Other/Separator";
 import StepIndicator from "../Other/StepIndicator";
-import { NavigationButton } from "../Buttons/IconButtons";
+import { NavigationActions, NavigationButton } from "../Buttons/IconButtons";
 import { UsualScreen } from "../View/Views";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import { FC, useState } from "react";
 import { FormDetailledHabitValues, FormStepsHabit } from "../../types/FormHabitTypes";
 import { FrequencyTypes, SeriazableHabit } from "../../types/HabitTypes";
 import React from "react"
+import Quoti from "../Other/Quoti";
 
 export interface HabitAdvancedDetailsFormProps {
     isNewObjectifHabit?: boolean,
@@ -106,8 +107,9 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"goBack"}/>
-                        <NavigationButton noPadding action={"validation"} methode={handleValidation}/>
+                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="À quelle fréquence ?"/>

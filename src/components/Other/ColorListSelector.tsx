@@ -1,8 +1,9 @@
 import { FlatList, StyleSheet, TouchableOpacity, View } from "react-native"
 import { useThemeColor } from "../Themed"
 import { ColorsList } from "../../data/ColorsList"
-import { Dispatch, FC } from "react"
+import { Dispatch, FC, useContext } from "react"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 interface ColorBlockProps {
     color: string,
@@ -11,8 +12,9 @@ interface ColorBlockProps {
 }
 
 export const ColorBlock: FC<ColorBlockProps> = ({color, isSelected, setSelectedColor}) => {
+    const {theme} = useContext(AppContext)
 
-    const font = useThemeColor({}, "Font")
+    const font = useThemeColor(theme, "Font")
     const borderColor = isSelected ? font : color
 
     return(

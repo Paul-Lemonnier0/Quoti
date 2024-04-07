@@ -1,7 +1,8 @@
 import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, useColorScheme } from "react-native"
 import cardStyle from "../../styles/StyledCard"
 import { useThemeColor } from "../Themed"
-import React from "react"
+import React, { useContext } from "react"
+import { AppContext } from "../../data/AppContext"
 
 export enum SocialConnectionWay {
     Google = "Google",
@@ -18,8 +19,9 @@ export interface SocialButtonProps {
 const SocialButton: React.FC<SocialButtonProps> = ({provider, onPress}) => {
 
     const colorScheme = useColorScheme()
+    const {theme} = useContext(AppContext)
 
-    const secondary = useThemeColor({}, "Secondary")
+    const secondary = useThemeColor(theme, "Secondary")
     const shadowStyle = cardStyle().shadow
 
     let img: ImageSourcePropType = require("../../img/Auth/Google.png");

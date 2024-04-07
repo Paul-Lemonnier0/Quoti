@@ -11,13 +11,17 @@ export interface PresentationHabitListProps {
     baseColor?: string,
     deleteHabit: (habit: Habit | FormDetailledObjectifHabit) => void,
     editHabit: (habitID: string, newHabit: Habit | FormDetailledObjectifHabit) => void,
+    isNotObjectifIDConst?: boolean,
+    isNotNewObjectifHabit?: boolean,
 }
 
 const PresentationHabitList: FC<PresentationHabitListProps> = ({
     habits, 
     baseColor, 
     deleteHabit,
-    editHabit
+    editHabit,
+    isNotObjectifIDConst,
+    isNotNewObjectifHabit
 }) => {
     return(
         <View style={{gap: 20}}>
@@ -25,6 +29,8 @@ const PresentationHabitList: FC<PresentationHabitListProps> = ({
                 habits.map((habit, index) => (
                     <Animated.View key={index} entering={FadeInDown.duration(400).delay(200 * index)}>
                         <HabitudeListItemPresentation key={index} 
+                            isNotObjectifIDConst={isNotObjectifIDConst}
+                            isNotNewObjectifHabit={isNotNewObjectifHabit}
                             habitude={baseColor ? {...habit, color: baseColor} : habit}                             
                             deleteHabit={() => deleteHabit(habit)}
                             editHabit={editHabit}

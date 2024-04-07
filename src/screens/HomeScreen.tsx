@@ -17,6 +17,10 @@ import { FrequencyTypes, Habit, SeriazableObjectif } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { HomeStackParamsList } from '../navigation/BottomTabNavigator';
+import ProfilItem from '../components/Profil/ProfilItem';
+import { auth } from '../firebase/InitialisationFirebase';
+import ProfilButton from '../components/Profil/ProfilButton';
+import { UserContext } from '../data/UserContext';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HomeScreen">
 
@@ -25,6 +29,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
   //IMPORTS
 
   const { changeDate, filteredHabitsByDate, isFetched, addHabit, addObjectif } = useContext(HabitsContext);
+  const {user} = useContext(UserContext)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -145,6 +150,10 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
 
   //JSX
 
+  const handleNavigationToDetailsScreen = () => {
+    navigation.navigate("ProfilDetailsScreen")
+}
+
   return (
       <UsualScreen>
         <View style={styles.container}>
@@ -157,7 +166,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
                 </View> 
 
                 <IconButton name={"plus"} provider={IconProvider.Feather} onPress={handleAddHabitsPlaceholder}/>
-
+                {user && <ProfilButton user={user} onPress={handleNavigationToDetailsScreen}/>}
             </View>
 
             <Periodes 

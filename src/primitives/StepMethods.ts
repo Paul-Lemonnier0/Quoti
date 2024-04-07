@@ -1,5 +1,5 @@
 import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
-import { FilteredHabitsType, Habit, Step, StepList, StreakValues } from "../types/HabitTypes";
+import { FilteredHabitsType, Habit, PrioritesType, Step, StepList, StreakValues } from "../types/HabitTypes";
 
 export const updateHabitStepState = (
   previousHabits: FilteredHabitsType, habit: Habit,
@@ -84,4 +84,44 @@ export const setHabitWithDefaultStep = (habit: Habit): Habit => {
   }
 
   return finalHabit
+}
+
+export interface PriorityDetailsType {
+  color: string,
+  text: string,
+  icon: string
+}
+
+export const getPriorityDetails = (priority: PrioritesType | undefined): PriorityDetailsType => {
+
+  if(!priority || priority === PrioritesType.None) {
+    return {
+      color: "",
+      text: "",
+      icon: ""
+    }
+  }
+
+  switch(priority){
+    case PrioritesType.Low:
+      return {
+        color: "#54d152",
+        text: "Faible",
+        icon: "chevron-down"
+      }
+
+    case PrioritesType.Medium:
+      return {
+        color: "#ffb86e",
+        text: "Moyenne",
+        icon: "chevron-up"
+      }
+
+    case PrioritesType.High:
+      return {
+        color: "#ff6c6c",
+        text: "Élevée",
+        icon: "chevrons-up"
+      }
+  }
 }

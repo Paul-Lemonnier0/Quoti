@@ -1,11 +1,12 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { SubText, SubTitleText } from "../../styles/StyledText"
+import { NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText"
 import ItemIcon from "../Icons/ItemIcon"
 import { useThemeColor } from "../Themed"
 import cardStyle from "../../styles/StyledCard"
 import { Objectif } from "../../types/HabitTypes"
-import { FC } from "react"
+import { FC, useContext } from "react"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 export interface ObjectifRadioItem {
     objectif: Objectif,
@@ -17,10 +18,11 @@ export interface ObjectifRadioItem {
 }
 
 const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress, backgroundColor, borderColor, isPressDisabled}) => {
+    const {theme} = useContext(AppContext)
 
     
-    const bgColor = backgroundColor ?? useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
+    const bgColor = backgroundColor ?? useThemeColor(theme, "Secondary")
+    const contrast = useThemeColor(theme, "Contrast")
 
     const brColor = isSelected ? contrast : (borderColor ?? bgColor)
     
@@ -32,7 +34,7 @@ const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress
 
             <View style={[styles.displayColumn, {justifyContent: "center"}]}>
                 <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                <SubText numberOfLines={1} text={objectif.description}/>
+                <NormalGrayText bold numberOfLines={1} text={objectif.description}/>
             </View>
         </TouchableOpacity>
     )

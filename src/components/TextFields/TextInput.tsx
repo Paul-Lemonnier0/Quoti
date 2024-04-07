@@ -1,4 +1,4 @@
-import { FC, Ref, forwardRef, useImperativeHandle, useState } from "react"
+import { FC, Ref, forwardRef, useContext, useImperativeHandle, useState } from "react"
 import { useThemeColor } from "../Themed"
 import { TextInput, View } from "react-native"
 import { StyleSheet } from "react-native";
@@ -7,6 +7,7 @@ import { Icon, IconButton, IconProvider } from "../Buttons/IconButtons";
 import { fontPixel, getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export interface TextInputCustomProps {
     startingValue?: string,
@@ -27,15 +28,16 @@ export interface CustomTextInputRefType {
 
 
 export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, placeholder}, ref) => {
+    const {theme} = useContext(AppContext)
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
-    const contrast = useThemeColor({}, "Contrast") 
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
-    const fontGray = useThemeColor({}, "FontGray") 
-    const errorColor = useThemeColor({}, "Error") 
-    const inputDisabledBackground = useThemeColor({}, "InputDisabledBackground") 
+    const contrast = useThemeColor(theme, "Contrast") 
+    const secondary = useThemeColor(theme, "Secondary") 
+    const font = useThemeColor(theme, "Font") 
+    const fontGray = useThemeColor(theme, "FontGray") 
+    const errorColor = useThemeColor(theme, "Error") 
+    const inputDisabledBackground = useThemeColor(theme, "InputDisabledBackground") 
 
     const backgroundColor = disabled ? inputDisabledBackground : secondary
     const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : "transparent")
@@ -45,8 +47,6 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
     useImperativeHandle(ref, () => ({
         getValue: () => value,
     }));
-
-    console.log(isWrong)
 
     return(
         <View style={styles.container}>
@@ -76,15 +76,16 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
 })
 
 export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, placeholder }, ref) => {
+    const {theme} = useContext(AppContext)
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
-    const contrast = useThemeColor({}, "Contrast") 
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
-    const fontGray = useThemeColor({}, "FontGray") 
-    const errorColor = useThemeColor({}, "Error") 
-    const inputDisabledBackground = useThemeColor({}, "InputDisabledBackground") 
+    const contrast = useThemeColor(theme, "Contrast") 
+    const secondary = useThemeColor(theme, "Secondary") 
+    const font = useThemeColor(theme, "Font") 
+    const fontGray = useThemeColor(theme, "FontGray") 
+    const errorColor = useThemeColor(theme, "Error") 
+    const inputDisabledBackground = useThemeColor(theme, "InputDisabledBackground") 
 
     const backgroundColor = disabled ? inputDisabledBackground : secondary
     const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : "transparent")
@@ -127,16 +128,17 @@ export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInpu
 })
 
 
-export const PasswordInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage }, ref) => {
+export const PasswordInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, placeholder }, ref) => {
+    const {theme} = useContext(AppContext)
 
     const [isFieldFocus, setIsFieldFocus] = useState(false)
 
-    const contrast = useThemeColor({}, "Contrast") 
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
-    const fontGray = useThemeColor({}, "FontGray")  
-    const errorColor = useThemeColor({}, "Error") 
-    const inputDisabledBackground = useThemeColor({}, "InputDisabledBackground") 
+    const contrast = useThemeColor(theme, "Contrast") 
+    const secondary = useThemeColor(theme, "Secondary") 
+    const font = useThemeColor(theme, "Font") 
+    const fontGray = useThemeColor(theme, "FontGray")  
+    const errorColor = useThemeColor(theme, "Error") 
+    const inputDisabledBackground = useThemeColor(theme, "InputDisabledBackground") 
 
     const backgroundColor = disabled ? inputDisabledBackground : secondary
     const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : (isWrong ? errorColor : "transparent")
@@ -171,6 +173,7 @@ export const PasswordInputCustom = forwardRef<CustomTextInputRefType, TextInputC
                 <TextInput value={value} onChangeText={handlePasswordChange}
                     secureTextEntry={!isPasswordHidden} 
                     editable={!disabled}
+                    placeholder={placeholder}
                     placeholderTextColor={fontGray} 
                     selectionColor={font}
                     autoCorrect={false}
@@ -200,15 +203,16 @@ export interface SearchBarCustomProps {
 }
 
 export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCustomProps>(({ onChangeText, startingValue, labelName, boldLabel, onFocus, disabled, onBlur, placeholder }, ref) => {
+    const {theme} = useContext(AppContext)
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
-    const contrast = useThemeColor({}, "Contrast") 
-    const secondary = useThemeColor({}, "Secondary") 
-    const font = useThemeColor({}, "Font") 
-    const fontGray = useThemeColor({}, "FontGray") 
-    const errorColor = useThemeColor({}, "Error") 
-    const inputDisabledBackground = useThemeColor({}, "InputDisabledBackground") 
+    const contrast = useThemeColor(theme, "Contrast") 
+    const secondary = useThemeColor(theme, "Secondary") 
+    const font = useThemeColor(theme, "Font") 
+    const fontGray = useThemeColor(theme, "FontGray") 
+    const errorColor = useThemeColor(theme, "Error") 
+    const inputDisabledBackground = useThemeColor(theme, "InputDisabledBackground") 
 
     const backgroundColor = disabled ? inputDisabledBackground : secondary
     const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : "transparent"

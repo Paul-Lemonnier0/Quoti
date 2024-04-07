@@ -3,7 +3,7 @@ import { FC, memo } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import IconImage from "../Other/IconImage";
-import { HugeText, LittleNormalText, SubText, SubTitleText } from "../../styles/StyledText";
+import { HugeText, LittleNormalText, NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText";
 import { Dimensions } from "react-native";
 import ProgressBar from "../Progress/ProgressBar";
 import { FormDetailledObjectif } from "../../types/FormObjectifTypes";
@@ -28,7 +28,7 @@ const ObjectifSkeletonBlock: FC<ObjectifSkeletonBlockProps> = memo(({objectif}) 
 
                 <View style={styles.titleDescriptionContainer}>
                     <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                    <SubText numberOfLines={1} text={objectif.description}/>
+                    <NormalGrayText bold numberOfLines={1} text={objectif.description}/>
                 </View>
 
                 <View style={styles.progressContainer}>

@@ -6,7 +6,8 @@ import { TouchableOpacity } from "react-native-gesture-handler"
 import { StyleSheet } from "react-native"
 import { TextInput } from "react-native"
 import { IconButton, IconProvider } from "./IconButtons"
-import React, { FC } from "react"
+import React, { FC, useContext } from "react"
+import { AppContext } from "../../data/AppContext"
 
 export interface BasicProps {
     value: number,
@@ -17,9 +18,10 @@ export interface BasicProps {
 }
 
 export const IncrementButtons: FC<BasicProps> = ({value, setValue, isBorderHidden, suffixe, customBackgroundColor}) => {
+    const {theme} = useContext(AppContext)
 
-    const font = useThemeColor({}, "Font")
-    const secondary = useThemeColor({}, "Secondary")
+    const font = useThemeColor(theme, "Font")
+    const secondary = useThemeColor(theme, "Secondary")
 
     const displayedValue = suffixe ? value + " " + suffixe : value
 
@@ -46,10 +48,10 @@ export interface IncrementTimeProps extends BasicProps{
 }
 
 export const IncrementTime: FC<IncrementTimeProps> = ({value, setValue, isDisabled, isMinutes, isBorderHidden, customBackgroundColor}) => {
+    const {theme} = useContext(AppContext)
 
-    const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
-    const secondary = useThemeColor({}, "Secondary")
+    const font = useThemeColor(theme, "Font")
+    const secondary = useThemeColor(theme, "Secondary")
 
     const suffixe = isMinutes ? " min": " h"
 

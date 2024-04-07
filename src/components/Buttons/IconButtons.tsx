@@ -4,7 +4,8 @@ import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons, Oc
 import { NormalText } from "../../styles/StyledText";
 import { useNavigation } from "@react-navigation/native";
 import { getWidthResponsive, widthPixel } from "../../styles/UtilsStyles";
-import React, { ComponentProps, FC } from "react";
+import React, { ComponentProps, FC, useContext } from "react";
+import { AppContext } from "../../data/AppContext";
 
 export type FeatherIconName = ComponentProps<typeof Feather>['name'];
 export type MaterialCommunityIconName = ComponentProps<typeof MaterialCommunityIcons>['name'];
@@ -26,18 +27,18 @@ export interface IconProps {
     name: string,
     provider: IconProvider,
     color?: string,
-    size?: number
+    size?: number,
 }
 export const Icon: FC<IconProps> = ({name, provider, color, size}) => {
-
-    const font = useThemeColor({}, "Font")
+    const {theme} = useContext(AppContext)
+    const font = useThemeColor(theme, "Font")
     const iconBaseSize = size ? getWidthResponsive(size) : getWidthResponsive(24)
     
     const iconProps = { color : color ?? font, size: iconBaseSize };
 
     switch (provider){
         case IconProvider.Feather:
-            return <Feather name={name as FeatherIconName} {...iconProps}/>
+            return <Feather style={{padding: 0}} name={name as FeatherIconName} {...iconProps}/>
 
         case IconProvider.MaterialCommunityIcons:
             return <MaterialCommunityIcons name={name as MaterialCommunityIconName} {...iconProps}/>
@@ -70,8 +71,10 @@ export interface IconButtonProps extends BasicIconButtonProps {
 }
 
 export const IconButton: FC<IconButtonProps> = ({onPress, name, provider, color, size, disabled, noPadding}) => {
-    const font = useThemeColor({}, "Font")
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+    const {theme} = useContext(AppContext)
+
+    const font = useThemeColor(theme, "Font")
+    const disabledButtonText = useThemeColor(theme, "DisabledButtonText")
 
     const colorIconBase =  disabled ? disabledButtonText : (color ?? font)
 
@@ -87,10 +90,11 @@ export interface BorderIconButtonProps extends BasicIconButtonProps {
 }
 
 export const BorderIconButton: FC<BorderIconButtonProps> = ({onPress, name, provider, color, size, isTransparent, disabled}) => {
+    const {theme} = useContext(AppContext)
 
-    const secondary = useThemeColor({}, "Secondary")
-    const contrast = useThemeColor({}, "Contrast")
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+    const secondary = useThemeColor(theme, "Secondary")
+    const contrast = useThemeColor(theme, "Contrast")
+    const disabledButtonText = useThemeColor(theme, "DisabledButtonText")
 
     const colorIconBase =  disabled ? disabledButtonText : (color ? color : contrast)
     const backgroundColor = isTransparent ? "transparent" : secondary
@@ -103,11 +107,12 @@ export const BorderIconButton: FC<BorderIconButtonProps> = ({onPress, name, prov
 }
 
 export const BackgroundIconButton: FC<BasicIconButtonProps> = ({onPress, name, provider, color, size, disabled}) => {
+    const {theme} = useContext(AppContext)
 
-    const font = useThemeColor({}, "Font")
-    const fontContrast = useThemeColor({}, "FontContrast")
-    const contrast = useThemeColor({}, "Contrast")
-    const disabledBackground = useThemeColor({}, "DisabledButtonBackground")
+    const font = useThemeColor(theme, "Font")
+    const fontContrast = useThemeColor(theme, "FontContrast")
+    const contrast = useThemeColor(theme, "Contrast")
+    const disabledBackground = useThemeColor(theme, "DisabledButtonBackground")
 
     const colorIconBase = color ? color : fontContrast
     const backgroundColor = disabled ? disabledBackground : contrast
@@ -126,16 +131,24 @@ export interface BasicNavigationButtonProps {
     noPadding?: boolean
 }
 
+export enum NavigationActions {
+    goBack = "goBack",
+    close = "close",
+    goNext = "goNext",
+    validation = "validation"
+}
+
 export interface NavigationButtonProps extends BasicNavigationButtonProps {
-    action: string,
+    action: NavigationActions,
     customIconName?: string,
 }
 
 export const NavigationButton: FC<NavigationButtonProps> = ({action, methode, customProvider, customIconName, disabled, noPadding}) =>
 {
-    const font = useThemeColor({}, "Font")
-    const contrast = useThemeColor({}, "Contrast")
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+    const {theme} = useContext(AppContext)
+
+    const contrast = useThemeColor(theme, "Contrast")
+    const disabledButtonText = useThemeColor(theme, "DisabledButtonText")
     
     const colorBase = disabled ? disabledButtonText : contrast
 
@@ -148,7 +161,7 @@ export const NavigationButton: FC<NavigationButtonProps> = ({action, methode, cu
         validation: "check",
     };
 
-    const iconName = iconNames[action] || customIconName
+    const iconName = (iconNames[action] || customIconName) ?? "x"
 
     const handlePress = () => {
         if(methode) methode()
@@ -168,8 +181,10 @@ export const NavigationButton: FC<NavigationButtonProps> = ({action, methode, cu
 
 export const CloseButton: FC<BasicNavigationButtonProps> = ({methode, customProvider, disabled, noPadding}) =>
 {
-    const contrast = useThemeColor({}, "Contrast")
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+    const {theme} = useContext(AppContext)
+
+    const contrast = useThemeColor(theme, "Contrast")
+    const disabledButtonText = useThemeColor(theme, "DisabledButtonText")
     
     const colorBase = disabled ? disabledButtonText : contrast
 
@@ -186,8 +201,6 @@ export const CloseButton: FC<BasicNavigationButtonProps> = ({methode, customProv
             <Icon name={iconName} provider={customProvider ?? IconProvider.Feather} color={colorBase}/>
         </TouchableOpacity>);
 }
-
-
 
 const styles = StyleSheet.create({
 

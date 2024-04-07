@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, View } from "react-native";
 import { useThemeColor } from "../Themed";
 import { NormalText } from "../../styles/StyledText";
-import React, { FC, memo } from "react";
+import React, { FC, memo, useContext } from "react";
 import { DateData } from "react-native-calendars";
 import { DayProps } from "react-native-calendars/src/calendar/day";
+import { AppContext } from "../../data/AppContext";
 
 export interface MemoizedDayContainerProps extends Omit<DayProps, 'date'> {
     date: DateData,
@@ -11,11 +12,11 @@ export interface MemoizedDayContainerProps extends Omit<DayProps, 'date'> {
 } 
 
 const MemoizedDayContainer: FC<MemoizedDayContainerProps> = memo(({ date, state, marking, onDayPress }) => {
+    const {theme} = useContext(AppContext)
 
-    const contrast = useThemeColor({}, "Contrast");
-    const fontContrast = useThemeColor({}, "FontContrast");
-    const font = useThemeColor({}, "Font");
-    const selection = useThemeColor({}, "Selection");
+    const contrast = useThemeColor(theme, "Contrast");
+    const fontContrast = useThemeColor(theme, "FontContrast");
+    const font = useThemeColor(theme, "Font");
 
     const isToday = state === "today";
     const isSelected = marking && marking.selected

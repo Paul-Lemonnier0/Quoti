@@ -1,7 +1,8 @@
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { useThemeColor } from "../Themed";
 import { NormalText, SubTitleText } from "../../styles/StyledText";
-import React, { FC } from "react";
+import React, { FC, useContext } from "react";
+import { AppContext } from "../../data/AppContext";
 
 export interface BasicButtonProps {
     onPress(): void,
@@ -18,11 +19,12 @@ export interface BackgroundTextButtonProps extends BasicButtonProps {
 }
 
 export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, isTransparent, disabled, extend, bold}) => {
-    
-    const font = useThemeColor({}, "Font")
-    const contrast = useThemeColor({}, "Contrast")
-    const secondary = useThemeColor({}, "Secondary")
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+    const {theme} = useContext(AppContext)
+
+    const font = useThemeColor(theme, "Font")
+    const contrast = useThemeColor(theme, "Contrast")
+    const secondary = useThemeColor(theme, "Secondary")
+    const disabledButtonText = useThemeColor(theme, "DisabledButtonText")
 
     const backgroundColor = isTransparent ? "transparent" : secondary
     const width = extend ? "100%" : null
@@ -43,10 +45,11 @@ export interface BackgroundTextButtonProps extends BasicButtonProps {
 }
 
 export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, color, bold, disabled, extend}) => {
-    
-    const font = useThemeColor({}, "Font")
-    const fontContrast = useThemeColor({}, "FontContrast")
-    const contrast = useThemeColor({}, "Contrast")
+    const {theme} = useContext(AppContext)
+
+    const font = useThemeColor(theme, "Font")
+    const fontContrast = useThemeColor(theme, "FontContrast")
+    const contrast = useThemeColor(theme, "Contrast")
 
 
     const backgroundColor = contrast
@@ -70,10 +73,11 @@ export interface TextButtonProps extends BasicButtonProps {
 }
 
 export const TextButton: FC<TextButtonProps> = ({onPress, text, bold, semiBold, disabled, extend, isGray, noPadding}) => {
-    
-    const font = useThemeColor({}, "Font")
-    const fontGray = useThemeColor({}, "FontGray")
-    const disabledButtonText = useThemeColor({}, "DisabledButtonText")
+    const {theme} = useContext(AppContext)
+
+    const font = useThemeColor(theme, "Font")
+    const fontGray = useThemeColor(theme, "FontGray")
+    const disabledButtonText = useThemeColor(theme, "DisabledButtonText")
 
     const color = disabled ? disabledButtonText : (isGray ? fontGray : font)
 

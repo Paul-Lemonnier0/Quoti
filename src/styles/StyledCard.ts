@@ -1,9 +1,12 @@
 import { StyleSheet } from "react-native";
 import { useThemeColor } from "../components/Themed";
+import { useContext } from "react";
+import { AppContext } from "../data/AppContext";
 
 const cardStyle = () => {
+  const {theme} = useContext(AppContext)
 
-  const secondary = useThemeColor({}, "Secondary")
+  const secondary = useThemeColor(theme, "Secondary")
 
   return StyleSheet.create({
 

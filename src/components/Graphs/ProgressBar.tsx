@@ -1,8 +1,9 @@
 import {StyleSheet, View, ViewStyle} from 'react-native';
 import { useThemeColor } from '../../components/Themed';
 import Animated, { useDerivedValue } from 'react-native-reanimated';
-import { FC } from 'react';
+import { FC, useContext } from 'react';
 import React from "react"
+import { AppContext } from '../../data/AppContext';
 
 export interface ProgressBarProps {
     couleur: string,
@@ -12,7 +13,9 @@ export interface ProgressBarProps {
 
 
 export const ProgressBar:FC<ProgressBarProps> = ({couleur, pourcentage, style}) => {
-    const primaryColor = useThemeColor({}, "Primary")
+    const {theme} = useContext(AppContext)
+
+    const primaryColor = useThemeColor(theme, "Primary")
 
     const pourcentage_str = useDerivedValue(() => {
         return pourcentage + "%";

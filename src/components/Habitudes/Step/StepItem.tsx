@@ -1,16 +1,17 @@
 import { View } from "react-native"
-import { NormalGrayText, SubText, SubTitleText } from "../../../styles/StyledText"
-import { TouchableOpacity } from "react-native"
+import { NormalGrayText, SubTitleText } from "../../../styles/StyledText"
 import CustomCheckBox from "../../CheckBox/CustomCheckBox"
 import { StyleSheet } from "react-native"
 import { durationToTimeString } from "../../../primitives/BasicsMethods"
 import { getWidthResponsive } from "../../../styles/UtilsStyles"
 import { Step } from "../../../types/HabitTypes"
-import { FC } from "react"
+import { FC, useContext, useRef } from "react"
 import { FormFullStep, FormStep } from "../../../types/FormHabitTypes"
 import React from "react"
 import { useThemeColor } from "../../Themed"
-import { IconButton, IconProvider } from "../../Buttons/IconButtons"
+import { Icon, IconButton, IconProvider } from "../../Buttons/IconButtons"
+import { getPriorityDetails } from "../../../primitives/StepMethods"
+import { AppContext } from "../../../data/AppContext"
 
 export interface StepItemProps {
     step: Step | FormStep,
@@ -22,6 +23,8 @@ export interface StepItemProps {
     noPress?: boolean,
     isHighlight?: boolean,
     isEditable?: boolean,
+    isPriorityBadgeHidden?: boolean,
+    areAllStepsChecked?: boolean,
     onDelete?: () => void
 }
 
@@ -35,44 +38,45 @@ const StepItem: FC<StepItemProps> = ({
     noPress, 
     isHighlight,
     isEditable,
-    onDelete
+    onDelete,
+    areAllStepsChecked
 }) => {
 
-    const isChecked = "isChecked" in step ? step.isChecked : false
+    const isChecked = isEditable ? false : ("isChecked" in step ? step.isChecked : false)
     const hasDuration = "duration" in step
 
-    const secondary = useThemeColor({}, "Secondary")
+    const {theme} = useContext(AppContext)
+    const secondary = useThemeColor(theme, "Secondary")
 
     const borderHidden = !isChecked && !isNextToBeChecked && !isHighlight
     let duration = hasDuration ? durationToTimeString((step as Step).duration) :  "--"
     duration = duration === "0min" ? "--" : duration
 
-    return(
+    const priorityDetails = getPriorityDetails((step as Step | FormFullStep).priority ?? undefined)
+
+    return( 
         <View style={[styles.renderStepContainer, {opacity: disabled ? 0.5 : 1, 
             backgroundColor: secondary
         }]}>
 
-            <View style={{flexDirection: "row", gap: 20, alignItems: "center"}}>
-
-
-                <CustomCheckBox isPrimary disabled={disabled} color={color} isChecked={isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} 
+            <View style={{flexDirection: "row", gap: 20, alignItems: "center", flex: 1}}>
+                <CustomCheckBox isPrimary disabled={(disabled || areAllStepsChecked)} color={color} isChecked={isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} 
                     onPress={onPress}/>
 
                 <View style={styles.titreEtDescriptionContainer}>
                     <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>
                     <NormalGrayText text={duration}/>
                 </View>
-
-                {(isEditable && onDelete) && <IconButton name={"x"} provider={IconProvider.Feather} onPress={onDelete}/>}
-
             </View>
+            {
+                priorityDetails && priorityDetails.icon != "" &&
+                <Icon provider={IconProvider.Feather} name={priorityDetails.icon} color={priorityDetails.color}/>
+            }
 
-            {/* <SubText text={"L'informatique c'est super chouette, bientot c'est le master"}/> */}
-
-{/* 
-            <View style={styles.stepDurationContainer}>
-                <SubText text={duration}/>
-            </View> */}
+            {
+                (isEditable && onDelete) && 
+                <IconButton name={"x"} provider={IconProvider.Feather} onPress={onDelete} noPadding/>
+            }
         </View>
     )
 }
@@ -80,11 +84,12 @@ const StepItem: FC<StepItemProps> = ({
 const styles = StyleSheet.create({
     renderStepContainer: {
         display: "flex", 
-        flexDirection: "column", 
-        justifyContent: "center", 
+        flexDirection: "row", 
+        justifyContent: "space-between", 
         alignItems: "center", 
         gap: getWidthResponsive(20),
         padding: 15,
+        paddingRight: 20,
         borderRadius: 20
     },
 

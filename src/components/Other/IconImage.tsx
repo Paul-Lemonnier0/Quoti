@@ -6,6 +6,7 @@ import { useThemeColor } from "../Themed";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
 import { FC } from "react";
 import React from "react"
+import { AppContext } from "../../data/AppContext";
 
 export interface IconImageProps {
   image: string
@@ -14,9 +15,6 @@ export interface IconImageProps {
 const IconImage: FC<IconImageProps> = ({image}) => {
 
     const img = HabitIcons[image]
-    const primary = useThemeColor({}, "Primary")
-
-
 
     return(
         <View style={[styles.imageContainer]}>

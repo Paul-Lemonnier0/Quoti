@@ -4,12 +4,13 @@ import { HugeText, NormalGrayText } from "../../styles/StyledText"
 import { FC, useState } from "react"
 import { StyleSheet } from "react-native"
 import StepIndicator from "../../components/Other/StepIndicator"
-import { NavigationButton } from "../../components/Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { RadioButtonsBar } from "../../components/RadioButtons/RadioButtonsBar"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AddScreenStackType } from "../../navigation/BottomTabNavigator"
 import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList"
 import React from "react"
+import Quoti from "../../components/Other/Quoti"
 
 type PreAddScreenProps = NativeStackScreenProps<AddScreenStackType, "PreAddScreen">
 
@@ -49,8 +50,9 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"close"} methode={handleClose}/>
-                        <NavigationButton noPadding action={"goNext"} methode={handleGoNext}/>
+                        <NavigationButton noPadding action={NavigationActions.close} methode={handleClose}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleGoNext}/>
                     </View>
 
                     <HugeText text="Que voulez vous faire ?"/>
@@ -75,6 +77,7 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
                     <View style={styles.groupContainer}>
                         <RadioButtonsBar items={radios} setSelectedItem={handleSetSelectedItem} selectedItem={selectedItem}/>
                     </View>
+                    
                 </View>
             </View>
         </UsualScreen>

@@ -7,6 +7,9 @@ import { useEffect } from "react";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { subscribeToFriendRequests, subscribeToFriends } from "../firebase/Firestore_User_Primitives";
+import * as FileSystem from 'expo-file-system';
+import { getProfilePictureLocalPath, saveProfilePictureLocally } from "../primitives/UserPrimitives";
+import { newUserValuesProps } from "../screens/ProfilScreens/ProfilSettingsScreens/ProfilDataSettingsScreen";
 
 export interface UserFullType extends User {
     friendRequests?: string[],
@@ -17,12 +20,14 @@ export type UserType = UserFullType | null
 
 export interface UserContextType {
     user: UserType | null,
-    setUser: Dispatch<React.SetStateAction<UserType>>
+    setUser: Dispatch<React.SetStateAction<UserType>>,
+    handleSetUser: (newValues: newUserValuesProps) => Promise<void>
 }
 
 const UserContext = createContext<UserContextType>({
     user: null,
-    setUser: () => {}
+    setUser: () => {},
+    handleSetUser: async() => {}
 })
 
 export interface UserContextProviderProps {
@@ -64,63 +69,49 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
         })
     }
 
+    const handleSetUser = async(newValues: newUserValuesProps) => {
+        setUser((prevUser) => (prevUser ? {...prevUser, ...newValues, photoURL: newValues.photoURL ?? prevUser.photoURL} : null))
+
+        if(newValues.photoURL) {
+            const localPhotoURL = await saveProfilePictureLocally(newValues.photoURL, user.uid)
+
+            if(localPhotoURL) {
+                setUser((prevUser) => (prevUser ? {...prevUser, photoURL: localPhotoURL} : null))
+                Image.prefetch(localPhotoURL) 
+            }
+        }
+    }
+
     useEffect(() => {
         const handleLoadProfilPicture = async() => {
-            if(user){
-                try{
-                    setIsLoading(true)
-    
-                    const storageProfilPictureKey = user.uid + "_" + "picture"
-    
-                    if(user.photoURL){
-    
-                        await Image.prefetch(user.photoURL)
-                        await AsyncStorage.setItem(storageProfilPictureKey, user.photoURL)
-                        setUser((prevUser: UserType) => {
-                            if(prevUser){
-                                return {
-                                    ...prevUser, 
-                                    photoURL: user.photoURL
-                                }
-                            }
-                            
-                            return null
-                        })
+            setIsLoading(true)
+            const profilPicturePath = await getProfilePictureLocalPath(user.uid)
+            if(profilPicturePath) {
+                setUser((prevUser) => (prevUser ? {...prevUser, photoURL: profilPicturePath} : null))
+                Image.prefetch(profilPicturePath)
+            }
+
+            else {
+                if(user.photoURL) {
+                    const profilPicturePath = await saveProfilePictureLocally(user.photoURL, user.uid)
+                    if(profilPicturePath) {
+                        setUser((prevUser) => (prevUser ? {...prevUser, photoURL: profilPicturePath} : null))
+                        Image.prefetch(profilPicturePath)
                     }
-    
-                    else {
-                        const cachedProfilImage = await AsyncStorage.getItem(storageProfilPictureKey)
-                        
-                        if(cachedProfilImage){
-                            setUser((prevUser: UserType) => {
-                                if(prevUser){
-                                    return {
-                                        ...prevUser, 
-                                        photoURL: cachedProfilImage
-                                    }
-                                }
-                                
-                                return null
-                            })
-                        }
-                    }
-    
-                    setIsLoading(false)
-                }
-    
-                catch(e){
-                    console.log("Erreur en fetch user image")
                 }
             }
+
+            setIsLoading(false)
         }
 
         handleLoadProfilPicture()
+
         subscribeToFriendRequests(user.email ?? "", setUserFriendRequest)
         subscribeToFriends(user.email ?? "", setUserFriends)
     }, [])
 
     return(
-        <UserContext.Provider value={{user, setUser}}>
+        <UserContext.Provider value={{user, setUser, handleSetUser}}>
             {children}
         </UserContext.Provider>
     )

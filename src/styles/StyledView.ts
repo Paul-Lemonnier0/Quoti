@@ -1,8 +1,11 @@
 import { StyleSheet } from "react-native";
 import { useThemeColor } from '../components/Themed';
+import { useContext } from "react";
+import { AppContext } from "../data/AppContext";
 
 const viewStyle = () => {
-  const primary = useThemeColor({}, "Primary")
+  const {theme} = useContext(AppContext)
+  const primary = useThemeColor(theme, "Primary")
 
   return StyleSheet.create({
     backgroundView: {

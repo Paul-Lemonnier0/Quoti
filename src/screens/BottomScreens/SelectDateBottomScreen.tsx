@@ -8,6 +8,10 @@ import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import React, { Dispatch, FC, RefObject, useMemo } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet";
+import { CustomStaticBottomSheet } from "../../components/BottomSheets/CustomBottomSheet";
+import { TextButton } from "../../components/Buttons/UsualButton";
+import Separator from "../../components/Other/Separator";
+import FooterBottomSheet from "../../components/BottomSheets/FooterBottomSheets";
 
 export interface SelectDateBottomScreenProps {
   bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -16,11 +20,6 @@ export interface SelectDateBottomScreenProps {
 }
 
 const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetModalRef, selectedDate, setSelectedDate}) => {
-
-    const handleSelectDate = (date: Date) => {
-      bottomSheetModalRef.current?.close();
-      setSelectedDate(date)
-    }
 
     const closeModal = () => {
       bottomSheetModalRef.current?.close();
@@ -35,10 +34,8 @@ const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetMod
     const snapPoints_Default = useMemo(() => ['75%'], []);
 
     return (
-        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default}
-            footerText={"Aujourd'hui"} footerMethod={handleGoToday}>
-
-          <UsualScreen secondaryBackground>
+        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default}>
+          <UsualScreen secondaryBackground hideMenu>
             <View style={styles.container}>
               <View style={styles.pageTitleContainer}>
                   <View style={{flex: 1}}>
@@ -50,9 +47,11 @@ const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetMod
               <View style={styles.calendarContainer}>
                 <CalendarListCustom closeModal={closeModal} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
               </View>
+
+              <FooterBottomSheet text={"Aujourd'hui"} onPress={handleGoToday}/>
             </View>
           </UsualScreen>
-        </SimpleFullBottomSheet>
+        </CustomStaticBottomSheet>
     );
   };
   
@@ -63,7 +62,8 @@ const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetMod
     container:{
       flex: 1, 
       gap: 30, 
-      marginBottom: 60, 
+      marginBottom: 30, 
+      marginHorizontal: -20,
       flexDirection: "column", 
       justifyContent: "space-between"
     },
@@ -84,6 +84,7 @@ const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetMod
 
     calendarContainer: {
       flex: 1, 
-      marginHorizontal: -10
+      marginHorizontal: -10,
+      marginBottom: 30, 
     },
   })

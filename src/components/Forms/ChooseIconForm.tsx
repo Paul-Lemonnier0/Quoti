@@ -1,17 +1,19 @@
-import { FC, useState } from "react";
+import { FC, useContext, useState } from "react";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import HabitIcons from "../../data/HabitIcons";
 import { splitArrayIntoChunks } from "../../primitives/BasicsMethods";
 import { useThemeColor } from "../Themed";
 import { FlatList, Image, StyleSheet, TouchableOpacity, View } from "react-native";
 import { UsualScreen } from "../View/Views";
-import { NavigationButton } from "../Buttons/IconButtons";
+import { NavigationActions, NavigationButton } from "../Buttons/IconButtons";
 import { HugeText } from "../../styles/StyledText";
 import StepIndicator from "../Other/StepIndicator";
 import { CustomCarousel } from "../Carousel/CustomCarousel";
 import { FormColoredHabit, FormIconedHabitValues } from "../../types/FormHabitTypes";
 import { SeriazableHabit } from "../../types/HabitTypes";
 import React from "react"
+import Quoti from "../Other/Quoti";
+import { AppContext } from "../../data/AppContext";
 
 export interface ChooseIconFormProps {
     defaultIcon?: string,
@@ -32,9 +34,10 @@ const ChooseIconForm: FC<ChooseIconFormProps> = ({
     currentStep,
     totalSteps
 }) => {
+    const {theme} = useContext(AppContext)
 
-    const secondary = useThemeColor({}, "Secondary")
-    const font = useThemeColor({}, "Font")
+    const secondary = useThemeColor(theme, "Secondary")
+    const font = useThemeColor(theme, "Font")
 
     
 
@@ -80,8 +83,9 @@ const ChooseIconForm: FC<ChooseIconFormProps> = ({
 
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-                        <NavigationButton noPadding action={"goBack"}/>
-                        <NavigationButton noPadding action={"goNext"} methode={handleValidation}/>
+                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <Quoti/>
+                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="Choisissez une icône"/>

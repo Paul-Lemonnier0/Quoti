@@ -2,7 +2,9 @@ import { View } from "react-native"
 import Separator from "../Other/Separator"
 import { TextButton } from "../Buttons/UsualButton"
 import { StyleSheet } from "react-native"
-import React, { FC } from "react"
+import React, { FC, useContext } from "react"
+import { useThemeColor } from "../Themed"
+import { AppContext } from "../../data/AppContext"
 
 export interface FooterBottomSheetProps {
     text: string,
@@ -10,8 +12,11 @@ export interface FooterBottomSheetProps {
 }
 
 const FooterBottomSheet: FC<FooterBottomSheetProps> = ({text, onPress}) => {
+    const {theme} = useContext(AppContext)
+    const secondary = useThemeColor(theme, "Secondary")
+
     return(
-        <View style={{gap: 10, marginTop: 0, marginHorizontal: -15}}>
+        <View style={{gap: 10, marginTop: 0, marginHorizontal: -30, backgroundColor: secondary}}>
             <Separator opacity={0.5}/>
 
             <View style={styles.footer}>

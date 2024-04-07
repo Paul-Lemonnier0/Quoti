@@ -8,7 +8,7 @@ import { BackgroundTextButton, TextButton } from "../../components/Buttons/Usual
 import { FC, useRef } from "react"
 import { useState } from "react"
 import { auth, db } from "../../firebase/InitialisationFirebase"
-import { NavigationButton } from "../../components/Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { doc, getDoc, setDoc } from "firebase/firestore"
 import { updateProfile } from "firebase/auth"
 import SocialButton, { SocialConnectionWay } from "../../components/Buttons/SocialButton"
@@ -92,7 +92,7 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
 
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
+                        <NavigationButton action={NavigationActions.goBack}/>
                     </View>
                     <HugeText text={"Inscription"}/>
                 </View>

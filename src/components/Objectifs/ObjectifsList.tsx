@@ -4,10 +4,10 @@ import { BottomSheetModalMethodsContext, BottomSheetModalMethodsContextProvider 
 import { useRef } from "react"
 import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen"
 import { FlatList } from "react-native"
-import ObjectifBlock from "./ObjectifBlock"
+import ObjectifBlock, { PresentationObjectifBlock } from "./ObjectifBlock"
 import { HabitsContext } from "../../data/HabitContext"
 import { InnerLogicObjectifType } from "../ScreenComponents/HomeScreenComponents/NotEmptyScreen"
-import { FrequencyTypes, SeriazableObjectif, Step } from "../../types/HabitTypes"
+import { FrequencyTypes, Objectif, SeriazableObjectif, Step } from "../../types/HabitTypes"
 import React from "react"
 
 export interface ObjectifListProps {
@@ -74,3 +74,38 @@ const ObjectifsList: FC<ObjectifListProps> = ({objectifs, handleOnPress, current
 }
 
 export default ObjectifsList
+
+interface PresentationObjectifListProps {
+    objectifs: Objectif[],
+    handleOnPress: (seriazableObjectif: SeriazableObjectif) => void
+}
+
+export const PresentationObjectifList: FC<PresentationObjectifListProps> = ({objectifs, handleOnPress}) => {
+    const {Habits} = useContext(HabitsContext)
+    const habits = Object.values(Habits)
+
+    const renderObjectifs = ({item, index}) => {
+        
+        const objectifID = item.objectifID
+
+        const habitsForObjectif = habits.filter((habit) => habit.objectifID === objectifID)
+
+        return (
+            <PresentationObjectifBlock key={objectifID} 
+                index={index}
+                objectifID={objectifID}
+                handleOnPress={handleOnPress}
+                habits={habitsForObjectif}/>
+        )
+    }
+
+    return(
+        <FlatList 
+            data={objectifs} 
+            renderItem={renderObjectifs}
+            scrollEnabled={false}
+            style={{marginHorizontal: -30}}
+            contentContainerStyle={{paddingHorizontal: 30, gap: 10}}
+        />
+    )
+}

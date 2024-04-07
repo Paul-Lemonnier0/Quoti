@@ -1,8 +1,9 @@
 import { useThemeColor } from "../Themed";
 import { View, StyleSheet, SafeAreaView, KeyboardAvoidingView } from "react-native";
-import React, { FC, Fragment, ReactNode } from "react";
+import React, { FC, Fragment, ReactNode, useContext } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
+import { AppContext } from "../../data/AppContext";
 
 export interface BasicViewProps {
     hideMenu?: boolean,
@@ -15,11 +16,12 @@ export interface UsualScreenProps extends BasicViewProps {
 
 
 export const UsualScreen: FC<UsualScreenProps> = ({hideMenu, secondaryBackground, children}) => {
+    const {theme} = useContext(AppContext)
 
-    const primary = useThemeColor({}, "Primary")
-    const secondary = useThemeColor({}, "Secondary")
-    const linearGradientOpacityStart = useThemeColor({}, "LinearGradientOpacityStart")
-    const linearGradientOpacityEnd = useThemeColor({}, "LinearGradientOpacityEnd")
+    const primary = useThemeColor(theme, "Primary")
+    const secondary = useThemeColor(theme, "Secondary")
+    const linearGradientOpacityStart = useThemeColor(theme, "LinearGradientOpacityStart")
+    const linearGradientOpacityEnd = useThemeColor(theme, "LinearGradientOpacityEnd")
 
     return(
         <View style={{flex: 1, backgroundColor: primary}}>
@@ -51,7 +53,7 @@ export const CustomScrollView: FC<BasicViewProps> = ({hideMenu, children}) => {
 
 const styles = StyleSheet.create({
     container: {
-        padding: 30,
+        paddingHorizontal: 20,
         paddingTop: 10,
         marginBottom: -20,
         paddingBottom: 0,

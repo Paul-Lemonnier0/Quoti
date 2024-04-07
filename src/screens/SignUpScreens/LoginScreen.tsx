@@ -9,7 +9,7 @@ import { FC, useContext, useRef } from "react"
 import { useState } from "react"
 import { auth } from "../../firebase/InitialisationFirebase"
 import { Alert } from "react-native"
-import { NavigationButton } from "../../components/Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { useNavigation } from "@react-navigation/native"
 import SocialButton, { SocialConnectionWay } from "../../components/Buttons/SocialButton"
 import { useColorScheme } from "react-native"
@@ -75,7 +75,7 @@ const LoginScreen: FC<LoginScreenProps> = ({navigation}) => {
 
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
+                        <NavigationButton action={NavigationActions.goBack}/>
                     </View>
                     <HugeText text={"Connexion"}/>
                 </View>

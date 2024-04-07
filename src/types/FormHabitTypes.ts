@@ -1,4 +1,4 @@
-import { FrequencyTypes, Step } from "./HabitTypes"
+import { FrequencyTypes, PrioritesType, Step } from "./HabitTypes"
 
 interface FormPlaceholderStep {
     numero: number,
@@ -8,7 +8,8 @@ interface FormFullStep extends FormPlaceholderStep {
     titre: string,
     description: string,
     duration: number | undefined,
-    stepID: string
+    stepID: string,
+    priority?: PrioritesType
 }
 
 type FormStep = FormPlaceholderStep | FormFullStep

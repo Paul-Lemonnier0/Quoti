@@ -8,11 +8,11 @@ export interface ThemeProps {
 
 const useThemeColor = (props: ThemeProps, colorName: string): string => {
   const theme = useColorScheme();
-  const colorFromProps = props[theme ?? "light"];
-
-  if (colorFromProps) return colorFromProps;
-
-  return Colors[theme ?? "light"][colorName];
+  
+  const darkProps = props.dark
+  const lightProps = props.light
+  
+  return Colors[lightProps ? "light" : darkProps ? "dark" : theme ?? "light"][colorName];
 };
 
 export {useThemeColor};

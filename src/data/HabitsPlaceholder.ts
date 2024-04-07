@@ -1,10 +1,19 @@
 import StepsList from "../components/Habitudes/Step/StepsList"
+import { generateUniqueID } from "../primitives/BasicsMethods";
 import { FormDetailledHabit } from "../types/FormHabitTypes"
 import { FormDetailledObjectif } from "../types/FormObjectifTypes"
-import { FrequencyTypes, Habit, SeriazableHabit, Step, StepList } from "../types/HabitTypes"
+import { FrequencyTypes, Habit, PrioritesType, SeriazableHabit, Step, StepList } from "../types/HabitTypes"
 
 // const today = new Date().toDateString()
+const stepPriorities: PrioritesType[] = [PrioritesType.Medium, PrioritesType.High, PrioritesType.Low];
+
+function getRandomPriority(): PrioritesType {
+  const index = Math.floor(Math.random() * stepPriorities.length);
+  return stepPriorities[index]
+}
+
 const today = "Sun Jan 21 2024"
+
 
 const StepsPlaceholder: Step[][] = [
   [
@@ -15,7 +24,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 10,
       stepID: "b1bd68c7-021c-4b21-b029-2a4314980c9f",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Course",
@@ -24,7 +34,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 30,
       stepID: "59b3d1a4-4a7c-4d8c-82fe-72a13cc0f11c",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Étirements",
@@ -33,7 +44,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 10,
       stepID: "b1bd68c7-021c-4b21-b029-2a4314980c9g",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     }
   ],
 
@@ -45,7 +57,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 15,
       stepID: "fd272a3e-5063-4d96-8a2a-1e5eeb0f964e",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Respiration profonde",
@@ -54,7 +67,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 10,
       stepID: "fd272a3e-5063-4d96-8a2a-1e5eeb0f964f",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     }
   ],
 
@@ -66,7 +80,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 30,
       stepID: "c47c4c15-05f5-4e1d-926c-32a9b002eaa7",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Révision",
@@ -75,7 +90,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 20,
       stepID: "c47c4c15-05f5-4e1d-926c-32a9b002eaa8",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     }
   ],
 
@@ -87,7 +103,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 1,
       stepID: "fd272a3e-5063-4d96-8a2a-1e5eeb0f964f",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Hydratation",
@@ -96,7 +113,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 0,
       stepID: "fd272a3e-5063-4d96-8a2a-1e5eeb0f9650",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     }
   ],
 
@@ -108,7 +126,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 45,
       stepID: "c47c4c15-05f5-4e1d-926c-32a9b002eaa8",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Collation saine",
@@ -117,7 +136,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 15,
       stepID: "c47c4c15-05f5-4e1d-926c-32a9b002eaa9",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     }
   ],
 
@@ -129,7 +149,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 45,
       stepID: "78b4d0f8-c6f5-4d6e-8f87-176a88acaa23",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     },
     {
       titre: "Choix de couleurs",
@@ -138,7 +159,8 @@ const StepsPlaceholder: Step[][] = [
       duration: 15,
       stepID: "78b4d0f8-c6f5-4d6e-8f87-176a88acaa24",
       habitID: "",
-      created: today
+      created: today,
+      priority: getRandomPriority()
     }
   ]
 ]
@@ -158,7 +180,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     steps: StepsPlaceholder[0],
     icon: "run",
     notificationEnabled: true,
-    alertTime: "undefined"
+    alertTime: "undefined",
   },
 
   {
@@ -270,18 +292,24 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
           description: "Échauffement dynamique de 10 minutes",
           numero: 0,
           duration: 10,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         },
         {
           titre: "Course",
           description: "Course de 5 km",
           numero: 1,
           duration: 30,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         },
         {
           titre: "Étirements",
           description: "Étirements post-course de 10 minutes",
           numero: 2,
           duration: 10,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         }
       ],
       icon: "run",
@@ -306,6 +334,8 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
           description: "Mise en place d'une routine avant le coucher",
           numero: 0,
           duration: 30,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         }
       ],
       icon: "Zzz",
@@ -330,12 +360,16 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
           description: "Préparer et manger un repas équilibré",
           numero: 0,
           duration: 45,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         },
         {
           titre: "Collation saine",
           description: "Prendre une collation saine",
           numero: 1,
           duration: 15,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         }
       ],
       icon: "healthy",
@@ -360,6 +394,8 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
           description: "Découvrir des alternatives sans alcool",
           numero: 0,
           duration: 20,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         }
       ],
       icon: "beer",
@@ -399,6 +435,8 @@ export const ObjectifPlaceholder_Meditation = () => {
           description: "Session de méditation de 20 minutes",
           numero: 0,
           duration: 20,
+          priority: getRandomPriority(),
+          stepID: generateUniqueID(),
         }
       ],
       icon: "meditation",
@@ -423,12 +461,16 @@ export const ObjectifPlaceholder_Meditation = () => {
           description: "Écrire pendant 30 minutes",
           numero: 0,
           duration: 30,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         },
         {
           titre: "Révision",
           description: "Révision et correction du texte",
           numero: 1,
           duration: 20,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         }
       ],
       icon: "pencil",
@@ -453,12 +495,16 @@ export const ObjectifPlaceholder_Meditation = () => {
           description: "Tricoter pendant 45 minutes",
           numero: 0,
           duration: 45,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         },
         {
           titre: "Choix de couleurs",
           description: "Choisir les couleurs pour le prochain projet",
           numero: 1,
           duration: 15,
+          stepID: generateUniqueID(),
+          priority: getRandomPriority()
         }
       ],
       icon: "Yarn",

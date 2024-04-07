@@ -2,8 +2,9 @@ import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 import { Text } from "react-native";
 import { useThemeColor } from "../components/Themed";
 import { fontPixel } from "./UtilsStyles";
-import { FC } from "react";
+import { FC, useContext } from "react";
 import React from "react"
+import { AppContext } from "../data/AppContext";
 
 export interface CustomTextProps {
   text: string | number | null,
@@ -17,8 +18,14 @@ export interface CustomTextProps {
 }
 
 const CustomText: FC<CustomTextProps> = ({text, style, color = 'Font', fontSize = 16, fontFamily = 'fontLight', numberOfLines = undefined}) => {
-    const mergedStyles = StyleSheet.flatten([
-      {color: useThemeColor({}, color), fontSize: fontPixel(fontSize), fontFamily},
+  const {theme} = useContext(AppContext)  
+  
+  const mergedStyles = StyleSheet.flatten([
+      {
+        color: useThemeColor(theme, color), 
+        fontSize: fontPixel(fontSize), 
+        fontFamily,
+      },
       style
     ])
   
@@ -29,9 +36,9 @@ const CustomText: FC<CustomTextProps> = ({text, style, color = 'Font', fontSize 
     )
 }
 
-export const SubText: FC<CustomTextProps> = ({text, style, numberOfLines}) => {
+export const SubText: FC<CustomTextProps> = ({text, style, numberOfLines, bold}) => {
   return (
-    <CustomText text={text} style={style} color={"FontGray"} fontSize={14} fontFamily="fontLight" numberOfLines={numberOfLines}/>
+    <CustomText text={text} style={style} color={"FontGray"} fontSize={14} fontFamily={bold ? "fontSemiBold" : "fontLight"} numberOfLines={numberOfLines}/>
   );
 }
 
@@ -67,7 +74,7 @@ export const NormalText: FC<CustomTextProps> = ({text, style, numberOfLines, bol
 
 export const NormalGrayText: FC<CustomTextProps> = ({text, style, numberOfLines, bold}) => {
   return (
-    <CustomText text={text} color="FontGray" style={style} fontSize={16} fontFamily={"fontLight"} numberOfLines={numberOfLines}/>
+    <CustomText text={text} color="FontGray" style={style} fontSize={16} fontFamily={bold ? "fontSemiBold" : "fontLight"} numberOfLines={numberOfLines}/>
   );
 }
 

@@ -5,7 +5,7 @@ import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdate
 import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
 import { addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore, updateObjectifInFirestore } from "../firebase/Firestore_Objectifs_Primitives";
 import { UserContext, UserContextType } from "./UserContext";
-import { FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList, Step, StreakValues } from "../types/HabitTypes";
+import { FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList, Step, StepList, StreakValues } from "../types/HabitTypes";
 import { FormDetailledHabit } from "../types/FormHabitTypes";
 import { FormDetailledObjectif } from "../types/FormObjectifTypes";
 import { DefaultHabit } from "../types/DefaultHabit";
@@ -257,7 +257,6 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       setFilteredHabitsByDate(previousFilteredHabits =>  removeHabitFromFilteredHabits(previousFilteredHabits, oldHabit))
 
       console.log("Updating habit : ", oldHabit.titre, "...")
-      let updatedHabit: Habit = {...oldHabit, ...newValues}
 
       if(newValues.hasOwnProperty("steps")){
         newValues["steps"] = Object.values(newValues.steps)
@@ -265,22 +264,35 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       
       await updateHabitInFirestore(userID, oldHabit, newValues)
 
-      let newSteps: Step[] = []
-      const isNewStepPlaceholder = Object.values(updatedHabit.steps).some(step => step.numero === -1);
+      //On créer une habit qui a les valeurs updated
+      let updatedHabit: Habit = {...oldHabit, ...newValues}
+
+      let newSteps = Object.values(updatedHabit.steps)
+      console.log(newSteps)
+
+      const deletedSteps = Object.values(updatedHabit.steps).filter((step) => !("deleted" in step))
+
+      const isNewStepPlaceholder = 
+        ((deletedSteps.length === 1) && deletedSteps[0].numero === -1) 
+        || deletedSteps.length === 0;
 
       if(isNewStepPlaceholder){
-        newSteps =  Object.values(updatedHabit.steps).filter((step) => (step.numero !== -1))
-        newSteps.push(createDefaultStepFromHabit(updatedHabit, updatedHabit.habitID))
+        const placeholderStep: StepList = {}
+        placeholderStep[oldHabit.habitID] = createDefaultStepFromHabit(updatedHabit, updatedHabit.habitID)
+        updatedHabit["steps"] = {...placeholderStep}
       }
 
-      const validSteps = getValidHabitsStepsForDate(newSteps, oldHabit.habitID, currentDate)
-      updatedHabit["steps"] = {...validSteps}
+      else {
+        const validSteps = getValidHabitsStepsForDate(newSteps, oldHabit.habitID, currentDate)
+        updatedHabit["steps"] = {...validSteps}
+      } 
         
       setFilteredHabitsByDate(previousFilteredHabits => updateFilteredHabitsWithNewHabit(previousFilteredHabits, updatedHabit, currentDate))
       setHabits(previousHabits => updateHabitsWithNewHabit(previousHabits, updatedHabit))
 
       console.log("Habit : ", updatedHabit.titre, " successfully updated !")
-      return updatedHabit
+
+      return oldHabit
     }
 
     const getHabitFromFilteredHabits = (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string): Habit | undefined => {

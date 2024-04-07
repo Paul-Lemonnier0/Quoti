@@ -32,6 +32,7 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
         }
 
         if(newValues.steps) {
+
             let oldSteps = Object.values((oldHabit as SeriazableHabit).steps)
 
             const isOldStepPlaceholder = oldSteps.length === 1 && oldSteps[0].stepID === oldHabit.habitID
@@ -87,26 +88,34 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
                 const convertedOldHabit = convertBackSeriazableHabit(oldHabit as SeriazableHabit)
 
                 try{
-                    closeModal()
-                    validationAdditionnalMethod ? validationAdditionnalMethod({...oldHabit, ...values, ...newValues}) : null
-
                     const steps = {}
 
                     newValues.steps.forEach((step) => {
-                        if(step as FormPlaceholderStep){
+                        if(step.numero === -1){
                             steps[oldHabit.habitID] = {...step}
                         }
             
                         else {
-                            if(step as Step | FormFullStep){
-                                steps[(step as Step | FormFullStep).stepID] = {...step}
-                            }
+                            steps[(step as Step | FormFullStep).stepID] = {...step}
                         }
                     })
 
-                    await updateHabit(convertedOldHabit, {...newValues, ...values, steps})
+                    let objectifID: string | null = null
+                    if("objectifID" in newValues) {
+                        objectifID = newValues.objectifID ?? null
+                    }
+
+                    newValues.steps.forEach((step) => {
+                        console.log(step)
+                    })
+
+                    closeModal()
+                    validationAdditionnalMethod ? validationAdditionnalMethod({...oldHabit, ...values, ...newValues}) : null
+                    await updateHabit(convertedOldHabit, {...newValues, ...values, objectifID, steps})
                     setIsLoading(false)
                     Success_Impact()
+                    
+                    console.log("habit updated")
                 }
         
                 catch(e){
@@ -124,8 +133,6 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
         }
 
         else {
-            console.log("EditAdvancedDetailsScreen : ", {...newValues, ...values, habitID: oldHabit.habitID})
-            console.log("EditAdvancedDetailsScreen (steps): ", {...newValues, ...values, habitID: oldHabit.habitID}.steps)
 
             validationAdditionnalMethod ? validationAdditionnalMethod({...newValues, ...values, habitID: oldHabit.habitID}) : null
             Success_Impact()

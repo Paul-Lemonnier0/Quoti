@@ -1,7 +1,7 @@
 import { View, StyleSheet } from "react-native"
 import { NormalText, SubTitleText, TitleText } from "../../styles/StyledText"
 import { UsualScreen } from "../../components/View/Views"
-import { NavigationButton } from "../../components/Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { Image } from "react-native"
 import { useContext } from "react"
 import { HabitsContext } from "../../data/HabitContext"
@@ -60,7 +60,7 @@ const UserDetailsScreen = ({ route, navigation }: UserDetailsScreenProps) => {
           <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
-                        <NavigationButton action={"goBack"}/>
+                        <NavigationButton action={NavigationActions.goBack}/>
                     </View>
                 </View>
 

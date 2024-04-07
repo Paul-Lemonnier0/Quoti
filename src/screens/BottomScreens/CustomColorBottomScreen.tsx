@@ -1,4 +1,4 @@
-import React, { Dispatch, FC, RefObject, useEffect, useMemo, useState } from 'react';
+import React, { Dispatch, FC, RefObject, useContext, useEffect, useMemo, useState } from 'react';
 import { Keyboard, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native';
 import ColorPicker, { HueSlider, Panel1, returnedResults } from 'reanimated-color-picker';
 import { useThemeColor } from "../../components/Themed";
@@ -7,6 +7,7 @@ import { Feather } from '@expo/vector-icons';
 import Separator from '../../components/Other/Separator';
 import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet";
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { AppContext } from '../../data/AppContext';
 
 export interface CustomColorBottomScreenProps {
   bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -15,8 +16,10 @@ export interface CustomColorBottomScreenProps {
 }
 
 const CustomColorBottomScreen: FC<CustomColorBottomScreenProps> = ({ bottomSheetModalRef, selectedColor, setSelectedColor }) => {
-  const font = useThemeColor({}, "Font");
-  const errorColor = useThemeColor({}, "Error") 
+  const {theme} = useContext(AppContext)
+  
+  const font = useThemeColor(theme, "Font");
+  const errorColor = useThemeColor(theme, "Error") 
 
   const snapPoints = useMemo(() => ['65%'], []);
 

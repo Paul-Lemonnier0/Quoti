@@ -37,6 +37,8 @@ const listKeyIDfromArray = (array: Array<Object>, idName: string, habitID: strin
 
 const durationToTimeString = (duration: number): string => {
 
+  if(duration ===0) return "--"
+
   const hours = Math.floor(duration / 60)
   const remainingMinutes = duration % 60
 
@@ -48,6 +50,14 @@ const durationToTimeString = (duration: number): string => {
   return formatedDuration
 }
 
+const getMinutesFromDuration = (duration: number): number => {
+  return duration % 60
+}
+
+const getHoursFromDuration = (duration: number): number => {
+  return Math.floor(duration / 60);
+}
+
 
 const splitArrayIntoChunks = <T>(arr: T[], chunkSize: number): T[][] => {
   const chunkedArray: T[][] = [];
@@ -57,4 +67,16 @@ const splitArrayIntoChunks = <T>(arr: T[], chunkSize: number): T[][] => {
   return chunkedArray;
 };
 
-export {generateUniqueID, listKeyIDfromArray, durationToTimeString, splitArrayIntoChunks}
+const isTextInputValueValid = (value: string | undefined) => {
+  return value && value.trim().length > 0
+}
+
+export {
+  generateUniqueID, 
+  listKeyIDfromArray, 
+  durationToTimeString, 
+  splitArrayIntoChunks, 
+  getMinutesFromDuration, 
+  getHoursFromDuration,
+  isTextInputValueValid
+}

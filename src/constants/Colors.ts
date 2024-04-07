@@ -27,7 +27,7 @@ const theme: ThemeObject = {
       FontGray: "#808080",
       Font: "#071220",
       FontContrast: "#fff",
-      Contrast: "#222222",
+      Contrast: "#000000",
       Primary: "#f6f6f9",
       Secondary: "#fff",
       Tertiary: "#bfbfbf",

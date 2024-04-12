@@ -5,7 +5,7 @@ import { UsualScreen } from "../../components/View/Views"
 import { StyleSheet } from "react-native"
 import { CustomTextInputRefType, PasswordInputCustom, TextInputCustom } from "../../components/TextFields/TextInput"
 import { BackgroundTextButton, TextButton } from "../../components/Buttons/UsualButton"
-import { FC, useRef } from "react"
+import { FC, useContext, useRef } from "react"
 import { useState } from "react"
 import { auth, db } from "../../firebase/InitialisationFirebase"
 import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
@@ -17,10 +17,13 @@ import { Error_Impact, Success_Impact } from "../../constants/Impacts"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
 
 type SignUpScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "SignUpScreen">
 
 const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
+
+    const {setIsLoading} = useContext(AppContext)
 
     const usernameRef = useRef<CustomTextInputRefType>(null)
     const [isUserNameWrong, setIsUserNameWrong] = useState<boolean>(false)
@@ -56,8 +59,10 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
      }
 
      else{
+        setIsLoading(true)
         try{
             if(email && password && username){
+                
                 const {user} = await createUserWithEmailAndPassword(auth, email, password);
                 await updateProfile(user, {displayName: username});
     
@@ -78,6 +83,7 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
             Error_Impact()
         }
 
+        setIsLoading(false)
      }
     }
 

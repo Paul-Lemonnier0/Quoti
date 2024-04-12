@@ -55,8 +55,8 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
                 const detailledObjectif: FormBasicObjectif = {
                     titre, 
                     description, 
-                    startingDate: startingDate.toDateString(), 
-                    endingDate: endingDate.toDateString()
+                    startingDate: startingDate.toISOString(), 
+                    endingDate: endingDate.toISOString()
                 }
 
                 handleGoNext(detailledObjectif)

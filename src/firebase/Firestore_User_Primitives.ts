@@ -2,11 +2,11 @@ import { arrayRemove, arrayUnion, doc, getDoc, onSnapshot, setDoc, updateDoc } f
 import { db } from "./InitialisationFirebase"
 import { Unsubscribe } from "firebase/auth"
 
-export const sendFriendInvitation = async(senderID: string, receiverID: string) => {
+export const sendFriendInvitation = async(senderID: string, senderMail: string, receiverID: string, receiverMail: string) => {
     try{
         console.log("Sending friend invitation...")
 
-        const requestRef = doc(db, "Users", receiverID, "Friends", "Requests")
+        const requestRef = doc(db, "Users", receiverMail, "Friends", "Requests")
 
         const requestsDoc = await getDoc(requestRef)
 
@@ -18,6 +18,18 @@ export const sendFriendInvitation = async(senderID: string, receiverID: string) 
             await setDoc(requestRef, {friends: [senderID]})
         }
 
+        const sendedRequestRef = doc(db, "Users", senderMail, "Friends", "Requests")
+
+        const sendedRequestsDoc = await getDoc(sendedRequestRef)
+
+        if(sendedRequestsDoc.exists()){
+            await updateDoc(sendedRequestRef, {sended: arrayUnion(receiverID)})
+        }
+
+        else{
+            await setDoc(sendedRequestRef, {sended: [receiverID]})
+        }
+
         console.log("Invitation well sended !")
     
     }
@@ -27,15 +39,15 @@ export const sendFriendInvitation = async(senderID: string, receiverID: string) 
     }
 }
 
-export const acceptFriendInvitation = async(userID: string, friendID: string) => {
+export const acceptFriendInvitation = async(userID: string, userMail: string, friendID: string, friendMail: string) => {
     try{
         console.log("Accepting friend invitation...")
 
-        const requestRef = doc(db, "Users", userID, "Friends", "Requests")
+        const requestRef = doc(db, "Users", userMail, "Friends", "Requests")
 
         await updateDoc(requestRef, {friends: arrayRemove(friendID)})
         
-        const acceptedRef = doc(db, "Users", userID, "Friends", "Accepted")
+        const acceptedRef = doc(db, "Users", userMail, "Friends", "Accepted")
         const acceptedDoc = await getDoc(acceptedRef)
 
         if(acceptedDoc.exists()){
@@ -44,11 +56,42 @@ export const acceptFriendInvitation = async(userID: string, friendID: string) =>
 
         else await setDoc(acceptedRef, {friends: [friendID]})
 
+        //Pour le sender
+
+        const acceptedRefSender = doc(db, "Users", friendMail, "Friends", "Accepted")
+        const acceptedDocSender = await getDoc(acceptedRefSender)
+
+        if(acceptedDocSender.exists()){
+            await updateDoc(acceptedRefSender, {friends: arrayUnion(userID)})
+        }
+
+        else await setDoc(acceptedRefSender, {friends: [userID]})
+
         console.log("Friend well accepted !")
     }
 
     catch(e){
         console.log("Error while accepting friend invitation : ", e)
+    }
+}
+
+export const refuseFriendInvitation = async(userID: string, userMail: string, friendID: string, friendMail: string) => {
+    try{
+        console.log("Refusing friend invitation...")
+
+        const requestRef = doc(db, "Users", userMail, "Friends", "Requests")
+
+        await updateDoc(requestRef, {friends: arrayRemove(friendID)})
+
+        const requestRefSender = doc(db, "Users", friendMail, "Friends", "Requests")
+
+        await updateDoc(requestRefSender, {sended: arrayRemove(userID)})
+
+        console.log("Friend well refused !")
+    }
+
+    catch(e){
+        console.log("Error while refusing friend invitation : ", e)
     }
 }
 
@@ -80,4 +123,20 @@ export const subscribeToFriends = (userID: string, callback: (friendRequests: Ar
     })
 
     return unsubscribe
+}
+
+export const getSendedFriendRequest = async(userMail: string): Promise<string[]> => {
+    const sendedRequestRef = doc(db, "Users", userMail, "Friends", "Requests")
+    const sendedRequestsDoc = await getDoc(sendedRequestRef)
+
+    if(sendedRequestsDoc.exists()) {
+        if("sended" in sendedRequestsDoc.data()) {
+            return sendedRequestsDoc.data().sended
+        }
+    }
+
+    return []
+}
+
+export const updateUserBestStreak = (userID: string) => {
 }

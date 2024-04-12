@@ -4,6 +4,8 @@ import { Dispatch } from "react";
 import { IMAGE_COMPRESSION, IMAGE_DIMENSIONS, IMAGE_FORMAT } from '../constants/BasicConstants';
 import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createUserWithEmailAndPassword, User } from 'firebase/auth';
+import { faker } from '@faker-js/faker';
 
 export const selectImage = async(setImage: Dispatch<string | null>) => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,3 +63,26 @@ export const getProfilePictureLocalPath = async (uid: string): Promise<string | 
     }
 };
 
+export interface BaseUserType {
+    displayName: string,
+    email: string,
+    birthDate: Date,
+    fullName: string,
+    password: string
+}
+
+export const generateRandomUsers = (nbUsers: number): BaseUserType[] => {
+    const users: BaseUserType[] = []
+    
+    for(let i = 0; i<nbUsers; ++i) {
+        users.push({
+            displayName: faker.person.fullName(),
+            email: faker.internet.email(),
+            fullName: faker.person.fullName(),
+            birthDate: faker.date.birthdate(),
+            password: faker.internet.password()
+        })
+    }
+    
+    return users
+}

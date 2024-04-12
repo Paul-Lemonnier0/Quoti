@@ -1,5 +1,5 @@
 import { View } from "react-native"
-import { NormalGrayText, SubTitleText } from "../../../styles/StyledText"
+import { LittleNormalText, NormalGrayText, NormalText, SubTitleText } from "../../../styles/StyledText"
 import CustomCheckBox from "../../CheckBox/CustomCheckBox"
 import { StyleSheet } from "react-native"
 import { durationToTimeString } from "../../../primitives/BasicsMethods"
@@ -47,6 +47,7 @@ const StepItem: FC<StepItemProps> = ({
 
     const {theme} = useContext(AppContext)
     const secondary = useThemeColor(theme, "Secondary")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     const borderHidden = !isChecked && !isNextToBeChecked && !isHighlight
     let duration = hasDuration ? durationToTimeString((step as Step).duration) :  "--"
@@ -65,7 +66,7 @@ const StepItem: FC<StepItemProps> = ({
 
                 <View style={styles.titreEtDescriptionContainer}>
                     <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>
-                    <NormalGrayText text={duration}/>
+                    <NormalText style={{color: fontGray}} bold text={duration}/>
                 </View>
             </View>
             {

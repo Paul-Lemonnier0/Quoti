@@ -19,9 +19,9 @@ const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, sna
 
     const fontGray = useThemeColor(theme, "FontGray")
     const popupColor = useThemeColor(theme, "Popup")
-    const primary = useThemeColor(theme, "Secondary")
+    const secondary = useThemeColor(theme, "Secondary")
 
-    const backgroundColor = isPrimary ? primary : popupColor
+    const backgroundColor = isPrimary ? secondary : popupColor
 
     const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
 

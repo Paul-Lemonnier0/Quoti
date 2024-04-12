@@ -1,7 +1,7 @@
 import {FlatList, StyleSheet, View} from 'react-native';
 import { UsualScreen } from '../../components/View/Views';
 import { HugeText } from '../../styles/StyledText';
-import { FC, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import ProfilItem from '../../components/Profil/ProfilItem';
 import { CustomTextInputRefType, SearchBarCustom } from '../../components/TextFields/TextInput'
 import { HomeStackParamsList } from '../../navigation/BottomTabNavigator';
@@ -12,12 +12,12 @@ import { UserFirestoreType } from '../../types/FirestoreTypes/UserTypes';
 import React from "react"
 import { NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons';
 import { TextButton } from '../../components/Buttons/UsualButton';
+import { Database_getUsersInfo } from '../../firebase/Database_User_Primitives';
 
 type DisplayUsersScreenProps = NativeStackScreenProps<HomeStackParamsList, "DisplayUsersScreen">
 
 const DisplayUsersScreen: FC<DisplayUsersScreenProps> = ({route, navigation}) => {
-    const {users} = route.params
-
+    const {userIDs} = route.params
 
     const [usersToDisplay, setUsersToDisplay] = useState<(UserFirestoreType | null)[]>([])
     const [searchValue, setSearchValue] = useState<string>("")
@@ -28,11 +28,19 @@ const DisplayUsersScreen: FC<DisplayUsersScreenProps> = ({route, navigation}) =>
       return <ProfilItem user={item} onPress={() => {}}/>
     }
 
+    useEffect(() => {
+      const getUsers = async(userIDs: string[]) => {
+        setUsersToDisplay(await Database_getUsersInfo(userIDs))
+      }
+
+      getUsers(userIDs)
+    }, [])
+
     const updateList = (text: string) => {
       setSearchValue(text)
       const getAllUsers = async() => {
 
-        const filteredUsers = users.filter((user) => {
+        const filteredUsers = usersToDisplay.filter((user) => {
             return user?.displayName.startsWith(text)
         })
 

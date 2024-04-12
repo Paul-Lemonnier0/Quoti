@@ -7,40 +7,52 @@ import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyle
 import { FC, useContext } from "react";
 import React from "react"
 import { AppContext } from "../../data/AppContext";
+import { Habit } from "../../types/HabitTypes";
+import { isHabitScheduledForDate } from "../../primitives/HabitudesReccurence";
 
 
 export interface RangeActivityProps {
     start: Date,
-    activity: {[key: string]: string[]}
+    history: string[],
     activityColor: string,
-    totalSteps: number
+    habit: Habit
 }
 
-const RangeActivity: FC<RangeActivityProps> = ({start, activity, activityColor, totalSteps}) => {
+const RangeActivity: FC<RangeActivityProps> = ({habit, start, history, activityColor}) => {
     const {theme} = useContext(AppContext)
+    const secondaryLowOpacity = useThemeColor(theme, "SecondaryLowOpacity");
+    const popup = useThemeColor(theme, "Popup");
+    const contrast = useThemeColor(theme, "Contrast");
+    const contrastLowOpacity = useThemeColor(theme, "ContrastLowOpacity");
 
-    const secondary = useThemeColor(theme, "Secondary")
-
-    const history: Date[] = [];
+    const daysRange: Date[] = [];
     for(let i = 0; i < 7; ++i){
         const new_date = addDays(start, -i)
-        history.unshift(new_date)
+        daysRange.unshift(new_date)
     }
 
-    const dayWithLogs = Object.keys(activity)
+    const today = new Date().setHours(0,0,0,0)
+    const history_string = history.map(hist => new Date(hist).toISOString().slice(0, 10))
 
     return(
         <View style={styles.container}>
         {
-            history.map((day, index) => {
-                const stringDay = day.toString()
-                const isDone = dayWithLogs.includes(stringDay) && activity[stringDay].length === totalSteps;
+            daysRange.map((day, index) => {
+                const isDone = history_string.includes(day.toISOString().slice(0, 10));
                 const dayName = day.toLocaleDateString("fr", { weekday: 'long' }).substring(0,2);        
-                const backgroundColor = isDone ? activityColor : secondary
+                const isStart = day.toISOString() === start .toISOString()  
                 
+                const day_temp = new Date(day)
+                const isToday = day_temp.setHours(0,0,0,0) === today
+                
+                const isPlanned = isHabitScheduledForDate(habit, day)
+
+                const backgroundColor = isDone ? activityColor : isPlanned ? popup : secondaryLowOpacity
+                const borderColor = isStart ? contrast : (isToday ? contrastLowOpacity : "transparent")
+
                 return(
                     <View key={index} style={styles.subContainer}>
-                        <View style={[styles.day, {backgroundColor}]}/>
+                        <View style={[styles.day, {backgroundColor, borderColor, borderWidth: 2}]}/>
                         <View style={styles.center}>
                             <LittleNormalText bold text={dayName}/>
                         </View>

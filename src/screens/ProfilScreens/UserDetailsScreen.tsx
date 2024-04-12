@@ -33,7 +33,7 @@ const UserDetailsScreen = ({ route, navigation }: UserDetailsScreenProps) => {
 
     const handleFriendRequest = async() => {
       if(user?.email){
-        await sendFriendInvitation(detailledUser.uid, user.email)
+        // await sendFriendInvitation(detailledUser.uid, user.email)
       }
     }
 

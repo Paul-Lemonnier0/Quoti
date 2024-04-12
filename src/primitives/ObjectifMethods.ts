@@ -2,8 +2,8 @@ import { FilteredHabitsType, Objectif, ObjectifList, SeriazableObjectif } from "
 import { displayTree } from "./BasicsMethods"
 
 export const getSeriazableObjectif = (objectif: Objectif): SeriazableObjectif => {
-    const startingDate = objectif.startingDate.toDateString()
-    const endingDate = objectif.endingDate.toDateString()
+    const startingDate = objectif.startingDate.toISOString()
+    const endingDate = objectif.endingDate.toISOString()
 
     return({
         ...objectif,

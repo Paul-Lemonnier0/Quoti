@@ -65,7 +65,7 @@ export const MultiDatePicker: FC<MultiDatePickerProps> = ({onPress, startDate, e
     const endDateStringOptions: DateOptions = {day: 'numeric', month: "short", year: "numeric"}
     let endDateString: string;
 
-    if(endDate.toDateString() === startDate.toDateString()){
+    if(endDate.toISOString() === startDate.toISOString()){
         endDateString = "?"
         startDateStringOptions["month"] = "short"
         startDateStringOptions["year"] = "numeric"

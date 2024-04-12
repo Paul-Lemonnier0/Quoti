@@ -28,41 +28,10 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
 
   //IMPORTS
 
-  const { changeDate, filteredHabitsByDate, isFetched, addHabit, addObjectif } = useContext(HabitsContext);
+  const { changeDate, filteredHabitsByDate, isFetched } = useContext(HabitsContext);
   const {user} = useContext(UserContext)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
-
-  const handleAddHabitsPlaceholder = async() => {
-    try{
-
-      setIsLoading(true)
-
-      const obj_hab_SemiMarathon = ObjectifPlaceholder_SemiMarathon()
-      const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
-
-      const objectifWithID_Semi = await addObjectif(obj_hab_SemiMarathon["objectif"]) 
-      if(objectifWithID_Semi?.objectifID){
-        const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
-        await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
-      }
-
-      const objectifWithID_BienEtre = await addObjectif(obj_hab_BienEtre["objectif"]) 
-      if(objectifWithID_BienEtre?.objectifID){
-        const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
-        await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
-      }
-
-      await Promise.all(habitsPlaceholder.map(addHabit));
-
-      setIsLoading(false)
-
-    }
-    catch(e){
-      setIsLoading(false)
-      console.log("Erreur add placeholder habits : ", e)
-    }
-  }
 
   const [displayedHabits, setDisplayedHabits] = useState<Habit[]>([])
   const [displayedObjectifs, setDisplayedObjectifs] = useState<string[]>([])
@@ -124,9 +93,9 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
     const handleChangeSelectedDate = async(date: Date) =>  {
       if(isFetched){
         setIsLoading(true)
-  
-        await changeDate(date)
         setSelectedDate(date)
+
+        await changeDate(date)
 
         setIsLoading(false)
       }
@@ -141,18 +110,21 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
   }, []);
 
   const handlePressOnHabit = (habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
-    navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
+      navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
   }
 
   const handlePressOnObjectif = (seriazableObjectif: SeriazableObjectif, frequency: FrequencyTypes, currentDateString: string) => {
-    navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
+      navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
   }
 
   //JSX
 
   const handleNavigationToDetailsScreen = () => {
-    navigation.navigate("ProfilDetailsScreen")
-}
+      navigation.navigate("ProfilDetailsScreen")
+  }
+
+  const hasNotifications = user && user.friendRequests && user.friendRequests.length > 0
+  console.log(user?.friendRequests)
 
   return (
       <UsualScreen>
@@ -165,8 +137,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                <IconButton name={"plus"} provider={IconProvider.Feather} onPress={handleAddHabitsPlaceholder}/>
-                {user && <ProfilButton user={user} onPress={handleNavigationToDetailsScreen}/>}
+                {user && <ProfilButton user={user} noBadge={!hasNotifications} onPress={handleNavigationToDetailsScreen}/>}
             </View>
 
             <Periodes 
@@ -188,8 +159,8 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
               
               <CustomScrollView>
                 <View style={styles.subBody}>
-                  <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnObjectif} currentDateString={selectedDate.toDateString()}/>
-                  <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnHabit} currentDateString={selectedDate.toDateString()}/>
+                  <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnObjectif} currentDateString={selectedDate.toISOString()}/>
+                  <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnHabit} currentDateString={selectedDate.toISOString()}/>
                 </View>
               </CustomScrollView>
             }

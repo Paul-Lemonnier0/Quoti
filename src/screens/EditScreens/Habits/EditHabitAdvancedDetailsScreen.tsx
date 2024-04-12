@@ -46,12 +46,12 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
             oldSteps = oldSteps.map((step) => {
                 if(step.created){
                     const createdDate = new Date(step.created)
-                    return {...step, created: createdDate.toDateString()}
+                    return {...step, created: createdDate.toISOString()}
                 }
 
                 if(step.deleted){
                     const deletedDate = new Date(step.deleted)
-                    return {...step, deleted: deletedDate.toDateString()}
+                    return {...step, deleted: deletedDate.toISOString()}
                 }
 
                 return {...step}
@@ -104,10 +104,6 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
                     if("objectifID" in newValues) {
                         objectifID = newValues.objectifID ?? null
                     }
-
-                    newValues.steps.forEach((step) => {
-                        console.log(step)
-                    })
 
                     closeModal()
                     validationAdditionnalMethod ? validationAdditionnalMethod({...oldHabit, ...values, ...newValues}) : null

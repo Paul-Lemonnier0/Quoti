@@ -5,12 +5,16 @@ import { StyleSheet } from "react-native"
 import { View } from "react-native"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator"
-import { FC } from "react"
+import { FC, useContext } from "react"
 import React from "react"
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "../../firebase/InitialisationFirebase"
+import { AuthContext, AuthStates } from "../../data/AuthContext"
 
 type WelcomeScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "WelcomeScreen">
 
 const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
+    const {setUserAuthState} = useContext(AuthContext)
 
     const handleGoToLoginScreen = () => {
         navigation.navigate("LoginScreen")
@@ -19,6 +23,27 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
     const handleGoToSignUpScreen = () => {
         navigation.navigate("SignUpScreen")
     }
+
+    const connectToDarkCreep = async() => {
+        console.log("connection to darkcreep...")
+        await signInWithEmailAndPassword(auth, "lemonnierpaul49070@gmail.com", "123456");
+        setUserAuthState(AuthStates.Ready)
+
+      }
+  
+      const connectToArzakal = async() => {
+        console.log("connection to arzakal...")
+  
+        try {
+            await signInWithEmailAndPassword(auth, "paul.lemonnier70@gmail.com", "123456");
+            setUserAuthState(AuthStates.Ready)
+
+        }
+
+        catch(e) {
+            console.log("erreur connection à arzakal : ", e)
+        }
+      }
 
     return(
         <UsualScreen hideMenu>
@@ -35,6 +60,10 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
 
                     <View style={styles.connexionContainer}>
 
+                    <View style={{flexDirection: 'row', justifyContent: 'center', gap: 20}}>
+                        <BackgroundTextButton text={"DarkCreep"} bold onPress={connectToDarkCreep}/>
+                        <BackgroundTextButton text={"Arzakal"} bold onPress={connectToArzakal}/>
+                    </View>
                         <BackgroundTextButton bold text={"S'inscrire"} onPress={handleGoToSignUpScreen}/>
                         
                         <View style={styles.footer}>

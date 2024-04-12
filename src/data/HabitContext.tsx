@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, FC, ReactNode } from "react";
-import { addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
+import { addHabitDoneDate, addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
@@ -10,10 +10,14 @@ import { FormDetailledHabit } from "../types/FormHabitTypes";
 import { FormDetailledObjectif } from "../types/FormObjectifTypes";
 import { DefaultHabit } from "../types/DefaultHabit";
 import { removeObjectifFromFilteredHabits, removeObjectifFromObjectifs } from "../primitives/ObjectifMethods";
+import { auth } from "../firebase/InitialisationFirebase";
+import { calculateNextScheduledDate } from "../primitives/HabitudesReccurence";
 
 export interface HabitContextType {
   Habits: HabitList,
+  HabitsHistory: {[key: string]: Date[]}
   Objectifs: ObjectifList,
+  ObjectifsHistory: {[key: string]: Date[]}
   filteredHabitsByDate: FilteredHabitsType,
   isFetched: boolean,
   changeDate: (date: Date) => Promise<void>,
@@ -31,22 +35,25 @@ export interface HabitContextType {
 
 const defaultHabitContext: HabitContextType = {
   Habits: {}, 
+  HabitsHistory: {},
   Objectifs: {}, 
+  ObjectifsHistory: {},
+
   filteredHabitsByDate: { 
     Quotidien: {Habitudes: {}, Objectifs: {}}, 
     Hebdo: {Habitudes: {}, Objectifs: {}}, 
     Mensuel: {Habitudes: {}, Objectifs: {}}
   },
   isFetched: false,
-  changeDate: async (date: Date) => {},
-  addHabit: async (habit: FormDetailledHabit) => undefined,
-  removeHabit: async (habit: Habit) => {},
+  changeDate: async () => {},
+  addHabit: async () => undefined,
+  removeHabit: async () => {},
   updateHabitRelationWithObjectif: async (habit: Habit, destination_objectifID: string | null) => habit,
   updateHabit: async (oldHabit: Habit, newValues: { [key: string]: any }, currentDate?: Date) => oldHabit,
   addObjectif: async (objectif: FormDetailledObjectif) => undefined,
-  handleCheckStep: async (habitID: string, stepID: string, date: Date, isChecked: boolean, isHabitNowCompleted: boolean) => {},
+  handleCheckStep: async () => {},
   getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => DefaultHabit,
-  removeObjectif: async(objectifID: string, deletePinnedHabit?: boolean) => {},
+  removeObjectif: async() => {},
   updateObjectif: async (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => oldObjectif,
   retrieveHabitsLinkToObjectif: (objectifID: string) => []
 }
@@ -65,7 +72,10 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
     const userID = user.email as string
 
     const [Habits, setHabits] = useState<HabitList>({});
+    const [HabitsHistory, setHabitsHistory] = useState<{[key: string]: Date[]}>({});
+
     const [Objectifs, setObjectifs] = useState<ObjectifList>({});
+    const [ObjectifsHistory, setObjectifsHistory] = useState<{[key: string]: Date[]}>({});
 
     let selectedDate = new Date()
 
@@ -81,13 +91,33 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
     const fetchHabits = async (): Promise<HabitList> => {
         console.log("Fetching habits...")
 
-        const habits = await getAllOwnHabits(userID)
-        // const habits={}
-        setHabits(habits);        
+        const {habits, history} = await getAllOwnHabits(userID)
+        const today = new Date()
+
+        for (const [habitID, habit] of Object.entries(habits)) {
+          if(habit.currentStreak > 0) {
+            if(habit.lastCompletionDate !== "none") {
+              const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
+  
+              if(nextDateAfterLastCompletion.setHours(0,0,0,0) < today.setHours(0,0,0,0)) {
+                habits[habitID] = {...habit, currentStreak: 0}
+              }
+            } 
+          }
+        }
+
+        setHabits(habits)
+        setHabitsHistory(history)
 
         console.log("habits successfully fetched.")
         return habits;
     };
+
+    const updateHabitStreaks = (habits: HabitList): HabitList => {
+
+
+      return habits
+    }
 
 
 
@@ -127,6 +157,8 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       settupHabits();
       fetchObjectifs();
     }, []);
+
+
 
 
 
@@ -171,6 +203,19 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       }
 
       if(isHabitNowCompleted){
+        if(auth.currentUser && auth.currentUser.email)
+          addHabitDoneDate(auth?.currentUser.email as string, habit.habitID, date.toISOString().slice(0,10))
+
+        setHabitsHistory((prevHabitHistory) => {
+          if(prevHabitHistory[habitID]) {
+            prevHabitHistory[habitID].push(date)
+          }
+
+          else prevHabitHistory[habitID] = [date]
+
+          return {...prevHabitHistory}
+        })
+
         newStreakValues = getUpdatedStreakOfHabit(habit, date)
         promises.push(updateCompletedHabit(userID, habitID, newStreakValues))
 
@@ -192,7 +237,6 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       await Promise.all(promises)
       console.log("End of check step transactions.")
     }
-
 
     const addHabit = async(habit: FormDetailledHabit): Promise<Habit | undefined> => {
       try{
@@ -341,11 +385,11 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       const habits = Object.values(Habits)
       return habits.filter((habit) => habit.objectifID === objectifID)
     }
-    
-
     const exportedValues: HabitContextType = {
       Habits,
+      HabitsHistory,
       Objectifs,
+      ObjectifsHistory,
       filteredHabitsByDate,
       isFetched,
       changeDate,

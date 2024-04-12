@@ -19,6 +19,8 @@ export interface MarkedMultipleDateType {
   endingDate?: boolean,
 }
 
+//TODO : récupérer les start et end dates par default
+
 const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
     const WIDTH = Dimensions.get("window").width - 40
 

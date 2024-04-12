@@ -1,6 +1,6 @@
 import { View, StyleSheet, Switch } from "react-native"
 import { HugeText, NormalGrayText, SubTitleText, TitleText } from "../../styles/StyledText"
-import { useState, FC } from "react"
+import { useState, FC, useEffect } from "react"
 import { useThemeColor } from "../../components/Themed"
 import { CustomScrollView, UsualScreen } from "../../components/View/Views"
 import { Icon, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
@@ -15,6 +15,7 @@ import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
 import { signOut } from "firebase/auth"
 import React from "react"
 import ProfilButton from "../../components/Profil/ProfilButton"
+import BottomMenuStyle from "../../styles/StyledBottomMenu"
 
 type ProfilSettingsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilSettingsScreen">
 
@@ -102,6 +103,18 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
 
     const [notificationEnabled, setNotificationEnabled] = useState<boolean>(true)
 
+        
+    useEffect(() => {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: {
+            display: "none"
+          }
+        });
+        return () => navigation.getParent()?.setOptions({
+          tabBarStyle: BottomMenuStyle().bottomMenuStyle
+        });
+      }, [navigation]);
+
     const handleSignOut = async() => {
         await signOut(auth)
         console.log("déconnecté")
@@ -183,7 +196,7 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
     const commands = [generalCommands, preferencesCommands, otherCommands]
 
     return(
-        <UsualScreen>
+        <UsualScreen hideMenu>
           <View style={[styles.container]}>
                 <View style={styles.header}>
                     <View style={styles.subHeader}>

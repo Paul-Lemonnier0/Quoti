@@ -3,7 +3,7 @@ import { db } from "./InitialisationFirebase";
 
 async function addStepLog(date: Date, userID: string, habitID: string, stepID: string) {
 
-    const date_string = date.toDateString()
+    const date_string = date.toISOString()
 
     const userDoc = doc(db, "Users", userID)
 
@@ -28,7 +28,7 @@ async function addStepLog(date: Date, userID: string, habitID: string, stepID: s
 }
 
 async function removeStepLog(date: Date, userID: string, habitID: string, stepID: string){
-    const date_string = date.toDateString()
+    const date_string = date.toISOString()
     
     
     const userDoc = doc(db, "Users", userID)
@@ -46,7 +46,7 @@ async function removeStepLog(date: Date, userID: string, habitID: string, stepID
 
 async function changeStepStateFirestore(date: Date, userID: string, habitID: string, stepID: string, isChecked: boolean) {
 
-    const dateString = date.toDateString()
+    const dateString = date.toISOString()
     console.log("step concerned at date : ", stepID, " | ", dateString)
 
     try{
@@ -94,7 +94,7 @@ async function removeHabitLogs (userID: string, habitID: string){
 async function getDateLogs(date: Date, userID: string): Promise<string[]> {
 
     let doneSteps: string[] = [];
-    const date_string = date.toDateString()
+    const date_string = date.toISOString()
 
     
     const userDoc = doc(db, "Users", userID)
@@ -114,7 +114,7 @@ async function getDateLogs(date: Date, userID: string): Promise<string[]> {
 
 export async function getLogsForHabitInDate(date: Date, userID: string){
 
-    const date_string = date.toDateString()
+    const date_string = date.toISOString()
 
     const userDoc = doc(db, "Users", userID)
     
@@ -123,10 +123,6 @@ export async function getLogsForHabitInDate(date: Date, userID: string){
 
     if(dateDocSnap.exists()){
         const habits = dateDocSnap.data()?.habitudes || {}
-
-        for(const habID in habits){
-            console.log(habID, " => ", habits[habID])
-        }
     }
 }
 

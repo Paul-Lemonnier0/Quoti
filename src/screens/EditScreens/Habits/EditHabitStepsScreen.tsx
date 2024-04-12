@@ -19,17 +19,8 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
         //On filtre pour enlever le placeholder
         let updatedStepsArray: (Step | FormStep)[] = oldStepsArray.filter((step) => (step as Step).stepID !== oldHabit.habitID)
 
-        // updatedStepsArray = updatedStepsArray.map((step) => {
-        //     if(step as Step){
-        //         const createdDate = new Date((step as Step).created)
-        //         return {...step, created: createdDate.toDateString()}
-        //     }
-
-        //     return {...step}
-        // })
-
         if(values.steps){
-            const today = new Date().toDateString()
+            const today = new Date().toISOString()
             const newStepIDs: string[] = values.steps.map((step) => (step as (Step | FormFullStep)).stepID);
             
             //les deleted

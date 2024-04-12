@@ -9,7 +9,7 @@ interface FormFullStep extends FormPlaceholderStep {
     description: string,
     duration: number | undefined,
     stepID: string,
-    priority?: PrioritesType
+    priority?: PrioritesType,
 }
 
 type FormStep = FormPlaceholderStep | FormFullStep
@@ -18,6 +18,8 @@ interface FormBasicHabit {
     titre: string,
     description: string,
     objectifID: string | undefined,
+    startingDate?: string
+
 }
 
 export interface FormColoredHabitValues {

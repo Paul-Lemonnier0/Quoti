@@ -1,4 +1,3 @@
-import { Image } from "react-native"
 import { View } from "react-native"
 import { LittleNormalText, NormalText, SubText, SubTitleText, TitleText } from "../../styles/StyledText"
 import { StyleSheet } from "react-native"
@@ -11,7 +10,7 @@ import Badge from "../Other/Badge"
 import { useThemeColor } from "../Themed"
 import { AppContext } from "../../data/AppContext"
 import FastImage from 'react-native-fast-image';
-
+import {Image} from "expo-image"
 export interface ProfilButtonProps {
     user: User,
     onPress: () => void,
@@ -19,6 +18,7 @@ export interface ProfilButtonProps {
     modificationBadge?: boolean,
     tall?: boolean,
     huge?: boolean,
+    hugeBadge?: boolean,
     disabled?: boolean
 }
 
@@ -28,14 +28,18 @@ interface PlaceholderProfilPictureProps {
     huge?: boolean,
 }
 
-const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({name, tall, huge}) => {
+export const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({name, tall, huge}) => {
+    const {theme} = useContext(AppContext)
+
+    const secondary = useThemeColor(theme, "Secondary")
+    
     return(
         <View style={{
-            backgroundColor: "#3F798F",
+            backgroundColor: secondary,
             justifyContent: "center",
             alignItems: "center",
             borderRadius: 200,
-            width: huge ? 100 : tall ? 70 : 55,
+            width: huge ? 100 : tall ? 70 : 60,
             aspectRatio: 1
         }}>
             {
@@ -43,13 +47,17 @@ const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({name, tall
                 <TitleText text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white", fontSize: 28}}/> :
                 tall ? 
                 <SubTitleText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white"}}/> :
-                <LittleNormalText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white"}}/>
+                <NormalText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white"}}/>
             }
         </View>
     )
 }
 
-const ProfilButton: FC<ProfilButtonProps> = ({ user, onPress, noBadge, tall, huge, disabled, modificationBadge }) => {
+const ProfilButton: FC<ProfilButtonProps> = ({ user, onPress, noBadge, tall, huge, hugeBadge, disabled, modificationBadge }) => {
+    const blurhash =
+  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+
+    
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
@@ -61,7 +69,9 @@ const ProfilButton: FC<ProfilButtonProps> = ({ user, onPress, noBadge, tall, hug
             style={styles.container}>
                 {
                     user && user.photoURL ?
-                    <Image style={[styles.image, {width: huge ? 100 : tall ? 70 : 55}]}
+                    <Image
+                        cachePolicy={"memory-disk"} 
+                        style={[styles.image, {width: huge ? 100 : tall ? 70 : 55}]}
                         source={{ 
                             uri: user.photoURL ?? undefined,
                         }}
@@ -70,7 +80,7 @@ const ProfilButton: FC<ProfilButtonProps> = ({ user, onPress, noBadge, tall, hug
                     <PlaceholderProfilPicture name={user.displayName ?? "A"} tall={tall} huge={huge}/>
                 }
             </TouchableOpacity>
-            {!noBadge && (modificationBadge ? <Badge modificationBadge fillColor={font} bgColor={primary}/> : <Badge fillColor={font} bgColor={primary}/>) }
+            {!noBadge && (modificationBadge ? <Badge huge={hugeBadge} modificationBadge fillColor={font} bgColor={primary}/> : <Badge huge={hugeBadge} fillColor={font} bgColor={primary}/>) }
         </View>
     )
 }

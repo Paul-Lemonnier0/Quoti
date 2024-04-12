@@ -6,7 +6,7 @@ import { Image } from "react-native";
 import { useEffect } from "react";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { subscribeToFriendRequests, subscribeToFriends } from "../firebase/Firestore_User_Primitives";
+import { getSendedFriendRequest, subscribeToFriendRequests, subscribeToFriends } from "../firebase/Firestore_User_Primitives";
 import * as FileSystem from 'expo-file-system';
 import { getProfilePictureLocalPath, saveProfilePictureLocally } from "../primitives/UserPrimitives";
 import { newUserValuesProps } from "../screens/ProfilScreens/ProfilSettingsScreens/ProfilDataSettingsScreen";
@@ -21,13 +21,17 @@ export type UserType = UserFullType | null
 export interface UserContextType {
     user: UserType | null,
     setUser: Dispatch<React.SetStateAction<UserType>>,
-    handleSetUser: (newValues: newUserValuesProps) => Promise<void>
+    handleSetUser: (newValues: newUserValuesProps) => Promise<void>,
+    addUserFriendRequest: (userID: string) => void,
+    sendedFriendRequests: string[]
 }
 
 const UserContext = createContext<UserContextType>({
     user: null,
     setUser: () => {},
-    handleSetUser: async() => {}
+    handleSetUser: async() => {},
+    addUserFriendRequest: () => {},
+    sendedFriendRequests: []
 })
 
 export interface UserContextProviderProps {
@@ -37,6 +41,8 @@ export interface UserContextProviderProps {
 const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
 
     const [user, setUser] = useState<UserType | null>(auth.currentUser)
+    const [sendedFriendRequests, setSendedFriendRequests] = useState<string[]>([])
+
     if(!user) {
         return null
     }
@@ -54,6 +60,14 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
 
             return null
         })
+    }
+
+    const setSendedUserFriendRequest = async(userMail: string) => {
+        setSendedFriendRequests(await getSendedFriendRequest(userMail))
+    }
+
+    const addUserFriendRequest = (userID: string) => {
+        setSendedFriendRequests(prevRequests => [...prevRequests, userID])
     }
 
     const setUserFriends = (friends: Array<string>) => {
@@ -106,12 +120,17 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
 
         handleLoadProfilPicture()
 
-        subscribeToFriendRequests(user.email ?? "", setUserFriendRequest)
-        subscribeToFriends(user.email ?? "", setUserFriends)
+        if(user.email) {
+            setSendedUserFriendRequest(user.email)
+            setSendedUserFriendRequest(user.email)
+            subscribeToFriendRequests(user.email, setUserFriendRequest)
+            subscribeToFriends(user.email, setUserFriends)
+        }
+
     }, [])
 
     return(
-        <UserContext.Provider value={{user, setUser, handleSetUser}}>
+        <UserContext.Provider value={{user, setUser, handleSetUser, addUserFriendRequest, sendedFriendRequests}}>
             {children}
         </UserContext.Provider>
     )

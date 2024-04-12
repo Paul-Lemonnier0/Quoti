@@ -1,17 +1,16 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore"
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDocs, query, updateDoc } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
-import { displayTree, listKeyIDfromArray } from "../primitives/BasicsMethods"
+import { listKeyIDfromArray } from "../primitives/BasicsMethods"
 import { createDefaultStepFromHabit } from "../primitives/StepMethods"
 import { removeHabitLogs } from "./Firestore_Step_Primitives"
 import { getUpdatedStreakOfHabit, stringToFrequencyType } from "../primitives/HabitMethods"
 import { FormDetailledHabit } from "../types/FormHabitTypes"
 import { FirestoreHabit, FirestoreStep } from "../types/FirestoreTypes/FirestoreHabitTypes"
-import { FrequencyTypes, Habit, HabitList, Step, StepList, StreakValues } from "../types/HabitTypes"
-
+import { FrequencyTypes, Habit, HabitList, StepList, StreakValues } from "../types/HabitTypes"
 const setupHabit = (habit: FormDetailledHabit): FirestoreHabit => {
 
-    const todayDateString = new Date().toDateString()
-    const startingDate = todayDateString
+    const todayDateString = new Date().toISOString()
+    const startingDate = habit.startingDate ?? todayDateString
     const objectifID = habit.objectifID ?? null
 
     const settedUpHabit: FirestoreHabit = { 
@@ -21,7 +20,7 @@ const setupHabit = (habit: FormDetailledHabit): FirestoreHabit => {
         bestStreak: 0,
         currentStreak: 0, 
         lastCompletionDate: "none",
-        steps: habit.steps.map((step) => ({...step, created: todayDateString}))
+        steps: habit.steps.map((step) => ({...step, created: startingDate}))
     }
 
     return settedUpHabit
@@ -44,7 +43,7 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userID: string): Pr
 
     else oldSteps = habitToAdd.steps
 
-    oldSteps = oldSteps.map(step => ({...step, created: "Sun Jan 21 2024"}))
+    oldSteps = oldSteps.map(step => ({...step}))
 
     const steps: StepList  = listKeyIDfromArray(oldSteps, "stepID", habitID)
       
@@ -56,13 +55,20 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userID: string): Pr
     return {...habitToAdd, objectifID: habitToAdd.objectifID ?? undefined, startingDate, habitID, steps, frequency}
 }
 
-const getAllOwnHabits = async(userID: string): Promise<HabitList> => {
+interface HabitsFromFirestoreRetrieve {
+    habits: HabitList,
+    history: {[key: string]: Date[]}
+}
+
+const getAllOwnHabits = async(userID: string): Promise<HabitsFromFirestoreRetrieve> => {
 
     const today = new Date()
     const userDoc = doc(db, "Users", userID)
 
     const qry = query(collection(userDoc, "Habits"));
     const querySnapshot = await getDocs(qry)
+
+    const habitsHistory: {[key: string]: Date[]} = {}
 
     const habitArray: Habit[] = await Promise.all(
         querySnapshot.docs.map(async (habit) => {
@@ -86,10 +92,17 @@ const getAllOwnHabits = async(userID: string): Promise<HabitList> => {
 
         const newStreakValues: StreakValues = getUpdatedStreakOfHabit(data, today);
 
+        if(data.doneDates) {
+            habitsHistory[habitID] = data.doneDates.map((stringDate) => new Date(stringDate))
+        }
+
         return  {...data, habitID, startingDate, steps, daysOfWeek, newStreakValues, frequency, objectifID: data.objectifID ?? undefined};
     }));
 
-    return habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {});
+    return {
+        habits: habitArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {}),
+        history: habitsHistory
+    }
 }
 
 const removeHabitInFirestore = async(habit: Habit, userID: string) => {
@@ -126,9 +139,24 @@ const updateCompletedHabit = async(userID: string, habitID: string, newStreakVal
     console.log("Streak of habit updated !");
 }
 
+const addHabitDoneDate = async(userID: string, habitID: string, dateString: string) => {
+    const userDoc = doc(db, "Users", userID)
+
+    console.log("Updating habit done dates by adding : ", dateString, " in firestore for habit with id : ", habitID, "...")
+
+    const habitsRef = collection(userDoc, 'Habits')
+    const docRef = doc(habitsRef, habitID)
+
+    await updateDoc(docRef, {doneDates: arrayUnion(dateString)});
+
+    console.log("Habit done dates successfully updated in firestore !")
+}
+
 export {
     addHabitToFireStore, 
     removeHabitInFirestore, 
     updateHabitInFirestore, 
     getAllOwnHabits,
-    updateCompletedHabit}
+    updateCompletedHabit,
+    addHabitDoneDate
+}

@@ -1,6 +1,6 @@
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { useThemeColor } from "../Themed"
-import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons, Octicons } from '@expo/vector-icons'; 
+import { AntDesign, Feather, MaterialCommunityIcons, MaterialIcons, Ionicons, Octicons, FontAwesome5 } from '@expo/vector-icons'; 
 import { NormalText } from "../../styles/StyledText";
 import { useNavigation } from "@react-navigation/native";
 import { getWidthResponsive, widthPixel } from "../../styles/UtilsStyles";
@@ -13,6 +13,7 @@ export type MaterialIconName = ComponentProps<typeof MaterialIcons>['name'];
 export type AntDesignName = ComponentProps<typeof AntDesign>['name'];
 export type IoniconsIconName = ComponentProps<typeof Ionicons>['name'];
 export type OcticonsIconName = ComponentProps<typeof Octicons>['name'];
+export type FontAwesome5IconName = ComponentProps<typeof FontAwesome5>['name'];
 
 export enum IconProvider {
     Feather = "Feather",
@@ -21,6 +22,7 @@ export enum IconProvider {
     AntDesign = "AntDesign",
     IonIcons = "IonIcons",
     Octicons = "Octicons",
+    FontAwesome5 = "FontAwesome5",
 }
 
 export interface IconProps {
@@ -55,6 +57,9 @@ export const Icon: FC<IconProps> = ({name, provider, color, size}) => {
         case IconProvider.Octicons:
             return <Octicons name={name as OcticonsIconName} {...iconProps}/>
 
+        case IconProvider.FontAwesome5:
+            return <FontAwesome5 name={name as FontAwesome5IconName} {...iconProps}/>
+    
         default: {
             return <NormalText text="?"/>
         }

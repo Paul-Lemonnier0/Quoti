@@ -17,7 +17,7 @@ import { Database_getUsersInfo } from "../../firebase/Database_User_Primitives"
 import RequestFriendItem from "../../components/Profil/RequestFriendItem"
 import { TouchableOpacity } from "react-native"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
+import { HomeStackParamsList, NewsScreenStackType } from "../../navigation/BottomTabNavigator"
 import { UserFirestoreType } from "../../types/FirestoreTypes/UserTypes"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
@@ -30,66 +30,82 @@ import Separator from "../../components/Other/Separator"
 import CustomCard from "../../components/Other/Card"
 import { SeriazableObjectif } from "../../types/HabitTypes"
 import ProfilDetailsForm from "../../components/Profil/ProfilDetailsForm"
+import { sendFriendInvitation } from "../../firebase/Firestore_User_Primitives"
+import { Success_Impact } from "../../constants/Impacts"
 
-type ProfilDetailsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilDetailsScreen">
+type AnyUserProfilScreenProps = NativeStackScreenProps<NewsScreenStackType, "AnyUserProfilScreen">
 
-const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
+const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) => {
 
     const {Habits, Objectifs} = useContext(HabitsContext)
-    const {user} = useContext(UserContext)
-
+    const {user, sendedFriendRequests, addUserFriendRequest} = useContext(UserContext)
+    const {detailledUser} = route.params
     const {theme} = useContext(AppContext)
 
-    const [friendRequestsUsers, setFriendRequestsUsers] = useState<string[]>([])
-    const [userFriends, setUserFriends] = useState<string[]>(user?.friends ?? [])
+    const [friendRequestsUsers, setFriendRequestsUsers] = useState<(UserFirestoreType | null)[]>([])
+    const [userFriendsID, setUserFriendsID] = useState<UserFirestoreType[]>([])
+
+    const isAlreadyFriend = (user && user.friends && detailledUser && detailledUser.email && user.friends.includes(detailledUser.email)) as boolean
+    const [isFriend, setIsFriend] = useState<boolean>(isAlreadyFriend)
+
+    const hasAlreadySendedInvation = sendedFriendRequests.includes(detailledUser.uid)
+
+    const [hasSendedInvitation, setHasSendedInvation] = useState<boolean>(hasAlreadySendedInvation)
 
     const nb_habits = Object.keys(Habits).length
     const nb_objectifs = Object.keys(Objectifs).length
+    const nb_friends = 5
 
     const handleSeeHabits = () => {
-      navigation.navigate("ProfilListHabitScreen")
     }
 
     const handleSeeObjectifs = () => {
-      navigation.navigate("ProfilListObjectifScreen")
     }
 
     const handleSeeFriends = () => {
-      navigation.navigate("DisplayUsersScreen", {userIDs: userFriends})
     }
 
-    const handleOpenSettings = () => {
-      navigation.navigate("ProfilSettingsScreen")
+    const handleAddFriend = async() => {
+        if(user && user.email && detailledUser.email){
+            await sendFriendInvitation(user.uid, user.email, detailledUser.uid, detailledUser.email)
+            addUserFriendRequest(detailledUser.uid)
+            setHasSendedInvation(true)
+            Success_Impact()
+        }
     }
 
     useEffect(() => {
-      if(user?.friendRequests) {
-        setFriendRequestsUsers(user?.friendRequests)
+      const getRequestFriendsUserInfo = async() => {
+        setFriendRequestsUsers(await Database_getUsersInfo(user?.friendRequests ?? []))
       }
+
+      getRequestFriendsUserInfo()
     }, [user?.friendRequests])
 
     useEffect(() => {
-      if(user?.friends) {
-        setUserFriends(user?.friends)
+      const getUsersFriendsInfo = async() => {
+        const res = await Database_getUsersInfo(user?.friends ?? [])
+        setUserFriendsID(res.filter(user => user !== null && user !== undefined))
       }
+
+      getUsersFriendsInfo()
     }, [user?.friends])
 
-    const handlePressOnProfil = () => navigation.navigate("ProfilNotificationsScreen")
-
     return(
-       <ProfilDetailsForm
-          user={user}
-          nb_friends={userFriends.length}
-          nb_habits={nb_habits}
-          nb_objectifs={nb_objectifs}
-          handleOpenSettings={handleOpenSettings}
-          handleSeeHabits={handleSeeHabits}
-          handleSeeFriends={handleSeeFriends}
-          handleSeeObjectifs={handleSeeObjectifs}
-          handleSeeSucces={() => {}}
-          handlePressOnProfil={handlePressOnProfil}
-      />
+        <ProfilDetailsForm
+            user={detailledUser}
+            nb_friends={nb_friends}
+            nb_habits={nb_habits}
+            nb_objectifs={nb_objectifs}
+            handleAddFriend={handleAddFriend}
+            handleSeeHabits={handleSeeHabits}
+            handleSeeFriends={handleSeeFriends}
+            handleSeeObjectifs={handleSeeObjectifs}
+            handleSeeSucces={() => {}}
+            isFriend={isFriend}
+            hasSendedInvitation={hasSendedInvitation}
+        />
   );
 };
   
-export default ProfilDetailsScreen;
+export default AnyUserProfilScreen;

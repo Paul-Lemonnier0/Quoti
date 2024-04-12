@@ -53,8 +53,6 @@ const HabitForm: FC<HabitFormProps> = ({
 
     const [displayedObjectifs, setDisplayedObjectifs] = useState<Objectif[]>(Object.values(Objectifs))
 
-    console.log(constObjectifID)
-
     const [selectedObjectif, setSelectedObjectif] = useState<string | undefined>(constObjectifID ?? ((isForModifyingHabit && baseHabit?.objectifID) ? baseHabit.objectifID : undefined))
 
 

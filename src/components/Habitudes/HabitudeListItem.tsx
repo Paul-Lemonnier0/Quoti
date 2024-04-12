@@ -1,5 +1,5 @@
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import { NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText";
+import { LittleNormalText, NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText";
 import { useThemeColor } from "../Themed";
 import cardStyle from "../../styles/StyledCard";
 import StepIndicator from "../Other/StepIndicator";
@@ -40,6 +40,7 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({
     const color = habitude.objectifID ? Objectifs[habitude.objectifID].color : habitude.color
 
     const primary = useThemeColor(theme, "Primary")
+    const fontGray = useThemeColor(theme, "FontGray")
     const stylesCard = cardStyle()
 
     const handlePress = () => {  
@@ -96,7 +97,7 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({
 
                     <View style={styles.habitTitleStateContainer}>
                         <SubTitleText numberOfLines={1} text={habit.titre}/>
-                        <NormalGrayText bold numberOfLines={1} text={habit.description}/>
+                        <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={habit.description}/>
                     </View>
 
                     <View style={styles.pourcentageContainer}>

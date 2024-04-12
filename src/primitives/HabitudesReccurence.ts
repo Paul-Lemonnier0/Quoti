@@ -2,26 +2,31 @@ import { startOfWeek } from "date-fns"
 import { Habit } from "../types/HabitTypes"
 import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes"
 
-function isHabitScheduledForDate(habit: Habit, currentDate: Date): boolean {
-    if(habit.startingDate > currentDate) return false
+function isHabitScheduledForDate(habit: Habit, currentDate: Date): boolean { 
+    const completedDateTemp = new Date(currentDate)  
+    const habitStartingDate = new Date(habit.startingDate)  
 
-    if(habit.startingDate.getFullYear() === currentDate.getFullYear()
-        && habit.startingDate.getMonth() === currentDate.getMonth()
-        && habit.startingDate.getDate() === currentDate.getDate()
+    if(habitStartingDate.setHours(0,0,0,0) > completedDateTemp.setHours(0,0,0,0)) return false
+
+    
+
+    if(habitStartingDate.getFullYear() === completedDateTemp.getFullYear()
+        && habitStartingDate.getMonth() === completedDateTemp.getMonth()
+        && habitStartingDate.getDate() === completedDateTemp.getDate()
         && habit.daysOfWeek.length === 0)
     { return true }
 
     switch (habit.frequency){
         case "Quotidien":
-            return isHabitPlannedThisDay(habit.daysOfWeek, habit.startingDate, habit.reccurence, currentDate)
+            return isHabitPlannedThisDay(habit.daysOfWeek, habitStartingDate, habit.reccurence, completedDateTemp)
 
         case "Hebdo":
-            if(startOfWeek(habit.startingDate, {weekStartsOn: 1}) > currentDate) return false
-            return isHabitPlannedThisWeek(habit.startingDate, currentDate, habit.reccurence)
+            if(startOfWeek(habitStartingDate, {weekStartsOn: 1}).setHours(0,0,0,0) > completedDateTemp.setHours(0,0,0,0)) return false
+            return isHabitPlannedThisWeek(habitStartingDate, completedDateTemp, habit.reccurence)
 
         case "Mensuel":
-            if(getFirstDayOfMonth(habit.startingDate) > currentDate) return false
-            return isHabitPlannedThisMonth(habit.startingDate, currentDate, habit.reccurence)
+            if(getFirstDayOfMonth(habitStartingDate).setHours(0,0,0,0) > completedDateTemp.setHours(0,0,0,0)) return false
+            return isHabitPlannedThisMonth(habitStartingDate, completedDateTemp, habit.reccurence)
     }
 
     return false

@@ -30,6 +30,9 @@ import { FrequencyDetails } from "../../components/Habitudes/FrequencyDetails";
 import Separator from "../../components/Other/Separator";
 import Quoti from "../../components/Other/Quoti";
 import { AppContext } from "../../data/AppContext";
+import { addHabitDoneDate } from "../../firebase/Firestore_Habits_Primitives";
+import { FormStep } from "../../types/FormHabitTypes";
+import BottomMenuStyle from "../../styles/StyledBottomMenu";
 
 type HabitudeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HabitudeScreen">
 
@@ -40,14 +43,15 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
     const tertiary = useThemeColor(theme, "Tertiary")
     const secondary = useThemeColor(theme, "Secondary")
 
-    const {getHabitFromFilteredHabits, handleCheckStep, Objectifs} = useContext(HabitsContext)
+    const {getHabitFromFilteredHabits, handleCheckStep, Objectifs, HabitsHistory} = useContext(HabitsContext)
 
 
     const bottomSheetModalRef_HabitCompleted = useRef<BottomSheetModal>(null)
     const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
     
-    const currentDate = new Date(currentDateString)
 
+    const currentDate = new Date(currentDateString)
+    
     const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID) ?? Habits_Skeleton[0]
 
     if(objectifID){
@@ -68,74 +72,57 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
     const isFinished = steps.filter(step => step.isChecked).length === steps.length
 
-    const onStepChecked = (step, index) => {
-        const isChecked = !step.isChecked
+    const onStepChecked = (step: Step | FormStep, index: number) => {
+        const stepWellType = step as Step
+        const isChecked = !stepWellType.isChecked
 
         const updatedSteps = [...steps]
-        updatedSteps[index] = {...step, isChecked}
+        updatedSteps[index] = {...stepWellType, isChecked}
 
-        const new_doneSteps = updatedSteps.filter(step => step.isChecked).length
+        const new_doneSteps = updatedSteps.filter(stepWellType => stepWellType.isChecked).length
         const isHabitNowCompleted = new_doneSteps === totalSteps
 
-        handleCheckStep(habitID, step.stepID, currentDate, isChecked, isHabitNowCompleted)
+        handleCheckStep(habitID, stepWellType.stepID, currentDate, isChecked, isHabitNowCompleted)
         setSteps(updatedSteps);    
 
         if(isHabitNowCompleted){
             bottomSheetModalRef_HabitCompleted.current?.present();
             Success_Impact()
+
+            if(user && user.email) {
+            }
         }
     }
 
     const imageSize = 35
 
-    const [lastSevenDaysLogs, setLastSevenDaysLogs] = useState<{[key: string]: string[]}>({})
-    const [logsReady, setLogsReady] = useState<boolean>(false)
-
     // const {user} = useContext(UserContext)
     const user = auth.currentUser
 
-    useEffect(() => {
-        const getLast7DaysLogs = async() => {
-            const startingDate = addDays(currentDate, -7);
-            const endingDate = currentDate;
+    const history = HabitsHistory[habitID]
 
-            if(user){
-                const lastSevenDaysLogs_temp = await getLogsForHabitInDateRange(startingDate, endingDate, user.uid, habitID)
-                setLastSevenDaysLogs(lastSevenDaysLogs_temp)
-            }
-
-            setLogsReady(true)
-        }
-
-        getLast7DaysLogs();
-    }, [])
+    const [last7DaysLogs, setLast7DaysLogs] = useState<string[]>([])
+    const startingDate = addDays(currentDate, -7);
+    const endingDate = currentDate;
 
     useEffect(() => {
-        if(logsReady){
-
-            let logsForCurrentDate = {}
-            const currentDateString = currentDate.toString()
-            const doneStepsAtCurrentDate = steps.filter(step => step.isChecked).map(step => step.stepID)
-            
-            if(isCompleted){
-                logsForCurrentDate[currentDateString] = doneStepsAtCurrentDate
-                setLastSevenDaysLogs(previousLogs => {
-                    const updatedLogs = previousLogs;
-                    updatedLogs[currentDateString] = doneStepsAtCurrentDate
-
-                    return {...previousLogs, [currentDateString]: doneStepsAtCurrentDate}
-                })
-            }
-
-            else {
-                setLastSevenDaysLogs(previousLogs => {
-                    delete previousLogs[currentDateString]
-                    return {...previousLogs}
-                })
-            }
+        const last7DaysLogs_temp: Date[] = []
+        if(history) {
+            history.forEach(date => {
+                const date_temp = new Date(date)
+                if(date_temp.setHours(0,0,0,0) >= startingDate.setHours(0,0,0,0) && date_temp.setHours(0,0,0,0) <= endingDate.setHours(0,0,0,0)) {
+                    last7DaysLogs_temp.push(date)
+                }
+            })
+        
+            last7DaysLogs_temp.sort((date1, date2) => date1.valueOf() - date2.valueOf());
         }
-    }, [logsReady, steps])
 
+        console.log(history)
+
+        setLast7DaysLogs(last7DaysLogs_temp.map(log => log.toISOString()))
+
+    }, [HabitsHistory])
 
     const handleOpenSettings = useCallback(() => {
         bottomSheetModalRef_Settings.current?.present();
@@ -144,7 +131,6 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
     const goBack = () => {
         navigation.goBack()
     }
- 
 
     return(
         <UsualScreen>
@@ -191,14 +177,15 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
                                     <View style={styles.streakHeader}>
                                         <View style={styles.streakLeftHeader}>
-                                            <Icon name={"flame"} color={habit.color} provider={IconProvider.IonIcons} size={30}/>
+                                            <Icon provider={IconProvider.FontAwesome5} size={30} color={habit.color} name="fire"/>
+
                                             <HugeText text={habit.currentStreak}/>
                                         </View>
 
-                                        <TextButton onPress={() => {}} text={"Voir plus"} isGray noPadding/>
+                                        <TextButton onPress={() => navigation.navigate("HabitStreakDetailsScreen", {habitID: habit.habitID, currentDateString: currentDateString})} text={"Voir plus"} isGray noPadding/>
                                     </View>
 
-                                    <RangeActivity start={currentDate} activity={lastSevenDaysLogs} totalSteps={steps.length} activityColor={habit.color}/>
+                                    <RangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
                                 </View>
                             </View>
 
@@ -306,7 +293,8 @@ const styles = StyleSheet.create({
         display: "flex", 
         flexDirection: "row", 
         alignItems: "center", 
-        gap: getWidthResponsive(10)
+        gap: getWidthResponsive(10),
+        marginLeft: 5
     }
 })
 

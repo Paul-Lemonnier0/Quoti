@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native"
-import { NormalText } from "../../styles/StyledText"
+import { LittleNormalText, NormalText } from "../../styles/StyledText"
 import { addDays } from "date-fns"
 import { useThemeColor } from "../Themed"
 import React, { useContext } from "react"
@@ -15,7 +15,7 @@ const CalendarDayLabels = () => {
     let currentDateTemp = new Date("2024-01-15")
     
     for(let i = 1; i<8; ++i){
-      const currentDayString: string = currentDateTemp.toLocaleDateString("fr", {weekday: "long"}).substring(0,1).toUpperCase()
+      const currentDayString: string = currentDateTemp.toLocaleDateString("fr", {weekday: "long"}).substring(0,2)
       daysLabels.push(currentDayString)
 
       currentDateTemp = addDays(currentDateTemp, 1)
@@ -27,7 +27,8 @@ const CalendarDayLabels = () => {
           daysLabels.map((dayLabel, index) => {
             return(
               <View key={index} style={styles.dayLabel}>
-                <NormalText text={dayLabel} style={{color}}/>
+                <LittleNormalText bold text={dayLabel} style={{color}}/>
+
               </View>
             )
           })

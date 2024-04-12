@@ -139,7 +139,7 @@ export const updateHabitsWithNewHabit = (previousHabits: HabitList, newHabit: Ha
 
 export const getSeriazableHabit = (habit: Habit): SeriazableHabit => {
   if("startingDate" in habit) {
-    const startingDate = habit.startingDate.toDateString()
+    const startingDate = habit.startingDate.toISOString()
   
     return({
         ...habit,
@@ -161,12 +161,13 @@ export const convertBackSeriazableHabit = (habit: SeriazableHabit): Habit => {
 
 export const getUpdatedStreakOfHabit = (habit: Habit | FirestoreHabit, currentDate: Date): StreakValues => {
 
-  const completedDateString = currentDate.toDateString()
+  const completedDateTemp = new Date(currentDate)
+  const completedDateString = currentDate.toISOString()
 
   let streakStopped = false;
   if(habit.lastCompletionDate !== "none"){
     const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
-    streakStopped = nextDateAfterLastCompletion < currentDate 
+    streakStopped = nextDateAfterLastCompletion.setHours(0,0,0,0) < completedDateTemp.setHours(0,0,0,0)
   }
 
   const newStreak = streakStopped ? 1 : habit.currentStreak + 1
@@ -190,16 +191,23 @@ export const getUpdatedStreakOfHabit = (habit: Habit | FirestoreHabit, currentDa
 
 export const getValidHabitsStepsForDate = (steps: Step[], habitID: string, currentDate: Date): StepList  => {
   const validSteps: StepList = {}
+  const currentDateTemp = new Date(currentDate)
 
   steps.forEach((step) => {
     if(step.created && step.stepID !== habitID){
       const createdDate = new Date(step.created)
 
-      if(currentDate >= createdDate){
+      if(currentDateTemp.setHours(0,0,0,0) >= createdDate.setHours(0,0,0,0)){
+        // console.log("2")
+
         if(step.deleted){
+          // console.log("3")
+
           const deletedDate = new Date(step.deleted)
   
-          if(currentDate < deletedDate){
+          if(currentDateTemp.setHours(0,0,0,0) < deletedDate.setHours(0,0,0,0)){
+            // console.log("4")
+
             validSteps[step.stepID] = {...step}
           }
         }

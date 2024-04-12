@@ -1,10 +1,10 @@
+import { addDays } from "date-fns";
 import StepsList from "../components/Habitudes/Step/StepsList"
 import { generateUniqueID } from "../primitives/BasicsMethods";
 import { FormDetailledHabit } from "../types/FormHabitTypes"
 import { FormDetailledObjectif } from "../types/FormObjectifTypes"
 import { FrequencyTypes, Habit, PrioritesType, SeriazableHabit, Step, StepList } from "../types/HabitTypes"
 
-// const today = new Date().toDateString()
 const stepPriorities: PrioritesType[] = [PrioritesType.Medium, PrioritesType.High, PrioritesType.Low];
 
 function getRandomPriority(): PrioritesType {
@@ -12,8 +12,7 @@ function getRandomPriority(): PrioritesType {
   return stepPriorities[index]
 }
 
-const today = "Sun Jan 21 2024"
-
+const today = addDays(new Date(), -90).toISOString()
 
 const StepsPlaceholder: Step[][] = [
   [
@@ -172,7 +171,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     daysOfWeek: [],
     titre: "Entraînement Semi-Marathon",
     description: "Course d'entraînement pour le semi-marathon",
-    // startingDate: today,
+    startingDate: today,
     occurence: 3,
     reccurence: 2,
     objectifID: undefined,
@@ -188,7 +187,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     daysOfWeek: [],
     titre: "Méditation",
     description: "Séance de méditation quotidienne",
-    // startingDate: today,
+    startingDate: today,
     occurence: 1,
     reccurence: 1,
     objectifID: undefined,
@@ -204,7 +203,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     daysOfWeek: [2, 4],
     titre: "Écriture créative",
     description: "Session d'écriture créative",
-    // startingDate: today,
+    startingDate: today,
     occurence: 1,
     reccurence: 2,
     frequency: FrequencyTypes.Hebdo,
@@ -221,7 +220,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     daysOfWeek: [],
     titre: "Hydratation",
     description: "Boire de l'eau régulièrement",
-    // startingDate: today,
+    startingDate: today,
     occurence: 8,
     reccurence: 1,
     frequency: FrequencyTypes.Quotidien,
@@ -237,7 +236,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     daysOfWeek: [0, 2, 4],
     titre: "Nourriture saine",
     description: "Choix alimentaires sains",
-    // startingDate: today,
+    startingDate: today,
     occurence: 3,
     reccurence: 1,
     frequency: FrequencyTypes.Quotidien,
@@ -253,7 +252,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     daysOfWeek: [2],
     titre: "Tricot",
     description: "Séance de tricot créatif",
-    // startingDate: today,
+    startingDate: today,
     occurence: 2,
     reccurence: 2,
     frequency: FrequencyTypes.Hebdo,
@@ -272,7 +271,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
     description: "Objectif de préparation physique et mentale pour le semi-marathon",
     icon: "run",
     startingDate: today,
-    endingDate: "Tue Nov 28 2023",
+    endingDate: addDays(new Date(today), 90).toISOString(),
   };
 
   const habits: FormDetailledHabit[] = [
@@ -281,7 +280,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       daysOfWeek: [1, 3, 5],
       titre: "Course Régulière",
       description: "Entraînement quotidien pour le semi-marathon",
-      // startingDate: today,
+      startingDate: today,
       // endingDate: "Tue Nov 28 2023",
       occurence: 2,
       reccurence: 1,
@@ -323,7 +322,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       daysOfWeek: [],
       titre: "Dormir Suffisamment",
       description: "Prioriser le sommeil pour une meilleure récupération",
-      // startingDate: today,
+      startingDate: today,
       // endingDate: "Tue Nov 28 2023",
       occurence: 1,
       reccurence: 1,
@@ -349,7 +348,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       daysOfWeek: [0, 2, 4],
       titre: "Manger Sain",
       description: "Adopter une alimentation équilibrée",
-      // startingDate: today,
+      startingDate: today,
       // endingDate: "Tue Nov 28 2023",
       occurence: 3,
       reccurence: 1,
@@ -383,7 +382,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       daysOfWeek: [1, 3, 5],
       titre: "Éviter l'Alcool",
       description: "Se priver d'alcool pendant la préparation au semi-marathon",
-      // startingDate: today,
+      startingDate: today,
       // endingDate: "Tue Nov 28 2023",
       occurence: 1,
       reccurence: 2,
@@ -415,7 +414,7 @@ export const ObjectifPlaceholder_Meditation = () => {
     description: "Objectif de favoriser le bien-être personnel à travers différentes habitudes",
     icon: "meditation",
     startingDate: today,
-    endingDate: "Sat Dec 30 2024",
+    endingDate: addDays(new Date(today), 90).toISOString(),
   };
 
   const habits: FormDetailledHabit[] = [
@@ -424,7 +423,7 @@ export const ObjectifPlaceholder_Meditation = () => {
       daysOfWeek: [0, 2, 4],
       titre: "Méditation Quotidienne",
       description: "Séance quotidienne de méditation",
-      // startingDate: today,
+      startingDate: today,
       // endingDate: "Sat Dec 30 2024",
       occurence: 1,
       reccurence: 1,

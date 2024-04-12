@@ -79,7 +79,7 @@ const ObjectifDetailsComponent: FC<ObjectifDetailsComponentProps> = ({
                             <View style={styles.bodyHeader}>
                                 <View style={styles.titreEtDescriptionContainer}>
                                     <HugeText text={objectif.titre} />
-                                    <NormalGrayText text={objectif.description} />
+                                    <NormalGrayText bold text={objectif.description} />
                                 </View>
 
                                 <ProgressBar

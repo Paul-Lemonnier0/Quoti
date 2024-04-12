@@ -45,6 +45,10 @@ import ConditionUtilisationScreen from '../screens/ProfilScreens/ProfilSettingsS
 import HelpAndSupportScreen from '../screens/ProfilScreens/ProfilSettingsScreens/HelpAndSupportScreen';
 import SecurityScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SecurityScreen';
 import SubscriptionScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SubscriptionScreen';
+import HabitStreakDetailsScreen from '../screens/Habitude/HabitStreakDetailsScreen';
+import UtilsScreen from '../screens/UtilsScreen';
+import AnyUserProfilScreen from '../screens/ProfilScreens/AnyUserProfilScreen';
+import ProfilNotificationsScreen from '../screens/ProfilScreens/ProfilNotificationsScreen';
 
 
 export type BottomTabParamList = {
@@ -60,6 +64,8 @@ function BottomTabNavigator() {
   const {theme} = useContext(AppContext)
   const bottomMenuStyle = BottomMenuStyle().bottomMenuStyle
   const fontGray = useThemeColor(theme, "FontGray")
+
+  //TODO : tester la solution avec le router
 
   return (
     <BottomTab.Navigator
@@ -130,6 +136,11 @@ export type HomeStackParamsList = {
     habitFrequency: FrequencyTypes,
     objectifID: string | undefined,
     currentDateString: string,
+    
+  },
+  HabitStreakDetailsScreen: {
+    habitID: string,
+    currentDateString: string,
   },
   SharedHabitScreen: {
     habitID: string,
@@ -144,12 +155,16 @@ export type HomeStackParamsList = {
     seriazableObjectif: SeriazableObjectif,
   },
   ProfilDetailsScreen: undefined,
+  ProfilNotificationsScreen: undefined,
+  AnyUserProfilScreen: {
+    detailledUser: User
+  },
   ProfilListHabitScreen: undefined,
   ProfilListObjectifScreen: undefined,
   ProfilListSuccessScreen: undefined,
   ProfilSettingsScreen: undefined,
   DisplayUsersScreen: {
-    users: (UserFirestoreType | null)[]
+    userIDs: string[]
   },
 
   ProfilDataSettingsScreen: undefined,
@@ -163,20 +178,23 @@ export type HomeStackParamsList = {
 
 
 
-const HomeStack = createNativeStackNavigator<HomeStackParamsList>();
+const HomeStack = createNativeStackNavigator<HomeStackParamsList>()
 
 function HomeNavigator() {
   return (
     <HomeStack.Navigator screenOptions={{ headerShown: false }}>
-      <HomeStack.Screen name="HomeScreen" component={HomeScreen} options={{}}/>
+      <HomeStack.Screen name="HomeScreen" component={HomeScreen}  options={{}}/>
 
       <HomeStack.Screen name="HabitudeScreen" component={HabitudeScreen} options={{}}/>
+      <HomeStack.Screen name="HabitStreakDetailsScreen" component={HabitStreakDetailsScreen} options={{}}/>
       <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{}}/>
 
       <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen} options={{}}/>
       <HomeStack.Screen name="PresentationObjectifDetailsScreen" component={PresentationObjectifDetailsScreen} options={{}}/>
 
       <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen} options={{}}/>
+      <HomeStack.Screen name="AnyUserProfilScreen" component={AnyUserProfilScreen} options={{}}/>
+      <HomeStack.Screen name="ProfilNotificationsScreen" component={ProfilNotificationsScreen} options={{}}/>
       <HomeStack.Screen name="ProfilSettingsScreen" component={ProfilSettingsScreen} options={{}}/>
 
       <HomeStack.Screen name="ProfilListHabitScreen" component={ProfilListHabitScreen} options={{}}/>
@@ -258,7 +276,11 @@ export type NewsScreenStackType = {
   NewsScreen: undefined,
   UserDetailsScreen: {
     detailledUser: User
-  }
+  },
+  UtilsScreen: undefined,
+  AnyUserProfilScreen: {
+    detailledUser: User
+  },
 }
 
 const NewsScreenStack = createNativeStackNavigator<NewsScreenStackType>();
@@ -268,6 +290,8 @@ function NewsScreenNavigator() {
     <NewsScreenStack.Navigator screenOptions={{ headerShown: false }}>
       <NewsScreenStack.Screen name="NewsScreen" component={NewsScreen}/>   
       <NewsScreenStack.Screen name="UserDetailsScreen" component={UserDetailsScreen}/>
+      <NewsScreenStack.Screen name="UtilsScreen" component={UtilsScreen}/>
+      <NewsScreenStack.Screen name="AnyUserProfilScreen" component={AnyUserProfilScreen}/>
     </NewsScreenStack.Navigator>
   );
 }

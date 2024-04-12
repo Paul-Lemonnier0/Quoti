@@ -19,7 +19,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { getProfilePictureLocalPath, saveProfilePictureLocally, selectImage } from '../../../primitives/UserPrimitives'
 import { AppContext } from '../../../data/AppContext'
 import { isTextInputValueValid } from '../../../primitives/BasicsMethods'
-import { updateProfile } from 'firebase/auth'
+import { updateEmail, updateProfile } from 'firebase/auth'
 import { UserContext, UserType } from '../../../data/UserContext'
 import { Error_Impact, Success_Impact } from '../../../constants/Impacts'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
@@ -78,9 +78,7 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
 
             const newValues: newUserValuesProps = {}
             if(user.photoURL !== profilPicture && profilPicture) {
-                if(user.uid) {
-                    console.log("updating photo...")
-                    
+                if(user.uid) {                    
                     const downloadedPhotoURL = await saveProfilPicture(user.uid, profilPicture)
                     newValues.photoURL = downloadedPhotoURL
                 }
@@ -88,14 +86,16 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
 
             if(user.displayName !== newDisplayName)
                 newValues.displayName = newDisplayName
-        
+         
             if(user.email !== newEmail) 
                 newValues.email = newEmail
             
             try {
                 if(auth.currentUser && user){
-                    console.log("updating Profile...")
                     await updateProfile(auth.currentUser, {...newValues})
+                    if(newValues.email) {
+                        await updateEmail(auth.currentUser, newValues.email)
+                    }
     
                     const updatedUser: UserType = {
                         ...user,

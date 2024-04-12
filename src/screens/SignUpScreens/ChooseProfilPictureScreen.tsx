@@ -56,7 +56,6 @@ const ChooseProfilPictureScreen: FC<ChooseProfilPictureScreenProps> = () => {
             if(user?.uid && image){
                 const photoURL = await saveProfilPicture(user.uid, image)
                 await updateProfile(user, {photoURL});
-                await Database_setUser({...user, displayName: username, photoURL})
            
                 setUserAuthState(AuthStates.Ready)                       
             }

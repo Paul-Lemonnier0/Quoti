@@ -10,6 +10,7 @@ import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsLi
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator";
 import React from "react"
+import { Database_setUser } from "../../firebase/Database_User_Primitives";
 
 type AccountCreatedScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "AccountCreatedScreen">
 
@@ -25,6 +26,12 @@ const AccountCreatedScreen: FC<AccountCreatedScreenProps> = ({navigation}) => {
             });
         };
 
+        const createAccount_DB = async() => {
+            if(auth.currentUser)
+                await Database_setUser({...auth.currentUser})
+        }
+
+        createAccount_DB()
         disableGestures()
     }, [])
 

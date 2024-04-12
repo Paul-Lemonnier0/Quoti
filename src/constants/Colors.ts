@@ -5,6 +5,7 @@ export interface Theme {
   Contrast: string;
   Primary: string;
   Secondary: string;
+  SecondaryLowOpacity: string,
   Tertiary: string;
   Popup: string;
   Error: string;
@@ -15,6 +16,7 @@ export interface Theme {
   Selection: string;
   LinearGradientOpacityStart: string;
   LinearGradientOpacityEnd: string;
+  ContrastLowOpacity: string
 }
 
 export interface ThemeObject {
@@ -30,6 +32,8 @@ const theme: ThemeObject = {
       Contrast: "#000000",
       Primary: "#f6f6f9",
       Secondary: "#fff",
+      SecondaryLowOpacity: "rgba(255, 255, 255, 0.5)",
+      ContrastLowOpacity: "rgba(0, 0, 0, 0.25)",
       Tertiary: "#bfbfbf",
       Popup: "#f6f6f9",
       Error: "#ee1b15",
@@ -48,6 +52,8 @@ const theme: ThemeObject = {
       Contrast: "#fff",
       Primary: "#000000",
       Secondary: "#12161b",
+      SecondaryLowOpacity: "rgba(18, 22, 27, 0.5)",
+      ContrastLowOpacity: "rgba(255, 255, 255, 0.25)",
       Selection: 'rgba(65, 68, 71, 0.5)',
       InputBackground: "#f9f9f9",
       InputDisabledBackground: "#ededed",

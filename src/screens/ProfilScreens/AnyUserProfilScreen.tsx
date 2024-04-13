@@ -1,54 +1,38 @@
-import { View, StyleSheet } from "react-native"
-import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubMassiveText, SubTitleGrayText, SubTitleText, TitleGrayText, TitleText } from "../../styles/StyledText"
 import { useState, FC } from "react"
-import { useThemeColor } from "../../components/Themed"
-import { CustomScrollView, UsualScreen } from "../../components/View/Views"
-import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
-import { Image } from "react-native"
 import { useContext } from "react"
 import { HabitsContext } from "../../data/HabitContext"
-import { signOut } from "@firebase/auth"
-import { auth } from "../../firebase/InitialisationFirebase"
-import { BorderTextButton } from "../../components/Buttons/UsualButton"
-import { UserContext } from "../../data/UserContext"
-import { FlatList } from "react-native"
+import { UserContext, UserType } from "../../data/UserContext"
 import { useEffect } from "react"
-import { Database_getUsersInfo } from "../../firebase/Database_User_Primitives"
-import RequestFriendItem from "../../components/Profil/RequestFriendItem"
-import { TouchableOpacity } from "react-native"
-import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { HomeStackParamsList, NewsScreenStackType } from "../../navigation/BottomTabNavigator"
+import { Database_getUsersInfo, UserDataBase } from "../../firebase/Database_User_Primitives"
 import { UserFirestoreType } from "../../types/FirestoreTypes/UserTypes"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
-import ProfilButton from "../../components/Profil/ProfilButton"
-import { ItemType, RadioButtonsBar } from "../../components/RadioButtons/RadioButtonsBar"
-import HabitudesList from "../../components/Habitudes/HabitudesList"
-import PresentationHabitList from "../../components/Habitudes/PresentationHabitList"
-import ObjectifsList from "../../components/Objectifs/ObjectifsList"
-import Separator from "../../components/Other/Separator"
-import CustomCard from "../../components/Other/Card"
-import { SeriazableObjectif } from "../../types/HabitTypes"
 import ProfilDetailsForm from "../../components/Profil/ProfilDetailsForm"
-import { sendFriendInvitation } from "../../firebase/Firestore_User_Primitives"
-import { Success_Impact } from "../../constants/Impacts"
+import { cancelFriendInvitation, getVisitInfoUserFromUserDB, sendFriendInvitation, VisitInfoUser } from "../../firebase/Firestore_User_Primitives"
+import { BottomScreenOpen_Impact } from "../../constants/Impacts"
+import { HomeStackParamsList, NewsScreenStackType } from "../../navigation/BottomTabNavigator"
+import { NativeStackScreenProps } from "@react-navigation/native-stack"
 
-type AnyUserProfilScreenProps = NativeStackScreenProps<NewsScreenStackType, "AnyUserProfilScreen">
+type AnyUserProfilScreenProps = NativeStackScreenProps<NewsScreenStackType , "AnyUserProfilScreen"> | NativeStackScreenProps<HomeStackParamsList , "AnyUserProfilScreen">
 
-const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) => {
+const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({route}) => {
 
     const {Habits, Objectifs} = useContext(HabitsContext)
-    const {user, sendedFriendRequests, addUserFriendRequest} = useContext(UserContext)
+    const {user, sendedFriendRequests, addUserFriendRequest, removeUserFriendRequest} = useContext(UserContext)
     const {detailledUser} = route.params
     const {theme} = useContext(AppContext)
+
+    const [visitUserInfo, setVisitUserInfo] = useState<VisitInfoUser>(detailledUser as VisitInfoUser)
 
     const [friendRequestsUsers, setFriendRequestsUsers] = useState<(UserFirestoreType | null)[]>([])
     const [userFriendsID, setUserFriendsID] = useState<UserFirestoreType[]>([])
 
-    const isAlreadyFriend = (user && user.friends && detailledUser && detailledUser.email && user.friends.includes(detailledUser.email)) as boolean
+    const [isUserInfoLoading, setIsUserInfoLoading] = useState<boolean>(true)
+
+    const isAlreadyFriend = (user && user.friends && detailledUser && user.friends.includes(detailledUser.uid)) as boolean
     const [isFriend, setIsFriend] = useState<boolean>(isAlreadyFriend)
 
-    const hasAlreadySendedInvation = sendedFriendRequests.includes(detailledUser.uid)
+    const hasAlreadySendedInvation = (detailledUser && sendedFriendRequests.includes(detailledUser.uid)) as boolean
 
     const [hasSendedInvitation, setHasSendedInvation] = useState<boolean>(hasAlreadySendedInvation)
 
@@ -66,13 +50,43 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
     }
 
     const handleAddFriend = async() => {
-        if(user && user.email && detailledUser.email){
-            await sendFriendInvitation(user.uid, user.email, detailledUser.uid, detailledUser.email)
-            addUserFriendRequest(detailledUser.uid)
-            setHasSendedInvation(true)
-            Success_Impact()
+        if(user && user.email && detailledUser && detailledUser.email){
+            if(user.friends?.includes(detailledUser.uid)) {
+
+            }
+
+            else if(hasSendedInvitation) {
+              console.log("canceling friend request")
+              removeUserFriendRequest(detailledUser.uid)
+
+              setHasSendedInvation(false)
+
+              cancelFriendInvitation(user.uid, user.email, detailledUser.uid, detailledUser.email)
+            }
+
+            else {
+              console.log("sending friend request")
+              addUserFriendRequest(detailledUser.uid)
+
+              setHasSendedInvation(true)
+
+              sendFriendInvitation(user.uid, user.email, detailledUser.uid, detailledUser.email)
+            }
+
+            BottomScreenOpen_Impact()
         }
     }
+
+    useEffect(() => {
+        const setupUserInfo = async() => {
+            setIsUserInfoLoading(true)
+            const infos = await getVisitInfoUserFromUserDB(detailledUser)
+            setIsUserInfoLoading(false)
+            setVisitUserInfo(infos)
+        }
+
+        setupUserInfo()
+    }, [])
 
     useEffect(() => {
       const getRequestFriendsUserInfo = async() => {
@@ -93,7 +107,7 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
 
     return(
         <ProfilDetailsForm
-            user={detailledUser}
+            user={visitUserInfo}
             nb_friends={nb_friends}
             nb_habits={nb_habits}
             nb_objectifs={nb_objectifs}
@@ -104,6 +118,7 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
             handleSeeSucces={() => {}}
             isFriend={isFriend}
             hasSendedInvitation={hasSendedInvitation}
+            isLoading={isUserInfoLoading}
         />
   );
 };

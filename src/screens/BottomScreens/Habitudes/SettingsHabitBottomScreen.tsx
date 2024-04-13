@@ -16,6 +16,7 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Habit } from "../../../types/HabitTypes";
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import React from "react"
+import ShareHabitBottomScreen from "../Social/ShareHabitBottomScreen";
 
 
 export interface SettingHabitBottomScreenProps {
@@ -50,6 +51,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     }
 
     const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
+    const bottomSheetModalRef_ShareHabitScreen: RefObject<BottomSheetModal> = useRef(null)
 
     const handleDelete = async() => {
         setIsLoading(true)
@@ -73,27 +75,8 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         modifyAdditionnalMethod ? modifyAdditionnalMethod() : null
     }
 
-    const handleShare = async() => {
-        BottomScreenOpen_Impact()
-
-        try{
-            const result = await Share.share({
-                message: habit.titre + " : " + habit.description,
-                url: `exp://172.20.10.2:8081/--/SharedHabitScreen?habitID='50'&userID='Paul'`,
-            })
-
-            if(result.action === Share.sharedAction){
-                //shared
-            }
-
-            else if(result.action === Share.dismissedAction){
-                //Pas shared
-            }
-        }
-
-        catch(e){
-            console.log("Shared Error : ", e)
-        }
+    const handleOpenShare = () => {
+        bottomSheetModalRef_ShareHabitScreen.current?.present() 
     }
 
     const handleBreakObjectifRelation = async() => {
@@ -131,7 +114,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     const commands: commandType[] = [
         {icon: "trending-up", provider: IconProvider.Feather, text:"Passer pour aujourd'hui", method: handleSkip},
         {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'habitude", method: handleOpenEdit},
-        {icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleShare},
+        {icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleOpenShare},
     ]
 
     if(habitType === "Objectifs"){
@@ -178,6 +161,11 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 habit={getSeriazableHabit(habit)}
                 validationAdditionnalMethod={handleEdit}
                 editHabitCustomMethod={() => {}}
+            />
+            
+            <ShareHabitBottomScreen
+                bottomSheetModalRef={bottomSheetModalRef_ShareHabitScreen}
+                habit={habit}
             />
         </CustomStaticBottomSheet>
     );

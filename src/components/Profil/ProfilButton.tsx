@@ -11,8 +11,9 @@ import { useThemeColor } from "../Themed"
 import { AppContext } from "../../data/AppContext"
 import FastImage from 'react-native-fast-image';
 import {Image} from "expo-image"
+import { VisitInfoUser } from "../../firebase/Firestore_User_Primitives"
 export interface ProfilButtonProps {
-    user: User,
+    user: User | VisitInfoUser,
     onPress: () => void,
     noBadge?: boolean,
     modificationBadge?: boolean,
@@ -26,16 +27,18 @@ interface PlaceholderProfilPictureProps {
     name: string,
     tall?: boolean,
     huge?: boolean,
+    isPrimary?: boolean
 }
 
-export const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({name, tall, huge}) => {
+export const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({name, isPrimary, tall, huge}) => {
     const {theme} = useContext(AppContext)
 
     const secondary = useThemeColor(theme, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
     
     return(
         <View style={{
-            backgroundColor: secondary,
+            backgroundColor: isPrimary ? primary : secondary,
             justifyContent: "center",
             alignItems: "center",
             borderRadius: 200,

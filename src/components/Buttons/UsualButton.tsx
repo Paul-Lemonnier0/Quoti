@@ -41,10 +41,11 @@ export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, 
 
 
 export interface BackgroundTextButtonProps extends BasicButtonProps {
-    color?: string
+    color?: string,
+    bgColor?: string
 }
 
-export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, color, bold, disabled, extend}) => {
+export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, bgColor, color, bold, disabled, extend}) => {
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
@@ -52,7 +53,7 @@ export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, te
     const contrast = useThemeColor(theme, "Contrast")
 
 
-    const backgroundColor = contrast
+    const backgroundColor = bgColor ?? contrast
     const colorBase = color ? color : fontContrast
 
     const opacity = disabled ? 0.6 : 1

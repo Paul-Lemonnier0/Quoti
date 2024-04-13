@@ -1,6 +1,8 @@
 import { arrayRemove, arrayUnion, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { Unsubscribe } from "firebase/auth"
+import { UserType } from "../data/UserContext"
+import { UserDataBase } from "./Database_User_Primitives"
 
 export const sendFriendInvitation = async(senderID: string, senderMail: string, receiverID: string, receiverMail: string) => {
     try{
@@ -39,12 +41,48 @@ export const sendFriendInvitation = async(senderID: string, senderMail: string, 
     }
 }
 
+export const cancelFriendInvitation = async(senderID: string, senderMail: string, receiverID: string, receiverMail: string) => {
+    try{
+        console.log("Sending friend invitation...")
+
+        const requestRef = doc(db, "Users", receiverMail, "Friends", "Requests")
+
+        const requestsDoc = await getDoc(requestRef)
+
+        if(requestsDoc.exists()){
+            await updateDoc(requestRef, {friends: arrayRemove(senderID)})
+        }
+
+        else{
+            await setDoc(requestRef, {friends: [senderID]})
+        }
+
+        const sendedRequestRef = doc(db, "Users", senderMail, "Friends", "Requests")
+
+        const sendedRequestsDoc = await getDoc(sendedRequestRef)
+
+        if(sendedRequestsDoc.exists()){
+            await updateDoc(sendedRequestRef, {sended: arrayRemove(receiverID)})
+        }
+
+        else{
+            await setDoc(sendedRequestRef, {sended: [receiverID]})
+        }
+
+        console.log("Invitation well canceled !")
+    
+    }
+
+    catch(e){
+        console.log("Error while sending friend invitation : ", e)
+    }
+}
+
 export const acceptFriendInvitation = async(userID: string, userMail: string, friendID: string, friendMail: string) => {
     try{
         console.log("Accepting friend invitation...")
 
         const requestRef = doc(db, "Users", userMail, "Friends", "Requests")
-
         await updateDoc(requestRef, {friends: arrayRemove(friendID)})
         
         const acceptedRef = doc(db, "Users", userMail, "Friends", "Accepted")
@@ -57,6 +95,9 @@ export const acceptFriendInvitation = async(userID: string, userMail: string, fr
         else await setDoc(acceptedRef, {friends: [friendID]})
 
         //Pour le sender
+
+        const requestRefSender = doc(db, "Users", friendMail, "Friends", "Requests")
+        await updateDoc(requestRefSender, {sended: arrayRemove(userID)})
 
         const acceptedRefSender = doc(db, "Users", friendMail, "Friends", "Accepted")
         const acceptedDocSender = await getDoc(acceptedRefSender)
@@ -138,5 +179,42 @@ export const getSendedFriendRequest = async(userMail: string): Promise<string[]>
     return []
 }
 
-export const updateUserBestStreak = (userID: string) => {
+export const setBaseDetailsUser = async(userMail: string, birthDate: Date, isPrivate: boolean) => {
+    const userRef = doc(db, 'Users', userMail)
+    const userDoc = await getDoc(userRef)
+
+    if(userDoc.exists()) {
+        await updateDoc(userRef, {
+            birthDate: birthDate.toISOString(),
+            isPrivate: isPrivate
+        })
+
+        console.log("Profil Well updated !")
+    }
 }
+
+export interface VisitInfoUser extends UserDataBase {
+    isPrivate?: boolean,
+    nbHabits?: number,
+    nbObjectifs?: number,
+    nbHabitsFinished?: number,
+    nbObjectifsFinished?: number,
+    nbSucces?: number
+}
+
+export const getVisitInfoUserFromUserDB = async(userDB: UserDataBase): Promise<VisitInfoUser> => {
+    const user: VisitInfoUser = {...userDB}
+    
+    // const userRef = doc(db, "Users", userDB.email)
+    // const userDoc = await getDoc(userRef)
+
+    // if(userDoc.exists()) {
+    //     if(userDoc.data() && "isPrivate" in userDoc.data()) {
+    //         user.isPrivate = (userDoc.data().isPrivate) as boolean
+    //     }
+    // }
+
+    // else console.log("dont exists : ", userDB.email)
+
+    return user
+}   

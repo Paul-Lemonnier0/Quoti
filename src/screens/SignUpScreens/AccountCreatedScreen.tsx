@@ -11,15 +11,16 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator";
 import React from "react"
 import { Database_setUser } from "../../firebase/Database_User_Primitives";
+import { setBaseDetailsUser } from "../../firebase/Firestore_User_Primitives";
 
 type AccountCreatedScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "AccountCreatedScreen">
 
-const AccountCreatedScreen: FC<AccountCreatedScreenProps> = ({navigation}) => {
+const AccountCreatedScreen: FC<AccountCreatedScreenProps> = ({navigation, route}) => {
 
     const {setUserAuthState} = useContext(AuthContext)
+    const {firstName, lastName} = route.params
 
     useEffect(() => {
-
         const disableGestures = () => {
             navigation.setOptions({
                 gestureEnabled: false,
@@ -27,8 +28,9 @@ const AccountCreatedScreen: FC<AccountCreatedScreenProps> = ({navigation}) => {
         };
 
         const createAccount_DB = async() => {
-            if(auth.currentUser)
-                await Database_setUser({...auth.currentUser})
+            if(auth.currentUser && auth.currentUser.email) {
+                // await Database_setUser({...auth.currentUser}, firstName, lastName)
+            }
         }
 
         createAccount_DB()

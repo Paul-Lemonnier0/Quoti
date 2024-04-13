@@ -10,10 +10,19 @@ import { getSendedFriendRequest, subscribeToFriendRequests, subscribeToFriends }
 import * as FileSystem from 'expo-file-system';
 import { getProfilePictureLocalPath, saveProfilePictureLocally } from "../primitives/UserPrimitives";
 import { newUserValuesProps } from "../screens/ProfilScreens/ProfilSettingsScreens/ProfilDataSettingsScreen";
+import { Database_GetSpecificUser } from "../firebase/Database_User_Primitives";
 
 export interface UserFullType extends User {
     friendRequests?: string[],
-    friends?: string[]
+    friends?: string[],
+    firstName: string,
+    lastName: string,
+    isPrivate?: boolean,
+    nbHabits?: number,
+    nbObjectifs?: number,
+    nbHabitsFinished?: number,
+    nbObjectifsFinished?: number,
+    nbSucces?: number
 } 
 
 export type UserType = UserFullType | null
@@ -23,6 +32,7 @@ export interface UserContextType {
     setUser: Dispatch<React.SetStateAction<UserType>>,
     handleSetUser: (newValues: newUserValuesProps) => Promise<void>,
     addUserFriendRequest: (userID: string) => void,
+    removeUserFriendRequest: (userID: string) => void,
     sendedFriendRequests: string[]
 }
 
@@ -31,6 +41,7 @@ const UserContext = createContext<UserContextType>({
     setUser: () => {},
     handleSetUser: async() => {},
     addUserFriendRequest: () => {},
+    removeUserFriendRequest: () => {},
     sendedFriendRequests: []
 })
 
@@ -40,7 +51,7 @@ export interface UserContextProviderProps {
 
 const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
 
-    const [user, setUser] = useState<UserType | null>(auth.currentUser)
+    const [user, setUser] = useState<UserType | null>(auth.currentUser ? {...auth.currentUser, firstName: "unknown", lastName: "unknown"} : null)
     const [sendedFriendRequests, setSendedFriendRequests] = useState<string[]>([])
 
     if(!user) {
@@ -70,6 +81,11 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
         setSendedFriendRequests(prevRequests => [...prevRequests, userID])
     }
 
+    const removeUserFriendRequest = (userID: string) => {
+        setSendedFriendRequests(prevRequests => prevRequests.filter(id => id !== userID))
+    }
+
+
     const setUserFriends = (friends: Array<string>) => {
         setUser((prevUser: UserType) => {
             if(prevUser){
@@ -97,6 +113,13 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
     }
 
     useEffect(() => {
+        const handleGetUserInfo = async() => {
+            const infos = await Database_GetSpecificUser(user.uid)
+            if(infos && infos.firstName && infos.lastName) {
+                setUser((prevUser) => (prevUser ? {...prevUser, firstName: infos.firstName, lastName: infos.lastName} : null))
+            }
+        }
+        
         const handleLoadProfilPicture = async() => {
             setIsLoading(true)
             const profilPicturePath = await getProfilePictureLocalPath(user.uid)
@@ -122,15 +145,18 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
 
         if(user.email) {
             setSendedUserFriendRequest(user.email)
-            setSendedUserFriendRequest(user.email)
             subscribeToFriendRequests(user.email, setUserFriendRequest)
             subscribeToFriends(user.email, setUserFriends)
+            handleGetUserInfo()
         }
 
     }, [])
 
     return(
-        <UserContext.Provider value={{user, setUser, handleSetUser, addUserFriendRequest, sendedFriendRequests}}>
+        <UserContext.Provider value={{
+            user, setUser, handleSetUser, 
+            addUserFriendRequest, removeUserFriendRequest, sendedFriendRequests
+        }}>
             {children}
         </UserContext.Provider>
     )

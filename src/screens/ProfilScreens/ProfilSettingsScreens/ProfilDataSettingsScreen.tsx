@@ -60,8 +60,6 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
         await selectImage(setProfilPicture)
     }
 
-  
-
     const handleValidation = async() => {
         const newDisplayName = displayNameRef.current?.getValue()
         const newFullName = fullNameRef.current?.getValue()
@@ -103,7 +101,7 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
                     }
 
                     handleSetUser({...newValues})
-                    await Database_setUser(updatedUser)
+                    await Database_setUser(updatedUser, user.firstName, user.lastName, user.isPrivate)
                     Success_Impact()
                     navigation.goBack()
                 }

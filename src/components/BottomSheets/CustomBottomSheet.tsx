@@ -83,6 +83,7 @@ export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheet
           snapPoints={snapPoints}
           onDismiss={onDismiss ?? undefined}
           enablePanDownToClose={true}
+          keyboardBehavior="interactive"
           enableDynamicSizing={snapPoints === undefined}
           backdropComponent={noBackdrop ? null : renderBackdrop}>
 

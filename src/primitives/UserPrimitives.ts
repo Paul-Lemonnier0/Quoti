@@ -66,20 +66,29 @@ export const getProfilePictureLocalPath = async (uid: string): Promise<string | 
 export interface BaseUserType {
     displayName: string,
     email: string,
-    birthDate: Date,
-    fullName: string,
+    isPrivate: boolean,
+    firstName: string,
+    lastName: string,
     password: string
 }
+
+function generateRandomInteger(max) {
+    return Math.floor(Math.random() * max) + 1;
+}
+
 
 export const generateRandomUsers = (nbUsers: number): BaseUserType[] => {
     const users: BaseUserType[] = []
     
     for(let i = 0; i<nbUsers; ++i) {
+        let value = generateRandomInteger(10);
+
         users.push({
             displayName: faker.person.fullName(),
             email: faker.internet.email(),
-            fullName: faker.person.fullName(),
-            birthDate: faker.date.birthdate(),
+            firstName: faker.person.firstName(),
+            lastName: faker.person.lastName(),
+            isPrivate: value % 2 === 0,
             password: faker.internet.password()
         })
     }

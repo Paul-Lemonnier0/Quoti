@@ -8,20 +8,24 @@ import { FC } from "react"
 import React from "react"
 import { PlaceholderProfilPicture } from "./ProfilButton"
 import { IconButton, IconProvider } from "../Buttons/IconButtons"
+import { UserType } from "../../data/UserContext"
 
 export interface ProfilItemProps {
-    user: User,
+    user: UserType,
     onPress: () => void,
     handleAcceptFriend?: () => void,
     handleRefuseFriend?: () => void,
+    isPrimary?: boolean
 }
 
-const ProfilItem: FC<ProfilItemProps> = ({ user, onPress, handleAcceptFriend, handleRefuseFriend }) => {
+const ProfilItem: FC<ProfilItemProps> = ({ user, onPress, isPrimary, handleAcceptFriend, handleRefuseFriend }) => {
 
     const handleNavigationToDetailsScreen = () => {
         //navigation.navigate("UserDetailsScreen", {detailledUser: user})
         onPress()
     }
+
+    if(!user) return null
 
     return (
         <TouchableOpacity onPress={handleNavigationToDetailsScreen} style={styles.container}>
@@ -30,12 +34,16 @@ const ProfilItem: FC<ProfilItemProps> = ({ user, onPress, handleAcceptFriend, ha
                     user.photoURL ?
                         <Image placeholder={"disk"} source={{ uri: user?.photoURL ?? undefined }} style={styles.image} />
                         :
-                        <PlaceholderProfilPicture name={user.displayName ?? ""}/>
+                        <PlaceholderProfilPicture isPrimary={isPrimary} name={user.displayName ?? ""}/>
                 }
 
                 <View style={styles.detailsContainer}>
                     <SubTitleText text={user.displayName} />
-                    <SubText text="**placeholder**" />
+                    {
+                        user.firstName && user.lastName ?
+                        <SubText text={user.firstName + " " + user.lastName}/>: 
+                        <SubText text={""}/>
+                    }
                 </View>
             </View>
 

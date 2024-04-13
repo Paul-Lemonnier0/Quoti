@@ -18,12 +18,15 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
+import { Database_setUser } from "../../firebase/Database_User_Primitives"
 
 type SignUpScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "SignUpScreen">
 
-const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
+const SignUpScreen: FC<SignUpScreenProps> = ({navigation, route}) => {
 
     const {setIsLoading} = useContext(AppContext)
+
+    const {firstName, lastName, isPrivate} = route.params
 
     const usernameRef = useRef<CustomTextInputRefType>(null)
     const [isUserNameWrong, setIsUserNameWrong] = useState<boolean>(false)
@@ -64,6 +67,8 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
             if(email && password && username){
                 
                 const {user} = await createUserWithEmailAndPassword(auth, email, password);
+                await Database_setUser({...user, displayName: username}, firstName, lastName, isPrivate)
+
                 await updateProfile(user, {displayName: username});
     
                 const userDocRef = doc(db, "Users", email)
@@ -71,9 +76,10 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
             
                 if (!docSnapshot.exists()) {
                     await setDoc(userDocRef, {});
+
                     Success_Impact()
     
-                    navigation.navigate("AccountCreatedScreen")
+                    navigation.navigate("AccountCreatedScreen", {firstName: firstName, lastName: lastName})
                 }     
             }
         }
@@ -91,7 +97,6 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
 
     const handleFacebookSignUp = () => {}
 
-
     return (
         <UsualScreen hideMenu>
             <View style={styles.container}>
@@ -100,7 +105,7 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation}) => {
                     <View style={styles.subHeader}>
                         <NavigationButton action={NavigationActions.goBack}/>
                     </View>
-                    <HugeText text={"Inscription"}/>
+                    <HugeText text={"Bienvenue, " + firstName + " !"}/>
                 </View>
 
 

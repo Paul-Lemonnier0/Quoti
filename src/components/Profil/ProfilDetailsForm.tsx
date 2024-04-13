@@ -12,19 +12,26 @@ import { CustomScrollView, UsualScreen } from '../View/Views'
 import { UserType } from '../../data/UserContext'
 import IllustrationsList, { IllustrationsType } from '../../data/IllustrationsList'
 import { Image } from 'react-native'
+import { BackgroundTextButton } from '../Buttons/UsualButton'
+import { VisitInfoUser } from '../../firebase/Firestore_User_Primitives'
 
 interface ProfilHeaderProps {
-    user: UserType,
+    user: UserType | VisitInfoUser,
     user_data: UserData[],
     handlePressOnProfil?: () => void,
-    notCurrentUser?: boolean
+    handleAddFriend: () => void,
+    notCurrentUser?: boolean,
+    hasSendedFriendRequest?: boolean,
+    isFriend?: boolean,
 }
 
-const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, handlePressOnProfil}) => {
+const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, handlePressOnProfil, hasSendedFriendRequest, isFriend, handleAddFriend}) => {
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
+    const secondary = useThemeColor(theme, "Secondary")
+    const font = useThemeColor(theme, "Font")
 
-    const hasNotification = user?.friendRequests && user.friendRequests.length > 0
+    const hasNotification = (user && "friendRequests" in user && user?.friendRequests && user.friendRequests.length > 0) as boolean
 
     const onPress = () => handlePressOnProfil ?  handlePressOnProfil() : undefined
 
@@ -34,11 +41,20 @@ const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, h
                 {user && <ProfilButton disabled={!hasNotification || notCurrentUser} huge hugeBadge noBadge={!hasNotification || notCurrentUser} user={user} onPress={onPress}/>}
                 <View style={styles.titreEtDescriptionContainer}>
                     <TitleText text={"@" + user?.displayName ?? "unknown"}/>
-                    <NormalText bold style={{color: fontGray}} text={user?.email ?? "unknown"} />
+                    <NormalText bold style={{color: fontGray}} text={user && user?.firstName && user?.lastName ? (user.firstName + " " + user.lastName) : "unknown"} />
                 </View>
             </View>
 
             <RenderUserData user_data={user_data}/>
+
+            {
+                isFriend ?
+                <BackgroundTextButton text="Suivi(e)" bgColor={secondary} color={font} bold onPress={handleAddFriend}/> :
+
+                (hasSendedFriendRequest ?
+                <BackgroundTextButton text="En attente" bgColor={secondary} color={font} bold onPress={handleAddFriend}/> :
+                <BackgroundTextButton text="Suivre" bold onPress={handleAddFriend}/>)
+            }
 
             <View style={{marginBottom: -15}}>
                 <Separator/>
@@ -148,7 +164,7 @@ const RenderUserData: FC<RenderUserDataProps> = ({user_data}) => {
 }
 
 type ProfilDetailsFormProps = {
-    user: UserType,
+    user: UserType | VisitInfoUser,
     nb_friends: number,
     nb_habits: number,
     nb_objectifs: number,
@@ -160,7 +176,8 @@ type ProfilDetailsFormProps = {
     handleAddFriend?: () => void,
     handlePressOnProfil?: () => void,
     isFriend?: boolean,
-    hasSendedInvitation?: boolean
+    hasSendedInvitation?: boolean,
+    isLoading?: boolean
 }
 
 const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
@@ -176,7 +193,8 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
     handleAddFriend,
     isFriend,
     hasSendedInvitation,
-    handlePressOnProfil
+    handlePressOnProfil,
+    isLoading
 }) => {
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
@@ -232,7 +250,6 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
 
     //TODO : add to user : best streak, current streak, succes, ended obj, ended habits
 
-    const isPrivateUser = false
     const currentStreak = 12
 
     const friendIconName = isFriend ? "user-check" : (hasSendedInvitation ? "user-minus" : "user-plus")
@@ -261,15 +278,23 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
                             }
                         </View>
                     </View>
-                {
-                    isPrivateUser ?
+                
+                    {
+                    (user?.isPrivate && !isFriend)?
                     <View style={styles.body}>
                         <ProfilHeader 
                             user={user} 
                             user_data={user_data}
                             handlePressOnProfil={handlePressOnProfil}
-                            notCurrentUser={handleAddFriend !== undefined}/>
-                        <RenderPrivateData/>
+                            notCurrentUser={handleAddFriend !== undefined}
+                            handleAddFriend={handleAddFriend ?? (() => {})}
+                            hasSendedFriendRequest={hasSendedInvitation}
+                            isFriend={isFriend}/>
+
+                        {
+                            !isLoading &&
+                            <RenderPrivateData/>
+                        }
                     </View> 
                     
                     :
@@ -280,38 +305,29 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
                                 user={user} 
                                 user_data={user_data}
                                 handlePressOnProfil={handlePressOnProfil}
-                                notCurrentUser={handleAddFriend !== undefined}/>
+                                notCurrentUser={handleAddFriend !== undefined}
+                                handleAddFriend={handleAddFriend ?? (() => {})}
+                                hasSendedFriendRequest={hasSendedInvitation}
+                                isFriend={isFriend}/>
 
-                            <View style={{gap: 10}}>
-                                {/* <CustomCard>
-                                    <View style={{flexDirection: "row", gap: 15, paddingHorizontal: -10, width: "100%", alignItems: "center"}}>
-                                        <View style={{marginHorizontal: 0, justifyContent: "center",  marginTop: 5, alignItems: "center"}}>
-                                            <Icon provider={IconProvider.FontAwesome5} size={60} name="fire"/>
-                                        </View>
+                            {
+                                !isLoading &&
 
-                                        <View style={{flex: 1}}>
-                                            <SubMassiveText text={"70"}/>
-                                            <View style={{flexDirection: "row", gap: 5, alignItems: "center"}}>
-                                                <Icon name={streakIcon} provider={IconProvider.Feather} color={streakColor}/>
-                                                <NormalText bold text={streakSentence} style={{color: streakColor}}/>
-                                            </View>
-                                        </View>
-                                    </View>
-                                </CustomCard> */}
-
-                                <FlatList
-                                    key={1}
-                                    numColumns={2}
-                                    columnWrapperStyle={{gap: 10, flex: 1}}
-                                    contentContainerStyle={{gap: 10}}
-                                    data={userStatList}
-                                    scrollEnabled={false}
-                                    renderItem={({item}) => <UserStatComponent item={item}/>}
-                                />
-                            </View>
+                                <View style={{gap: 10}}>
+                                    <FlatList
+                                        key={1}
+                                        numColumns={2}
+                                        columnWrapperStyle={{gap: 10, flex: 1}}
+                                        contentContainerStyle={{gap: 10}}
+                                        data={userStatList}
+                                        scrollEnabled={false}
+                                        renderItem={({item}) => <UserStatComponent item={item}/>}
+                                    />
+                                </View>
+                            }
                         </View>
                     </CustomScrollView>
-                }
+                    }
             </View>
 
         </UsualScreen>

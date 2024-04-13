@@ -4,11 +4,24 @@ import { User, UserInfo } from "firebase/auth";
 import { UserType } from "../data/UserContext";
 import { UserFirestoreType } from "../types/FirestoreTypes/UserTypes";
 
-async function Database_setUser(user: User){
+export interface UserDataBase {
+    uid: string,
+    firstName: string,
+    lastName: string,
+    displayName: string,
+    email: string,
+    photoURL?: string,
+    isPrivate?: boolean
+}
+
+async function Database_setUser(user: User, firstName: string, lastName: string, isPrivate?: boolean){
     await set(ref(database, "Users/" + user.uid), {
         displayName: user.displayName,
         email: user.email,
-        photoURL: user.photoURL
+        photoURL: user.photoURL,
+        firstName: firstName,
+        lastName: lastName,
+        isPrivate: isPrivate ?? true
     })
 }
 
@@ -59,7 +72,7 @@ async function Database_getUsersInfo(usersIDs: string[]): Promise<(UserFirestore
     }
 }
 
-async function Database_getAllUsers(text: string): Promise<User[]>{
+async function Database_getAllUsers(text: string, includedInUserIDs?: string[]): Promise<UserDataBase[]>{
     
     if(text.length === 0){
         return []
@@ -75,6 +88,12 @@ async function Database_getAllUsers(text: string): Promise<User[]>{
         if(usersSnapshot.exists()){
             const users_vals: User[] = usersSnapshot.val()
             const usersArray = Object.entries(users_vals).map(([uid, userData]: [string, any]) => ({ ...userData, uid }));
+
+
+            if(includedInUserIDs) {
+                return usersArray.filter(user => includedInUserIDs.includes(user.uid))
+            }
+
             return usersArray
         }
 

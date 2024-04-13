@@ -57,23 +57,25 @@ const UtilsScreen = () => {
       }
     }
     const handleAddBunchOfUsers = async() => {
-      const randomUsers = generateRandomUsers(75)
+      const randomUsers = generateRandomUsers(20)
 
       setIsLoading(true)
 
       randomUsers.forEach(async(randomUser) => {
         const {user} = await createUserWithEmailAndPassword(auth, randomUser.email, randomUser.password)
+        await Database_setUser({...user, displayName: randomUser.displayName}, randomUser.firstName, randomUser.lastName, randomUser.isPrivate)
+
         await updateProfile(user, {displayName: randomUser.displayName})
 
-        const userDocRef = doc(db, "Users", randomUser.email)
+        const userDocRef = doc(db, "Users", randomUser.email.toLowerCase())
         const docSnapshot = await getDoc(userDocRef);
     
         if (!docSnapshot.exists()) {
             await setDoc(userDocRef, {});
+            
             Success_Impact()
         }     
 
-        await Database_setUser({...user, displayName: randomUser.displayName})
       })
 
       setIsLoading(false)

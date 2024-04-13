@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Daily",
-    "slug": "Daily",
+    "name": "quoti.",
+    "slug": "quoti.",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./src/assets/images/DailyIcon.png",
-    "scheme": "Daily",
+    "icon": "./src/assets/images/QuotiIcon.png",
+    "scheme": "Quoti",
     "userInterfaceStyle": "automatic",
 
     "updates": {
@@ -18,13 +18,13 @@
 
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.arzakal.Daily",
+      "bundleIdentifier": "com.arzakal.Quoti",
       "splash": {
-        "image": "./src/assets/images/DailySplashDark.png",
+        "image": "./src/assets/images/QuotiSplashDark.png",
         "resizeMode": "cover",
         "backgroundColor": "#000000",
         "dark": {
-            "image": "./src/assets/images/DailySplashDark.png",
+            "image": "./src/assets/images/QuotiSplashDark.png",
             "resizeMode": "cover",
             "backgroundColor": "#000000"
         }
@@ -32,11 +32,11 @@
     },
     "android": {
       "splash": {
-        "image": "./src/assets/images/DailySplash.png",
+        "image": "./src/assets/images/QuotiSplash.png",
         "resizeMode": "cover",
         "backgroundColor": "#ffffff",
         "dark": {
-            "image": "./src/assets/images/DailySplash.png",
+            "image": "./src/assets/images/QuotiSplash.png",
             "resizeMode": "cover",
             "backgroundColor": "#000000"
         }
@@ -47,7 +47,7 @@
         "backgroundColor": "#ffffff"
       },
 
-      "package": "com.arzakal.Daily",
+      "package": "com.arzakal.Quoti",
 
       "intentFilters": [
         {

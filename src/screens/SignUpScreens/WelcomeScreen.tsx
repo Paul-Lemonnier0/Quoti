@@ -20,8 +20,8 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
         navigation.navigate("LoginScreen")
     }
 
-    const handleGoToSignUpScreen = () => {
-        navigation.navigate("SignUpScreen")
+    const handleGoToBaseDetailsSignUpScreen = () => {
+        navigation.navigate("BaseDetailsSignUpScreen")
     }
 
     const connectToDarkCreep = async() => {
@@ -53,7 +53,7 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
 
                     <View style={styles.header}>
                         <View>
-                        <MassiveText text=".Daily" style={{fontFamily: "fontSemiBoldPoppins"}}/>
+                        <MassiveText text="quoti." style={{fontFamily: "fontSemiBoldPoppins"}}/>
                         <TitleText text="Créez vos habitudes !" style={{fontFamily: "fontMediumPoppins"}}/>
                         </View>
                     </View>
@@ -64,7 +64,7 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
                         <BackgroundTextButton text={"DarkCreep"} bold onPress={connectToDarkCreep}/>
                         <BackgroundTextButton text={"Arzakal"} bold onPress={connectToArzakal}/>
                     </View>
-                        <BackgroundTextButton bold text={"S'inscrire"} onPress={handleGoToSignUpScreen}/>
+                        <BackgroundTextButton bold text={"S'inscrire"} onPress={handleGoToBaseDetailsSignUpScreen}/>
                         
                         <View style={styles.footer}>
                             <NormalText text={"Déjà membre ? "}/> 

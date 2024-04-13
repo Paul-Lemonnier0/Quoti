@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { UsualScreen } from '../components/View/Views';
 import { HugeText } from '../styles/StyledText';
 import { FC, useCallback, useContext, useRef, useState } from 'react';
-import { Database_getAllUsers } from '../firebase/Database_User_Primitives';
+import { Database_getAllUsers, UserDataBase } from '../firebase/Database_User_Primitives';
 import ProfilItem from '../components/Profil/ProfilItem';
 import { CustomTextInputRefType, SearchBarCustom } from '../components/TextFields/TextInput'
 import { AppContext } from '../data/AppContext';
@@ -21,7 +21,7 @@ const NewsScreen: FC<NewsScreenProps> = ({navigation}) => {
     const {addHabit, addObjectif} = useContext(HabitsContext);
     const {setIsLoading} = useContext(AppContext)
 
-    const [users, setUsers] = useState<User[]>([])
+    const [users, setUsers] = useState<UserDataBase[]>([])
     const [searchValue, setSearchValue] = useState("")
 
     const searchValueRef = useRef<CustomTextInputRefType>(null)
@@ -35,7 +35,6 @@ const NewsScreen: FC<NewsScreenProps> = ({navigation}) => {
         const getAllUsers = async() => {
           const res = await Database_getAllUsers(text)
           setUsers(res.filter(user => user.uid !== auth.currentUser?.uid))     
-
         }
   
         getAllUsers()
@@ -63,7 +62,6 @@ const NewsScreen: FC<NewsScreenProps> = ({navigation}) => {
                     style={{flex: 1}} 
                     renderItem={renderUser} 
                     contentContainerStyle={{gap: 20}}
-                    // onViewableItemsChanged={onViewableItemsChanged}
                     />
                 </View>
             </View>
@@ -71,8 +69,6 @@ const NewsScreen: FC<NewsScreenProps> = ({navigation}) => {
         </UsualScreen>
     )
 }
-const temp = 20
-
     
 const styles = StyleSheet.create({  
     container: {

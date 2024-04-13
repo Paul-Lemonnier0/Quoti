@@ -109,6 +109,7 @@ export const BottomTextInputCustom = forwardRef<CustomTextInputRefType, TextInpu
             
             <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
                 <BottomSheetTextInput
+                    
                     placeholder={placeholder}
                     editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
@@ -199,22 +200,36 @@ export interface SearchBarCustomProps {
     onFocus?: () => void,
     onBlur?: () => void,
     disabled?: boolean,
-    placeholder?: string
+    placeholder?: string,
+    isPrimary?: boolean,
+    keyboardAvoidingView?: boolean
 }
 
-export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCustomProps>(({ onChangeText, startingValue, labelName, boldLabel, onFocus, disabled, onBlur, placeholder }, ref) => {
+export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCustomProps>(({ 
+    onChangeText, 
+    startingValue, 
+    labelName, 
+    boldLabel, 
+    onFocus, 
+    disabled, 
+    onBlur, 
+    placeholder,
+    isPrimary,
+    keyboardAvoidingView
+ }, ref) => {
     const {theme} = useContext(AppContext)
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
 
     const contrast = useThemeColor(theme, "Contrast") 
     const secondary = useThemeColor(theme, "Secondary") 
+    const primary = useThemeColor(theme, "Primary") 
     const font = useThemeColor(theme, "Font") 
     const fontGray = useThemeColor(theme, "FontGray") 
     const errorColor = useThemeColor(theme, "Error") 
     const inputDisabledBackground = useThemeColor(theme, "InputDisabledBackground") 
 
-    const backgroundColor = disabled ? inputDisabledBackground : secondary
+    const backgroundColor = disabled ? inputDisabledBackground : (isPrimary ? primary : secondary)
     const borderColor = disabled ? inputDisabledBackground : isFieldFocus ? contrast : "transparent"
 
     const [value, setValue] = useState<string>(startingValue ? startingValue : "");
@@ -231,6 +246,8 @@ export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCusto
         setValue(text)
     }
 
+    const TextComponent = keyboardAvoidingView ? BottomSheetTextInput : TextInput
+
 
     return(
         <View style={styles.container}>
@@ -239,7 +256,7 @@ export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCusto
 
                 <Icon name={"search"} provider={IconProvider.Feather} size={20} color={fontGray}/>
 
-                <TextInput placeholder={placeholder ?? ""} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
+                <TextComponent placeholder={placeholder ?? ""} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={handleChangeText} autoCorrect={false}
                     
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}

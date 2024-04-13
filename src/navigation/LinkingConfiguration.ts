@@ -32,7 +32,7 @@ export interface RootStackParamsList {
 }
 
 const LinkingConfiguration: LinkingOptions<RootStackParamsList> = {
-  prefixes: ['https://daily.com', 'daily://'],
+  prefixes: ['https://quoti.com', 'quoti://'],
   config: {
     screens: {
       Home: {

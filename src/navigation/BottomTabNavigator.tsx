@@ -47,8 +47,10 @@ import SecurityScreen from '../screens/ProfilScreens/ProfilSettingsScreens/Secur
 import SubscriptionScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SubscriptionScreen';
 import HabitStreakDetailsScreen from '../screens/Habitude/HabitStreakDetailsScreen';
 import UtilsScreen from '../screens/UtilsScreen';
-import AnyUserProfilScreen from '../screens/ProfilScreens/AnyUserProfilScreen';
 import ProfilNotificationsScreen from '../screens/ProfilScreens/ProfilNotificationsScreen';
+import { UserType } from '../data/UserContext';
+import AnyUserProfilScreen from '../screens/ProfilScreens/AnyUserProfilScreen';
+import { UserDataBase } from '../firebase/Database_User_Primitives';
 
 
 export type BottomTabParamList = {
@@ -156,8 +158,9 @@ export type HomeStackParamsList = {
   },
   ProfilDetailsScreen: undefined,
   ProfilNotificationsScreen: undefined,
+
   AnyUserProfilScreen: {
-    detailledUser: User
+    detailledUser: UserDataBase
   },
   ProfilListHabitScreen: undefined,
   ProfilListObjectifScreen: undefined,
@@ -278,8 +281,9 @@ export type NewsScreenStackType = {
     detailledUser: User
   },
   UtilsScreen: undefined,
+
   AnyUserProfilScreen: {
-    detailledUser: User
+    detailledUser: UserDataBase
   },
 }
 

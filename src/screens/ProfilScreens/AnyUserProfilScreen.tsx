@@ -4,7 +4,6 @@ import { HabitsContext } from "../../data/HabitContext"
 import { UserContext, UserType } from "../../data/UserContext"
 import { useEffect } from "react"
 import { Database_getUsersInfo, UserDataBase } from "../../firebase/Database_User_Primitives"
-import { UserFirestoreType } from "../../types/FirestoreTypes/UserTypes"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
 import ProfilDetailsForm from "../../components/Profil/ProfilDetailsForm"
@@ -24,8 +23,8 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({route}) => {
 
     const [visitUserInfo, setVisitUserInfo] = useState<VisitInfoUser>(detailledUser as VisitInfoUser)
 
-    const [friendRequestsUsers, setFriendRequestsUsers] = useState<(UserFirestoreType | null)[]>([])
-    const [userFriendsID, setUserFriendsID] = useState<UserFirestoreType[]>([])
+    const [friendRequestsUsers, setFriendRequestsUsers] = useState<(UserDataBase | null)[]>([])
+    const [userFriendsID, setUserFriendsID] = useState<UserDataBase[]>([])
 
     const [isUserInfoLoading, setIsUserInfoLoading] = useState<boolean>(true)
 

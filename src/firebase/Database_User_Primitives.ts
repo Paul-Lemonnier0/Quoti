@@ -2,7 +2,6 @@ import { child, equalTo, get, limitToFirst, orderByChild, query, ref, set, start
 import { database } from "./InitialisationFirebase"
 import { User, UserInfo } from "firebase/auth";
 import { UserType } from "../data/UserContext";
-import { UserFirestoreType } from "../types/FirestoreTypes/UserTypes";
 
 export interface UserDataBase {
     uid: string,
@@ -25,13 +24,13 @@ async function Database_setUser(user: User, firstName: string, lastName: string,
     })
 }
 
-async function Database_GetSpecificUser(userID: string){
+async function Database_GetSpecificUser(userID: string): Promise<(UserDataBase | null)>{
     try{
         const userRef = ref(database, `Users/${userID}`);
         const userSnapshot = await get(userRef)
 
         if(userSnapshot.exists()){
-            return userSnapshot.val()
+            return {uid: userID, ...userSnapshot.val()} as UserDataBase
         }
 
         else{
@@ -46,14 +45,14 @@ async function Database_GetSpecificUser(userID: string){
     }
 }
 
-async function Database_getUsersInfo(usersIDs: string[]): Promise<(UserFirestoreType | null)[]>{
+async function Database_getUsersInfo(usersIDs: string[]): Promise<(UserDataBase | null)[]>{
     try{
         const promises = usersIDs.map(async(userID) => {
             const userRef = ref(database, `Users/${userID}`);
             const userSnapshot = await get(userRef)
 
             if(userSnapshot.exists()){
-                return {uid: userID, ...userSnapshot.val() } as UserFirestoreType
+                return {uid: userID, ...userSnapshot.val() } as UserDataBase
             }
 
             else{

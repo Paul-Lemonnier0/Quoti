@@ -9,11 +9,12 @@ import CustomCard from '../Other/Card'
 import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from '../Buttons/IconButtons'
 import ProfilButton from './ProfilButton'
 import { CustomScrollView, UsualScreen } from '../View/Views'
-import { UserType } from '../../data/UserContext'
+import { UserContext, UserType } from '../../data/UserContext'
 import IllustrationsList, { IllustrationsType } from '../../data/IllustrationsList'
 import { Image } from 'react-native'
 import { BackgroundTextButton } from '../Buttons/UsualButton'
 import { VisitInfoUser } from '../../firebase/Firestore_User_Primitives'
+import { auth } from '../../firebase/InitialisationFirebase'
 
 interface ProfilHeaderProps {
     user: UserType | VisitInfoUser,
@@ -27,18 +28,20 @@ interface ProfilHeaderProps {
 
 const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, handlePressOnProfil, hasSendedFriendRequest, isFriend, handleAddFriend}) => {
     const {theme} = useContext(AppContext)
+    const {hasNotification} = useContext(UserContext)
+
     const fontGray = useThemeColor(theme, "FontGray")
     const secondary = useThemeColor(theme, "Secondary")
     const font = useThemeColor(theme, "Font")
 
-    const hasNotification = (user && "friendRequests" in user && user?.friendRequests && user.friendRequests.length > 0) as boolean
+    const hasNotifications = hasNotification()
 
     const onPress = () => handlePressOnProfil ?  handlePressOnProfil() : undefined
 
     return(
         <>
             <View style={styles.bodyHeader}>
-                {user && <ProfilButton disabled={!hasNotification || notCurrentUser} huge hugeBadge noBadge={!hasNotification || notCurrentUser} user={user} onPress={onPress}/>}
+                {user && <ProfilButton placeholderBorder isSelected={hasNotifications && !notCurrentUser} disabled={!hasNotifications || notCurrentUser} huge hugeBadge noBadge={!hasNotifications || notCurrentUser} user={user} onPress={onPress}/>}
                 <View style={styles.titreEtDescriptionContainer}>
                     <TitleText text={"@" + user?.displayName ?? "unknown"}/>
                     <NormalText bold style={{color: fontGray}} text={user && user?.firstName && user?.lastName ? (user.firstName + " " + user.lastName) : "unknown"} />
@@ -48,12 +51,15 @@ const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, h
             <RenderUserData user_data={user_data}/>
 
             {
-                isFriend ?
-                <BackgroundTextButton text="Suivi(e)" bgColor={secondary} color={font} bold onPress={handleAddFriend}/> :
+                user && auth.currentUser && (user.uid !== auth.currentUser.uid) &&
+                (
+                    isFriend ?
+                    <BackgroundTextButton text="Suivi(e)" bgColor={secondary} color={font} bold onPress={handleAddFriend}/> :
 
-                (hasSendedFriendRequest ?
-                <BackgroundTextButton text="En attente" bgColor={secondary} color={font} bold onPress={handleAddFriend}/> :
-                <BackgroundTextButton text="Suivre" bold onPress={handleAddFriend}/>)
+                    (hasSendedFriendRequest ?
+                    <BackgroundTextButton text="En attente" bgColor={secondary} color={font} bold onPress={handleAddFriend}/> :
+                    <BackgroundTextButton text="Suivre" bold onPress={handleAddFriend}/>)
+                )
             }
 
             <View style={{marginBottom: -15}}>

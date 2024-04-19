@@ -94,11 +94,11 @@ export const TextButton: FC<TextButtonProps> = ({onPress, text, bold, semiBold, 
 const styles = StyleSheet.create(
     {
         borderButton: {
-            borderRadius: 18,
+            borderRadius: 15,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            padding: 18,
+            padding: 15,
             borderWidth: 2
         },
 
@@ -106,7 +106,7 @@ const styles = StyleSheet.create(
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            padding: 18,
+            padding: 15,
         }
     }
 )

@@ -1,4 +1,4 @@
-import { addDoc, arrayUnion, collection, deleteDoc, doc, getDocs, query, updateDoc } from "firebase/firestore"
+import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { listKeyIDfromArray } from "../primitives/BasicsMethods"
 import { createDefaultStepFromHabit } from "../primitives/StepMethods"
@@ -7,6 +7,7 @@ import { getUpdatedStreakOfHabit, stringToFrequencyType } from "../primitives/Ha
 import { FormDetailledHabit } from "../types/FormHabitTypes"
 import { FirestoreHabit, FirestoreStep } from "../types/FirestoreTypes/FirestoreHabitTypes"
 import { FrequencyTypes, Habit, HabitList, StepList, StreakValues } from "../types/HabitTypes"
+import { UserEventRequest } from "../data/UserContext"
 const setupHabit = (habit: FormDetailledHabit): FirestoreHabit => {
 
     const todayDateString = new Date().toISOString()
@@ -54,6 +55,19 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userID: string): Pr
 
     return {...habitToAdd, objectifID: habitToAdd.objectifID ?? undefined, startingDate, habitID, steps, frequency}
 }
+
+const addRefHabitToFirestore = async (habitData: UserEventRequest, userID: string) => {
+    console.log("Adding ref habit to Firestore...");
+
+    try {
+        const userDoc = doc(db, "Users", userID)
+        const habitRef = await setDoc(doc(userDoc, "SharedHabits", habitData.habitID), habitData)
+
+        console.log("Habit reference successfully added");
+    } catch (error) {
+        console.error("Error adding habit reference to Firestore:", error);
+    }
+};
 
 interface HabitsFromFirestoreRetrieve {
     habits: HabitList,
@@ -105,6 +119,39 @@ const getAllOwnHabits = async(userID: string): Promise<HabitsFromFirestoreRetrie
     }
 }
 
+const getAllSharedHabits = async(userID: string): Promise<HabitsFromFirestoreRetrieve> => {
+
+    const userDoc = doc(db, "Users", userID)
+
+    const habitsHistory: {[key: string]: Date[]} = {}
+
+    const qry = query(collection(userDoc, "SharedHabits"));
+    const querySnapshot = await getDocs(qry)
+
+    const habitArray: (Habit | null)[] = await Promise.all(
+        querySnapshot.docs.map(async (habit) => {
+            const data = habit.data()
+            const habitID = data.habitID
+
+            //Récupère l'historique des jours ou l'hab à été faite
+            if(data.doneDates) {
+                habitsHistory[habitID] = data.doneDates.map((stringDate: Date | string) => new Date(stringDate))
+            }
+
+            //Récupère les data de l'hab
+            return await getSpecificHabit(data.ownerMail, habitID)
+        }
+    ))
+
+    const habits = habitArray.filter(habit => habit !== null)
+    const habitsList: HabitList = habits.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit, isShared: true}}), {})
+
+    return {
+        habits: habitsList,
+        history: habitsHistory
+    }
+}
+
 const removeHabitInFirestore = async(habit: Habit, userID: string) => {
 
     const userDoc = doc(db, "Users", userID)
@@ -152,11 +199,44 @@ const addHabitDoneDate = async(userID: string, habitID: string, dateString: stri
     console.log("Habit done dates successfully updated in firestore !")
 }
 
+const getSpecificHabit = async(userID: string, habitID: string): Promise<Habit | null> => {
+    const userDoc = doc(db, "Users", userID)
+
+    const habitDoc = doc(collection(userDoc, "Habits"), habitID);
+    const habitSnap = await getDoc(habitDoc)
+
+    if(habitSnap.exists()) {    
+        const data = habitSnap.data() as FirestoreHabit
+        let steps: StepList = {}
+
+        const notPlaceholderSteps = data.steps.filter((step: FirestoreStep) => (step.numero !== -1))
+        steps = listKeyIDfromArray(notPlaceholderSteps, "stepID", habitID)
+ 
+        if(notPlaceholderSteps.length < data.steps.length || notPlaceholderSteps.length === 0){
+            steps[habitID] = createDefaultStepFromHabit(data, habitID)
+        }
+
+        const isAllDays = data.daysOfWeek.length === 0 && data.daysOfWeek.includes(7)
+        const daysOfWeek = isAllDays ? [0,1,2,3,4,5,6] : data.daysOfWeek
+
+        const startingDate = new Date(data.startingDate)
+        const frequency = stringToFrequencyType(data.frequency)
+
+        return  {...data, habitID, startingDate, steps, daysOfWeek, frequency, objectifID: data.objectifID ?? undefined};
+    }
+
+    else return null
+}
+
+
 export {
     addHabitToFireStore, 
     removeHabitInFirestore, 
     updateHabitInFirestore, 
     getAllOwnHabits,
+    getAllSharedHabits,
     updateCompletedHabit,
-    addHabitDoneDate
+    addHabitDoneDate,
+    getSpecificHabit,
+    addRefHabitToFirestore
 }

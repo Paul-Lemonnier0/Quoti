@@ -22,7 +22,8 @@ import { UserContextProvider } from "./data/UserContext";
 import { HabitsProvider } from "./data/HabitContext";
 import Navigation from "./navigation";
 import React from "react"
-import { ThemeProps } from "./components/Themed";
+import Toast from "react-native-toast-message";
+import { toastConfig } from "./components/Toasts/CustomBaseToast";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -61,11 +62,9 @@ export default function App() {
     }
 
     setIsLoading(false)
-
-
   });
 
-  useEffect(() => {
+  useEffect(() => {  
     if(userAuthState === AuthStates.JustConnected){
       setUserAuthState(AuthStates.Ready)
     }
@@ -145,6 +144,7 @@ export default function App() {
           </NavigationContainer>
         </SafeAreaProvider>
       </AppContextProvider>
+      <Toast config={toastConfig}/>
     </GestureHandlerRootView>
   );
 }

@@ -118,8 +118,6 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
             last7DaysLogs_temp.sort((date1, date2) => date1.valueOf() - date2.valueOf());
         }
 
-        console.log(history)
-
         setLast7DaysLogs(last7DaysLogs_temp.map(log => log.toISOString()))
 
     }, [HabitsHistory])

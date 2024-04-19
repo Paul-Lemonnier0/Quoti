@@ -20,7 +20,7 @@ const RequestFriendItem: FC<RequestFriendItemProps> = ({ friend }) => {
     const {user} = useContext(UserContext)
 
     const handleAcceptFriendRequest = async() => {
-        await acceptFriendInvitation(user?.email ?? "", friend.uid)
+        // await acceptFriendInvitation(user?.email ?? "", friend.uid)
     }
 
     return (

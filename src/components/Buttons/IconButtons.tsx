@@ -91,10 +91,11 @@ export const IconButton: FC<IconButtonProps> = ({onPress, name, provider, color,
 }
 
 export interface BorderIconButtonProps extends BasicIconButtonProps {
-    isTransparent?: boolean    
+    isTransparent?: boolean,
+    isRound?: boolean
 }
 
-export const BorderIconButton: FC<BorderIconButtonProps> = ({onPress, name, provider, color, size, isTransparent, disabled}) => {
+export const BorderIconButton: FC<BorderIconButtonProps> = ({onPress, name, provider, color, size, isTransparent, disabled, isRound}) => {
     const {theme} = useContext(AppContext)
 
     const secondary = useThemeColor(theme, "Secondary")
@@ -105,7 +106,7 @@ export const BorderIconButton: FC<BorderIconButtonProps> = ({onPress, name, prov
     const backgroundColor = isTransparent ? "transparent" : secondary
 
     return(
-        <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.iconButton, {backgroundColor, borderColor: colorIconBase}]}>
+        <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.iconButton, {backgroundColor, borderColor: colorIconBase, borderRadius: isRound ? 500 : 15}]}>
             <Icon name={name} provider={provider} size={size} color={colorIconBase}/>
         </TouchableOpacity>
     );
@@ -216,22 +217,13 @@ const styles = StyleSheet.create({
     },
 
     iconButton: {
-        borderRadius: getWidthResponsive(15),
+        borderRadius: 15,
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        padding: getWidthResponsive(15),
+        padding: 15,
         aspectRatio: 1,
         borderWidth: 2,
         borderColor: "transparent"
-    },
-
-    circleBorderButton: {
-        alignItems: "center",
-        justifyContent: "center",
-        borderRadius: getWidthResponsive(50),
-        display: "flex",
-        padding: getWidthResponsive(15),
-        borderWidth: 2,
-    },
+    }
 })

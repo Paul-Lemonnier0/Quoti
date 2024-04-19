@@ -207,7 +207,7 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
                 <CustomScrollView>
                     <View style={styles.body}>
                         <View style={styles.bodyHeader}>
-                            {user && <ProfilButton tall noBadge user={user} onPress={() => {}}/>}
+                            {user && <ProfilButton placeholderBorder tall noBadge user={user} onPress={() => {}}/>}
                             <View style={styles.titreEtDescriptionContainer}>
                                 <HugeText text={user?.displayName ?? "unknown"}/>
                                 <NormalGrayText text={user?.email ?? "unknown"} />

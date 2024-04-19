@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, FC, ReactNode } from "react";
-import { addHabitDoneDate, addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
+import { addHabitDoneDate, addHabitToFireStore, getAllOwnHabits, getAllSharedHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
@@ -92,25 +92,29 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
         console.log("Fetching habits...")
 
         const {habits, history} = await getAllOwnHabits(userID)
+        const sharedHabits = await getAllSharedHabits(userID)
         const today = new Date()
 
-        for (const [habitID, habit] of Object.entries(habits)) {
+        const all_habits = {...habits, ...sharedHabits.habits}
+        const all_history = {...history, ...sharedHabits.history}
+
+        for (const [habitID, habit] of Object.entries(all_habits)) {
           if(habit.currentStreak > 0) {
             if(habit.lastCompletionDate !== "none") {
               const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
   
               if(nextDateAfterLastCompletion.setHours(0,0,0,0) < today.setHours(0,0,0,0)) {
-                habits[habitID] = {...habit, currentStreak: 0}
+                all_habits[habitID] = {...habit, currentStreak: 0}
               }
             } 
           }
         }
 
-        setHabits(habits)
-        setHabitsHistory(history)
+        setHabits(all_habits)
+        setHabitsHistory(all_history)
 
         console.log("habits successfully fetched.")
-        return habits;
+        return all_habits;
     };
 
     const updateHabitStreaks = (habits: HabitList): HabitList => {
@@ -312,7 +316,6 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       let updatedHabit: Habit = {...oldHabit, ...newValues}
 
       let newSteps = Object.values(updatedHabit.steps)
-      console.log(newSteps)
 
       const deletedSteps = Object.values(updatedHabit.steps).filter((step) => !("deleted" in step))
 

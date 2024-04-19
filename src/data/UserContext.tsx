@@ -6,14 +6,21 @@ import { Image } from "react-native";
 import { useEffect } from "react";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getSendedFriendRequest, subscribeToFriendRequests, subscribeToFriends } from "../firebase/Firestore_User_Primitives";
+import { getSendedFriendRequest, subscribeToFriendRequests, subscribeToFriends, subscribeToHabitsRequests } from "../firebase/Firestore_User_Primitives";
 import * as FileSystem from 'expo-file-system';
 import { getProfilePictureLocalPath, saveProfilePictureLocally } from "../primitives/UserPrimitives";
 import { newUserValuesProps } from "../screens/ProfilScreens/ProfilSettingsScreens/ProfilDataSettingsScreen";
 import { Database_GetSpecificUser } from "../firebase/Database_User_Primitives";
 
+export interface UserEventRequest {
+    ownerMail: string;
+    ownerID: string;
+    habitID: string;
+}
+
 export interface UserFullType extends User {
     friendRequests?: string[],
+    habitRequests?: UserEventRequest[],
     friends?: string[],
     firstName: string,
     lastName: string,
@@ -33,7 +40,8 @@ export interface UserContextType {
     handleSetUser: (newValues: newUserValuesProps) => Promise<void>,
     addUserFriendRequest: (userID: string) => void,
     removeUserFriendRequest: (userID: string) => void,
-    sendedFriendRequests: string[]
+    sendedFriendRequests: string[],
+    hasNotification: () => boolean
 }
 
 const UserContext = createContext<UserContextType>({
@@ -42,7 +50,8 @@ const UserContext = createContext<UserContextType>({
     handleSetUser: async() => {},
     addUserFriendRequest: () => {},
     removeUserFriendRequest: () => {},
-    sendedFriendRequests: []
+    sendedFriendRequests: [],
+    hasNotification: () => false
 })
 
 export interface UserContextProviderProps {
@@ -60,6 +69,11 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
     
     const [isLoading, setIsLoading] = useState(false)
 
+    const hasNotification = () => {
+        return ((user && user.friendRequests && user.friendRequests.length > 0) || 
+            (user && user.habitRequests && user.habitRequests.length > 0)) as boolean
+    }
+
     const setUserFriendRequest = (friendRequests: Array<any>) => {
         setUser((prevUser) => {
             if(prevUser){
@@ -72,7 +86,7 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
             return null
         })
     }
-
+    
     const setSendedUserFriendRequest = async(userMail: string) => {
         setSendedFriendRequests(await getSendedFriendRequest(userMail))
     }
@@ -85,6 +99,18 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
         setSendedFriendRequests(prevRequests => prevRequests.filter(id => id !== userID))
     }
 
+    const setUserHabitsRequests = (habitsRequests: Array<any>) => {
+        setUser((prevUser) => {
+            if(prevUser){
+                return {
+                    ...prevUser,
+                    habitRequests: [...habitsRequests]
+                }
+            }
+
+            return null
+        })
+    }
 
     const setUserFriends = (friends: Array<string>) => {
         setUser((prevUser: UserType) => {
@@ -147,6 +173,7 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
             setSendedUserFriendRequest(user.email)
             subscribeToFriendRequests(user.email, setUserFriendRequest)
             subscribeToFriends(user.email, setUserFriends)
+            subscribeToHabitsRequests(user.email, setUserHabitsRequests)
             handleGetUserInfo()
         }
 
@@ -155,7 +182,8 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
     return(
         <UserContext.Provider value={{
             user, setUser, handleSetUser, 
-            addUserFriendRequest, removeUserFriendRequest, sendedFriendRequests
+            addUserFriendRequest, removeUserFriendRequest, sendedFriendRequests,
+            hasNotification
         }}>
             {children}
         </UserContext.Provider>

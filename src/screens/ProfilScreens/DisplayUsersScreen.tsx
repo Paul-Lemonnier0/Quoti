@@ -6,20 +6,17 @@ import ProfilItem from '../../components/Profil/ProfilItem';
 import { CustomTextInputRefType, SearchBarCustom } from '../../components/TextFields/TextInput'
 import { HomeStackParamsList } from '../../navigation/BottomTabNavigator';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { auth } from '../../firebase/InitialisationFirebase';
-import { User } from 'firebase/auth';
-import { UserFirestoreType } from '../../types/FirestoreTypes/UserTypes';
 import React from "react"
 import { NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons';
 import { TextButton } from '../../components/Buttons/UsualButton';
-import { Database_getUsersInfo } from '../../firebase/Database_User_Primitives';
+import { Database_getUsersInfo, UserDataBase } from '../../firebase/Database_User_Primitives';
 
 type DisplayUsersScreenProps = NativeStackScreenProps<HomeStackParamsList, "DisplayUsersScreen">
 
 const DisplayUsersScreen: FC<DisplayUsersScreenProps> = ({route, navigation}) => {
     const {userIDs} = route.params
 
-    const [usersToDisplay, setUsersToDisplay] = useState<(UserFirestoreType | null)[]>([])
+    const [usersToDisplay, setUsersToDisplay] = useState<(UserDataBase | null)[]>([])
     const [searchValue, setSearchValue] = useState<string>("")
 
     const searchValueRef = useRef<CustomTextInputRefType>(null)

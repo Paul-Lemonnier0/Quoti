@@ -137,7 +137,7 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
                 <CustomScrollView>
                     <View style={styles.body}>
                         <View style={styles.bodyHeader}>
-                            {user && <ProfilButton tall modificationBadge user={{...user, photoURL: profilPicture}} onPress={handleEditProfilPicture}/>}
+                            {user && <ProfilButton placeholderBorder tall modificationBadge user={{...user, photoURL: profilPicture}} onPress={handleEditProfilPicture}/>}
                             <View style={styles.titreEtDescriptionContainer}>
                                 <HugeText text={user?.displayName ?? "unknown"}/>
                                 <NormalGrayText text={user?.email ?? "unknown"} />

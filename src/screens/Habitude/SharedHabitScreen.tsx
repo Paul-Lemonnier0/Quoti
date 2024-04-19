@@ -1,33 +1,249 @@
 import { useRoute } from "@react-navigation/native"
-import { FC, useContext } from "react";
+import { FC, useContext, useEffect, useState } from "react";
 import { HabitsContext } from "../../data/HabitContext";
-import { HugeText } from "../../styles/StyledText";
-import { UsualScreen } from "../../components/View/Views";
+import { HugeText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText";
+import { CustomScrollView, UsualScreen } from "../../components/View/Views";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
 import React from "react"
+import { StyleSheet, View } from "react-native";
+import { BorderIconButton, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
+import ProfilButton from "../../components/Profil/ProfilButton";
+import { AppContext } from "../../data/AppContext";
+import { useThemeColor } from "../../components/Themed";
+import Separator from "../../components/Other/Separator";
+import HabitIcons from "../../data/HabitIcons";
+import ProgressBar from "../../components/Progress/ProgressBar";
+import { FrequencyDetails } from "../../components/Habitudes/FrequencyDetails";
+import StepsList from "../../components/Habitudes/Step/StepsList";
+import { Image } from "react-native";
+import { Step } from "../../types/HabitTypes";
+import BottomMenuStyle from "../../styles/StyledBottomMenu";
+import { BackgroundTextButton, BorderTextButton, TextButton } from "../../components/Buttons/UsualButton";
+import Quoti from "../../components/Other/Quoti";
+import { acceptHabitInvitation, refuseHabitInvitation } from "../../firebase/Firestore_User_Primitives";
+import { auth } from "../../firebase/InitialisationFirebase";
+import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
+import Toast from "react-native-toast-message";
+import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 
 type SharedHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "SharedHabitScreen">
 
-const SharedHabitScreen: FC<SharedHabitScreenProps> = ({route}) => {
-    const {habitID, userID} = route.params;
+const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
+    const {habit, user} = route.params;
     const {Habits} = useContext(HabitsContext)
-    
-    if(!Habits.hasOwnProperty(habitID)){
-        return(
-            <UsualScreen>
-                <HugeText text={"Habitude indisponible... id : " + habitID}/>
-            </UsualScreen>
-        )
+
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
+
+    const imageSize = 35
+
+    const steps = Object.values(habit.steps)
+
+    useEffect(() => {
+        navigation.getParent()?.setOptions({
+          tabBarStyle: {
+            display: "none"
+          }
+        });
+        return () => navigation.getParent()?.setOptions({
+          tabBarStyle: BottomMenuStyle().bottomMenuStyle
+        });
+      }, [navigation]);
+
+    const handleAcceptHabitInvitation = () => {
+        if(auth.currentUser && auth.currentUser.email) {
+            acceptHabitInvitation(user.uid, user.email, auth.currentUser.email, convertBackSeriazableHabit(habit))
+        }
+
+        Toast.show({
+            type: "info",
+            text1: "Invitation acceptée !",
+            position: "top",
+            visibilityTime: 3000,
+            swipeable: true
+        })
+
+        BottomScreenOpen_Impact()
+        navigation.goBack()
+    }
+
+    const handleRefuseHabitInvitation = () => {
+        if(auth.currentUser && auth.currentUser.email) {
+            refuseHabitInvitation(user.uid, user.email, auth.currentUser.email, habit.habitID)
+        }
+
+        Toast.show({
+            type: "info",
+            text1: "Invitation refusée !",
+            position: "top",
+            visibilityTime: 3000,
+            swipeable: true
+        })
+
+        BottomScreenOpen_Impact()
+        navigation.goBack()
     }
 
     return(
-        <UsualScreen>
-            <HugeText text={"Shared !"}/>
-            <HugeText text={"habitID : " + habitID}/>
-            <HugeText text={"UserID : " + userID}/>
+        <UsualScreen hideMenu>
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
+                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <Quoti/>
+                        <IconButton noPadding name="settings" provider={IconProvider.Feather} onPress={() => {}}/>
+                    </View>
+
+                    <HugeText text="Invitation"/>
+
+                </View>
+
+                <CustomScrollView>     
+                    <View style={styles.body}>
+                        <View style={{gap: 15, justifyContent: "center", alignItems: "center"}}>
+                            <ProfilButton
+                                huge
+                                user={user}
+                                disabled
+                                noBadge
+                                isSelected
+                                onPress={() => {}}
+                            />
+                            <View style={styles.titreEtDescriptionContainer}>
+                                <TitleText text={user.displayName}/>
+                                <SubTitleText bold style={{color: fontGray}}
+                                    text={"Te propose une nouvelle habitude"}/>
+                            </View>
+
+                            <View style={{flexDirection: "row", gap: 10}}>
+                                <BorderIconButton name="check" provider={IconProvider.Feather} onPress={handleAcceptHabitInvitation}/>
+                                <BorderIconButton name="x" provider={IconProvider.Feather} onPress={handleRefuseHabitInvitation}/>
+                            </View>
+                        </View>
+
+                        <View style={{marginBottom: -30}}>
+                            <Separator/>
+                        </View>
+                        
+                        <View style={styles.habitBody}>            
+                            <View style={styles.bodyHeader}>
+                                <View style={[styles.displayRow, {gap: 20}]}>
+                                    <View style={{borderRadius: 20, borderColor: habit.color, borderWidth: 2, padding: 15}}>
+                                        <Image source={HabitIcons[habit.icon]} style={{height: imageSize, aspectRatio: 1}}/>
+                                    </View>
+
+                                    <View style={styles.habitTitreEtDescriptionContainer}>
+                                        <HugeText text={habit.titre}/>
+                                        <NormalGrayText bold text={habit.description}/>
+                                    </View>
+                                </View>
+                            </View>
+
+                            <View style={styles.bodyCore}>
+                                
+                                <View style={styles.groupContainer}>
+                                    <TitleText text="Etapes"/>
+
+                                    <View style={styles.displayColumn}>
+                                        <StepsList softDisabled steps={steps} color={habit.color}/>
+                                    </View>
+                                </View>
+
+                                <Separator/>
+
+                                <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+                                    <TitleText text={"Fréquence"}/>
+                                    <FrequencyDetails frequency={habit.frequency} reccurence={habit.reccurence} occurence={habit.occurence}/>
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                </CustomScrollView>
+
+            </View>
         </UsualScreen>
     )
 }
+
+const styles = StyleSheet.create({  
+    container: {
+      display: "flex", 
+      flexDirection: "column", 
+      gap: 30, 
+      flex: 1, 
+      marginBottom: 30    
+    },
+
+    header: {
+      display: "flex", 
+      flexDirection: "column", 
+      gap: 30,
+      marginBottom: 5
+    },
+
+    subHeader: {
+      display: "flex", 
+      flexDirection: "row", 
+      alignItems:"center", 
+      justifyContent: "space-between"
+    },
+
+    body: {
+        flex: 1, 
+        gap: 30,
+    },
+
+    habitBody: {
+        flex: 1,
+        gap: 30,
+        paddingTop: 30
+    },
+    
+    titreEtDescriptionContainer:{
+        display: "flex", 
+        flexDirection: "column", 
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 5
+    },
+
+    habitTitreEtDescriptionContainer: {
+        display: "flex", 
+        flex: 1,
+        flexDirection: "column", 
+        justifyContent: "center",
+    },
+    
+    displayColumn: {
+        display: "flex",
+        flexDirection: "column",
+    },
+
+    displayRow: {
+        display: "flex", 
+        flexDirection: "row",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+
+    bodyHeader: {
+        gap: 15,
+        display: "flex",
+        flexDirection: "column"
+    }, 
+
+    bodyCore: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 30
+    },
+
+    groupContainer: {
+        display: "flex", 
+        flexDirection: "column", 
+        gap: 30
+    },
+});
 
 export default SharedHabitScreen

@@ -4,39 +4,58 @@ import { SubText, SubTitleText } from "../../styles/StyledText"
 import { StyleSheet } from "react-native"
 import { TouchableOpacity } from "react-native"
 import { User } from "firebase/auth"
-import { FC } from "react"
+import { FC, useContext } from "react"
 import React from "react"
 import { PlaceholderProfilPicture } from "./ProfilButton"
-import { IconButton, IconProvider } from "../Buttons/IconButtons"
+import { Icon, IconButton, IconProvider } from "../Buttons/IconButtons"
 import { UserType } from "../../data/UserContext"
+import { AppContext } from "../../data/AppContext"
+import { useThemeColor } from "../Themed"
+import { UserDataBase } from "../../firebase/Database_User_Primitives"
 
 export interface ProfilItemProps {
-    user: UserType,
-    onPress: () => void,
-    handleAcceptFriend?: () => void,
-    handleRefuseFriend?: () => void,
-    isPrimary?: boolean
+    user: UserType | UserDataBase,
+    onPress?: () => void,
+    handleAccept?: () => void,
+    handleRefuse?: () => void,
+    isPrimary?: boolean,
+    isSelected?: boolean,
+    expand?: boolean
 }
 
-const ProfilItem: FC<ProfilItemProps> = ({ user, onPress, isPrimary, handleAcceptFriend, handleRefuseFriend }) => {
+const ProfilItem: FC<ProfilItemProps> = ({ 
+    user,
+    onPress, 
+    isPrimary, 
+    handleAccept, 
+    handleRefuse,
+    isSelected,
+    expand,
+}) => {
+
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
+    const contrast = useThemeColor(theme, "Contrast")
 
     const handleNavigationToDetailsScreen = () => {
         //navigation.navigate("UserDetailsScreen", {detailledUser: user})
-        onPress()
+        onPress ? onPress() : undefined
     }
 
     if(!user) return null
 
     return (
-        <TouchableOpacity onPress={handleNavigationToDetailsScreen} style={styles.container}>
+        <TouchableOpacity disabled={!onPress} onPress={handleNavigationToDetailsScreen} style={styles.container}>
             <View style={styles.subContainer}>
-                {
+                {  
                     user.photoURL ?
-                        <Image placeholder={"disk"} source={{ uri: user?.photoURL ?? undefined }} style={styles.image} />
-                        :
-                        <PlaceholderProfilPicture isPrimary={isPrimary} name={user.displayName ?? ""}/>
+                         <Image placeholder={"disk"} source={{ uri: user.photoURL}} 
+                             style={[styles.image, {borderColor: isSelected ? "transparent" : "transparent"}]} />
+                         : 
+                        
+                        <PlaceholderProfilPicture borderColor={contrast} isSelected={isSelected} isPrimary={isPrimary} name={user.displayName ?? ""}/>
+                
                 }
-
                 <View style={styles.detailsContainer}>
                     <SubTitleText text={user.displayName} />
                     {
@@ -48,10 +67,17 @@ const ProfilItem: FC<ProfilItemProps> = ({ user, onPress, isPrimary, handleAccep
             </View>
 
             {
-                handleAcceptFriend && handleRefuseFriend &&
+                expand &&
                 <View style={styles.iconContainer}>
-                    <IconButton onPress={handleAcceptFriend} name="check" provider={IconProvider.Feather}/>
-                    <IconButton onPress={handleRefuseFriend} name="x" provider={IconProvider.Feather}/>
+                    <Icon name="chevron-right" color={fontGray} provider={IconProvider.Feather}/>
+                </View>
+            }
+            
+            {
+                handleAccept && handleRefuse &&
+                <View style={styles.iconContainer}>
+                    <IconButton onPress={handleAccept} name="check" provider={IconProvider.Feather}/>
+                    <IconButton onPress={handleRefuse} name="x" provider={IconProvider.Feather}/>
                 </View>
             }
         </TouchableOpacity>
@@ -83,7 +109,8 @@ const styles = StyleSheet.create({
     image: {
         width: 60,
         height: 60,
-        borderRadius: 100
+        borderRadius: 100,
+        borderWidth: 2
     },
 
     detailsContainer: {

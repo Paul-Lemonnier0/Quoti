@@ -1,8 +1,10 @@
 import { arrayRemove, arrayUnion, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { Unsubscribe } from "firebase/auth"
-import { UserType } from "../data/UserContext"
+import { UserEventRequest, UserType } from "../data/UserContext"
 import { UserDataBase } from "./Database_User_Primitives"
+import { Habit } from "../types/HabitTypes"
+import { addRefHabitToFirestore } from "./Firestore_Habits_Primitives"
 
 export const sendFriendInvitation = async(senderID: string, senderMail: string, receiverID: string, receiverMail: string) => {
     try{
@@ -179,6 +181,34 @@ export const getSendedFriendRequest = async(userMail: string): Promise<string[]>
     return []
 }
 
+export const subscribeToHabitsRequests = (userID: string, callback: (habitsRequests: Array<any>) => void): Unsubscribe => {
+    const requestRef = doc(db, "Users", userID, "Friends", "HabitsInvitations")
+
+    const unsubscribe = onSnapshot(requestRef, (snapshot) => {
+        if(snapshot.exists()){
+            const habits = snapshot.data().habits || []
+            callback(habits)
+        }
+
+        else callback([])
+    })
+
+    return unsubscribe
+}
+
+export const getHabitInvitationRequest = async(userMail: string): Promise<string[]> => {
+    const habitSendedRequestRef = doc(db, "Users", userMail, "Friends", "HabitsInvitations")
+    const habitSendedRequestsDoc = await getDoc(habitSendedRequestRef)
+
+    if(habitSendedRequestsDoc.exists()) {
+        if("habits" in habitSendedRequestsDoc.data()) {
+            return habitSendedRequestsDoc.data().habits
+        }
+    }
+
+    return []
+}
+
 export const setBaseDetailsUser = async(userMail: string, birthDate: Date, isPrivate: boolean) => {
     const userRef = doc(db, 'Users', userMail)
     const userDoc = await getDoc(userRef)
@@ -218,3 +248,72 @@ export const getVisitInfoUserFromUserDB = async(userDB: UserDataBase): Promise<V
 
     return user
 }   
+
+export const sendHabitInvitation = async(senderID: string, senderMail: string, receiverMail: string, habitID: string) => {
+    try{
+        console.log("Sending friend invitation...")
+
+        const requestRef = doc(db, "Users", receiverMail, "Friends", "HabitsInvitations")
+        const data: UserEventRequest = {ownerMail: senderMail, ownerID: senderID, habitID: habitID}
+
+        const requestsDoc = await getDoc(requestRef)
+
+        if(requestsDoc.exists()){
+            await updateDoc(requestRef, {habits: arrayUnion(data)})
+        }
+
+        else{
+            await setDoc(requestRef, {habits: [data]})
+        }
+
+        console.log("Habit invitation well sended !")
+    }
+
+    catch(e){
+        console.log("Error while sending friend invitation : ", e)
+    }
+}
+
+
+export const acceptHabitInvitation = async(senderID: string, senderMail: string, userMail: string, habit: Habit) => {
+    try{
+        console.log("Accepting habit invitation...")
+
+        const data: UserEventRequest = {ownerMail: senderMail, ownerID: senderID, habitID: habit.habitID}
+
+        //Retirer la demande
+
+        const requestRef = doc(db, "Users", userMail, "Friends", "HabitsInvitations")
+        await updateDoc(requestRef, {habits: arrayRemove(data)})
+
+        //Ajouter dans les habits (en tant que ref)
+
+        await addRefHabitToFirestore(data, userMail)
+
+        console.log("Habit invitation well accepted !")
+    }
+
+    catch(e){
+        console.log("Error while refusing friend invitation : ", e)
+    }
+}
+
+export const refuseHabitInvitation = async(senderID: string, senderMail: string, userMail: string, habitID: string) => {
+    try{
+        console.log("Refusing habit invitation...")
+
+        const data: UserEventRequest = {ownerMail: senderMail, ownerID: senderID, habitID: habitID}
+
+        console.log("data : ", data)
+
+        const requestRef = doc(db, "Users", userMail, "Friends", "HabitsInvitations")
+
+        await updateDoc(requestRef, {habits: arrayRemove(data)})
+
+        console.log("Habit invitation well refused !")
+    }
+
+    catch(e){
+        console.log("Error while refusing friend invitation : ", e)
+    }
+}

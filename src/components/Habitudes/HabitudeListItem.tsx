@@ -18,6 +18,10 @@ import SettingNewObjectifHabitBottomScreen from "../../screens/BottomScreens/Hab
 import HabitStepDetailsBottomScreen from "../../screens/BottomScreens/Habitudes/HabitStepDetailsBottomScreen";
 import { AppContext } from "../../data/AppContext";
 import { HabitsContext } from "../../data/HabitContext";
+import Separator from "../Other/Separator";
+import ProfilButton from "../Profil/ProfilButton";
+import { auth } from "../../firebase/InitialisationFirebase";
+import ProfilList from "../Profil/ProfilList";
 
 export interface HabitudeListItemProps {
     habitude: Habit,
@@ -89,7 +93,9 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({
                 style={[
                     stylesCard.card, 
                     styles.container,
-                    {transform: [{scale}]}
+                    {
+                        transform: [{scale}]
+                    }
                 ]}>
 
                 <View style={styles.habit}>
@@ -107,7 +113,15 @@ export const HabitudeListItem: FC<HabitudeListItemProps> =  ({
 
                 <StepIndicator height={3} inactiveColor={primary} color={color}
                     currentStep={habitDoneSteps} totalSteps={totalSteps}/>
+
+                {
+                    habit.isShared && auth.currentUser &&
+                    <>
+                    <ProfilList users={[auth.currentUser, auth.currentUser,  auth.currentUser,  auth.currentUser,  auth.currentUser]}/>
+                    </>
+                }
             </Animated.View>
+
         </TouchableOpacity>
 
         <SettingHabitBottomScreen 

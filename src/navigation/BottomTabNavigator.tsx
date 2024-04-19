@@ -32,7 +32,6 @@ import React, { useContext } from 'react';
 import { AntDesignName, FeatherIconName } from '../components/Buttons/IconButtons';
 import { FrequencyTypes, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
 import { User } from 'firebase/auth';
-import { UserFirestoreType } from '../types/FirestoreTypes/UserTypes';
 import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from '../types/FormHabitTypes';
 import { FormBasicObjectif, FormColoredObjectif, FormDetailledObjectif } from '../types/FormObjectifTypes';
 import { AppContext } from '../data/AppContext';
@@ -145,8 +144,8 @@ export type HomeStackParamsList = {
     currentDateString: string,
   },
   SharedHabitScreen: {
-    habitID: string,
-    userID: string
+    habit: SeriazableHabit,
+    user: UserDataBase
   },
   ObjectifDetailsScreen: {
     seriazableObjectif: SeriazableObjectif,

@@ -29,7 +29,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
   //IMPORTS
 
   const { changeDate, filteredHabitsByDate, isFetched } = useContext(HabitsContext);
-  const {user} = useContext(UserContext)
+  const {user, hasNotification} = useContext(UserContext)
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -123,8 +123,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
       navigation.navigate("ProfilDetailsScreen")
   }
 
-  const hasNotifications = user && user.friendRequests && user.friendRequests.length > 0
-  console.log(user?.friendRequests)
+  const hasNotifications = hasNotification()
 
   return (
       <UsualScreen>
@@ -137,7 +136,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                {user && <ProfilButton user={user} noBadge={!hasNotifications} onPress={handleNavigationToDetailsScreen}/>}
+                {user && <ProfilButton placeholderBorder user={user} noBadge={!hasNotifications} onPress={handleNavigationToDetailsScreen}/>}
             </View>
 
             <Periodes 

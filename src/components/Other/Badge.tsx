@@ -21,8 +21,8 @@ const Badge: FC<BadgeProps> = ({huge, fillColor, bgColor, modificationBadge}) =>
         {
             backgroundBadgeStyle: {
                 position: "absolute", 
-                marginTop: -1.5, 
-                marginRight: -1.5,
+                marginTop: 0, 
+                marginRight: 0,
                 height: (huge || modificationBadge) ? 24 : 15, 
                 aspectRatio: 1,
                 right: 0, 
@@ -35,7 +35,7 @@ const Badge: FC<BadgeProps> = ({huge, fillColor, bgColor, modificationBadge}) =>
             },
 
             badgeStyle: {
-                height: (huge || modificationBadge) ? 17 : 10, 
+                height: (huge || modificationBadge) ? 18 : 10, 
                 aspectRatio: 1,
                 borderRadius: 20,
                 justifyContent: "center",

@@ -12,6 +12,7 @@ import { AppContext } from "../../data/AppContext"
 import FastImage from 'react-native-fast-image';
 import {Image} from "expo-image"
 import { VisitInfoUser } from "../../firebase/Firestore_User_Primitives"
+
 export interface ProfilButtonProps {
     user: User | VisitInfoUser,
     onPress: () => void,
@@ -20,51 +21,91 @@ export interface ProfilButtonProps {
     tall?: boolean,
     huge?: boolean,
     hugeBadge?: boolean,
-    disabled?: boolean
+    disabled?: boolean,
+    isSelected?: boolean,
+    isPrimary?: boolean,
+    small?: boolean,
+    borderColor?: string,
+    placeholderBorder?: boolean,
+    borderWidth?: number
 }
 
 interface PlaceholderProfilPictureProps {
     name: string,
     tall?: boolean,
     huge?: boolean,
-    isPrimary?: boolean
+    isPrimary?: boolean,
+    isSelected?: boolean,
+    small?: boolean,
+    borderColor?: string,
+    borderWidth?: number
 }
 
-export const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({name, isPrimary, tall, huge}) => {
+export const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({
+    name, 
+    isPrimary, 
+    small, 
+    tall, 
+    huge, 
+    isSelected,
+    borderColor,
+    borderWidth
+}) => {
     const {theme} = useContext(AppContext)
 
     const secondary = useThemeColor(theme, "Secondary")
     const primary = useThemeColor(theme, "Primary")
-    
+    const contrast = useThemeColor(theme, "Contrast")
+    const font = useThemeColor(theme, "Font")
+
     return(
         <View style={{
             backgroundColor: isPrimary ? primary : secondary,
             justifyContent: "center",
             alignItems: "center",
             borderRadius: 200,
-            width: huge ? 100 : tall ? 70 : 60,
-            aspectRatio: 1
+            width: huge ? 100 : (tall ? 70 : (small ? 45  : 60)),
+            aspectRatio: 1,
+            borderColor: isSelected ? contrast : (borderColor ?? "transparent"),
+            borderWidth: borderWidth ?? 2,
+            
         }}>
             {
                 huge ?
-                <TitleText text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white", fontSize: 28}}/> :
+                <TitleText text={name.substring(0,2).toLocaleUpperCase()} style={{color: font, fontSize: 28}}/> :
                 tall ? 
-                <SubTitleText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white"}}/> :
-                <NormalText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: "white"}}/>
+                <SubTitleText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: font}}/> :
+                <NormalText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: font}}/>
             }
         </View>
     )
 }
 
-const ProfilButton: FC<ProfilButtonProps> = ({ user, onPress, noBadge, tall, huge, hugeBadge, disabled, modificationBadge }) => {
-    const blurhash =
-  '|rF?hV%2WCj[ayj[a|j[az_NaeWBj@ayfRayfQfQM{M|azj[azf6fQfQfQIpWXofj[ayj[j[fQayWCoeoeaya}j[ayfQa{oLj?j[WVj[ayayj[fQoff7azayj[ayj[j[ayofayayayj[fQj[ayayj[ayfjj[j[ayjuayj[';
+const ProfilButton: FC<ProfilButtonProps> = ({ 
+    user, 
+    onPress, 
+    noBadge, 
+    tall, 
+    huge, 
+    hugeBadge, 
+    disabled, 
+    modificationBadge,
+    isSelected,
+    isPrimary,
+    small,
+    borderColor,
+    borderWidth,
+    placeholderBorder
+}) => {
 
-    
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
     const primary = useThemeColor(theme, "Primary")
+    const contrast = useThemeColor(theme, "Contrast")
+
+    const width = huge ? 100 : (tall ? 70 : (small ? 45 : 60))
+    const bdColor = isSelected ? contrast : (borderColor ?? "transparent")
 
     return (
         <View>
@@ -73,14 +114,20 @@ const ProfilButton: FC<ProfilButtonProps> = ({ user, onPress, noBadge, tall, hug
                 {
                     user && user.photoURL ?
                     <Image
-                        cachePolicy={"memory-disk"} 
-                        style={[styles.image, {width: huge ? 100 : tall ? 70 : 55}]}
+                        cachePolicy={"disk"} 
+                        style={[styles.image, {
+                            width, 
+                            borderWidth: borderWidth ?? 2,
+                            borderColor: bdColor
+                        }]}
+
                         source={{ 
                             uri: user.photoURL ?? undefined,
                         }}
                     />
                     :
-                    <PlaceholderProfilPicture name={user.displayName ?? "A"} tall={tall} huge={huge}/>
+                    <PlaceholderProfilPicture borderColor={placeholderBorder ? (borderColor ?? contrast) : "transparent"}
+                        isPrimary={isPrimary} isSelected={isSelected} name={user.displayName ?? "A"} tall={tall} huge={huge}/>
                 }
             </TouchableOpacity>
             {!noBadge && (modificationBadge ? <Badge huge={hugeBadge} modificationBadge fillColor={font} bgColor={primary}/> : <Badge huge={hugeBadge} fillColor={font} bgColor={primary}/>) }
@@ -98,7 +145,8 @@ const styles = StyleSheet.create({
     image: {
         width: 60,
         aspectRatio: 1,
-        borderRadius: 100
+        borderRadius: 100,
+        borderWidth: 3
     },
 
     detailsContainer: {

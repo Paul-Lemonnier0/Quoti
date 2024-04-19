@@ -48,6 +48,7 @@ interface BaseHabit extends ItemType, StreakValues {
     notificationEnabled?: boolean,
     objectifID: string | undefined
     steps: StepList,
+    isShared?: boolean
 }
 
 interface Habit extends BaseHabit {

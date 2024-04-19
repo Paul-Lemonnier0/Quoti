@@ -20,6 +20,7 @@ export interface StepsListProps {
     color: string,
     disabled?: boolean,
     editable?: boolean,
+    softDisabled?: boolean
 }
 
 interface RenderStepProps extends StepsListProps {
@@ -37,7 +38,8 @@ const RenderStep: FC<RenderStepProps> = ({
     isNotFormStep, 
     color,
     setSteps,
-    drag
+    drag,
+    softDisabled
 }) => {
 
     const index = steps.indexOf(step as Step)
@@ -121,7 +123,7 @@ const RenderStep: FC<RenderStepProps> = ({
                         index={index} 
                         isNextToBeChecked={isNextToBeChecked} 
                         isEditable={editable}
-                        areAllStepsChecked={areAllStepsChecked} 
+                        areAllStepsChecked={areAllStepsChecked || softDisabled} 
                         onDelete={handleRemoveStep}
                         onPress={checkStep}
                     />

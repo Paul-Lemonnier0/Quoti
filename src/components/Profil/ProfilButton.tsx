@@ -67,10 +67,12 @@ export const PlaceholderProfilPicture: FC<PlaceholderProfilPictureProps> = ({
             width: huge ? 100 : (tall ? 70 : (small ? 45  : 60)),
             aspectRatio: 1,
             borderColor: isSelected ? contrast : (borderColor ?? "transparent"),
-            borderWidth: borderWidth ?? 2,
+            borderWidth: borderWidth ?? 3,
             
         }}>
             {
+                small ?
+                <LittleNormalText bold text={name.substring(0,2).toLocaleUpperCase()} style={{color: font}}/> :
                 huge ?
                 <TitleText text={name.substring(0,2).toLocaleUpperCase()} style={{color: font, fontSize: 28}}/> :
                 tall ? 
@@ -104,30 +106,24 @@ const ProfilButton: FC<ProfilButtonProps> = ({
     const primary = useThemeColor(theme, "Primary")
     const contrast = useThemeColor(theme, "Contrast")
 
-    const width = huge ? 100 : (tall ? 70 : (small ? 45 : 60))
+    const width = huge ? 100 : (tall ? 70 : (small ? 45  : 60))
     const bdColor = isSelected ? contrast : (borderColor ?? "transparent")
 
     return (
-        <View>
+        <View style={{flexDirection: "row", alignItems: "center"}}>
             <TouchableOpacity onPress={onPress} disabled={disabled}
-            style={styles.container}>
+            style={[styles.container, {
+                borderRadius: 500, 
+                backgroundColor: bdColor, 
+                borderWidth: borderWidth ?? 2,
+                borderColor: isSelected ? contrast : (borderColor ?? "transparent")
+            }]}>
                 {
                     user && user.photoURL ?
-                    <Image
-                        cachePolicy={"disk"} 
-                        style={[styles.image, {
-                            width, 
-                            borderWidth: borderWidth ?? 2,
-                            borderColor: bdColor
-                        }]}
-
-                        source={{ 
-                            uri: user.photoURL ?? undefined,
-                        }}
-                    />
+                    <Image cachePolicy={"disk"} style={[styles.image, {width}]} source={{ uri: user.photoURL ?? undefined }}/>
                     :
-                    <PlaceholderProfilPicture borderColor={placeholderBorder ? (borderColor ?? contrast) : "transparent"}
-                        isPrimary={isPrimary} isSelected={isSelected} name={user.displayName ?? "A"} tall={tall} huge={huge}/>
+                    <PlaceholderProfilPicture isSelected={isSelected} name={user.displayName ?? "A"} 
+                        isPrimary={isPrimary} small={small} tall={tall} huge={huge}/>
                 }
             </TouchableOpacity>
             {!noBadge && (modificationBadge ? <Badge huge={hugeBadge} modificationBadge fillColor={font} bgColor={primary}/> : <Badge huge={hugeBadge} fillColor={font} bgColor={primary}/>) }
@@ -143,10 +139,8 @@ const styles = StyleSheet.create({
     },
 
     image: {
-        width: 60,
         aspectRatio: 1,
         borderRadius: 100,
-        borderWidth: 3
     },
 
     detailsContainer: {

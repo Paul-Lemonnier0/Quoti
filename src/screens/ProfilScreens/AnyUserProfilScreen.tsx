@@ -7,7 +7,7 @@ import { Database_getUsersInfo, UserDataBase } from "../../firebase/Database_Use
 import React from "react"
 import { AppContext } from "../../data/AppContext"
 import ProfilDetailsForm from "../../components/Profil/ProfilDetailsForm"
-import { cancelFriendInvitation, getVisitInfoUserFromUserDB, sendFriendInvitation, VisitInfoUser } from "../../firebase/Firestore_User_Primitives"
+import { cancelFriendInvitation, sendFriendInvitation, VisitInfoUser } from "../../firebase/Firestore_User_Primitives"
 import { BottomScreenOpen_Impact } from "../../constants/Impacts"
 import { HomeStackParamsList, NewsScreenStackType } from "../../navigation/BottomTabNavigator"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
@@ -79,9 +79,8 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({route}) => {
     useEffect(() => {
         const setupUserInfo = async() => {
             setIsUserInfoLoading(true)
-            const infos = await getVisitInfoUserFromUserDB(detailledUser)
             setIsUserInfoLoading(false)
-            setVisitUserInfo(infos)
+            setVisitUserInfo(detailledUser)
         }
 
         setupUserInfo()

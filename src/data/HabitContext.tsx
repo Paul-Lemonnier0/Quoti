@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext, FC, ReactNode } from "react";
-import { addHabitDoneDate, addHabitToFireStore, getAllOwnHabits, getAllSharedHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
+import { addHabitDoneDate, addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
@@ -11,7 +11,8 @@ import { FormDetailledObjectif } from "../types/FormObjectifTypes";
 import { DefaultHabit } from "../types/DefaultHabit";
 import { removeObjectifFromFilteredHabits, removeObjectifFromObjectifs } from "../primitives/ObjectifMethods";
 import { auth } from "../firebase/InitialisationFirebase";
-import { calculateNextScheduledDate } from "../primitives/HabitudesReccurence";
+import { calculateNextScheduledDate, isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
+import { toISOStringWithoutTimeZone } from "../primitives/BasicsMethods";
 
 export interface HabitContextType {
   Habits: HabitList,
@@ -30,7 +31,8 @@ export interface HabitContextType {
   getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => Habit | undefined,
   removeObjectif: (objectifID: string, deletePinnedHabit?: boolean) => Promise<void>,
   updateObjectif: (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => Promise<Objectif>,
-  retrieveHabitsLinkToObjectif: (objectifID: string) => Habit[]
+  retrieveHabitsLinkToObjectif: (objectifID: string) => Habit[],
+  addHabitIntern: (habit: Habit) => Habit
 }
 
 const defaultHabitContext: HabitContextType = {
@@ -55,7 +57,8 @@ const defaultHabitContext: HabitContextType = {
   getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => DefaultHabit,
   removeObjectif: async() => {},
   updateObjectif: async (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => oldObjectif,
-  retrieveHabitsLinkToObjectif: (objectifID: string) => []
+  retrieveHabitsLinkToObjectif: (objectifID: string) => [],
+  addHabitIntern: (habit: Habit) => habit
 }
 
 const HabitsContext = createContext<HabitContextType>(defaultHabitContext);
@@ -92,29 +95,25 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
         console.log("Fetching habits...")
 
         const {habits, history} = await getAllOwnHabits(userID)
-        const sharedHabits = await getAllSharedHabits(userID)
         const today = new Date()
 
-        const all_habits = {...habits, ...sharedHabits.habits}
-        const all_history = {...history, ...sharedHabits.history}
-
-        for (const [habitID, habit] of Object.entries(all_habits)) {
+        for (const [habitID, habit] of Object.entries(habits)) {
           if(habit.currentStreak > 0) {
             if(habit.lastCompletionDate !== "none") {
               const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
   
               if(nextDateAfterLastCompletion.setHours(0,0,0,0) < today.setHours(0,0,0,0)) {
-                all_habits[habitID] = {...habit, currentStreak: 0}
+                habits[habitID] = {...habit, currentStreak: 0}
               }
             } 
           }
         }
 
-        setHabits(all_habits)
-        setHabitsHistory(all_history)
+        setHabits(habits)
+        setHabitsHistory(history)
 
         console.log("habits successfully fetched.")
-        return all_habits;
+        return habits;
     };
 
     const updateHabitStreaks = (habits: HabitList): HabitList => {
@@ -128,7 +127,6 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
     const settupHabits = async () => {
       try{
         const habits = await fetchHabits()
-
         filterHabits(new Date(), userID, habits)
           .then(filteredHabits => {
             setFilteredHabitsByDate(filteredHabits)
@@ -208,7 +206,7 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
 
       if(isHabitNowCompleted){
         if(auth.currentUser && auth.currentUser.email)
-          addHabitDoneDate(auth?.currentUser.email as string, habit.habitID, date.toISOString().slice(0,10))
+          addHabitDoneDate(auth?.currentUser.email as string, habit.habitID, toISOStringWithoutTimeZone(date))
 
         setHabitsHistory((prevHabitHistory) => {
           if(prevHabitHistory[habitID]) {
@@ -231,38 +229,52 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
         habit = {...habit, ...newStreakValues}
       }
 
-      if(isHabitPlannedForSelectedDay(habit, date)){       
+      if(isHabitScheduledForDate(habit, date)){       
         const habitType = getHabitType(habit)
 
-        setFilteredHabitsByDate(previousFilteredHabits => (
-          updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked, newStreakValues)))
+        setFilteredHabitsByDate(previousFilteredHabits => (updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked, newStreakValues)))
       }
 
       await Promise.all(promises)
       console.log("End of check step transactions.")
     }
 
+    /**
+     * Ajoute une nouvelle habitude dans le stockage interne et dans firestore
+     */
+
     const addHabit = async(habit: FormDetailledHabit): Promise<Habit | undefined> => {
       try{
-          
-          const habitWithID = await addHabitToFireStore(habit, userID)    
-                
-          const finalHabit = setHabitWithDefaultStep(habitWithID)
-
-          setHabits((prevHabits) => (updateHabitsWithNewHabit(prevHabits, finalHabit)));
-
-          setFilteredHabitsByDate(previousFilteredHabits => (
-            updateFilteredHabitsWithNewHabit(previousFilteredHabits, finalHabit, selectedDate)
-          ))
-
-
-          console.log("habit well added !")
-          return finalHabit
+          if(auth.currentUser && auth.currentUser.email) {
+            const habitWithID = await addHabitToFireStore(habit, auth.currentUser.email, auth.currentUser.uid)    
+            if(habitWithID) {
+              const finalHabit = addHabitIntern(habitWithID)
+  
+              console.log("habit well added !")
+              return finalHabit
+            }
+          }
       }
 
       catch(e) {
         console.log("Error while adding habit : ", e)
       }
+    }
+
+    /**
+     * Ajoute une nouvelle habitude dans le stockage interne
+     */
+
+    const addHabitIntern = (habit: Habit): Habit => {
+      const finalHabit = setHabitWithDefaultStep(habit)
+  
+      setHabits((prevHabits) => (updateHabitsWithNewHabit(prevHabits, finalHabit)));
+
+      setFilteredHabitsByDate(previousFilteredHabits => (
+        updateFilteredHabitsWithNewHabit(previousFilteredHabits, finalHabit, selectedDate)
+      ))
+
+      return finalHabit
     }
 
 
@@ -281,17 +293,22 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       catch(e) { console.log("Error while adding objectif : ", e) }
     }
 
+    /**
+     * Supprime l'habitude spécifiée pour l'utilisateur courant en interne et sur firestore
+     */
 
     const removeHabit = async(habit: Habit) => {
-      console.log("Deleting habit : ", habit.titre, "...")
-      const habitID = habit.habitID
-
-      await removeHabitInFirestore(habit, userID)
-
-      setHabits(previousHabits => removeHabitFromHabits(previousHabits, habitID))
-      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
-
-      console.log("Habit : ", habit.titre, " succesfully deleted !")
+      if(auth.currentUser && auth.currentUser.email) {
+        console.log("Deleting habit : ", habit.titre, "...")
+        const habitID = habit.habitID
+  
+        await removeHabitInFirestore(habit, auth.currentUser.email, userID)
+  
+        setHabits(previousHabits => removeHabitFromHabits(previousHabits, habitID))
+        setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
+  
+        console.log("Habit : ", habit.titre, " succesfully deleted !")
+      }
     }
 
 
@@ -325,7 +342,7 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
 
       if(isNewStepPlaceholder){
         const placeholderStep: StepList = {}
-        placeholderStep[oldHabit.habitID] = createDefaultStepFromHabit(updatedHabit, updatedHabit.habitID)
+        placeholderStep[oldHabit.habitID] = createDefaultStepFromHabit(updatedHabit, updatedHabit.habitID, updatedHabit.startingDate)
         updatedHabit["steps"] = {...placeholderStep}
       }
 
@@ -396,7 +413,7 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       filteredHabitsByDate,
       isFetched,
       changeDate,
-      addHabit,
+      addHabit, addHabitIntern,
       removeHabit,
       updateHabitRelationWithObjectif,
       updateHabit,

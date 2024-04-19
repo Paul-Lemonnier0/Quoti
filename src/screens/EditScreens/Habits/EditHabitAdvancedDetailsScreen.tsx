@@ -11,6 +11,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { EditHabitStackProps } from "./EditHabitNav";
 import { SeriazableHabit, Step } from "../../../types/HabitTypes";
 import React from "react"
+import { toISOStringWithoutTimeZone } from "../../../primitives/BasicsMethods";
 
 type EditHabitAdvancedDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditHabitAdvancedDetailsScreen">
 
@@ -46,12 +47,12 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
             oldSteps = oldSteps.map((step) => {
                 if(step.created){
                     const createdDate = new Date(step.created)
-                    return {...step, created: createdDate.toISOString()}
+                    return {...step, created: toISOStringWithoutTimeZone(createdDate)}
                 }
 
                 if(step.deleted){
                     const deletedDate = new Date(step.deleted)
-                    return {...step, deleted: deletedDate.toISOString()}
+                    return {...step, deleted: toISOStringWithoutTimeZone(deletedDate)}
                 }
 
                 return {...step}

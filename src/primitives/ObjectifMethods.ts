@@ -1,9 +1,9 @@
 import { FilteredHabitsType, Objectif, ObjectifList, SeriazableObjectif } from "../types/HabitTypes"
-import { displayTree } from "./BasicsMethods"
+import { displayTree, toISOStringWithoutTimeZone } from "./BasicsMethods"
 
 export const getSeriazableObjectif = (objectif: Objectif): SeriazableObjectif => {
-    const startingDate = objectif.startingDate.toISOString()
-    const endingDate = objectif.endingDate.toISOString()
+    const startingDate = toISOStringWithoutTimeZone(objectif.startingDate)
+    const endingDate = objectif.endingDate ? toISOStringWithoutTimeZone(objectif.endingDate) : undefined
 
     return({
         ...objectif,
@@ -31,7 +31,7 @@ export const removeObjectifFromFilteredHabits = (filteredHabits: FilteredHabitsT
 
 export const convertBackSeriazableObjectif = (objectif: SeriazableObjectif): Objectif => {
     const startingDate = new Date(objectif.startingDate)
-    const endingDate = new Date(objectif.endingDate)
+    const endingDate = objectif.endingDate ? new Date(objectif.endingDate) : undefined
 
     return({
         ...objectif,

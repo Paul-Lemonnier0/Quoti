@@ -95,10 +95,10 @@ export default function App() {
     "fontSemiBold": require("./assets/fonts/WorkSans/WorkSans-SemiBold.ttf"),
     "fontBold": require("./assets/fonts/WorkSans/WorkSans-Bold.ttf"),
 
-    "fontLightPoppins": require("./assets/fonts/Poppins-Light.ttf"),
-    "fontMediumPoppins": require("./assets/fonts/Poppins-Medium.ttf"),
-    "fontSemiBoldPoppins": require("./assets/fonts/Poppins-SemiBold.ttf"),
-    "fontBoldPoppins": require("./assets/fonts/Poppins-Bold.ttf"),
+    // "fontLight": require("./assets/fonts/Poppins-Light.ttf"),
+    // "fontMedium": require("./assets/fonts/Poppins-Medium.ttf"),
+    // "fontSemiBold": require("./assets/fonts/Poppins-SemiBold.ttf"),
+    // "fontBold": require("./assets/fonts/Poppins-Bold.ttf"),
 
   });
 

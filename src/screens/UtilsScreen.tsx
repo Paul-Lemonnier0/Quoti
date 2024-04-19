@@ -99,7 +99,7 @@ const UtilsScreen = () => {
 
             <View style={styles.body}>
               <View style={{flex: 1}}/>
-              <BackgroundTextButton text={"Ajouter des utilisateurs"} bold onPress={handleAddBunchOfUsers}/>
+              {/* <BackgroundTextButton text={"Ajouter des utilisateurs"} bold onPress={handleAddBunchOfUsers}/> */}
               <BackgroundTextButton text={"Ajouter des habitudes"} bold onPress={handleAddHabitsPlaceholder}/>
 
             </View>

@@ -1,6 +1,6 @@
 import { addDays } from "date-fns";
 import StepsList from "../components/Habitudes/Step/StepsList"
-import { generateUniqueID } from "../primitives/BasicsMethods";
+import { generateUniqueID, toISOStringWithoutTimeZone } from "../primitives/BasicsMethods";
 import { FormDetailledHabit } from "../types/FormHabitTypes"
 import { FormDetailledObjectif } from "../types/FormObjectifTypes"
 import { FrequencyTypes, Habit, PrioritesType, SeriazableHabit, Step, StepList } from "../types/HabitTypes"
@@ -12,7 +12,7 @@ function getRandomPriority(): PrioritesType {
   return stepPriorities[index]
 }
 
-const today = addDays(new Date(), -90).toISOString()
+const today = toISOStringWithoutTimeZone(addDays(new Date(), -90))
 
 const StepsPlaceholder: Step[][] = [
   [
@@ -271,7 +271,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
     description: "Objectif de préparation physique et mentale pour le semi-marathon",
     icon: "run",
     startingDate: today,
-    endingDate: addDays(new Date(today), 90).toISOString(),
+    endingDate: toISOStringWithoutTimeZone(addDays(new Date(today), 90)),
   };
 
   const habits: FormDetailledHabit[] = [
@@ -414,7 +414,7 @@ export const ObjectifPlaceholder_Meditation = () => {
     description: "Objectif de favoriser le bien-être personnel à travers différentes habitudes",
     icon: "meditation",
     startingDate: today,
-    endingDate: addDays(new Date(today), 90).toISOString(),
+    endingDate: toISOStringWithoutTimeZone(addDays(new Date(today), 90)),
   };
 
   const habits: FormDetailledHabit[] = [

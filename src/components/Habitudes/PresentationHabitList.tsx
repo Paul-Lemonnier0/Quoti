@@ -3,7 +3,7 @@ import { HabitudeListItemPresentation } from "./HabitudeListItem"
 import Animated, { FadeInDown } from "react-native-reanimated"
 import { Habit } from "../../types/HabitTypes"
 import { FC } from "react"
-import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../types/FormHabitTypes"
+import { FormDetailledObjectifHabit } from "../../types/FormHabitTypes"
 import React from "react"
 
 export interface PresentationHabitListProps {
@@ -13,6 +13,7 @@ export interface PresentationHabitListProps {
     editHabit: (habitID: string, newHabit: Habit | FormDetailledObjectifHabit) => void,
     isNotObjectifIDConst?: boolean,
     isNotNewObjectifHabit?: boolean,
+    onPress?: (habit: Habit) => void
 }
 
 const PresentationHabitList: FC<PresentationHabitListProps> = ({
@@ -21,8 +22,10 @@ const PresentationHabitList: FC<PresentationHabitListProps> = ({
     deleteHabit,
     editHabit,
     isNotObjectifIDConst,
-    isNotNewObjectifHabit
+    isNotNewObjectifHabit,
+    onPress
 }) => {
+
     return(
         <View style={{gap: 20}}>
             {
@@ -34,6 +37,7 @@ const PresentationHabitList: FC<PresentationHabitListProps> = ({
                             habitude={baseColor ? {...habit, color: baseColor} : habit}                             
                             deleteHabit={() => deleteHabit(habit)}
                             editHabit={editHabit}
+                            onPress={ onPress ? () => onPress(habit as Habit) : undefined}
                         />
                     </Animated.View>
                 ))

@@ -30,9 +30,9 @@ import { TouchableOpacity } from 'react-native';
 import ValidationScreenObjectif from '../screens/AddScreen/Objectif/ValidationScreenObjectif';
 import React, { useContext } from 'react';
 import { AntDesignName, FeatherIconName } from '../components/Buttons/IconButtons';
-import { FrequencyTypes, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
+import { FrequencyTypes, Habit, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
 import { User } from 'firebase/auth';
-import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from '../types/FormHabitTypes';
+import { FormBasicHabit, FormColoredHabit, FormDetailledObjectifHabit, FormIconedHabit, FormStepsHabit } from '../types/FormHabitTypes';
 import { FormBasicObjectif, FormColoredObjectif, FormDetailledObjectif } from '../types/FormObjectifTypes';
 import { AppContext } from '../data/AppContext';
 import ProfilListHabitScreen from '../screens/ProfilScreens/ProfilListHabitScreen';
@@ -50,6 +50,8 @@ import ProfilNotificationsScreen from '../screens/ProfilScreens/ProfilNotificati
 import { UserType } from '../data/UserContext';
 import AnyUserProfilScreen from '../screens/ProfilScreens/AnyUserProfilScreen';
 import { UserDataBase } from '../firebase/Database_User_Primitives';
+import CustomBottomTabBar from './CustomBottomTabBar';
+import PresentationHabitScreen from '../screens/Habitude/PresentationHabitScreen';
 
 
 export type BottomTabParamList = {
@@ -70,6 +72,7 @@ function BottomTabNavigator() {
 
   return (
     <BottomTab.Navigator
+      tabBar={(props) => <CustomBottomTabBar {...props} />}
       initialRouteName="Home"
       screenOptions={{ tabBarStyle: bottomMenuStyle, tabBarInactiveTintColor: fontGray, tabBarActiveTintColor: "white",
         tabBarHideOnKeyboard: false, headerShown: false, tabBarShowLabel: false}}>
@@ -137,8 +140,12 @@ export type HomeStackParamsList = {
     habitFrequency: FrequencyTypes,
     objectifID: string | undefined,
     currentDateString: string,
-    
   },
+
+  PresentationHabitScreen: {
+    habit: SeriazableHabit,
+  },
+
   HabitStreakDetailsScreen: {
     habitID: string,
     currentDateString: string,
@@ -188,6 +195,8 @@ function HomeNavigator() {
       <HomeStack.Screen name="HomeScreen" component={HomeScreen}  options={{}}/>
 
       <HomeStack.Screen name="HabitudeScreen" component={HabitudeScreen} options={{}}/>
+      <HomeStack.Screen name="PresentationHabitScreen" component={PresentationHabitScreen} options={{}}/>
+
       <HomeStack.Screen name="HabitStreakDetailsScreen" component={HabitStreakDetailsScreen} options={{}}/>
       <HomeStack.Screen name="SharedHabitScreen" component={SharedHabitScreen} options={{}}/>
 

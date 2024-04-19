@@ -37,6 +37,11 @@ const HabitStreakDetailsScreen: FC<HabitStreakDetailsScreenProps> = ({route, nav
         bottomSheetModalRef.current?.present()
     }
 
+    console.log(habit.frequency)
+    console.log(habit.startingDate)
+    console.log(habit.reccurence)
+    console.log(habit.occurence)
+
     return (
         <UsualScreen hideMenu>
             <View style={styles.container}>

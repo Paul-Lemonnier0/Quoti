@@ -102,7 +102,6 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
     useEffect(() => {
         const retrieveFriends = async() => {
             if(user && user.friends) {
-                console.log("ok")
                 const resultat = await Database_getUsersInfo(user?.friends)
                 const res = resultat.filter(r => r !== null && r !== undefined)
 

@@ -1,5 +1,6 @@
-import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
+import { GlobalFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
 import { FilteredHabitsType, Habit, PrioritesType, Step, StepList, StreakValues } from "../types/HabitTypes";
+import { toISOStringWithoutTimeZone } from "./BasicsMethods";
 
 export const updateHabitStepState = (
   previousHabits: FilteredHabitsType, habit: Habit,
@@ -58,16 +59,18 @@ export const updateHabitStepState = (
     }
 }
 
-export const createDefaultStepFromHabit = (habit: FirestoreHabit | Habit, habitID: string): Step => {
+export const createDefaultStepFromHabit = (habit: GlobalFirestoreHabit | Habit, habitID: string, startingDate: Date): Step => {
 
     const defaultStep: Step = {
         numero: 0,
+        duration: 30, 
+
         titre: habit.titre, 
         description: habit.description, 
-        duration: 30, 
+
+        created: toISOStringWithoutTimeZone(startingDate),
         stepID: habitID,
         habitID,
-        created: "Sun Jan 31 2024"
     }
 
     return defaultStep;
@@ -79,7 +82,7 @@ export const setHabitWithDefaultStep = (habit: Habit): Habit => {
   if(Object.values(habit.steps).length === 0){
     const habitID = habit.habitID
     
-    const placeholderStep: StepList = {[habitID]: createDefaultStepFromHabit(habit, habitID)};
+    const placeholderStep: StepList = {[habitID]: createDefaultStepFromHabit(habit, habitID, habit.startingDate)};
     finalHabit = {...finalHabit, steps: placeholderStep}
   }
 

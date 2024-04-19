@@ -19,6 +19,7 @@ export interface DisplayHabitsScreenProps {
 }
 
 export const DisplayHabitsScreen: FC<DisplayHabitsScreenProps> = ({isSkeleton, displayedHabits, handleOnPress, currentDateString}) => {
+
     return(
       <>
           {
@@ -40,7 +41,7 @@ export interface RenderHabitsProps {
   currentDateString: string
 }
 
-export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, isLoading, isFetched, handleOnPress, currentDateString}) => {
+export const RenderHabits: FC<RenderHabitsProps> = ({habits, isLoading, isFetched, handleOnPress, currentDateString}) => {
 
   const isSkeleton = isLoading || !isFetched
 
@@ -60,7 +61,7 @@ export const RenderHabits: FC<RenderHabitsProps> = memo(({habits, isLoading, isF
       />
     </View>
   )
-})
+}
 
 export interface DisplayObjectifsScreenProps {
   isSkeleton: Boolean,

@@ -15,10 +15,11 @@ import ProfilItem from "../../components/Profil/ProfilItem"
 import { acceptFriendInvitation, acceptHabitInvitation, refuseFriendInvitation, refuseHabitInvitation } from "../../firebase/Firestore_User_Primitives"
 import { User } from "firebase/auth"
 import { Habit } from "../../types/HabitTypes"
-import { getSpecificHabit } from "../../firebase/Firestore_Habits_Primitives"
+import { getSpecificHabitForUser } from "../../firebase/Firestore_Habits_Primitives"
 import HabitRequestBlock from "../../components/Habitudes/HabitRequestBlock"
 import { getSeriazableHabit } from "../../primitives/HabitMethods"
 import Quoti from "../../components/Other/Quoti"
+import { HabitsContext } from "../../data/HabitContext"
 
 type ProfilNotificationsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilNotificationsScreen">
 
@@ -31,6 +32,7 @@ interface HabitRequestItem {
 const ProfilNotificationsScreen: FC<ProfilNotificationsScreenProps> = ({navigation}) => {
 
     const {user} = useContext(UserContext)
+    const {addHabit} = useContext(HabitsContext)
     const [friendRequestUsers, setFriendRequestUsers] = useState<UserDataBase[]>([])
     const [habitsRequestsUsers, setHabitsRequestsUsers] = useState<HabitRequestItem[]>([])
 
@@ -66,25 +68,12 @@ const ProfilNotificationsScreen: FC<ProfilNotificationsScreenProps> = ({navigati
             })
         }
 
-        const handleAcceptFriend = () => {
-            if(user?.uid && user?.email && item?.uid && item?.email) {
-                acceptHabitInvitation(user?.uid, user?.email, item.uid, item.email)
-            }
-        }
-
-        const handleRefuseFriend = () => {
-            if(user?.uid && user?.email && item?.uid && item?.email) {
-                refuseHabitInvitation(user?.uid, user?.email, item.uid, item.email)
-            }
-        }
-
         return <HabitRequestBlock 
-                index={index}
-                habit={item.habit}
-                user={item.user}
-                onPress={onPress}
-                handleAccept={handleAcceptFriend}
-                handleRefuse={handleRefuseFriend}/>
+                    index={index}
+                    habit={item.habit}
+                    user={item.user}
+                    onPress={onPress}
+                />
     }
 
     useEffect(() => {
@@ -118,9 +107,12 @@ const ProfilNotificationsScreen: FC<ProfilNotificationsScreenProps> = ({navigati
             if (user?.habitRequests && user.habitRequests.length > 0) {
                 const habitsPromises = user.habitRequests.map(async (req) => {
                     const res = await Database_GetSpecificUser(req.ownerID);
-                    const habit = await getSpecificHabit(req.ownerMail, req.habitID);
+                    const habit = await getSpecificHabitForUser(req.ownerMail, req.habitID);
                     if (habit && res) {
-                        return { user: res, habit };
+                        const members = habit.members
+                        members.push(res)
+
+                        return { user: res, habit: {...habit, members} };
                     } else {
                         return null;
                     }
@@ -137,7 +129,11 @@ const ProfilNotificationsScreen: FC<ProfilNotificationsScreenProps> = ({navigati
         getFriendsRequests()
     }, [user])
 
-    console.log("ok requests : ", habitsRequestsUsers)
+    if(habitsRequestsUsers.length > 0) {
+        console.log("ok requests : ", habitsRequestsUsers[0].habit.members)
+
+    }
+
 
 
     return(

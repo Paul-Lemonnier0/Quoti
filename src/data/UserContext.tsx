@@ -126,16 +126,17 @@ const UserContextProvider: FC<UserContextProviderProps> = ({children}) => {
     }
 
     const handleSetUser = async(newValues: newUserValuesProps) => {
-        setUser((prevUser) => (prevUser ? {...prevUser, ...newValues, photoURL: newValues.photoURL ?? prevUser.photoURL} : null))
 
         if(newValues.photoURL) {
             const localPhotoURL = await saveProfilePictureLocally(newValues.photoURL, user.uid)
 
             if(localPhotoURL) {
-                setUser((prevUser) => (prevUser ? {...prevUser, photoURL: localPhotoURL} : null))
+                setUser((prevUser) => (prevUser ? {...prevUser, ...newValues, photoURL: localPhotoURL} : null))
                 Image.prefetch(localPhotoURL) 
             }
         }
+
+        else setUser((prevUser) => (prevUser ? {...prevUser, ...newValues} : null))
     }
 
     useEffect(() => {

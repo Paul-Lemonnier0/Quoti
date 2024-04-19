@@ -1,3 +1,6 @@
+import { UserDataBase } from "../firebase/Database_User_Primitives"
+import { MemberType } from "./FirestoreTypes/FirestoreHabitTypes"
+
 export enum FrequencyTypes {
     Quotidien = "Quotidien",
     Hebdo = "Hebdo",
@@ -30,12 +33,12 @@ interface BaseObjectif extends ItemType {
 
 interface Objectif extends BaseObjectif {
     startingDate: Date,
-    endingDate: Date,
+    endingDate?: Date,
 }
 
 interface SeriazableObjectif extends BaseObjectif {
     startingDate: string,
-    endingDate: string,
+    endingDate?: string,
 }
 
 interface BaseHabit extends ItemType, StreakValues {
@@ -48,7 +51,8 @@ interface BaseHabit extends ItemType, StreakValues {
     notificationEnabled?: boolean,
     objectifID: string | undefined
     steps: StepList,
-    isShared?: boolean
+    isShared?: boolean,
+    members: (UserDataBase | null)[]
 }
 
 interface Habit extends BaseHabit {

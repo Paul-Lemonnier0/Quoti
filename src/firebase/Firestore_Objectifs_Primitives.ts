@@ -1,76 +1,188 @@
-import { addDoc, collection, deleteDoc, doc, getDocs, query, updateDoc, where } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, documentId, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { Objectif, ObjectifList } from "../types/HabitTypes"
-import { FirestoreObjectif } from "../types/FirestoreTypes/FirestoreHabitTypes"
+import { FirestoreObjectif, GlobalFirestoreObjectif, UserFirestoreHabit, UserFirestoreObjectif } from "../types/FirestoreTypes/FirestoreHabitTypes"
 import { FormDetailledObjectif } from "../types/FormObjectifTypes"
+import { FirestoreCollections, FirestoreUserSubCollections } from "../types/FirestoreTypes/FirestoreCollections"
+import { toISOStringWithoutTimeZone } from "../primitives/BasicsMethods"
 
-const collectionName = "Objectifs"
+/**
+ * [FIRESTORE] Ajoute un objectif dans la collection globale puis ajoute dans la collection privée de l'utilisateur
+ */
 
 const addObjectifToFirestore = async(objectifToAdd: FormDetailledObjectif, userID: string): Promise<Objectif> => {
 
-    const userDoc = doc(db, "Users", userID)
+    const {startingDate, endingDate, ...globalObjectif} = objectifToAdd
 
-    console.log("adding objectif to firestore...")
+    //Ajout dans global
+    const objectifsCollection = collection(db, FirestoreCollections.Objectifs)
+    const objectifRef = await addDoc(objectifsCollection, globalObjectif)
 
-    const objectifRef = await addDoc(collection(userDoc, collectionName), objectifToAdd)
     const objectifID = objectifRef.id;
+    console.log("Objectif well added to firestore with id : ", objectifID)
 
-    console.log("objectif added to firestore with id : ", objectifID)
+    //Ajout en spécifique
 
-    const startingDate = new Date(objectifToAdd.startingDate)
-    const endingDate = new Date(objectifToAdd.endingDate)
+    await addRefHabitToFirestore(objectifID, userID, startingDate, endingDate)
+    console.log("Objectif well added to user firestore")
 
-    return {...objectifToAdd, objectifID, startingDate, endingDate}
+    const startingDate_obj = new Date(objectifToAdd.startingDate)
+    const endingDate_obj = new Date(objectifToAdd.endingDate)
+
+    return {...objectifToAdd, objectifID, startingDate: startingDate_obj, endingDate: endingDate_obj}
 }
+
+const addRefHabitToFirestore = async (objectifID: string, userID: string, startingDate?: string, endingDate?: string): Promise<UserFirestoreObjectif | null> => {
+    console.log("Adding ref habit to Firestore...");
+
+    try {
+
+        const userSpecificValues: UserFirestoreObjectif = {
+            objectifID: objectifID,
+            startingDate: startingDate ?? toISOStringWithoutTimeZone(new Date())
+        }
+
+        if(endingDate) {
+            userSpecificValues.endingDate = endingDate
+        }
+        
+        const userDoc = doc(db,  FirestoreCollections.Users, userID)
+        await setDoc(
+            doc(userDoc, FirestoreUserSubCollections.UserObjectifs, objectifID),
+            userSpecificValues
+        )
+
+        console.log("Objectif reference successfully added");
+
+        return userSpecificValues
+    } 
+    
+    catch (error) {
+        console.error("Error adding objectif reference to Firestore:", error);
+    }
+
+    return null
+};
+
+/**
+ * [FIRESTORE] Récupère tous les objectifs d'un utilisateur
+ */
 
 const fetchAllObjectifs = async(userID: string): Promise<ObjectifList> => {
 
-    const userDoc = doc(db, "Users", userID)
+    //Récupère les objectifs d'un utilisateur
 
-    const qry = query(collection(userDoc, collectionName));
-    const querySnapshot = await getDocs(qry)
+    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userObjectifs_qry = query(collection(userDoc, FirestoreUserSubCollections.UserObjectifs))
+    const userObjectifsSnapshot = await getDocs(userObjectifs_qry)
 
-    const objectifArray = await Promise.all(
-        querySnapshot.docs.map(async (obj) => {
-        const objectifID = obj.id;
+    const userObjectifsArray: UserFirestoreObjectif[] = await Promise.all(
+        userObjectifsSnapshot.docs.map(async(obj) => {
+            const data = obj.data() as UserFirestoreObjectif
+            return { 
+                objectifID: obj.id, 
+                startingDate: data.startingDate, 
+                endingDate: data.endingDate
+            }
+        })
+    )
 
-        const obj_data = obj.data() as FirestoreObjectif;
-        const startingDate = new Date(obj_data.startingDate)
-        const endingDate = new Date(obj_data.endingDate)
+    const userObjectifsList = userObjectifsArray.reduce((newObjectifList, objectif) => ({...newObjectifList, [objectif.objectifID]: {...objectif}}), {})
+    const userObjectifsID = Object.keys(userObjectifsList)
 
-        return  {
-            ...obj_data, 
-            startingDate,
-            endingDate,
-            objectifID, 
-        };
-    }));
+    //Récupère les détails de ces objectifs
 
-    return objectifArray.reduce((newObjectifsList, objectif) => 
-        ({
-            ...newObjectifsList, 
-            [objectif.objectifID]: {...objectif}
-        }),
-    {});
+    if(userObjectifsID.length > 0) {
+        const objectifs_qry = query(
+            collection(db, FirestoreCollections.Objectifs),
+            where(documentId(), "in", userObjectifsID)
+        )
+    
+        const objectifsSnapshot = await getDocs(objectifs_qry)
+    
+        const objectifsArray: Objectif[] = await Promise.all(
+            objectifsSnapshot.docs.map(async (obj) => {
+            const objectifID = obj.id;
+    
+            const obj_data = obj.data() as GlobalFirestoreObjectif;
+    
+            const startingDate = new Date(userObjectifsList[obj.id].startingDate)
+            const endingDate = userObjectifsList[obj.id].endingDate ? new Date(userObjectifsList[obj.id].endingDate) : undefined
+    
+            const objectif: Objectif = {
+                ...obj_data, 
+                startingDate,
+                objectifID
+            }
+    
+            if(endingDate) objectif.endingDate = endingDate
+
+            return objectif
+        }));
+    
+        return objectifsArray.reduce((newObjectifsList, objectif) => 
+            ({
+                ...newObjectifsList, 
+                [objectif.objectifID]: {...objectif}
+            }),
+        {});
+    }
+
+    return {}
 }
+
+/**
+ * [FIRESTORE] Supprime un objectif dans la collection d'un utilisateur
+ */
 
 const removeObjectifInFirestore = async(objectifID: string, userID: string): Promise<void> => {
 
-    const userDoc = doc(db, "Users", userID)
-    console.log("Deleting objectif in firestore with id : ", objectifID, "...")
-    const docRef = doc(collection(userDoc, 'Objectifs'), objectifID)
+    const userDoc = doc(db, FirestoreCollections.Users, userID)
 
+    console.log("Deleting objectif in firestore with id : ", objectifID, "...")
+
+    const docRef = doc(collection(userDoc, FirestoreUserSubCollections.UserObjectifs), objectifID)
     await deleteDoc(docRef);
+
     console.log("Objectif successfully deleted in firestore !")
 }
 
+/**
+ * [FIRESTORE] Modifie un objectif dans la collection globale ou privée en fonction des données modifiées
+ */
+
 const updateObjectifInFirestore = async(userID: string, oldObjectif: Objectif, newValues: {[key: string]: any}) => {
-    const userDoc= doc(db, "Users", userID)
-
+    
     console.log("Updating objectif in firestore with id : ", oldObjectif.objectifID, "...")
+    
+    
+    if("startingDate" in newValues || "endingDate" in newValues) {
+        const userDoc = doc(db, FirestoreCollections.Users, userID)
+        const docRef = doc(
+            collection(userDoc, FirestoreUserSubCollections.UserObjectifs), 
+            oldObjectif.objectifID
+        )
+        
+        const newValues_temp = {}
 
-    const docRef = doc(collection(userDoc, 'Objectifs'), oldObjectif.objectifID)
-    await updateDoc(docRef, {...newValues})
+        if("startingDate" in newValues) newValues_temp["startingDate"] = newValues.startingDate
+        if("endingDate" in newValues) newValues_temp["endingDate"] = newValues.endingDate
+
+        await updateDoc(docRef, {...newValues_temp});
+
+        console.log("User-specific objectif information updated!");
+    }
+    
+    const {startingDate, endingDate, ...newValues_global} = newValues
+
+    //Modification des éléments généraux
+    if(Object.keys(newValues_global).length > 0) {
+        const objectifDoc = doc(db, FirestoreCollections.Objectifs, oldObjectif.objectifID)    
+        await updateDoc(objectifDoc, newValues_global)
+
+        console.log("Global objectif information updated!");
+    }
+
 
     console.log("Objectif successfully updated in firestore !")
 }

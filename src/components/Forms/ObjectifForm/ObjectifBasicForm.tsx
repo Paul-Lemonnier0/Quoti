@@ -17,6 +17,7 @@ import { AddObjectifScreenType, getAddObjectifStepsDetails } from "../../../cons
 import { addDays } from "date-fns"
 import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 import Quoti from "../../Other/Quoti"
+import { toISOStringWithoutTimeZone } from "../../../primitives/BasicsMethods"
 
 export interface ObjectifBasicForm {
     objectif?: SeriazableObjectif,
@@ -55,8 +56,8 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
                 const detailledObjectif: FormBasicObjectif = {
                     titre, 
                     description, 
-                    startingDate: startingDate.toISOString(), 
-                    endingDate: endingDate.toISOString()
+                    startingDate: toISOStringWithoutTimeZone(startingDate), 
+                    endingDate: toISOStringWithoutTimeZone(endingDate)
                 }
 
                 handleGoNext(detailledObjectif)

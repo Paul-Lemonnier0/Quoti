@@ -7,6 +7,7 @@ import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyle
 import { FC, useContext } from "react";
 import React from "react"
 import { AppContext } from "../../data/AppContext";
+import { toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods";
 
 export interface DatePickerBasicProps {
     onPress: () => void,
@@ -65,7 +66,7 @@ export const MultiDatePicker: FC<MultiDatePickerProps> = ({onPress, startDate, e
     const endDateStringOptions: DateOptions = {day: 'numeric', month: "short", year: "numeric"}
     let endDateString: string;
 
-    if(endDate.toISOString() === startDate.toISOString()){
+    if(toISOStringWithoutTimeZone(endDate) === toISOStringWithoutTimeZone(startDate)){
         endDateString = "?"
         startDateStringOptions["month"] = "short"
         startDateStringOptions["year"] = "numeric"

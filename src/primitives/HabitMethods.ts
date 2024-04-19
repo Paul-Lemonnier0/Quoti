@@ -1,6 +1,8 @@
+import { Database_getUsersInfo } from "../firebase/Database_User_Primitives";
 import { getDateLogs } from "../firebase/Firestore_Step_Primitives";
-import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
+import { MemberType, UserFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
 import { FilteredHabitsType, FrequencyTypes, HabitList, Habit, StreakValues, StepList, Step, SeriazableHabit } from "../types/HabitTypes";
+import { toISOStringWithoutTimeZone } from "./BasicsMethods";
 import { calculateNextScheduledDate, isHabitScheduledForDate } from "./HabitudesReccurence";
 
 export const filterHabits = async (date: Date, userID: string, habits: HabitList) => {
@@ -40,7 +42,7 @@ export const filterHabits = async (date: Date, userID: string, habits: HabitList
   return habitsScheduledForDate;
 };
 
-export const getHabitType = (habit: Habit | FirestoreHabit): "Objectifs" | "Habitudes" => {
+export const getHabitType = (habit: Habit | UserFirestoreHabit): "Objectifs" | "Habitudes" => {
   const isObjective = habit.objectifID !== undefined && habit.objectifID !== null
   const habitType = isObjective ? "Objectifs" : "Habitudes";
 
@@ -138,8 +140,8 @@ export const updateHabitsWithNewHabit = (previousHabits: HabitList, newHabit: Ha
 }
 
 export const getSeriazableHabit = (habit: Habit): SeriazableHabit => {
-  if("startingDate" in habit) {
-    const startingDate = habit.startingDate.toISOString()
+  if(habit.startingDate instanceof Date) {
+    const startingDate = toISOStringWithoutTimeZone(habit.startingDate)
   
     return({
         ...habit,
@@ -147,7 +149,9 @@ export const getSeriazableHabit = (habit: Habit): SeriazableHabit => {
       })
   }
 
-  return habit
+  const startingDate = habit.startingDate as string
+
+  return {...habit, startingDate}
 }
 
 export const convertBackSeriazableHabit = (habit: SeriazableHabit): Habit => {
@@ -159,10 +163,40 @@ export const convertBackSeriazableHabit = (habit: SeriazableHabit): Habit => {
   })
 }
 
-export const getUpdatedStreakOfHabit = (habit: Habit | FirestoreHabit, currentDate: Date): StreakValues => {
+/**
+ * Vérifie si une série est terminée sur une habitude. Renvoie les nouvelles streakValues
+ */
+
+export const checkIfStreakEndedHabit = (habit: Habit, currentDate: Date): StreakValues => {
 
   const completedDateTemp = new Date(currentDate)
-  const completedDateString = currentDate.toISOString()
+
+  let streakStopped = false;
+
+  if(habit.lastCompletionDate !== "none"){
+    const nextDateAfterLastCompletion = calculateNextScheduledDate(habit, new Date(habit.lastCompletionDate))
+    streakStopped = nextDateAfterLastCompletion.setHours(0,0,0,0) < completedDateTemp.setHours(0,0,0,0)
+
+    const currentStreak = streakStopped ? 0 : habit.currentStreak
+
+    return {
+      currentStreak: currentStreak,
+      lastCompletionDate: habit.lastCompletionDate,
+      bestStreak: habit.bestStreak
+    }
+  }
+
+  return {
+      currentStreak: habit.currentStreak,
+      lastCompletionDate: habit.lastCompletionDate,
+      bestStreak: habit.bestStreak
+  }
+}
+
+export const getUpdatedStreakOfHabit = (habit: Habit, currentDate: Date): StreakValues => {
+
+  const completedDateTemp = new Date(currentDate)
+  const completedDateString = toISOStringWithoutTimeZone(currentDate)
 
   let streakStopped = false;
   if(habit.lastCompletionDate !== "none"){
@@ -249,4 +283,36 @@ export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate: FilteredH
   }
 
   return filteredHabitsByDate[frequency].Habitudes?.[habitID]
+}
+
+export const getUsersDataBaseFromMember = async(members: MemberType[], userID?: string, userMail?: string, removeCurrentUser: boolean = true) => {
+    
+    if(removeCurrentUser) {
+      if(members.length > 1) {
+        let membersID: string[] = [] 
+
+        if(userID) {
+          membersID = members.filter(member => member.id !== userID).map(member => member.id)
+        }
+
+        else if (userMail) {
+          membersID = members.filter(member => member.mail !== userMail).map(member => member.id)
+        }
+
+        else {
+          membersID = members.map(member => member.id)
+        }
+        
+        return await Database_getUsersInfo(membersID)
+      }
+    }
+
+    else {
+      if(members.length > 0) {
+        const membersID = members.map(member => member.id)  
+        return await Database_getUsersInfo(membersID)
+      }
+    }
+
+    return []
 }

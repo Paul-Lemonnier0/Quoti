@@ -46,9 +46,11 @@ async function Database_GetSpecificUser(userID: string): Promise<(UserDataBase |
 }
 
 async function Database_getUsersInfo(usersIDs: string[]): Promise<(UserDataBase | null)[]>{
+
     try{
         const promises = usersIDs.map(async(userID) => {
             const userRef = ref(database, `Users/${userID}`);
+            
             const userSnapshot = await get(userRef)
 
             if(userSnapshot.exists()){
@@ -56,7 +58,7 @@ async function Database_getUsersInfo(usersIDs: string[]): Promise<(UserDataBase 
             }
 
             else{
-                console.log("Uilisateur introuvable.")
+                console.log("Utilisateur introuvable.")
                 return null
             }
         })

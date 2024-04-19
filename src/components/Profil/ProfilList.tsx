@@ -9,23 +9,32 @@ import { AppContext } from '../../data/AppContext'
 import { useThemeColor } from '../Themed'
 
 interface ProfilListProps {
-    users: (User | UserFullType | UserDataBase)[]
+    users: (User | UserFullType | UserDataBase)[],
+        /**
+     * Le nombre d'utilisateurs à afficher dans la liste. Par défaut, 3.
+     */
+    isPrimary?: boolean,
+    nbVisibleUsers?: number
 }
 
-const ProfilList: FC<ProfilListProps> = ({users}) => {
+/**
+ * Affiche une liste de X (par défault 3) profils d'utilisateurs puis le nombre restant de profils.
+ */
+
+const ProfilList: FC<ProfilListProps> = ({users, isPrimary, nbVisibleUsers = 3}: ProfilListProps): JSX.Element => {
     const {theme} = useContext(AppContext)
     const secondary = useThemeColor(theme, "Secondary")
 
-    const displayedUsers: (User | UserFullType | UserDataBase)[] = users.slice(0, 3);
+    const displayedUsers: (User | UserFullType | UserDataBase)[] = users.slice(0, nbVisibleUsers);
 
     return (
         <View style={{flexDirection: "row", gap: 10, alignItems: 'center'}}>
-            <View style={{flexDirection: "row", gap: -25}}>
+            <View style={{flexDirection: "row", gap: -20}}>
                 {
                     displayedUsers.map((user, index) => 
                         <ProfilButton key={index} onPress={() => {}}
                             noBadge small disabled 
-                            user={user} 
+                            user={user} isPrimary={isPrimary}
                             borderColor={secondary} borderWidth={3}
                         />
                     )
@@ -33,8 +42,8 @@ const ProfilList: FC<ProfilListProps> = ({users}) => {
             </View>
 
             {
-                users.length-3 > 0 &&
-                <NormalText bold text={"+"+ (users.length-3)}/>
+                users.length - nbVisibleUsers > 0 &&
+                <NormalText bold text={"+"+ (users.length - nbVisibleUsers)}/>
             }
         </View>
     )

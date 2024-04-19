@@ -12,6 +12,7 @@ import Marking, { MarkingProps, Markings } from 'react-native-calendars/src/cale
 import { DayProps } from 'react-native-calendars/src/calendar/day';
 import { isHabitScheduledForDate } from '../../primitives/HabitudesReccurence';
 import { Habit } from '../../types/HabitTypes';
+import { toISOStringWithoutTimeZone } from '../../primitives/BasicsMethods';
 
 
 export interface CalendarListCustomProps {
@@ -49,9 +50,11 @@ const CalendarListCustom: FC<CalendarListCustomProps> = ({closeModal, selectedDa
   }, []);
   
   const markedDates = useMemo(() => {
-    const startingDateString = selectedDates[0].toISOString().slice(0, 10)
+    const startingDateString = toISOStringWithoutTimeZone(selectedDates[0])
+    console.log("marked : ", startingDateString, selectedDates)
 
     const markedDatesObject = {[startingDateString]: {selected: true}}
+    console.log(markedDatesObject)
     return markedDatesObject;
   }, [selectedDates]);
 
@@ -119,10 +122,10 @@ export const StreakListCustom: FC<StreakListCustomProps> = ({history, habit, cur
     const markedDatesObject = {}
 
     history.forEach((date) => {
-      markedDatesObject[date.toISOString().slice(0, 10)] = {selected: true}
+      markedDatesObject[toISOStringWithoutTimeZone(date)] = {selected: true}
     })
 
-    const currentDateISOString = new Date(currentDateString).toISOString().slice(0, 10)
+    const currentDateISOString = toISOStringWithoutTimeZone(new Date(currentDateString))
     markedDatesObject[currentDateISOString] = {...markedDatesObject[currentDateISOString], marked: true}
 
     return markedDatesObject;
@@ -149,8 +152,8 @@ export const StreakListCustom: FC<StreakListCustomProps> = ({history, habit, cur
         renderScrollComponent={undefined}
         showScrollIndicator={false}
         current={today.toDateString()}
-        pastScrollRange={12}
-        futureScrollRange={0}
+        pastScrollRange={6}
+        futureScrollRange={6}
         customHeader={(date: CalendarHeaderProps ) => <CalendarMonthHeader currentDateString={date.current}/>}
         dayComponent={streakDayComponent}
       />

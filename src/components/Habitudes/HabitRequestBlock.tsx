@@ -14,8 +14,6 @@ interface HabitRequestBlockProps {
     index: number,
     habit: Habit,
     user: UserDataBase,
-    handleAccept: () => void,
-    handleRefuse: () => void
 }
 
 const HabitRequestBlock: FC<HabitRequestBlockProps> = ({
@@ -23,8 +21,6 @@ const HabitRequestBlock: FC<HabitRequestBlockProps> = ({
     index,
     habit,
     user,
-    handleAccept,
-    handleRefuse
 }) => {
 
     const handleOnPress = () => {

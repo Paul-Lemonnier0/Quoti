@@ -1,4 +1,4 @@
-import React, { useState, useRef, FC, useEffect, useCallback } from 'react';
+import React, { useState, useRef, FC, useEffect, useCallback, useMemo } from 'react';
 import { StyleSheet, View} from 'react-native';
 import { HugeText, SubTitleGrayText } from '../styles/StyledText';
 import { CustomScrollView, UsualScreen } from '../components/View/Views';
@@ -21,6 +21,7 @@ import ProfilItem from '../components/Profil/ProfilItem';
 import { auth } from '../firebase/InitialisationFirebase';
 import ProfilButton from '../components/Profil/ProfilButton';
 import { UserContext } from '../data/UserContext';
+import { toISOStringWithoutTimeZone } from '../primitives/BasicsMethods';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HomeScreen">
 
@@ -109,9 +110,9 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
         bottomSheetModalRef_Calendar.current?.present();
   }, []);
 
-  const handlePressOnHabit = (habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
+  const handlePressOnHabit = useCallback((habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
       navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
-  }
+  }, [])
 
   const handlePressOnObjectif = (seriazableObjectif: SeriazableObjectif, frequency: FrequencyTypes, currentDateString: string) => {
       navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
@@ -124,6 +125,8 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
   }
 
   const hasNotifications = hasNotification()
+
+  const selectedDateString = useMemo(() => toISOStringWithoutTimeZone(selectedDate), [selectedDate])
 
   return (
       <UsualScreen>
@@ -158,8 +161,21 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
               
               <CustomScrollView>
                 <View style={styles.subBody}>
-                  <RenderObjectifs objectifs={displayedObjectifs} selectedPeriode={selectedPeriode} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnObjectif} currentDateString={selectedDate.toISOString()}/>
-                  <RenderHabits habits={displayedHabits} isLoading={isLoading} isFetched={isFetched} handleOnPress={handlePressOnHabit} currentDateString={selectedDate.toISOString()}/>
+                  <RenderObjectifs 
+                      objectifs={displayedObjectifs} 
+                      selectedPeriode={selectedPeriode} 
+                      isLoading={isLoading} 
+                      isFetched={isFetched} 
+                      handleOnPress={handlePressOnObjectif} 
+                      currentDateString={selectedDateString}
+                  />
+                  <RenderHabits 
+                      habits={displayedHabits} 
+                      isLoading={isLoading} 
+                      isFetched={isFetched} 
+                      handleOnPress={handlePressOnHabit} 
+                      currentDateString={toISOStringWithoutTimeZone(selectedDate)}
+                  />
                 </View>
               </CustomScrollView>
             }

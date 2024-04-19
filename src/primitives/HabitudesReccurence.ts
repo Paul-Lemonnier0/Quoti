@@ -1,6 +1,6 @@
 import { startOfWeek } from "date-fns"
 import { Habit } from "../types/HabitTypes"
-import { FirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes"
+import { GlobalFirestoreHabit, GlobalHabit, UserFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes"
 
 function isHabitScheduledForDate(habit: Habit, currentDate: Date): boolean { 
     const completedDateTemp = new Date(currentDate)  
@@ -83,7 +83,7 @@ const getFirstDayOfMonth = (date: Date): Date => {
     return firstDayOfMonth
 }
 
-export const calculateNextScheduledDate = (habit: Habit | FirestoreHabit, startingDate: Date): Date => {
+export const calculateNextScheduledDate = (habit: Habit | GlobalHabit | GlobalFirestoreHabit, startingDate: Date): Date => {
     let nextScheduledDate = startingDate;
 
     switch (habit.frequency) {

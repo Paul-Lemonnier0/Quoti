@@ -6,6 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createUserWithEmailAndPassword, User } from 'firebase/auth';
 import { faker } from '@faker-js/faker';
+import { Image } from 'expo-image';
 
 export const selectImage = async(setImage: Dispatch<string | null>) => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -36,14 +37,24 @@ export const saveProfilePictureLocally = async (uri: string, uid: string): Promi
         const directory = `${FileSystem.cacheDirectory}profilePictures/`;
         const path = `${directory}${fileName}`;
         
+        console.log("saveProfilePictureLocally")
+
+
         const downloadResumable = FileSystem.createDownloadResumable(uri, path)
         const result = await downloadResumable.downloadAsync()
 
         if(result) {
+            console.log("result")
+
             await AsyncStorage.removeItem('picture_'+uid)
             await AsyncStorage.setItem('picture_'+uid, result.uri);
+
+            await Image.clearDiskCache()
+
             return result.uri;
         }
+
+        else console.log("no result")
         
         return null
     } catch (error) {

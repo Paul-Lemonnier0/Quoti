@@ -5,37 +5,48 @@ import { UserEventRequest, UserType } from "../data/UserContext"
 import { UserDataBase } from "./Database_User_Primitives"
 import { Habit } from "../types/HabitTypes"
 import { addRefHabitToFirestore } from "./Firestore_Habits_Primitives"
+import { FirestoreCollections, FirestoreSocialSubCollections, FirestoreUserSubCollections } from "../types/FirestoreTypes/FirestoreCollections"
+
+/**
+ * [FIRESTORE] Envoie une demande d'amis
+ */
 
 export const sendFriendInvitation = async(senderID: string, senderMail: string, receiverID: string, receiverMail: string) => {
     try{
         console.log("Sending friend invitation...")
 
-        const requestRef = doc(db, "Users", receiverMail, "Friends", "Requests")
+        const requestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            receiverMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
 
         const requestsDoc = await getDoc(requestRef)
 
-        if(requestsDoc.exists()){
+        if(requestsDoc.exists()) 
             await updateDoc(requestRef, {friends: arrayUnion(senderID)})
-        }
 
-        else{
-            await setDoc(requestRef, {friends: [senderID]})
-        }
+        else await setDoc(requestRef, {friends: [senderID]})
 
-        const sendedRequestRef = doc(db, "Users", senderMail, "Friends", "Requests")
+        const sendedRequestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            senderMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
 
         const sendedRequestsDoc = await getDoc(sendedRequestRef)
 
-        if(sendedRequestsDoc.exists()){
+        if(sendedRequestsDoc.exists())
             await updateDoc(sendedRequestRef, {sended: arrayUnion(receiverID)})
-        }
+        
 
-        else{
-            await setDoc(sendedRequestRef, {sended: [receiverID]})
-        }
+        else await setDoc(sendedRequestRef, {sended: [receiverID]})
 
         console.log("Invitation well sended !")
-    
     }
 
     catch(e){
@@ -43,11 +54,23 @@ export const sendFriendInvitation = async(senderID: string, senderMail: string, 
     }
 }
 
+
+/**
+ * [FIRESTORE] Annule une demande d'ami envoyée
+ */
+
+
 export const cancelFriendInvitation = async(senderID: string, senderMail: string, receiverID: string, receiverMail: string) => {
     try{
         console.log("Sending friend invitation...")
 
-        const requestRef = doc(db, "Users", receiverMail, "Friends", "Requests")
+        const requestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            receiverMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
 
         const requestsDoc = await getDoc(requestRef)
 
@@ -59,7 +82,13 @@ export const cancelFriendInvitation = async(senderID: string, senderMail: string
             await setDoc(requestRef, {friends: [senderID]})
         }
 
-        const sendedRequestRef = doc(db, "Users", senderMail, "Friends", "Requests")
+        const sendedRequestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            senderMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
 
         const sendedRequestsDoc = await getDoc(sendedRequestRef)
 
@@ -80,14 +109,32 @@ export const cancelFriendInvitation = async(senderID: string, senderMail: string
     }
 }
 
+/**
+ * [FIRESTORE] Accepte une demande d'ami reçue
+ */
+
 export const acceptFriendInvitation = async(userID: string, userMail: string, friendID: string, friendMail: string) => {
     try{
         console.log("Accepting friend invitation...")
 
-        const requestRef = doc(db, "Users", userMail, "Friends", "Requests")
+        const requestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            userMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
+
         await updateDoc(requestRef, {friends: arrayRemove(friendID)})
         
-        const acceptedRef = doc(db, "Users", userMail, "Friends", "Accepted")
+        const acceptedRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            userMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Friends
+        )
+
         const acceptedDoc = await getDoc(acceptedRef)
 
         if(acceptedDoc.exists()){
@@ -98,15 +145,29 @@ export const acceptFriendInvitation = async(userID: string, userMail: string, fr
 
         //Pour le sender
 
-        const requestRefSender = doc(db, "Users", friendMail, "Friends", "Requests")
+        const requestRefSender = doc(
+            db, 
+            FirestoreCollections.Users, 
+            friendMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
+
         await updateDoc(requestRefSender, {sended: arrayRemove(userID)})
 
-        const acceptedRefSender = doc(db, "Users", friendMail, "Friends", "Accepted")
+        const acceptedRefSender = doc(
+            db, 
+            FirestoreCollections.Users, 
+            friendMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Friends
+        )
+
         const acceptedDocSender = await getDoc(acceptedRefSender)
 
-        if(acceptedDocSender.exists()){
+        if(acceptedDocSender.exists())
             await updateDoc(acceptedRefSender, {friends: arrayUnion(userID)})
-        }
+        
 
         else await setDoc(acceptedRefSender, {friends: [userID]})
 
@@ -118,15 +179,32 @@ export const acceptFriendInvitation = async(userID: string, userMail: string, fr
     }
 }
 
+/**
+ * [FIRESTORE] Refuse une demande d'ami reçue
+ */
+
+
 export const refuseFriendInvitation = async(userID: string, userMail: string, friendID: string, friendMail: string) => {
     try{
         console.log("Refusing friend invitation...")
 
-        const requestRef = doc(db, "Users", userMail, "Friends", "Requests")
+        const requestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            userMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
 
         await updateDoc(requestRef, {friends: arrayRemove(friendID)})
 
-        const requestRefSender = doc(db, "Users", friendMail, "Friends", "Requests")
+        const requestRefSender = doc(
+            db, 
+            FirestoreCollections.Users, 
+            friendMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Requests
+        )
 
         await updateDoc(requestRefSender, {sended: arrayRemove(userID)})
 
@@ -138,8 +216,13 @@ export const refuseFriendInvitation = async(userID: string, userMail: string, fr
     }
 }
 
+/**
+ * [FIRESTORE] Ecoute les changements des demandes d'amis reçues (lance le callback si il y a une modification)
+ */
+
+
 export const subscribeToFriendRequests = (userID: string, callback: (friendRequests: Array<any>) => void): Unsubscribe => {
-    const requestRef = doc(db, "Users", userID, "Friends", "Requests")
+    const requestRef = doc(db, FirestoreCollections.Users, userID, FirestoreUserSubCollections.Social, FirestoreSocialSubCollections.Requests)
 
     const unsubscribe = onSnapshot(requestRef, (snapshot) => {
         if(snapshot.exists()){
@@ -153,8 +236,19 @@ export const subscribeToFriendRequests = (userID: string, callback: (friendReque
     return unsubscribe
 }
 
+/**
+ * [FIRESTORE] Ecoute les changements des amis de l'utilisateurs (ajout/suppression) (lance le callback si il y a une modification)
+ */
+
+
 export const subscribeToFriends = (userID: string, callback: (friendRequests: Array<any>) => void): Unsubscribe => {
-    const requestRef = doc(db, "Users", userID, "Friends", "Accepted")
+    const requestRef = doc(
+        db, 
+        FirestoreCollections.Users,
+        userID, 
+        FirestoreUserSubCollections.Social, 
+        FirestoreSocialSubCollections.Friends
+    )
 
     const unsubscribe = onSnapshot(requestRef, (snapshot) => {
         if(snapshot.exists()){
@@ -168,8 +262,20 @@ export const subscribeToFriends = (userID: string, callback: (friendRequests: Ar
     return unsubscribe
 }
 
+/**
+ * [FIRESTORE] Récupère les demandes d'amies envoyées par l'utilisateur
+ */
+
+
 export const getSendedFriendRequest = async(userMail: string): Promise<string[]> => {
-    const sendedRequestRef = doc(db, "Users", userMail, "Friends", "Requests")
+    const sendedRequestRef = doc(
+        db, 
+        FirestoreCollections.Users, 
+        userMail, 
+        FirestoreUserSubCollections.Social, 
+        FirestoreSocialSubCollections.Requests
+    )
+
     const sendedRequestsDoc = await getDoc(sendedRequestRef)
 
     if(sendedRequestsDoc.exists()) {
@@ -181,8 +287,18 @@ export const getSendedFriendRequest = async(userMail: string): Promise<string[]>
     return []
 }
 
+/**
+ * [FIRESTORE] Ecoute les changements des invitations à des habitudes reçues (lance le callback si il y a une modification)
+ */
+
 export const subscribeToHabitsRequests = (userID: string, callback: (habitsRequests: Array<any>) => void): Unsubscribe => {
-    const requestRef = doc(db, "Users", userID, "Friends", "HabitsInvitations")
+    const requestRef = doc(
+        db, 
+        FirestoreCollections.Users, 
+        userID, 
+        FirestoreUserSubCollections.Social, 
+        FirestoreSocialSubCollections.HabitsInvitation
+    )
 
     const unsubscribe = onSnapshot(requestRef, (snapshot) => {
         if(snapshot.exists()){
@@ -196,8 +312,19 @@ export const subscribeToHabitsRequests = (userID: string, callback: (habitsReque
     return unsubscribe
 }
 
+/**
+ * [FIRESTORE] Récupère les invitations reçues de collaboration à des habitudes
+ */
+
 export const getHabitInvitationRequest = async(userMail: string): Promise<string[]> => {
-    const habitSendedRequestRef = doc(db, "Users", userMail, "Friends", "HabitsInvitations")
+    const habitSendedRequestRef = doc(
+        db, 
+        FirestoreCollections.Users, 
+        userMail, 
+        FirestoreUserSubCollections.Social, 
+        FirestoreSocialSubCollections.HabitsInvitation
+    )
+
     const habitSendedRequestsDoc = await getDoc(habitSendedRequestRef)
 
     if(habitSendedRequestsDoc.exists()) {
@@ -209,20 +336,6 @@ export const getHabitInvitationRequest = async(userMail: string): Promise<string
     return []
 }
 
-export const setBaseDetailsUser = async(userMail: string, birthDate: Date, isPrivate: boolean) => {
-    const userRef = doc(db, 'Users', userMail)
-    const userDoc = await getDoc(userRef)
-
-    if(userDoc.exists()) {
-        await updateDoc(userRef, {
-            birthDate: birthDate.toISOString(),
-            isPrivate: isPrivate
-        })
-
-        console.log("Profil Well updated !")
-    }
-}
-
 export interface VisitInfoUser extends UserDataBase {
     isPrivate?: boolean,
     nbHabits?: number,
@@ -232,28 +345,22 @@ export interface VisitInfoUser extends UserDataBase {
     nbSucces?: number
 }
 
-export const getVisitInfoUserFromUserDB = async(userDB: UserDataBase): Promise<VisitInfoUser> => {
-    const user: VisitInfoUser = {...userDB}
-    
-    // const userRef = doc(db, "Users", userDB.email)
-    // const userDoc = await getDoc(userRef)
-
-    // if(userDoc.exists()) {
-    //     if(userDoc.data() && "isPrivate" in userDoc.data()) {
-    //         user.isPrivate = (userDoc.data().isPrivate) as boolean
-    //     }
-    // }
-
-    // else console.log("dont exists : ", userDB.email)
-
-    return user
-}   
+/**
+ * [FIRESTORE] Envoie une invitation de collaboration à une habitude
+ */
 
 export const sendHabitInvitation = async(senderID: string, senderMail: string, receiverMail: string, habitID: string) => {
     try{
         console.log("Sending friend invitation...")
 
-        const requestRef = doc(db, "Users", receiverMail, "Friends", "HabitsInvitations")
+        const requestRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            receiverMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.HabitsInvitation
+        )
+
         const data: UserEventRequest = {ownerMail: senderMail, ownerID: senderID, habitID: habitID}
 
         const requestsDoc = await getDoc(requestRef)
@@ -274,39 +381,85 @@ export const sendHabitInvitation = async(senderID: string, senderMail: string, r
     }
 }
 
+/**
+ * [FIRESTORE] Accepte une invitation de collaboration à une habitude
+ */
 
-export const acceptHabitInvitation = async(senderID: string, senderMail: string, userMail: string, habit: Habit) => {
+export const acceptHabitInvitation = async(senderID: string, senderMail: string, userID: string, userMail: string, habitID: string): Promise<boolean> => {
     try{
         console.log("Accepting habit invitation...")
 
-        const data: UserEventRequest = {ownerMail: senderMail, ownerID: senderID, habitID: habit.habitID}
+        const data: UserEventRequest = {
+            ownerMail: senderMail, 
+            ownerID: senderID, 
+            habitID: habitID
+        }
 
         //Retirer la demande
 
-        const requestRef = doc(db, "Users", userMail, "Friends", "HabitsInvitations")
+        const requestRef = doc(
+            db,
+            FirestoreCollections.Users,
+            userMail,
+            FirestoreUserSubCollections.Social,
+            FirestoreSocialSubCollections.HabitsInvitation
+        )
+
+        console.log("data : ", data)
+
         await updateDoc(requestRef, {habits: arrayRemove(data)})
 
         //Ajouter dans les habits (en tant que ref)
 
-        await addRefHabitToFirestore(data, userMail)
+        await addRefHabitToFirestore(habitID, userMail)
+
+        //Ajouter le nouvel utilisateur aux membres
+
+        const habitDoc = doc(
+            db,
+            FirestoreCollections.Habits,
+            habitID
+        )
+
+        await updateDoc(habitDoc, ({
+            members: arrayUnion({mail: userMail, id: userID})
+        }))
 
         console.log("Habit invitation well accepted !")
+
+        return true
     }
 
     catch(e){
-        console.log("Error while refusing friend invitation : ", e)
+        console.log("Error while accepting friend invitation : ", e)
     }
+
+    return false
 }
+
+/**
+ * [FIRESTORE] Refuse une invitation de collaboration à une habitude
+ */
 
 export const refuseHabitInvitation = async(senderID: string, senderMail: string, userMail: string, habitID: string) => {
     try{
         console.log("Refusing habit invitation...")
 
-        const data: UserEventRequest = {ownerMail: senderMail, ownerID: senderID, habitID: habitID}
+        const data: UserEventRequest = {
+            ownerMail: senderMail, 
+            ownerID: senderID, 
+            habitID: habitID
+        }
 
         console.log("data : ", data)
 
-        const requestRef = doc(db, "Users", userMail, "Friends", "HabitsInvitations")
+        const requestRef = doc(
+            db,
+            FirestoreCollections.Users,
+            userMail,
+            FirestoreUserSubCollections.Social,
+            FirestoreSocialSubCollections.HabitsInvitation
+        )
 
         await updateDoc(requestRef, {habits: arrayRemove(data)})
 

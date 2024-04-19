@@ -25,14 +25,18 @@ import { acceptHabitInvitation, refuseHabitInvitation } from "../../firebase/Fir
 import { auth } from "../../firebase/InitialisationFirebase";
 import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
 import Toast from "react-native-toast-message";
-import { BottomScreenOpen_Impact } from "../../constants/Impacts";
+import { BottomScreenOpen_Impact, Success_Impact } from "../../constants/Impacts";
+import { UserContext } from "../../data/UserContext";
 
 type SharedHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "SharedHabitScreen">
 
 const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
-    const {habit, user} = route.params;
-    const {Habits} = useContext(HabitsContext)
+    const {habit, user: senderUser} = route.params;
+    const {addHabitIntern} = useContext(HabitsContext)
+    const {setIsLoading} = useContext(AppContext)
+    const {user} = useContext(UserContext)
 
+    console.log("habitID:", habit.habitID )
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
 
@@ -51,26 +55,33 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
         });
       }, [navigation]);
 
-    const handleAcceptHabitInvitation = () => {
-        if(auth.currentUser && auth.currentUser.email) {
-            acceptHabitInvitation(user.uid, user.email, auth.currentUser.email, convertBackSeriazableHabit(habit))
+    const handleAcceptHabitInvitation = async() => {
+        setIsLoading(true)
+        if(user && user.email) {
+            if(await acceptHabitInvitation(senderUser.uid, senderUser.email, user.uid, user.email, habit.habitID)) {
+                addHabitIntern(convertBackSeriazableHabit(habit))
+
+                Toast.show({
+                    type: "info",
+                    text1: "Invitation acceptée !",
+                    position: "top",
+                    visibilityTime: 3000,
+                    swipeable: true
+                })
+
+                Success_Impact()
+                navigation.goBack()
+            }
         }
 
-        Toast.show({
-            type: "info",
-            text1: "Invitation acceptée !",
-            position: "top",
-            visibilityTime: 3000,
-            swipeable: true
-        })
 
-        BottomScreenOpen_Impact()
-        navigation.goBack()
+
+        setIsLoading(false)
     }
 
     const handleRefuseHabitInvitation = () => {
-        if(auth.currentUser && auth.currentUser.email) {
-            refuseHabitInvitation(user.uid, user.email, auth.currentUser.email, habit.habitID)
+        if(user && user.email) {
+            refuseHabitInvitation(senderUser.uid, senderUser.email, user.email, habit.habitID)
         }
 
         Toast.show({
@@ -104,14 +115,14 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
                         <View style={{gap: 15, justifyContent: "center", alignItems: "center"}}>
                             <ProfilButton
                                 huge
-                                user={user}
+                                user={senderUser}
                                 disabled
                                 noBadge
                                 isSelected
                                 onPress={() => {}}
                             />
                             <View style={styles.titreEtDescriptionContainer}>
-                                <TitleText text={user.displayName}/>
+                                <TitleText text={senderUser.displayName}/>
                                 <SubTitleText bold style={{color: fontGray}}
                                     text={"Te propose une nouvelle habitude"}/>
                             </View>

@@ -7,6 +7,8 @@ import { DayProps } from "react-native-calendars/src/calendar/day";
 import { AppContext } from "../../data/AppContext";
 import { Habit } from "../../types/HabitTypes";
 import { isHabitScheduledForDate } from "../../primitives/HabitudesReccurence";
+import { addDays } from "date-fns";
+import { convertToRGBA } from "react-native-reanimated";
 
 export interface MemoizedDayContainerProps extends Omit<DayProps, 'date'> {
     date: DateData,
@@ -27,6 +29,7 @@ const MemoizedDayContainer: FC<MemoizedDayContainerProps> = memo(({ date, state,
 
     const isToday = state === "today";
     const isSelected = marking && marking.selected
+    if(isSelected) console.log(isSelected)
 
     const color = isSelected ? fontContrast : font
 
@@ -71,9 +74,13 @@ const StreakMemoizedDayContainer: FC<StreakMemoizedDayContainerProps> = memo(({ 
     const today = new Date();
 
     const isScheduleForDate = isHabitScheduledForDate(habit, new Date(date.dateString))
+
     const isSameDayOrBeforeToday = new Date(date.dateString).setHours(0, 0, 0, 0) <= today.setHours(0, 0, 0, 0);
 
-    const color = isSelected ? habit.color : ((isScheduleForDate && isSameDayOrBeforeToday) ? popup : secondaryLowOpacity)
+    const rgba = convertToRGBA(habit.color)
+    const color = isSelected ? habit.color : 
+        ((isScheduleForDate && isSameDayOrBeforeToday) ? "#26292e" : 
+            (isScheduleForDate ? "rgba(18, 22, 27, 0.8)" : secondaryLowOpacity))
 
     return (
             <View style={[streakStyles.dayContainer]}>        

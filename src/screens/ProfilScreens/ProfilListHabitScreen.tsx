@@ -10,10 +10,12 @@ import { CustomTextInputRefType, SearchBarCustom } from '../../components/TextFi
 import { HugeText } from '../../styles/StyledText'
 import { NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons'
 import { TextButton } from '../../components/Buttons/UsualButton'
+import { FormDetailledObjectifHabit } from '../../types/FormHabitTypes'
+import { getSeriazableHabit } from '../../primitives/HabitMethods'
 
 type ProfilListHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilListHabitScreen">
 
-const ProfilListHabitScreen: FC<ProfilListHabitScreenProps> = ({}) => {
+const ProfilListHabitScreen: FC<ProfilListHabitScreenProps> = ({navigation}) => {
 
   const {Habits} = useContext(HabitsContext)
 
@@ -40,7 +42,9 @@ const ProfilListHabitScreen: FC<ProfilListHabitScreenProps> = ({}) => {
     setHabitsToDisplay(Object.values(Habits))
   }, [Habits])
 
-
+  const handlePressOnHabit = (habit: Habit) => {
+      navigation.navigate("PresentationHabitScreen", {habit: getSeriazableHabit(habit)})
+  }
 
   return (
     <UsualScreen>
@@ -67,6 +71,7 @@ const ProfilListHabitScreen: FC<ProfilListHabitScreenProps> = ({}) => {
                 habits={habitsToDisplay} 
                 deleteHabit={() => {}} 
                 editHabit={() => {}}
+                onPress={handlePressOnHabit}
               />
             </CustomScrollView>
         </View>

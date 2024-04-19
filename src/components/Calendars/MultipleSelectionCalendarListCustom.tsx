@@ -11,6 +11,7 @@ import CalendarDayLabels from './CalendarDayLabels';
 import CalendarMonthHeader from './CalendarMonthHeader';
 import { RANGE, THEME } from '../../constants/CalendarConst';
 import { CalendarHeaderProps } from 'react-native-calendars/src/calendar/header';
+import { toISOStringWithoutTimeZone } from '../../primitives/BasicsMethods';
 
 
 export interface MarkedMultipleDateType {
@@ -68,7 +69,7 @@ const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
         //if(selectedDates.length === 0 || !selectedDates[0]) return markedDatesObject
 
         const startingDate_temp = selectedDates[0]
-        const startingDateString = startingDate_temp.toISOString().slice(0, 10)
+        const startingDateString = toISOStringWithoutTimeZone(startingDate_temp)
 
         const endingDate_temp = selectedDates[1]
 
@@ -79,7 +80,7 @@ const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
         }
 
         else {
-            const endingDateString = endingDate_temp.toISOString().slice(0, 10)
+            const endingDateString = toISOStringWithoutTimeZone(endingDate_temp)
 
             markedDatesObject = {
                 [startingDateString]: {startingDate: true},
@@ -90,7 +91,7 @@ const MultipleSelectionCalendarListCustom = forwardRef((props, ref) => {
             currentDate = addDays(currentDate, 1)
 
             while(currentDate < endingDate_temp){
-                const currentDateString = currentDate.toISOString().slice(0, 10)
+                const currentDateString = toISOStringWithoutTimeZone(currentDate)
 
                 markedDatesObject[currentDateString] = {selected: true}
                 currentDate = addDays(currentDate, 1)

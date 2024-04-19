@@ -25,8 +25,8 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
     }
 
     const connectToDarkCreep = async() => {
-        console.log("connection to darkcreep...")
-        await signInWithEmailAndPassword(auth, "lemonnierpaul49070@gmail.com", "123456");
+        console.log("connection to zazou...")
+        await signInWithEmailAndPassword(auth, "paul.lemonnier7@gmail.com", "123456");
         setUserAuthState(AuthStates.Ready)
 
       }
@@ -35,7 +35,7 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
         console.log("connection to arzakal...")
   
         try {
-            await signInWithEmailAndPassword(auth, "paul.lemonnier70@gmail.com", "123456");
+            await signInWithEmailAndPassword(auth, "paul.lemonnier49070@gmail.com", "123456");
             setUserAuthState(AuthStates.Ready)
 
         }
@@ -61,7 +61,7 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
                     <View style={styles.connexionContainer}>
 
                     <View style={{flexDirection: 'row', justifyContent: 'center', gap: 20}}>
-                        <BackgroundTextButton text={"DarkCreep"} bold onPress={connectToDarkCreep}/>
+                        <BackgroundTextButton text={"Zazou"} bold onPress={connectToDarkCreep}/>
                         <BackgroundTextButton text={"Arzakal"} bold onPress={connectToArzakal}/>
                     </View>
                         <BackgroundTextButton bold text={"S'inscrire"} onPress={handleGoToBaseDetailsSignUpScreen}/>

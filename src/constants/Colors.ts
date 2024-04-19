@@ -64,6 +64,24 @@ const theme: ThemeObject = {
       Error: "#851405",
       LinearGradientOpacityStart: 'rgba(0,0,0,0)',
       LinearGradientOpacityEnd: 'rgba(0,0,0,1)'
+      // FontGray: "#7c7c7c",
+      // Font: "#fff",
+      // FontContrast: "#091823",
+      // Contrast: "#fafafa",
+      // Primary: "#1a1a1a",
+      // Secondary: "#1e2126",
+      // SecondaryLowOpacity: "rgba(30, 33, 38, 0.5)",
+      // ContrastLowOpacity: "rgba(250, 250, 250, 0.25)",
+      // Selection: 'rgba(65, 68, 71, 0.5)',
+      // InputBackground: "#f0f0f0",
+      // InputDisabledBackground: "#e0e0e0",
+      // DisabledButtonBackground: "#1e2126",
+      // DisabledButtonText: "#fafafa",
+      // Tertiary: "#464a4f",
+      // Popup: "#212529",
+      // Error: "#b71c1c",
+      // LinearGradientOpacityStart: 'rgba(0,0,0,0)',
+      // LinearGradientOpacityEnd: 'rgba(0,0,0,1)'
   },
 };
 

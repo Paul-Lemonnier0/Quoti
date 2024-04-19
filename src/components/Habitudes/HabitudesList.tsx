@@ -1,5 +1,5 @@
 import { HabitudeListItem } from "./HabitudeListItem"
-import { FC } from "react"
+import { FC, memo } from "react"
 import Animated from "react-native-reanimated"
 import { Habit } from "../../types/HabitTypes"
 import React from "react"

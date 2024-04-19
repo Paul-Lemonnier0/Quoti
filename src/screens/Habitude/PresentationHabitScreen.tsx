@@ -33,30 +33,23 @@ import { addHabitDoneDate } from "../../firebase/Firestore_Habits_Primitives";
 import { FormStep } from "../../types/FormHabitTypes";
 import BottomMenuStyle from "../../styles/StyledBottomMenu";
 import { toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods";
+import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
 
-type HabitudeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HabitudeScreen">
+type PresentationHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "PresentationHabitScreen">
 
-const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
+const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenProps) => {
 
-    const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
+    const {habit: seriazableHabit} = route.params;
     const {theme} = useContext(AppContext)
     const tertiary = useThemeColor(theme, "Tertiary")
     const secondary = useThemeColor(theme, "Secondary")
 
     const {getHabitFromFilteredHabits, handleCheckStep, Objectifs, HabitsHistory} = useContext(HabitsContext)
 
+    const habit = convertBackSeriazableHabit(seriazableHabit)
 
     const bottomSheetModalRef_HabitCompleted = useRef<BottomSheetModal>(null)
     const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
-    
-
-    const currentDate = new Date(currentDateString)
-    
-    const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID) ?? Habits_Skeleton[0]
-
-    if(objectifID){
-        habit["color"] = Objectifs[objectifID].color ?? habit.color
-    }
 
     const [steps, setSteps] = useState<Step[]>(Object.values(habit.steps))
 
@@ -72,34 +65,15 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
     const isFinished = steps.filter(step => step.isChecked).length === steps.length
 
-    const onStepChecked = (step: Step | FormStep, index: number) => {
-        const stepWellType = step as Step
-        const isChecked = !stepWellType.isChecked
-
-        const updatedSteps = [...steps]
-        updatedSteps[index] = {...stepWellType, isChecked}
-
-        const new_doneSteps = updatedSteps.filter(stepWellType => stepWellType.isChecked).length
-        const isHabitNowCompleted = new_doneSteps === totalSteps
-
-        handleCheckStep(habitID, stepWellType.stepID, currentDate, isChecked, isHabitNowCompleted)
-        setSteps(updatedSteps);    
-
-        if(isHabitNowCompleted){
-            bottomSheetModalRef_HabitCompleted.current?.present();
-            Success_Impact()
-
-            if(user && user.email) {
-            }
-        }
-    }
-
     const imageSize = 35
 
     // const {user} = useContext(UserContext)
     const user = auth.currentUser
 
-    const history = HabitsHistory[habitID]
+    const history = HabitsHistory[habit.habitID]
+
+    const currentDate = new Date()
+    const currentDateString = toISOStringWithoutTimeZone(currentDate)
 
     const [last7DaysLogs, setLast7DaysLogs] = useState<string[]>([])
     const startingDate = addDays(currentDate, -7);
@@ -164,7 +138,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                                 <TitleText text="Progression"/>
 
                                 <View style={styles.displayColumn}>
-                                    <StepsList disabled={false} steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
+                                    <StepsList disabled={false} steps={steps} onStepChecked={() => {}} softDisabled color={habit.color}/>
                                 </View>
                             </View>
 
@@ -296,4 +270,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default HabitudeScreen
+export default PresentationHabitScreen

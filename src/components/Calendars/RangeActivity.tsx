@@ -9,6 +9,7 @@ import React from "react"
 import { AppContext } from "../../data/AppContext";
 import { Habit } from "../../types/HabitTypes";
 import { isHabitScheduledForDate } from "../../primitives/HabitudesReccurence";
+import { toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods";
 
 
 export interface RangeActivityProps {
@@ -32,15 +33,15 @@ const RangeActivity: FC<RangeActivityProps> = ({habit, start, history, activityC
     }
 
     const today = new Date().setHours(0,0,0,0)
-    const history_string = history.map(hist => new Date(hist).toISOString().slice(0, 10))
+    const history_string = history.map(hist => toISOStringWithoutTimeZone(new Date(hist)))
 
     return(
         <View style={styles.container}>
         {
             daysRange.map((day, index) => {
-                const isDone = history_string.includes(day.toISOString().slice(0, 10));
+                const isDone = history_string.includes(toISOStringWithoutTimeZone(day));
                 const dayName = day.toLocaleDateString("fr", { weekday: 'long' }).substring(0,2);        
-                const isStart = day.toISOString() === start .toISOString()  
+                const isStart = toISOStringWithoutTimeZone(day) === toISOStringWithoutTimeZone(start)  
                 
                 const day_temp = new Date(day)
                 const isToday = day_temp.setHours(0,0,0,0) === today

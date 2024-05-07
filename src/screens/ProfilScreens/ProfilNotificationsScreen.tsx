@@ -2,24 +2,23 @@ import { View, StyleSheet } from "react-native"
 import { HugeText, SubTitleText } from "../../styles/StyledText"
 import { FC, useState } from "react"
 import { CustomScrollView, UsualScreen } from "../../components/View/Views"
-import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
+import { IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { useContext } from "react"
-import { UserContext, UserEventRequest } from "../../data/UserContext"
+import { UserContext } from "../../data/UserContext"
 import { FlatList } from "react-native"
 import { useEffect } from "react"
 import { Database_GetSpecificUser, Database_getUsersInfo, UserDataBase } from "../../firebase/Database_User_Primitives"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
 import React from "react"
 import ProfilItem from "../../components/Profil/ProfilItem"
-import { acceptFriendInvitation, acceptHabitInvitation, refuseFriendInvitation, refuseHabitInvitation } from "../../firebase/Firestore_User_Primitives"
-import { User } from "firebase/auth"
+import { acceptFriendInvitation, refuseFriendInvitation } from "../../firebase/Firestore_User_Primitives"
 import { Habit } from "../../types/HabitTypes"
 import { getSpecificHabitForUser } from "../../firebase/Firestore_Habits_Primitives"
 import HabitRequestBlock from "../../components/Habitudes/HabitRequestBlock"
 import { getSeriazableHabit } from "../../primitives/HabitMethods"
 import Quoti from "../../components/Other/Quoti"
 import { HabitsContext } from "../../data/HabitContext"
+import { HomeStackParamsList } from "../../navigation/HomeNavigator"
 
 type ProfilNotificationsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilNotificationsScreen">
 
@@ -104,6 +103,7 @@ const ProfilNotificationsScreen: FC<ProfilNotificationsScreenProps> = ({navigati
         }
 
         const getHabitsRequests = async () => {
+            console.log(user?.habitRequests)
             if (user?.habitRequests && user.habitRequests.length > 0) {
                 const habitsPromises = user.habitRequests.map(async (req) => {
                     const res = await Database_GetSpecificUser(req.ownerID);
@@ -124,17 +124,11 @@ const ProfilNotificationsScreen: FC<ProfilNotificationsScreenProps> = ({navigati
             }
         };
         
-
         getHabitsRequests()
         getFriendsRequests()
     }, [user])
 
-    if(habitsRequestsUsers.length > 0) {
-        console.log("ok requests : ", habitsRequestsUsers[0].habit.members)
-
-    }
-
-
+    console.log(habitsRequestsUsers)
 
     return(
         <UsualScreen>

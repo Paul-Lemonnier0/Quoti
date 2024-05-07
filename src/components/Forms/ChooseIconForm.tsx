@@ -82,7 +82,7 @@ const ChooseIconForm: FC<ChooseIconFormProps> = ({
             <View style={styles.container}>
 
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         <NavigationButton noPadding action={NavigationActions.goBack}/>
                         <Quoti/>
                         <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>

@@ -41,7 +41,7 @@ const CustomCheckBox: FC<CustomCheckBoxProps> = ({
         <TouchableOpacity onPress={onPress} disabled={noPress || disabled}
             style={[styles.stepCheckBox,
             { 
-                backgroundColor: isPrimary ? primary :secondary,
+                backgroundColor: isPrimary ? primary : secondary,
                 borderColor, 
                 borderWidth
             }]}>

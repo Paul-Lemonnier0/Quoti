@@ -66,7 +66,7 @@ const StepItem: FC<StepItemProps> = ({
 
                 <View style={styles.titreEtDescriptionContainer}>
                     <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>
-                    <NormalText style={{color: fontGray}} bold text={duration}/>
+                    <LittleNormalText style={{color: fontGray}} bold text={duration}/>
                 </View>
             </View>
             {

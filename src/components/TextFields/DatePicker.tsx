@@ -8,6 +8,7 @@ import { FC, useContext } from "react";
 import React from "react"
 import { AppContext } from "../../data/AppContext";
 import { toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods";
+import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 
 export interface DatePickerBasicProps {
     onPress: () => void,
@@ -34,14 +35,19 @@ export const DatePicker: FC<DatePickerProps> = ({onPress, date, label, boldLabel
     const dateStringOptions: DateOptions = {day: 'numeric', weekday: 'short', month: 'long', year: 'numeric'}
     const secondary = useThemeColor(theme, "Secondary") 
 
+    const handleOnPress = () => {
+        BottomScreenOpen_Impact()
+        onPress()
+    }
+
     return(
         <View style={styles.dateSelectionHeader}>
             {boldLabel ? <SubTitleText text={label}/> : 
                         <NormalText bold={semiBoldLabel} text={label}/>}
 
             <View style={styles.dateSelectionButtonContainer}>
-                <TouchableOpacity onPress={onPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
-                    <NormalText bold={semiBold} text={date.toLocaleDateString('fr', dateStringOptions)}/>
+                <TouchableOpacity onPress={handleOnPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
+                    <NormalText bold text={date.toLocaleDateString('fr', dateStringOptions)}/>
 
                     <Icon name="calendar-range-outline" provider={IconProvider.MaterialCommunityIcons}/>
 
@@ -53,7 +59,7 @@ export const DatePicker: FC<DatePickerProps> = ({onPress, date, label, boldLabel
  
 export interface MultiDatePickerProps extends DatePickerBasicProps {
     startDate: Date,
-    endDate: Date
+    endDate?: Date
 }
 
 export const MultiDatePicker: FC<MultiDatePickerProps> = ({onPress, startDate, endDate, label, boldLabel, semiBoldLabel, semiBold}) => {
@@ -66,7 +72,7 @@ export const MultiDatePicker: FC<MultiDatePickerProps> = ({onPress, startDate, e
     const endDateStringOptions: DateOptions = {day: 'numeric', month: "short", year: "numeric"}
     let endDateString: string;
 
-    if(toISOStringWithoutTimeZone(endDate) === toISOStringWithoutTimeZone(startDate)){
+    if(!endDate || toISOStringWithoutTimeZone(endDate) === toISOStringWithoutTimeZone(startDate)){
         endDateString = "?"
         startDateStringOptions["month"] = "short"
         startDateStringOptions["year"] = "numeric"
@@ -86,14 +92,19 @@ export const MultiDatePicker: FC<MultiDatePickerProps> = ({onPress, startDate, e
 
     const startDateString = startDate.toLocaleDateString("fr", startDateStringOptions)
 
+    const handleOnPress = () => {
+        BottomScreenOpen_Impact()
+        onPress()
+    }
+
     return(
         <View style={styles.dateSelectionHeader}>
             {boldLabel ? <SubTitleText text={label}/> : 
                         <NormalText bold={semiBoldLabel} text={label}/>}
 
             <View style={styles.dateSelectionButtonContainer}>
-                <TouchableOpacity onPress={onPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
-                    <NormalText bold={semiBold} text={startDateString + " - " + endDateString}/>
+                <TouchableOpacity onPress={handleOnPress} style={[styles.dateSelectionButton, {backgroundColor: secondary}]}>
+                    <NormalText bold text={startDateString + " - " + endDateString}/>
 
                     <Icon name="calendar-range-outline" provider={IconProvider.MaterialCommunityIcons}/>
 

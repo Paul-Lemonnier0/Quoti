@@ -1,13 +1,13 @@
 import { FlatList, Image, View } from "react-native"
 import { TextButton } from "../Buttons/UsualButton"
-import { HugeText, NormalText, SubTitleText } from "../../styles/StyledText"
+import { HugeText, SubTitleText } from "../../styles/StyledText"
 import Separator from "../Other/Separator"
 import { CustomTextInputRefType, TextInputCustom } from "../TextFields/TextInput"
 import { CustomScrollView, UsualScreen } from "../View/Views"
 import StepIndicator from "../Other/StepIndicator"
 import { NavigationActions, NavigationButton } from "../Buttons/IconButtons"
 import { StyleSheet } from "react-native"
-import { FC, useContext, useRef, useState } from "react"
+import { FC, useCallback, useContext, useRef, useState } from "react"
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants"
 import ObjectifRadioItem from "../Objectifs/ObjectifRadioItem"
 import { HabitsContext } from "../../data/HabitContext"
@@ -16,7 +16,13 @@ import { FormBasicHabit, FormDetailledObjectifHabit } from "../../types/FormHabi
 import React from "react"
 import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList"
 import Quoti from "../Other/Quoti"
-import { isTextInputValueValid } from "../../primitives/BasicsMethods"
+import { isTextInputValueValid, toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods"
+import { AppContext } from "../../data/AppContext"
+import { useThemeColor } from "../Themed"
+import { BottomScreenOpen_Impact, Error_Impact } from "../../constants/Impacts"
+import { DatePicker } from "../TextFields/DatePicker"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
+import SelectDateBottomScreen from "../../screens/BottomScreens/SelectDateBottomScreen"
 
 export interface HabitFormProps {
     isForModifyingHabit?: boolean,
@@ -37,6 +43,8 @@ const HabitForm: FC<HabitFormProps> = ({
     constObjectifID,
     currentStep = 1,
 }) => {
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
 
     const {Objectifs} = useContext(HabitsContext)
 
@@ -59,6 +67,7 @@ const HabitForm: FC<HabitFormProps> = ({
 
     const RenderObjectif = ({item, index}) => {
         const onPress = () => {
+            BottomScreenOpen_Impact()
 
             if(!isForModifyingHabit){
                 const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(item.objectifID, AddHabitScreenType.AddBasicDetails)
@@ -72,8 +81,9 @@ const HabitForm: FC<HabitFormProps> = ({
         }
 
         return (
-            <ObjectifRadioItem onPress={onPress} objectif={item} isPressDisabled={constObjectifID !== undefined}
-                        isSelected={selectedObjectif === item.objectifID}/>
+            <ObjectifRadioItem 
+                onPress={onPress} objectif={item} isPressDisabled={constObjectifID !== undefined}
+                isSelected={selectedObjectif === item.objectifID}/>
         )
     }
 
@@ -85,17 +95,25 @@ const HabitForm: FC<HabitFormProps> = ({
     }
 
     const handleValidation = () => {
-        let canGoNext = true
-
         const titre = titreRef.current?.getValue();
         const description = descriptionRef.current?.getValue();
         if(titre && description && isTextInputValueValid(titre) && isTextInputValueValid(description)){
-            const newValues: FormBasicHabit = {titre, description, objectifID: selectedObjectif}
+            const newValues: FormBasicHabit = {
+                titre: titre.trim(), 
+                description: description.trim(),
+                objectifID: selectedObjectif,
+                startingDate: toISOStringWithoutTimeZone(startingDate)
+            }
 
             handleGoNext(newValues)
+
+            setIsTitleWrong(false)
+            setIsDescriptionWrong(false)
         }
         
         else {
+            Error_Impact()
+
             setIsTitleWrong(!isTextInputValueValid(titre))
             setIsDescriptionWrong(!isTextInputValueValid(description))
         }
@@ -111,11 +129,24 @@ const HabitForm: FC<HabitFormProps> = ({
         )
     }
 
+    const [startingDate, setStartingDate] = useState<Date>(baseHabit?.startingDate ? new Date(baseHabit?.startingDate) : new Date())
+
+    const bottomSheetModalRef_Calendar = useRef<BottomSheetModal>(null);
+  
+    const handleOpenCalendar = useCallback(() => {
+        BottomScreenOpen_Impact()
+        bottomSheetModalRef_Calendar.current?.present();
+    }, []);
+
+    const isNotYetStartingDate = 
+        baseHabit && baseHabit.startingDate && 
+        new Date(baseHabit.startingDate).setHours(0,0,0,0) > new Date().setHours(0,0,0,0)
+
     return(
         <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         {(isForCreateObjectiveHabit || isForModifyingHabit) && closeModal ?
                             <NavigationButton noPadding methode={closeModal} action={NavigationActions.close}/>
                             :
@@ -130,46 +161,75 @@ const HabitForm: FC<HabitFormProps> = ({
                     <StepIndicator totalSteps={totalSteps} currentStep={currentStep}/>
                 </View>
 
-                <View style={styles.body}>
+                <CustomScrollView>
+                    <View style={styles.body}>
 
-                    <View style={{display: "flex", flexDirection: "column", gap: 20,
-                                justifyContent: "center", flex: 1}}>
+                        <View style={{display: "flex", flexDirection: "column", gap: 20,
+                                    justifyContent: "center", flex: 1}}>
 
-                        <View style={styles.subBody}>
-                            <TextInputCustom startingValue={baseHabit ? baseHabit.titre : ""} semiBold ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
-                            <TextInputCustom startingValue={baseHabit ? baseHabit.description : ""} semiBold ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
-                        </View>
-
-                        <View style={{marginTop: -30, marginBottom: 20}}>
-                            <Separator/>
-                        </View>
-
-                        <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                            <SubTitleText text={"Objectif"}/>
-                            <TextButton text={"Dissocier"} disabled={constObjectifID !== undefined} semiBold noPadding onPress={handleDissocier}/>
-                        </View>
-
-                        {
-                            displayedObjectifs.length === 0 ?
-                            <NoObjectifScreen/>
-                            
-                            :
-                            
-                            <View style={{flex: 1, marginBottom: -35}}>
-                                <View style={{display: "flex", flexDirection: "column", gap: 20, flex: 1}}>
-                                    <CustomScrollView>
-                                        <View style={{gap: 10, marginBottom: 40}}>
-                                        {
-                                            displayedObjectifs.map((obj, index) => <RenderObjectif key={index} item={obj} index={index}/>)
-                                        }
-                                        </View>
-                                    </CustomScrollView>
-                                </View> 
+                            <View style={styles.subBody}>
+                                <TextInputCustom startingValue={baseHabit ? baseHabit.titre : ""} semiBold ref={titreRef} labelName={"Titre"} placeholder={"Entrez un titre"} isWrong={isTitleWrong}/>
+                                <TextInputCustom startingValue={baseHabit ? baseHabit.description : ""} semiBold ref={descriptionRef} labelName={"Description"} placeholder={"Entrez une courte description"} isWrong={isDescriptionWrong}/>
                             </View>
-                        }
+                            
+                            {
+                                isNotYetStartingDate &&
+                                <>
+                                    <View style={{marginTop: 20, marginBottom: 10}}>
+                                        <Separator/>
+                                    </View>
+
+                                    <View style={[styles.displayColumn, {alignItems: "center", marginTop: 10}]}>
+                                        <DatePicker label={"Date de début"} semiBoldLabel
+                                            date={startingDate}
+                                            onPress={handleOpenCalendar}/>
+                                    </View>
+                                </>
+                            }
+                            {
+                                 !isForCreateObjectiveHabit &&
+                                 <>
+                                    <View style={{marginTop: 20, marginBottom: 20}}>
+                                        <Separator/>
+                                    </View>
+                                    <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+                                        <SubTitleText text={"Objectif"}/>
+                                        <TextButton isGray text={"Dissocier"} disabled={constObjectifID !== undefined} semiBold noPadding onPress={handleDissocier}/>
+                                    </View>
+                                </>
+                            }
+                            
+                            {
+                                displayedObjectifs.length === 0 ?
+                                <NoObjectifScreen/>
+                                
+                                :
+
+                                !isForCreateObjectiveHabit &&
+                                <View style={{flex: 1, marginBottom: -35}}>
+                                    <View style={{display: "flex", flexDirection: "column", gap: 20, flex: 1}}>
+                                        <FlatList
+                                            scrollEnabled={false}
+                                            data={displayedObjectifs}
+                                            style={{margin: -20}}
+                                            contentContainerStyle={{gap: 10, padding: 20, paddingBottom: 60}}
+                                            renderItem={({item, index}) => <RenderObjectif key={index} item={item} index={index}/>}
+                                        />
+                                    </View> 
+                                </View>
+                            }
+                        </View>
                     </View>
-                </View>
+                </CustomScrollView>
             </View>
+
+                        
+            <SelectDateBottomScreen
+                disabledPastDays
+                selectedDate={startingDate}
+                setSelectedDate={setStartingDate}
+                bottomSheetModalRef={bottomSheetModalRef_Calendar} 
+            />
         </UsualScreen>
     )
 }
@@ -178,7 +238,7 @@ const styles = StyleSheet.create({
     container: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 0, 
+        gap: 20, 
         flex: 1, 
         marginBottom: 0
     },
@@ -192,6 +252,7 @@ const styles = StyleSheet.create({
     body: {
         flex: 1, 
         gap: 30,
+        marginTop: 10,
         justifyContent: "center",
     },
 
@@ -214,6 +275,14 @@ const styles = StyleSheet.create({
         resizeMode: 'contain', 
         width: "75%", 
         maxHeight: "75%",
+    },
+
+    
+    displayColumn: {
+        display: "flex", 
+        flexDirection: "column", 
+        justifyContent: "center",
+        gap: 10
     },
 })
 

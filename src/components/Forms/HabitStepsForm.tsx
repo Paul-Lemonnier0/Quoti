@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo, useRef, useState } from "react";
 import { generateUniqueID } from "../../primitives/BasicsMethods";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import { Image, View } from "react-native";
-import { HugeText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText";
+import { HugeText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText";
 import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList";
 import { CustomScrollView, UsualScreen } from "../View/Views";
 import StepsList from "../Habitudes/Step/StepsList";
@@ -51,7 +51,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
             steps: []
         }
 
-        if(steps.length === 0){
+        if(steps.length === 0 || steps.filter(step => step.numero === -1).length > 0){
             newValues.steps = [{numero: -1}]
         }
 
@@ -70,9 +70,10 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
         handleGoNext(newValues)
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails((isForModifyingHabit && !isNewObjectifHabit) ? null : habit.objectifID ?? null, AddHabitScreenType.AddHabitSteps)
+    const objID = (isForModifyingHabit && !isNewObjectifHabit) ? null : (habit.objectifID ?? null) 
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(objID, AddHabitScreenType.AddHabitSteps)
 
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS + (isNewObjectifHabit ? 0 : (isForModifyingHabit ? -1 : 0))
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     const handleAddStep = () => {
@@ -87,8 +88,8 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
                     <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Education]}/>
 
                     <View style={styles.emptyScreenSubContainer}>
-                        <NormalText text={"Pour plus d'efficacité"}/>
-                        <SubTitleText text={"Décomposez votre habitude"}/>
+                        <TitleText text="Pour plus d'efficacité"/>
+                        <NormalGrayText bold text={"Décomposez votre habitude"}/>
                     </View>
                 </View>
             </View>
@@ -97,21 +98,28 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
 
     const StepScreen = () => {
         return(
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, marginBottom: -40, paddingBottom: 0}}>
                 <StepsList steps={steps} editable color={habit.color} setSteps={setSteps}/>
             </View>
         )
     }
+
+    const isStepsEmpty = steps.length === 0 || steps.filter(step => step.numero === -1).length > 0
 
     return(
         <UsualScreen hideMenu>
             <View style={styles.container}>
 
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         <NavigationButton noPadding action={NavigationActions.goBack}/>
                         <Quoti/>
-                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
+                        
+                        <NavigationButton noPadding action={
+                                (isForModifyingHabit && !isNewObjectifHabit) ? 
+                                NavigationActions.validation :
+                                NavigationActions.goNext
+                            } methode={handleValidation}/>
                     </View>            
 
                     
@@ -130,7 +138,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
                         </View>
                         
                         {
-                        steps.length === 0 ? 
+                        isStepsEmpty ? 
                             <NoStepScreen/>
                             :
                             <StepScreen/>

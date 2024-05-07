@@ -18,9 +18,9 @@ const ProgressBar: FC<ProgressBarProps> = ({progress, color, inactiveColor, with
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
-    const primary = useThemeColor(theme, "Primary")
+    const tertiary = useThemeColor(theme, "Tertiary")
     
-    const unfilledColor = inactiveColor ?? primary
+    const unfilledColor = inactiveColor ?? tertiary
     const finalColor = color ?? font
 
     const final_progress = progress ?? 0
@@ -40,6 +40,23 @@ const ProgressBar: FC<ProgressBarProps> = ({progress, color, inactiveColor, with
     }
     return(
         <Progress.Bar progress={final_progress} color={finalColor} width={null} borderWidth={0} height={3} unfilledColor={unfilledColor}/>
+    )
+}
+
+export const ProgressPie: FC<ProgressBarProps> = ({progress, color, inactiveColor, withPourcentage}) => {
+    const {theme} = useContext(AppContext)
+
+    const font = useThemeColor(theme, "Font")
+    const primary = useThemeColor(theme, "Primary")
+    
+    const unfilledColor = inactiveColor ?? primary
+    const finalColor = color ?? font
+
+    const final_progress = progress ?? 0
+    const pourcentage = Math.round(final_progress*100)
+
+    return(
+        <Progress.Circle progress={final_progress} color={finalColor} size={undefined} borderWidth={0} unfilledColor={unfilledColor}/>
     )
 }
 

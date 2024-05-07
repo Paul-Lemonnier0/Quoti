@@ -1,11 +1,11 @@
-import React, { createContext, useState, useEffect, useContext, FC, ReactNode } from "react";
-import { addHabitDoneDate, addHabitToFireStore, getAllOwnHabits, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
+import React, { createContext, useState, useEffect, useContext, FC, ReactNode, Dispatch } from "react";
+import { addHabitDoneDate, addHabitToFireStore, archiveUserHabit, getBackUserHabit, HabitState, markUserHabitAsDone, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
 import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
 import { addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore, updateObjectifInFirestore } from "../firebase/Firestore_Objectifs_Primitives";
 import { UserContext, UserContextType } from "./UserContext";
-import { FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList, Step, StepList, StreakValues } from "../types/HabitTypes";
+import { EMPTY_FILTERED_HABITS, FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList, Step, StepList, StreakValues } from "../types/HabitTypes";
 import { FormDetailledHabit } from "../types/FormHabitTypes";
 import { FormDetailledObjectif } from "../types/FormObjectifTypes";
 import { DefaultHabit } from "../types/DefaultHabit";
@@ -13,14 +13,25 @@ import { removeObjectifFromFilteredHabits, removeObjectifFromObjectifs } from ".
 import { auth } from "../firebase/InitialisationFirebase";
 import { calculateNextScheduledDate, isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
 import { toISOStringWithoutTimeZone } from "../primitives/BasicsMethods";
+import { fetchUserHabits } from "../firebase/Firestore_Fetch_Habits_Primitives";
 
 export interface HabitContextType {
   Habits: HabitList,
-  HabitsHistory: {[key: string]: Date[]}
+  ArchivedHabits: HabitList,
+  DoneHabits: HabitList,
+  
+  HabitsHistory: {[key: string]: Date[]},
   Objectifs: ObjectifList,
   ObjectifsHistory: {[key: string]: Date[]}
+
   filteredHabitsByDate: FilteredHabitsType,
+
   isFetched: boolean,
+  isArchivedHabitsFetched: boolean,
+  setIsArchivedHabitsFetched: Dispatch<boolean>,
+  isDoneHabitsFetched: boolean,
+  setIsDoneHabitsFetched: Dispatch<boolean>
+
   changeDate: (date: Date) => Promise<void>,
   addHabit: (habit: FormDetailledHabit) => Promise<Habit | undefined>,
   removeHabit: (habit: Habit) => Promise<void>,
@@ -32,21 +43,34 @@ export interface HabitContextType {
   removeObjectif: (objectifID: string, deletePinnedHabit?: boolean) => Promise<void>,
   updateObjectif: (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => Promise<Objectif>,
   retrieveHabitsLinkToObjectif: (objectifID: string) => Habit[],
-  addHabitIntern: (habit: Habit) => Habit
+  addHabitIntern: (habit: Habit) => Habit,
+
+  fetchArchivedHabits: () => Promise<Habit[]>,
+  fetchDoneHabits: () => Promise<Habit[]>,
+
+  archiveHabit: (habit: Habit, habitState?: HabitState) => Promise<void>,
+  markHabitAsDone: (habit: Habit, habitState?: HabitState) => Promise<void>,
+  getBackHabit: (habit: Habit, habitState?: HabitState) => Promise<void>,
 }
 
 const defaultHabitContext: HabitContextType = {
   Habits: {}, 
+  ArchivedHabits: {},
+  DoneHabits: {},
+
   HabitsHistory: {},
+
   Objectifs: {}, 
   ObjectifsHistory: {},
 
-  filteredHabitsByDate: { 
-    Quotidien: {Habitudes: {}, Objectifs: {}}, 
-    Hebdo: {Habitudes: {}, Objectifs: {}}, 
-    Mensuel: {Habitudes: {}, Objectifs: {}}
-  },
+  filteredHabitsByDate: EMPTY_FILTERED_HABITS,
+
   isFetched: false,
+  isArchivedHabitsFetched: false,
+  setIsArchivedHabitsFetched: () => {},
+  isDoneHabitsFetched: false,
+  setIsDoneHabitsFetched: () => {},
+
   changeDate: async () => {},
   addHabit: async () => undefined,
   removeHabit: async () => {},
@@ -58,7 +82,13 @@ const defaultHabitContext: HabitContextType = {
   removeObjectif: async() => {},
   updateObjectif: async (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => oldObjectif,
   retrieveHabitsLinkToObjectif: (objectifID: string) => [],
-  addHabitIntern: (habit: Habit) => habit
+  addHabitIntern: (habit: Habit) => habit,
+  fetchArchivedHabits: async() => [],
+  fetchDoneHabits: async() => [],
+
+  archiveHabit: async() => {},
+  markHabitAsDone: async() => {},
+  getBackHabit: async() => {},
 }
 
 const HabitsContext = createContext<HabitContextType>(defaultHabitContext);
@@ -77,24 +107,25 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
     const [Habits, setHabits] = useState<HabitList>({});
     const [HabitsHistory, setHabitsHistory] = useState<{[key: string]: Date[]}>({});
 
+    const [ArchivedHabits, setArchivedHabits] = useState<HabitList>({});
+    const [isArchivedHabitsFetched, setIsArchivedHabitsFetched] = useState<boolean>(false);
+
+    const [DoneHabits, setDoneHabits] = useState<HabitList>({});
+    const [isDoneHabitsFetched, setIsDoneHabitsFetched] = useState<boolean>(false);
+
     const [Objectifs, setObjectifs] = useState<ObjectifList>({});
     const [ObjectifsHistory, setObjectifsHistory] = useState<{[key: string]: Date[]}>({});
 
     let selectedDate = new Date()
 
-    const [filteredHabitsByDate, setFilteredHabitsByDate] = useState<FilteredHabitsType>(
-      {
-        Quotidien: {Habitudes: {}, Objectifs: {}}, 
-        Hebdo: {Habitudes: {}, Objectifs: {}}, 
-        Mensuel: {Habitudes: {}, Objectifs: {}}
-      });
+    const [filteredHabitsByDate, setFilteredHabitsByDate] = useState<FilteredHabitsType>(EMPTY_FILTERED_HABITS);
 
     const [isFetched, setIsFetched] = useState<boolean>(false)
 
     const fetchHabits = async (): Promise<HabitList> => {
         console.log("Fetching habits...")
 
-        const {habits, history} = await getAllOwnHabits(userID)
+        const {habits, history} = await fetchUserHabits(userID)
         const today = new Date()
 
         for (const [habitID, habit] of Object.entries(habits)) {
@@ -115,14 +146,6 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
         console.log("habits successfully fetched.")
         return habits;
     };
-
-    const updateHabitStreaks = (habits: HabitList): HabitList => {
-
-
-      return habits
-    }
-
-
 
     const settupHabits = async () => {
       try{
@@ -154,15 +177,10 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       }
     }
 
-
     useEffect(() => {
       settupHabits();
       fetchObjectifs();
     }, []);
-
-
-
-
 
     const changeDate = async(date: Date) => {
       selectedDate = date
@@ -174,23 +192,6 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
 
       catch(e) { console.log("error while changing date : ", e)}
     }
-
-
-    const isHabitPlannedForSelectedDay = (habit: Habit, date: Date): boolean => {
-      const frequency = habit.frequency
-
-      const objectifs = filteredHabitsByDate[frequency]?.Objectifs ?? {};
-      const habitudes = filteredHabitsByDate[frequency]?.Habitudes ?? {};
-
-      const isHabitInObjectifPlanned = habit.objectifID &&
-          objectifs[habit.objectifID]?.hasOwnProperty(habit.habitID);
-
-      const habitPlannedForCurrentDate = isHabitInObjectifPlanned ||
-          habitudes.hasOwnProperty(habit.habitID);
-
-      return habitPlannedForCurrentDate
-    }
-
 
     const handleCheckStep = async(habitID: string, stepID: string, date: Date, isChecked: boolean, isHabitNowCompleted: boolean) => {
       let habit = Habits[habitID]
@@ -373,12 +374,12 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
         await Promise.all(promises);
 
         const updatePromises = habits.map((habit) => {
-          if (deletePinnedHabit) {
-              return removeHabit(habit);
-          } else {
-              return updateHabitRelationWithObjectif(habit, null);
-          }
-      });
+            if (deletePinnedHabit) {
+                return removeHabit(habit);
+            } else {
+                return updateHabitRelationWithObjectif(habit, null);
+            }
+        });
 
         await Promise.all(updatePromises)
     }
@@ -400,18 +401,161 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       return updatedObjectif
     }
 
-
     const retrieveHabitsLinkToObjectif = (objectifID: string): Habit[] => {
       const habits = Object.values(Habits)
       return habits.filter((habit) => habit.objectifID === objectifID)
     }
+
+    const fetchArchivedHabits = async(): Promise<Habit[]> => {
+      if(user.email) {
+        const {habits, history} = await fetchUserHabits(user.email, HabitState.Archived)
+
+        setArchivedHabits(habits)
+
+        setHabitsHistory(prevHistory => ({
+          ...prevHistory,
+          ...history
+        }))
+
+        return Object.values(habits)
+      }
+
+      return []
+    }
+
+    const fetchDoneHabits = async(): Promise<Habit[]> => {
+      if(user.email) {
+        const {habits, history} = await fetchUserHabits(user.email, HabitState.Done)
+
+        setDoneHabits(habits)
+
+        setHabitsHistory(prevHistory => ({
+          ...prevHistory,
+          ...history
+        }))
+
+        return Object.values(habits)
+      }
+
+      return []
+    }
+
+    const archiveHabit = async(habit: Habit, habitState = HabitState.Current) => {
+      if(user.email) {
+        if(habitState !== HabitState.Archived) {
+          setArchivedHabits(prevArchivedHabits => ({
+            ...prevArchivedHabits,
+            [habit.habitID]: {...habit}
+          }))
+
+          if(habitState === HabitState.Done) {
+            setDoneHabits(prevHabits => {
+              const updatedHabits = { ...prevHabits };
+              delete updatedHabits[habit.habitID]
+              return updatedHabits
+            })
+          }
+
+          else {
+              setFilteredHabitsByDate(removeHabitFromFilteredHabits(filteredHabitsByDate, habit))
+
+              setHabits(prevHabits => {
+              const updatedHabits = { ...prevHabits };
+              delete updatedHabits[habit.habitID]
+              return updatedHabits
+            })
+          }
+
+          await archiveUserHabit(habit, user.email, user.uid, habitState)
+        }
+
+        else console.log("habit already archived")
+      }
+    }
+
+    const markHabitAsDone = async(habit: Habit, habitState = HabitState.Current) => {
+      if(user.email) {
+        if(habitState !== HabitState.Done) {
+          setDoneHabits(prevArchivedHabits => ({
+            ...prevArchivedHabits,
+            [habit.habitID]: {...habit}
+          }))
+  
+          if(habitState === HabitState.Archived) {
+            setArchivedHabits(prevHabits => {
+              const updatedHabits = { ...prevHabits };
+              delete updatedHabits[habit.habitID]
+              return updatedHabits
+            })
+          }
+  
+          else {
+              setFilteredHabitsByDate(removeHabitFromFilteredHabits(filteredHabitsByDate, habit))
+  
+              setHabits(prevHabits => {
+              const updatedHabits = { ...prevHabits };
+              delete updatedHabits[habit.habitID]
+              return updatedHabits
+            })
+          }
+  
+          await markUserHabitAsDone(habit, user.email, user.uid, habitState)
+        }
+        
+        else console.log("habit alreay marked as done")
+      }
+    }
+
+    
+    const getBackHabit = async(habit: Habit, habitState = HabitState.Current) => {
+      if(user.email) {
+        if(habitState === HabitState.Current) {
+          console.log("Habit already current")
+        }
+
+        else {
+          if(habitState === HabitState.Archived) {
+            setArchivedHabits(prevHabits => {
+              const updatedHabits = { ...prevHabits };
+              delete updatedHabits[habit.habitID]
+              return updatedHabits
+            })
+          }
+
+          else {
+            setDoneHabits(prevHabits => {
+              const updatedHabits = { ...prevHabits };
+              delete updatedHabits[habit.habitID]
+              return updatedHabits
+            })
+          }
+        }
+
+        addHabitIntern(habit)
+
+        await getBackUserHabit(habit, user.email, user.uid, habitState)
+      }
+    }
+
     const exportedValues: HabitContextType = {
       Habits,
+      ArchivedHabits,
+      DoneHabits,
+
       HabitsHistory,
       Objectifs,
       ObjectifsHistory,
+
       filteredHabitsByDate,
+
       isFetched,
+      
+      isArchivedHabitsFetched,
+      isDoneHabitsFetched,
+
+      setIsArchivedHabitsFetched,
+      setIsDoneHabitsFetched,
+
       changeDate,
       addHabit, addHabitIntern,
       removeHabit,
@@ -422,7 +566,14 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       getHabitFromFilteredHabits,
       removeObjectif,
       updateObjectif,
-      retrieveHabitsLinkToObjectif
+      retrieveHabitsLinkToObjectif,
+
+      fetchArchivedHabits,
+      fetchDoneHabits,
+
+      archiveHabit,
+      markHabitAsDone,
+      getBackHabit
     }
 
     return (

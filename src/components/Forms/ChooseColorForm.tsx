@@ -49,7 +49,7 @@ const ChooseColorForm: FC<ChooseColorFormProps> = ({
         <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         <NavigationButton noPadding action={NavigationActions.goBack}/>
                         <Quoti/>
                         <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
@@ -65,20 +65,20 @@ const ChooseColorForm: FC<ChooseColorFormProps> = ({
                         <ColorListSelector selectedColor={selectedColor} setSelectedColor={setSelectedColor}/>
                     </View>
 
-                    <View style={styles.centered}>
+                    {/* <View style={styles.centered}>
                         <View style={styles.customColorContainer}>
                             <BorderTextButton bold text="Aa" onPress={handleOpenCustomColor}/>
                             <View style={[styles.selectedColor, {borderColor: font, backgroundColor: selectedColor}]}/>
                         </View>
-                    </View>
+                    </View> */}
                 </View>
             </View>
 
-            <CustomColorBottomScreen 
+            {/* <CustomColorBottomScreen 
                 bottomSheetModalRef={bottomSheetModalRef_CustomColor} 
                 selectedColor={selectedColor}
                 setSelectedColor={setSelectedColor}
-            />
+            /> */}
         </UsualScreen>
     )
 }
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     selectedColor: {
         aspectRatio: 1,
         borderWidth: 2, 
-        borderRadius: 18,
+        borderRadius: 15,
     },
 
     body: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
         display: "flex", 
         justifyContent: "center", 
         alignContent: "center", 
-        flex:1
+        flex:1,
     },
 
     footer: {

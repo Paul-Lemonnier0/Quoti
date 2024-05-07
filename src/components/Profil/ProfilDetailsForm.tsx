@@ -1,20 +1,20 @@
-import { User } from 'firebase/auth'
-import React, { FC, useContext } from 'react'
+import React, { FC, useContext, useRef } from 'react'
 import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native'
-import { MassiveText, NormalText, SubMassiveText, SubTitleText, TitleText } from '../../styles/StyledText'
+import { MassiveText, NormalText, SubTitleText, TitleText } from '../../styles/StyledText'
 import { AppContext } from '../../data/AppContext'
 import { useThemeColor } from '../Themed'
-import Separator from '../Other/Separator'
-import CustomCard from '../Other/Card'
-import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from '../Buttons/IconButtons'
-import ProfilButton from './ProfilButton'
+import { BorderIconButton, Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from '../Buttons/IconButtons'
 import { CustomScrollView, UsualScreen } from '../View/Views'
 import { UserContext, UserType } from '../../data/UserContext'
-import IllustrationsList, { IllustrationsType } from '../../data/IllustrationsList'
-import { Image } from 'react-native'
 import { BackgroundTextButton } from '../Buttons/UsualButton'
 import { VisitInfoUser } from '../../firebase/Firestore_User_Primitives'
 import { auth } from '../../firebase/InitialisationFirebase'
+import Separator from '../Other/Separator'
+import CustomCard from '../Other/Card'
+import ProfilButton from './ProfilButton'
+import UserSettingsBottomScreen from '../../screens/BottomScreens/Social/UserSettings'
+import { UserDataBase } from '../../firebase/Database_User_Primitives'
+import { BottomSheetModal } from '@gorhom/bottom-sheet'
 
 interface ProfilHeaderProps {
     user: UserType | VisitInfoUser,
@@ -26,7 +26,15 @@ interface ProfilHeaderProps {
     isFriend?: boolean,
 }
 
-const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, handlePressOnProfil, hasSendedFriendRequest, isFriend, handleAddFriend}) => {
+const ProfilHeader: FC<ProfilHeaderProps> = ({
+    user, 
+    user_data, 
+    notCurrentUser, 
+    handlePressOnProfil, 
+    hasSendedFriendRequest, 
+    isFriend, 
+    handleAddFriend
+}) => {
     const {theme} = useContext(AppContext)
     const {hasNotification} = useContext(UserContext)
 
@@ -41,7 +49,16 @@ const ProfilHeader: FC<ProfilHeaderProps> = ({user, user_data, notCurrentUser, h
     return(
         <>
             <View style={styles.bodyHeader}>
-                {user && <ProfilButton placeholderBorder isSelected={hasNotifications && !notCurrentUser} disabled={!hasNotifications || notCurrentUser} huge hugeBadge noBadge={!hasNotifications || notCurrentUser} user={user} onPress={onPress}/>}
+                {user && <ProfilButton 
+                    placeholderBorder 
+                    isSelected={hasNotifications && !notCurrentUser} 
+                    disabled={!hasNotifications || notCurrentUser} 
+                    huge 
+                    hugeBadge 
+                    noBadge={!hasNotifications || notCurrentUser} 
+                    user={user} 
+                    onPress={onPress}
+                />}
                 <View style={styles.titreEtDescriptionContainer}>
                     <TitleText text={"@" + user?.displayName ?? "unknown"}/>
                     <NormalText bold style={{color: fontGray}} text={user && user?.firstName && user?.lastName ? (user.firstName + " " + user.lastName) : "unknown"} />
@@ -76,9 +93,6 @@ const RenderPrivateData = () => {
     return(
         <View style={{flex: 1, flexGrow: 1}}>
             <View style={[styles.emptySreenContainer, {justifyContent: "space-evenly"}]}>
-
-                {/* <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Traveler]}/> */}
-
                 <View style={{padding: 40, borderRadius: 500, borderWidth: 3, borderColor: contrast}}>
                     <Icon name="lock" provider={IconProvider.Feather} size={45}/>
                 </View>
@@ -120,7 +134,7 @@ const UserStatComponent: FC<UserStatComponentProps> = ({item}) => {
     const font = useThemeColor(theme, "Font")
   
     return(
-      <CustomCard flex onPress={item.onPress}>
+      <CustomCard flex onPress={item.number > 0 ? item.onPress : undefined}>
         <View style={{gap: 40, flex: 1}}>
           <View style={{flexDirection: "row", justifyContent: "space-between"}}>
             <View style={{flexDirection: "row", gap: 10, alignItems: "flex-end", justifyContent: "flex-end"}}>
@@ -152,17 +166,17 @@ const RenderUserData: FC<RenderUserDataProps> = ({user_data}) => {
       <View style={{display: "flex", flexDirection: "row", gap: 0, justifyContent: "center", alignItems: "center", marginHorizontal: 60}}>
         {
             user_data.map((data, index) => 
-                    <TouchableOpacity onPress={data.onPress} key={index} style={{ 
-                        flex: 1, 
-                        gap: 5, 
-                        display: "flex", 
-                        flexDirection: "column", 
-                        alignItems: "center", 
-                        justifyContent: "center",
-                    }}>
-                        <TitleText text={data.number}/>
-                        <NormalText bold text={data.title} style={{color: fontGray}}/>
-                    </TouchableOpacity>
+                <TouchableOpacity onPress={data.onPress} key={index} style={{ 
+                    flex: 1, 
+                    gap: 5, 
+                    display: "flex", 
+                    flexDirection: "column", 
+                    alignItems: "center", 
+                    justifyContent: "center",
+                }}>
+                    <TitleText text={data.number}/>
+                    <NormalText bold text={data.title} style={{color: fontGray}}/>
+                </TouchableOpacity>
             )
         }
       </View>
@@ -171,16 +185,20 @@ const RenderUserData: FC<RenderUserDataProps> = ({user_data}) => {
 
 type ProfilDetailsFormProps = {
     user: UserType | VisitInfoUser,
-    nb_friends: number,
+    friends: string[],
     nb_habits: number,
+    nb_habits_done: number,
     nb_objectifs: number,
+    nb_objectifs_done: number,
     handleSeeFriends: () => void,
     handleSeeObjectifs: () => void,
+    handleSeeDoneObjectifs: () => void,
     handleSeeHabits: () => void,
+    handleSeeDoneHabits: () => void,
     handleSeeSucces: () => void,
-    handleOpenSettings?: () => void,
     handleAddFriend?: () => void,
     handlePressOnProfil?: () => void,
+    handleOpenSettings?: () => void,
     isFriend?: boolean,
     hasSendedInvitation?: boolean,
     isLoading?: boolean
@@ -188,15 +206,19 @@ type ProfilDetailsFormProps = {
 
 const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
     user,
-    nb_friends,
+    friends,
     nb_habits,
+    nb_habits_done,
     nb_objectifs,
+    nb_objectifs_done,
     handleSeeFriends,
     handleSeeObjectifs,
+    handleSeeDoneObjectifs,
     handleSeeHabits,
+    handleSeeDoneHabits,
     handleSeeSucces,
-    handleOpenSettings,
     handleAddFriend,
+    handleOpenSettings,
     isFriend,
     hasSendedInvitation,
     handlePressOnProfil,
@@ -210,13 +232,13 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
 
     const user_data: UserData[] = [
         {
-            number: nb_friends,
+            number: friends.length,
             title: "Amis",
             onPress: handleSeeFriends
         },
         {
             number: 4,
-            title: "Succès",
+            title: "Posts",
             onPress: handleSeeSucces
         }
     ]
@@ -229,11 +251,11 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
             onPress: handleSeeHabits,
         },
         {
-            number: 7,
+            number: nb_habits_done,
             title: "Habitudes",
             subTitle: "Terminées",
             color: fontGray,
-            onPress: handleSeeHabits,
+            onPress: handleSeeDoneHabits,
         },
 
     
@@ -246,19 +268,21 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
 
 
         {
-            number: 4,
+            number: nb_objectifs_done,
             title: "Objectifs",
             subTitle: "Terminés",
             color: fontGray,
-            onPress: handleSeeObjectifs,
+            onPress: handleSeeDoneObjectifs,
         }
     ]
 
-    //TODO : add to user : best streak, current streak, succes, ended obj, ended habits
-
     const currentStreak = 12
 
-    const friendIconName = isFriend ? "user-check" : (hasSendedInvitation ? "user-minus" : "user-plus")
+    const userSettingsBottomsheetModalRef = useRef<BottomSheetModal>(null)
+
+    const handleOpenOtherUserSettings = () => {
+        userSettingsBottomsheetModalRef.current?.present()
+    }
 
     return(
         <UsualScreen>
@@ -272,15 +296,12 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
                                 <Icon provider={IconProvider.FontAwesome5} name="fire" color={streakColor}/>
                                 <TitleText text={currentStreak}/>
                             </View>
-
                             {
-                                handleOpenSettings &&
-                                <IconButton noPadding name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
-                            }
-                            {
-                                handleAddFriend &&
-                                
-                                <IconButton noPadding name={friendIconName} provider={IconProvider.Feather} onPress={handleAddFriend}/>
+                                <BorderIconButton isBorderGray isTransparent name={"settings"} provider={IconProvider.Feather} onPress={
+                                    auth && auth.currentUser && user && (user.uid === auth.currentUser.uid ) && handleOpenSettings ?
+                                    handleOpenSettings :
+                                    handleOpenOtherUserSettings
+                                }/>
                             }
                         </View>
                     </View>
@@ -319,12 +340,12 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
                             {
                                 !isLoading &&
 
-                                <View style={{gap: 10}}>
+                                <View style={{gap: 10, margin: -20}}>
                                     <FlatList
                                         key={1}
                                         numColumns={2}
                                         columnWrapperStyle={{gap: 10, flex: 1}}
-                                        contentContainerStyle={{gap: 10}}
+                                        contentContainerStyle={{gap: 10, padding: 20}}
                                         data={userStatList}
                                         scrollEnabled={false}
                                         renderItem={({item}) => <UserStatComponent item={item}/>}
@@ -335,6 +356,10 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
                     </CustomScrollView>
                     }
             </View>
+
+            <UserSettingsBottomScreen
+                bottomSheetModalRef={userSettingsBottomsheetModalRef}
+                detailledUser={user as UserDataBase}/>
 
         </UsualScreen>
     );

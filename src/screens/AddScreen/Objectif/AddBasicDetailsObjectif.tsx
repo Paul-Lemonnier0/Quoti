@@ -2,9 +2,10 @@ import { FC } from "react"
 import { ObjectifBasicForm } from "../../../components/Forms/ObjectifForm/ObjectifBasicForm"
 import { FormBasicObjectif } from "../../../types/FormObjectifTypes"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import { AddObjectifScreenType, getAddObjectifStepsDetails } from "../../../constants/BasicConstants"
 import React from "react"
+import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 type AddBasicDetailsObjectifProps = NativeStackScreenProps<AddScreenStackType, "AddBasicDetailsObjectif">
 
@@ -12,6 +13,7 @@ const AddBasicDetailsObjectif: FC<AddBasicDetailsObjectifProps> = ({navigation})
 
     const handleGoNext = (detailledObjectif: FormBasicObjectif) => {
         navigation.navigate("ChooseColorScreenObjectif", {objectif: {...detailledObjectif}})
+        BottomScreenOpen_Impact()
     }
 
     const CURRENT_STEP_DETAILS = getAddObjectifStepsDetails(AddObjectifScreenType.AddBasicObjectifDetails)

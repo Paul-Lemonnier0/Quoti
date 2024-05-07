@@ -1,6 +1,6 @@
 import { StyleSheet, TouchableOpacity } from "react-native"
 import { useThemeColor } from "../Themed";
-import { NormalText, SubTitleText } from "../../styles/StyledText";
+import { LittleNormalText, NormalText, SubTitleText } from "../../styles/StyledText";
 import React, { FC, useContext } from "react";
 import { AppContext } from "../../data/AppContext";
 
@@ -10,6 +10,7 @@ export interface BasicButtonProps {
     disabled?: boolean,
     extend?: boolean,
     bold?: boolean,
+    isFlex?: boolean
 }
 
 
@@ -18,7 +19,7 @@ export interface BackgroundTextButtonProps extends BasicButtonProps {
     isTransparent?: boolean,
 }
 
-export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, isTransparent, disabled, extend, bold}) => {
+export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, isTransparent, disabled, extend, bold, isFlex}) => {
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
@@ -33,7 +34,7 @@ export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, 
     const borderColor = disabled ? disabledButtonText : contrast
 
     return(
-    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {backgroundColor, width, borderColor}]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {backgroundColor, width, borderColor, flex: isFlex ? 1 : 0}]}>
         { bold ? <SubTitleText text={text} style={{color}}/> : <NormalText text={text} style={{color}}/> }
     </TouchableOpacity>);
 }
@@ -45,7 +46,7 @@ export interface BackgroundTextButtonProps extends BasicButtonProps {
     bgColor?: string
 }
 
-export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, bgColor, color, bold, disabled, extend}) => {
+export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, bgColor, color, bold, disabled, extend, isFlex}) => {
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
@@ -61,7 +62,7 @@ export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, te
     const width = extend ? "100%" : null
 
     return(
-    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {opacity, backgroundColor, width, borderColor: backgroundColor}]}>
+    <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {opacity, backgroundColor, width, borderColor: backgroundColor, flex: isFlex ? 1 : 0,}]}>
         {bold ? <SubTitleText text={text} style={{color: colorBase}}/> : <NormalText text={text} style={{color: colorBase}}/>}
     </TouchableOpacity>);
 }
@@ -70,10 +71,21 @@ export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, te
 export interface TextButtonProps extends BasicButtonProps {
     semiBold?: boolean,
     isGray?: boolean,
-    noPadding?: boolean
+    noPadding?: boolean,
+    small?: boolean
 }
 
-export const TextButton: FC<TextButtonProps> = ({onPress, text, bold, semiBold, disabled, extend, isGray, noPadding}) => {
+export const TextButton: FC<TextButtonProps> = ({
+    onPress, 
+    text, 
+    bold, 
+    semiBold, 
+    disabled, 
+    extend, 
+    isGray, 
+    noPadding,
+    small
+}) => {
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
@@ -87,7 +99,17 @@ export const TextButton: FC<TextButtonProps> = ({onPress, text, bold, semiBold, 
 
     return(
     <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.normalButton, {width, padding}]}>
-        {bold ? <SubTitleText text={text} style={{color}}/> : <NormalText bold={semiBold} text={text} style={{color}}/>}
+        {
+            small ?
+            <LittleNormalText bold={bold} text={text} style={{color}}/> :
+
+            (
+                bold ? 
+                <SubTitleText text={text} style={{color}}/> 
+                :
+                <NormalText bold={semiBold} text={text} style={{color}}/>
+        )
+        }
     </TouchableOpacity>);
 }
 

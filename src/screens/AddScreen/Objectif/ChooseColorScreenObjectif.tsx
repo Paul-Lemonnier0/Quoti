@@ -1,22 +1,12 @@
-import React, { useState, useRef, useMemo, useCallback, FC } from "react"
-import { View, StyleSheet } from "react-native"
-import { BorderTextButton } from "../../../components/Buttons/UsualButton"
-import { UsualScreen } from "../../../components/View/Views"
-import { HugeText, SubTitleText } from "../../../styles/StyledText"
-import { useNavigation, useRoute } from "@react-navigation/native"
-import { useThemeColor } from "../../../components/Themed"
-import { ColorsList } from "../../../data/ColorsList"
-import CustomColorBottomScreen from "../../BottomScreens/CustomColorBottomScreen"
-import { NavigationButton } from "../../../components/Buttons/IconButtons"
-import StepIndicator from "../../../components/Other/StepIndicator"
-import ColorListSelector from "../../../components/Other/ColorListSelector"
+import React, { FC } from "react"
 import ChooseColorForm from "../../../components/Forms/ChooseColorForm"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import { FormColoredHabitValues } from "../../../types/FormHabitTypes"
-import { AddObjectifScreenType, getAddHabitStepsDetails, getAddObjectifStepsDetails } from "../../../constants/BasicConstants"
+import { AddObjectifScreenType, getAddObjectifStepsDetails } from "../../../constants/BasicConstants"
+import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
-type ChooseColorScreenObjectifProps = NativeStackScreenProps<AddScreenStackType , "ChooseColorScreenObjectif">
+type ChooseColorScreenObjectifProps = NativeStackScreenProps<AddScreenStackType, "ChooseColorScreenObjectif">
 
 export const ChooseColorScreenObjectif: FC<ChooseColorScreenObjectifProps> = ({route, navigation}) => {
 
@@ -24,6 +14,7 @@ export const ChooseColorScreenObjectif: FC<ChooseColorScreenObjectifProps> = ({r
 
     const handleGoNext = (values: FormColoredHabitValues) => {
         navigation.navigate("ChooseIconScreenObjectif", {objectif: {...objectif, ...values}})
+        BottomScreenOpen_Impact()
     } 
     
     const CURRENT_STEP_DETAILS = getAddObjectifStepsDetails(AddObjectifScreenType.ChooseColorScreenObjectif)

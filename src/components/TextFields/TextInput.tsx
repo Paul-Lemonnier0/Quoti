@@ -1,6 +1,6 @@
 import { FC, Ref, forwardRef, useContext, useImperativeHandle, useState } from "react"
 import { useThemeColor } from "../Themed"
-import { TextInput, View } from "react-native"
+import { Animated, TextInput, View } from "react-native"
 import { StyleSheet } from "react-native";
 import { NormalText, SubText, SubTitleText } from "../../styles/StyledText";
 import { Icon, IconButton, IconProvider } from "../Buttons/IconButtons";
@@ -27,7 +27,18 @@ export interface CustomTextInputRefType {
 }
 
 
-export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({ startingValue, labelName, boldLabel, semiBold, onFocus, disabled, onBlur, isWrong, errorMessage, placeholder}, ref) => {
+export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCustomProps>(({
+    startingValue, 
+    labelName, 
+    boldLabel, 
+    semiBold, 
+    onFocus, 
+    disabled, 
+    onBlur, 
+    isWrong, 
+    errorMessage, 
+    placeholder
+}, ref) => {
     const {theme} = useContext(AppContext)
 
     const [isFieldFocus, setIsFieldFocus] = useState<boolean>(false)
@@ -61,13 +72,20 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
                 <TextInput editable={!disabled} placeholder={placeholder ?? ""} placeholderTextColor={fontGray} selectionColor={font}
                     value={value} onChangeText={setValue} autoCorrect={false}
                     
+                    
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
                     onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
 
-                    style={[styles.textInput, {paddingRight: isWrong ? 0 : getWidthResponsive(18), color: font,}]}
+                    style={[
+                        styles.textInput, 
+                        {
+                            paddingRight: isWrong ? 0 : getWidthResponsive(18), color: font
+                        },
+
+                    ]}
                 />
 
-                {isWrong && <IconButton onPress={() => {}} provider={IconProvider.Feather} name={"x-circle"} color={errorColor} noPadding/>}
+                {isWrong && <IconButton isShaking onPress={() => {}} provider={IconProvider.Feather} name={"x-circle"} color={errorColor} noPadding/>}
             </View>
 
             {errorMessage && <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>}
@@ -202,7 +220,8 @@ export interface SearchBarCustomProps {
     disabled?: boolean,
     placeholder?: string,
     isPrimary?: boolean,
-    keyboardAvoidingView?: boolean
+    keyboardAvoidingView?: boolean,
+    opacity?: Animated.AnimatedInterpolation<string | number>
 }
 
 export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCustomProps>(({ 
@@ -215,7 +234,8 @@ export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCusto
     onBlur, 
     placeholder,
     isPrimary,
-    keyboardAvoidingView
+    keyboardAvoidingView,
+    opacity
  }, ref) => {
     const {theme} = useContext(AppContext)
 
@@ -250,22 +270,38 @@ export const SearchBarCustom = forwardRef<CustomTextInputRefType, SearchBarCusto
 
 
     return(
-        <View style={styles.container}>
+        <Animated.View style={[styles.container, {opacity}]}>
             {labelName !== undefined ? (boldLabel ? <SubTitleText text={labelName}/> : <NormalText text={labelName}/>) : null}
             <View style={[styles.searchInputContainer, {borderColor, backgroundColor}]}>
 
                 <Icon name={"search"} provider={IconProvider.Feather} size={20} color={fontGray}/>
 
-                <TextComponent placeholder={placeholder ?? ""} editable={!disabled} placeholderTextColor={fontGray} selectionColor={font}
-                    value={value} onChangeText={handleChangeText} autoCorrect={false}
+                <TextComponent 
+                    value={value} 
+
+                    placeholder={placeholder ?? ""} 
+                    placeholderTextColor={fontGray} 
                     
+                    editable={!disabled} 
+                    selectionColor={font}
+                    autoCorrect={false}
+
+                    onChangeText={handleChangeText} 
                     onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
                     onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
 
-                    style={[styles.textInput, {paddingRight: 18, color: font}]}
+                    style={[styles.textInput, {paddingRight: 12, color: font}]}
+                />
+
+                <IconButton name={"x"} noPadding onPress={() => {
+                        handleChangeText("")
+                    }} 
+                    provider={IconProvider.Feather} 
+                    size={20} 
+                    color={fontGray}
                 />
             </View>
-        </View>
+        </Animated.View>
     )
 })
 
@@ -284,7 +320,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: getWidthResponsive(20), 
         paddingVertical: getHeightResponsive(20), 
         borderRadius: getWidthResponsive(18), 
-        fontFamily: "fontLight", 
+        fontFamily: "fontSemiBold", 
     },
 
     textInputContainer: {

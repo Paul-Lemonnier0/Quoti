@@ -68,6 +68,7 @@
     "react-native-swipeable": "^0.6.0",
     "react-native-swiper": "^1.6.0",
     "react-native-toast-message": "^2.2.0",
+    "react-native-walkthrough-tooltip": "^1.6.0",
     "react-navigation": "^5.0.0",
     "reanimated-color-picker": "^2.4.0",
     "sharp": "^0.33.0",

@@ -27,7 +27,7 @@ const addObjectifToFirestore = async(objectifToAdd: FormDetailledObjectif, userI
     console.log("Objectif well added to user firestore")
 
     const startingDate_obj = new Date(objectifToAdd.startingDate)
-    const endingDate_obj = new Date(objectifToAdd.endingDate)
+    const endingDate_obj = objectifToAdd.endingDate ? new Date(objectifToAdd.endingDate) : undefined
 
     return {...objectifToAdd, objectifID, startingDate: startingDate_obj, endingDate: endingDate_obj}
 }
@@ -105,6 +105,9 @@ const fetchAllObjectifs = async(userID: string): Promise<ObjectifList> => {
             const objectifID = obj.id;
     
             const obj_data = obj.data() as GlobalFirestoreObjectif;
+
+            obj_data.titre = obj_data.titre.trim()
+            obj_data.description = obj_data.description.trim()
     
             const startingDate = new Date(userObjectifsList[obj.id].startingDate)
             const endingDate = userObjectifsList[obj.id].endingDate ? new Date(userObjectifsList[obj.id].endingDate) : undefined

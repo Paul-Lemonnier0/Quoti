@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native"
 import AddHabitToObjectifNav from "../../../screens/AddScreen/Objectif/AddHabitToObjectifNav"
 import { View } from "react-native"
 import { NavigationActions, NavigationButton } from "../../Buttons/IconButtons"
-import { HugeText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
+import { HugeText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
 import StepIndicator from "../../Other/StepIndicator"
 import { CustomScrollView, UsualScreen } from "../../View/Views"
 import PresentationHabitList from "../../Habitudes/PresentationHabitList"
@@ -63,8 +63,8 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
                     <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Creative]}/>
                     
                     <View style={styles.emptyScreenSubContainer}>
-                        <NormalText text={"Pour plus d'efficacité"}/>
-                        <SubTitleText text={"Décomposez votre objectif"}/>
+                        <TitleText text="Pour plus d'efficacité"/>
+                        <NormalGrayText bold text={"Décomposez votre objectif"}/>
                     </View>
                 </View>
             </View>
@@ -74,28 +74,26 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
     const DisplayHabitsScreen = () => {
         return(
             <View style={styles.body}>
+                <PresentationHabitList 
+                    baseColor={objectif.color} habits={habitsForObjectif} 
+                    editHabit={(habitID: string, newHabit: (Habit | FormDetailledObjectifHabit)): void => {                            
+                        setHabitsForObjectif((previousObjectifHabits) => (
+                            previousObjectifHabits.map((prevHab) => {
+                                if(prevHab.habitID === habitID) {
+                                    return newHabit
+                                }
 
-                <CustomScrollView>
-                    <PresentationHabitList baseColor={objectif.color} habits={habitsForObjectif} 
-                        editHabit={(habitID: string, newHabit: (Habit | FormDetailledObjectifHabit)): void => {                            
-                            setHabitsForObjectif((previousObjectifHabits) => (
-                                previousObjectifHabits.map((prevHab) => {
-                                    if(prevHab.habitID === habitID) {
-                                        return newHabit
-                                    }
+                                return prevHab
+                            })
+                        ))
+                    }}
 
-                                    return prevHab
-                                })
-                            ))
-                        }}
-
-                        deleteHabit={(habit: (Habit | FormDetailledObjectifHabit)): void => {
-                            setHabitsForObjectif((previousObjectifHabits) => (
-                                previousObjectifHabits.filter((prevHab) => prevHab.habitID != habit.habitID)
-                            ))
-                        }}
-                    />
-                </CustomScrollView>
+                    deleteHabit={(habit: (Habit | FormDetailledObjectifHabit)): void => {
+                        setHabitsForObjectif((previousObjectifHabits) => (
+                            previousObjectifHabits.filter((prevHab) => prevHab.habitID != habit.habitID)
+                        ))
+                    }}
+                />
             </View>
         )
     }
@@ -104,7 +102,7 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
         <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         <NavigationButton noPadding action={NavigationActions.goBack}/>
                         <Quoti/>
                         <NavigationButton noPadding action={NavigationActions.validation} methode={handleValidate}/>
@@ -117,9 +115,9 @@ const ObjectifHabitsForm: FC<ObjectifHabitsFormProps> = ({objectif, handleGoNext
 
                 <View style={styles.body}>
 
-                    <View style={{marginTop: -10, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
+                    <View style={{marginTop: 0, justifyContent: "space-between", alignItems: "center", flexDirection: "row"}}>
                         <TitleText text={"Habitudes"}/>
-                        <TextButton text="Ajouter" onPress={handleAddHabit} semiBold/>
+                        <TextButton text="Ajouter" noPadding onPress={handleAddHabit} semiBold/>
                     </View>
 
                     {

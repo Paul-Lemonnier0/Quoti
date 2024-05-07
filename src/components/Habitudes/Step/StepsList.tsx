@@ -12,6 +12,7 @@ import DraggableFlatList, {
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
 import StepDetailsBottomScreen from "../../../screens/BottomScreens/Habitudes/Steps/StepDetailsBottomScreen"
 import AddStepBottomScreen from "../../../screens/BottomScreens/AddStepBottomScreen"
+import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts"
 
 export interface StepsListProps {
     steps: Step[] | FormStep[],
@@ -52,7 +53,12 @@ const RenderStep: FC<RenderStepProps> = ({
         setSteps ? setSteps(updatedSteps) : null
     }
     
-    const handleLongPress = drag ? drag : () => {};
+    const handleLongPress = () => {
+        if(drag) {
+            drag()
+            BottomScreenOpen_Impact()
+         }
+    }
     const checkStep = onStepChecked ? () => onStepChecked(step, index) : undefined
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null)
@@ -165,6 +171,7 @@ const StepsList: FC<StepsListProps> = ({steps, onStepChecked, color, disabled, e
                     data={steps}
                     style={{flex: 1}}
                     containerStyle={{ flex : 1 }}
+                    contentContainerStyle={{paddingBottom: 40}}
                     renderItem={({ item, drag }) => (
                         <RenderStep
                             step={item as (Step | FormStep)}
@@ -179,9 +186,14 @@ const StepsList: FC<StepsListProps> = ({steps, onStepChecked, color, disabled, e
                             key={(item as (Step | FormStep)).numero}
                         />
                     )}
+
+                    onPlaceholderIndexChange={() => {
+                        BottomScreenOpen_Impact()
+                    }}
     
                     onDragEnd={({ data }) => {
                         setSteps ? setSteps(data) : null
+                        Success_Impact()
                     }}
     
                     keyExtractor={(item) => {

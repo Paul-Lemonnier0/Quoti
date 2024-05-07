@@ -1,4 +1,4 @@
-import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, documentId, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
+import { addDoc, arrayRemove, arrayUnion, collection, deleteDoc, doc, documentId, Firestore, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore"
 import { auth, db } from "./InitialisationFirebase"
 import { listKeyIDfromArray, toISOStringWithoutTimeZone } from "../primitives/BasicsMethods"
 import { createDefaultStepFromHabit } from "../primitives/StepMethods"
@@ -15,7 +15,6 @@ import { Database_getUsersInfo, UserDataBase } from "./Database_User_Primitives"
  */
 
 const setupFirestoreGlobalHabit = (habit: FormDetailledHabit, userMail: string, userID: string, habitStartingDate?: string): GlobalFirestoreHabit => {
-    console.log(habitStartingDate)
     const startingDate = habitStartingDate ?? toISOStringWithoutTimeZone(new Date())
 
     const { alertTime, notificationEnabled, objectifID, ...habitTemp } = habit;
@@ -63,7 +62,6 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userMail: string, u
         const globalHabit = setupFirestoreGlobalHabit(habit, userMail, userID, habit.startingDate)
     
         const habitsCollection = collection(db, FirestoreCollections.Habits)
-        console.log("globalHabit : ", globalHabit)
         const habitRef = await addDoc(habitsCollection, globalHabit)
     
         const habitID = habitRef.id    
@@ -133,143 +131,35 @@ const addRefHabitToFirestore = async (habitID: string, userID: string, startingD
     return userHabit
 };
 
-
-interface HabitsFromFirestoreRetrieve {
-    habits: HabitList,
-    history: {[key: string]: Date[]}
-}
-
-/**
- * [FIRESTORE] Récupère toutes les habitudes d'un utilisateur ainsi que l'historique associé
- */
-
-const getAllOwnHabits = async(userID: string): Promise<HabitsFromFirestoreRetrieve> => {
-    try {
-        const today = new Date()
-  
-        const userDoc = doc(db, FirestoreCollections.Users, userID)
-        const userHabits_qry = query(collection(userDoc, FirestoreUserSubCollections.UserHabits))
-        const userHabitsSnapshot = await getDocs(userHabits_qry)
-    
-        const habitsHistory: {[key: string]: Date[]} = {}
-        
-        const userHabitsArray: UserFirestoreHabit[] = await Promise.all(
-            userHabitsSnapshot.docs.map(async(habit) => {
-                const habitID = habit.id
-                const data = habit.data() as UserFirestoreHabit
-    
-                const objectifID = data.objectifID
-    
-                if(data.doneDates && data.doneDates.length > 0) {
-                    habitsHistory[habitID] = data.doneDates.map((stringDate) => new Date(stringDate))
-                }
-    
-                return {...data, habitID, objectifID };
-            })
-        )
-    
-        const userHabitsList = userHabitsArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {})
-    
-        const userHabitsID = Object.keys(userHabitsList)
-        
-        if(userHabitsID.length > 0) {
-
-            if (userHabitsID.length > 0) {
-                const batchSize = 30;
-                const habitBatches: (string[])[] = [];
-
-                for (let i = 0; i < userHabitsID.length; i += batchSize) {
-                    const batch = userHabitsID.slice(i, i + batchSize);
-                    habitBatches.push(batch);
-                }
-
-                
-                const habitsArray: Habit[] = [];
-                for (const batch_habitsID of habitBatches) {
-                    const habits_qry = query(
-                        collection(db, FirestoreCollections.Habits),
-                        where(documentId(), "in", batch_habitsID)
-                    );
-
-                    const habitsSnapshot = await getDocs(habits_qry);
-
-                    const batchHabitsArray = await Promise.all(
-                        habitsSnapshot.docs.map(async (habit) => {
-                            const habitID = habit.id;
-                            const data = habit.data() as GlobalFirestoreHabit;
-                            const userHabit = userHabitsList[habitID] as UserFirestoreHabit;
-
-                            let steps: StepList = {};
-                            const notPlaceholderSteps = data.steps.filter((step: FirestoreStep) => step.numero !== -1);
-                            steps = listKeyIDfromArray(notPlaceholderSteps, "stepID", habitID);
-
-                            if (notPlaceholderSteps.length < data.steps.length || notPlaceholderSteps.length === 0) {
-                                steps[habitID] = createDefaultStepFromHabit(data, habitID, new Date(userHabit.startingDate));
-                            }
-
-                            const isAllDays = data.daysOfWeek.length === 0 && data.daysOfWeek.includes(7);
-                            const daysOfWeek = isAllDays ? [0, 1, 2, 3, 4, 5, 6] : data.daysOfWeek;
-
-                            const frequency = stringToFrequencyType(data.frequency);
-
-                            const objectifID = userHabit.objectifID ?? undefined;
-
-                            const startingDate = new Date(userHabit.startingDate);
-
-                            const members = await getUsersDataBaseFromMember(data.members, undefined, userID);
-
-                            const fullHabit = { ...data, ...userHabit, startingDate, steps, daysOfWeek, frequency, objectifID, members };
-
-                            const newStreakValues: StreakValues = checkIfStreakEndedHabit(fullHabit, today);
-
-                            return { ...fullHabit, ...newStreakValues };
-                        })
-                    );
-
-                    habitsArray.push(...batchHabitsArray);
-                }
-
-                return {
-                    habits: habitsArray.reduce((newHabitList, habit) => ({...newHabitList, [habit.habitID]: {...habit}}), {}),
-                    history: habitsHistory
-                }
-            }
-        }
-    }
-
-    catch(e) {
-        console.log("Error while fetching habits in firestore : ", e)
-    }
-    
-    
-    return {
-        habits: {},
-        history: {}
-    }
-}
-
 /**
  * [FIRESTORE] Supprime une habitude dans la collection d'un utilisateur et l'enlève des membres
  */
 
-const removeHabitInFirestore = async(habit: Habit, userMail: string, userID: string) => {
+const removeHabitInFirestore = async(habit: Habit, userMail: string, userID: string, deleteLogs = true, baseState = HabitState.Current) => {
 
     const userDoc = doc(db, FirestoreCollections.Users, userMail)
 
     console.log("Deleting habit in firestore with id : ", habit.habitID, "...")
 
-    const docRef = doc(collection(userDoc, FirestoreUserSubCollections.UserHabits), habit.habitID)
+    const customCollection = 
+    baseState === HabitState.Archived ? FirestoreUserSubCollections.UserArchivedHabits
+        : baseState === HabitState.Done ? FirestoreUserSubCollections.UserDoneHabits
+            : FirestoreUserSubCollections.UserHabits
+
+    const docRef = doc(collection(userDoc, customCollection), habit.habitID)
     await deleteDoc(docRef);
 
     console.log("Habit successfully deleted in firestore !")
 
-    const habitDoc = doc(db, FirestoreCollections.Users, habit.habitID)
-    await updateDoc(habitDoc, {members: arrayRemove({
-        mail: userMail,
-        id: userID
-    })})
-
-    await removeHabitLogs(userMail, habit.habitID)
+    if(deleteLogs) {
+        const habitDoc = doc(db, FirestoreCollections.Habits, habit.habitID)
+        await updateDoc(habitDoc, {members: arrayRemove({
+            mail: userMail,
+            id: userID
+        })})
+    
+        await removeHabitLogs(userMail, habit.habitID)
+    }
 }
 
 /**
@@ -382,9 +272,9 @@ const getSpecificGlobalHabit = async(habitID: string): Promise<GlobalHabit | nul
  * [FIRESTORE] Récupère les informations propres à un utilisateur sur une habitude spécifique
  */
 
-const getUserInfoForSpecificHabit = async(userID: string, habitID: string): Promise<UserFirestoreHabit | null> => {
+const getUserInfoForSpecificHabit = async(userID: string, habitID: string, customCollection = FirestoreUserSubCollections.UserHabits): Promise<UserFirestoreHabit | null> => {
     const userDoc = doc(db, FirestoreCollections.Users, userID)
-    const habitDoc = doc(collection(userDoc, FirestoreUserSubCollections.UserHabits), habitID);
+    const habitDoc = doc(collection(userDoc, customCollection), habitID);
 
     const habitSnap = await getDoc(habitDoc)
     if(habitSnap.exists()) {    
@@ -416,16 +306,160 @@ const getSpecificHabitForUser = async(userID: string, habitID: string): Promise<
     return null
 }
 
+/**
+ * [FIRESTORE] Récupère les habitudes liées à un objectif pour un utilisateur
+ */
+
+const getUserHabitsForObjectif = async(userMail: string, objectifID: string): Promise<Habit[]> => {
+
+    try{
+        const habits: Habit[] = []
+
+        const userDoc = doc(db, FirestoreCollections.Users, userMail)
+        const habitCollection = collection(userDoc, FirestoreUserSubCollections.UserHabits); 
+
+        const qry = query(habitCollection, where("objectifID", "==", objectifID))
+
+        const qrySnap = await getDocs(qry)
+
+        await Promise.all(qrySnap.docs.map(async(firestoreHabit) => {
+            const userHabit = firestoreHabit.data() as UserFirestoreHabit
+
+            const globalHabit = await getSpecificGlobalHabit(userHabit.habitID)
+            if(globalHabit) {
+                const startingDate = new Date(userHabit.startingDate)
+
+                const members = await getUsersDataBaseFromMember(globalHabit.members, undefined, userMail)
+    
+                habits.push({...globalHabit, ...userHabit, objectifID, startingDate, members})
+            }
+        }))
+
+        return habits
+    }
+
+    catch(e) {
+        console.log("Error while retrieving habits for objectif : ", e)
+    }
+
+    return []
+}
+
+export enum HabitState {
+    Current = "Current",
+    Done = "Done",
+    Archived = "Archived"
+}
+
+/**
+ * [FIRESTORE] Archive une habitude en fonction de son état courant
+ */
+
+export const archiveUserHabit = async(habit: Habit, userMail: string, userID: string, baseState = HabitState.Current): Promise<void> => {
+
+    try {
+        console.log("Archiving habit...")
+
+        const userDoc = doc(db, FirestoreCollections.Users, userMail)
+    
+        const customCollection = 
+            baseState === HabitState.Archived ? FirestoreUserSubCollections.UserArchivedHabits
+                : baseState === HabitState.Done ? FirestoreUserSubCollections.UserDoneHabits
+                    : FirestoreUserSubCollections.UserHabits
+
+        const userHabit = await getUserInfoForSpecificHabit(userMail, habit.habitID, customCollection)
+
+        await removeHabitInFirestore(habit, userMail, userID, false)
+        
+        await setDoc(
+            doc(userDoc, FirestoreUserSubCollections.UserArchivedHabits, habit.habitID),
+            userHabit
+        )
+
+        console.log("Habit successfully archived !")
+    }
+
+    catch(e) {
+        console.log("Error while archiving habit : ", e)
+    }
+}
+
+/**
+ * [FIRESTORE] Marque une habitude comme terminée en fonction de son état courant
+ */
+
+export const markUserHabitAsDone = async(habit: Habit, userMail: string, userID: string, baseState = HabitState.Current): Promise<void> => {
+    try {
+        console.log("Marking habit as done...")
+        
+        const userDoc = doc(db, FirestoreCollections.Users, userMail)
+
+        const customCollection = 
+            baseState === HabitState.Archived ? FirestoreUserSubCollections.UserArchivedHabits
+                : baseState === HabitState.Done ? FirestoreUserSubCollections.UserDoneHabits
+                    : FirestoreUserSubCollections.UserHabits
+
+        const userHabit = await getUserInfoForSpecificHabit(userMail, habit.habitID, customCollection)
+    
+        await removeHabitInFirestore(habit, userMail, userID, false)
+    
+        await setDoc(
+            doc(userDoc, FirestoreUserSubCollections.UserDoneHabits, habit.habitID),
+            userHabit
+        )
+
+        console.log("Habit successfully marked as done !")
+    }
+
+    catch(e) {
+        console.log("Error while marking habit as done : ", e)
+    }
+}
+
+/**
+ * [FIRESTORE] Récupère une habitude qui était soit terminée ou archivée et la remets dans les currents
+ */
+
+export const getBackUserHabit = async(habit: Habit, userMail: string, userID: string, baseState = HabitState.Done): Promise<void> => {
+    try {
+        console.log("Getting habit back...")
+        
+        if(baseState !== HabitState.Current) {
+            const userDoc = doc(db, FirestoreCollections.Users, userMail)
+
+            const customCollection = 
+                baseState === HabitState.Archived ? FirestoreUserSubCollections.UserArchivedHabits
+                    : FirestoreUserSubCollections.UserDoneHabits
+    
+            const userHabit = await getUserInfoForSpecificHabit(userMail, habit.habitID, customCollection)
+        
+            await removeHabitInFirestore(habit, userMail, userID, false, baseState)
+        
+            await setDoc(
+                doc(userDoc, FirestoreUserSubCollections.UserHabits, habit.habitID),
+                userHabit
+            )
+
+            console.log("Habit successfully got back !")
+        }
+
+        else console.log("Habit already current")
+    }
+
+    catch(e) {
+        console.log("Error while marking habit as done : ", e)
+    }
+}
 
 export {
     addHabitToFireStore, 
     removeHabitInFirestore, 
     updateHabitInFirestore, 
-    getAllOwnHabits,
     updateCompletedHabit,
     addHabitDoneDate,
     getSpecificGlobalHabit,
     getUserInfoForSpecificHabit,
     getSpecificHabitForUser,
-    addRefHabitToFirestore
+    addRefHabitToFirestore,
+    getUserHabitsForObjectif
 }

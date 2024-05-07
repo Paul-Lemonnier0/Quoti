@@ -1,10 +1,6 @@
-import { SubTitleText } from "../../../styles/StyledText"
 import { FC, RefObject, useCallback, useContext, useRef } from "react";
-import FooterBottomSheet from "../../../components/BottomSheets/FooterBottomSheets";
-import { Share, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native";
-import { Icon, IconProvider } from "../../../components/Buttons/IconButtons";
-import { TouchableOpacity } from "react-native";
 import { useThemeColor } from "../../../components/Themed";
 import { HabitsContext } from "../../../data/HabitContext";
 import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
@@ -17,6 +13,12 @@ import { Habit } from "../../../types/HabitTypes";
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import React from "react"
 import ShareHabitBottomScreen from "../Social/ShareHabitBottomScreen";
+import Command, { CommandType } from "../../../components/Other/Command";
+import { BottomSheetCloseButton, IconButton, IconProvider } from "../../../components/Buttons/IconButtons";
+import EditHabitFrequencyScreen from "../../EditScreens/Habits/EditHabitFrequencyScreen";
+import EditHabitFrequencyNav from "../../EditScreens/Habits/EditHabitFrequencyNav";
+import { TitleText } from "../../../styles/StyledText";
+import EndHabitBottomScreen from "./EndHabitBottomScreen";
 
 
 export interface SettingHabitBottomScreenProps {
@@ -38,7 +40,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const {removeHabit, updateHabitRelationWithObjectif, Objectifs} = useContext(HabitsContext)
+    const {removeHabit, updateHabitRelationWithObjectif, Objectifs, archiveHabit} = useContext(HabitsContext)
 
     const habitType = getHabitType(habit)
 
@@ -46,12 +48,13 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
 
 
     const closeModal = () => {
-        bottomSheetModalRef.current?.close()
+         bottomSheetModalRef.current?.close()
         // additionnalClosedMethod ? additionnalClosedMethod() : null
     }
 
     const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_ShareHabitScreen: RefObject<BottomSheetModal> = useRef(null)
+    const bottomSheetModalRef_EndHabit: RefObject<BottomSheetModal> = useRef(null)
 
     const handleDelete = async() => {
         setIsLoading(true)
@@ -61,17 +64,20 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         closeModal()
         Success_Impact()
     }
-
-    const handleSkip = () => {
-        Success_Impact()
-    }
-
+    
     const handleOpenEdit = () => {
         handleOpenEditHabit()
     }
 
+    const handleOpenEditFrequency = () => {
+        handleOpenEditHabitFrequency()
+    }
+
+    const handleEditFrequency = () => {
+        modifyAdditionnalMethod ? modifyAdditionnalMethod() : null
+    }
+
     const handleEdit = () => {
-        closeModal()
         modifyAdditionnalMethod ? modifyAdditionnalMethod() : null
     }
 
@@ -87,8 +93,29 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         Success_Impact()
     }
 
+    const archiveOldHabit = async() => {
+        setIsLoading(true)
+        await archiveHabit(habit)
+        setIsLoading(false)
+
+        closeModal()
+        additionnalClosedMethod ? additionnalClosedMethod() : null
+    }
+
     const openPinObjectifScreen = () => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef_PinObjectifScreen.current?.present() 
+    }
+
+    const handleOpenFinishHabitBottomScreen = () => {
+        BottomScreenOpen_Impact()
+        bottomSheetModalRef_EndHabit.current?.present()
+    }
+
+    const closeParentModal = () => {
+        setTimeout(() => {
+            closeModal()
+        }, 200)
     }
 
     const handleMakeObjectifRelation = async(habit: Habit, selectedPinObjectifID: string | null) => 
@@ -99,22 +126,10 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
 
 
     const error = useThemeColor(theme, "Error")
-    const font = useThemeColor(theme, "Font")
-    const tertiary = useThemeColor(theme, "Tertiary")
-    const fontGray = useThemeColor(theme, "FontGray")
 
-    interface commandType {
-        icon: string,
-        provider: IconProvider,
-        text: string,
-        method: () => void,
-        color?: string
-    }
-
-    const commands: commandType[] = [
-        {icon: "trending-up", provider: IconProvider.Feather, text:"Passer pour aujourd'hui", method: handleSkip},
+    const commands: CommandType[] = [
         {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'habitude", method: handleOpenEdit},
-        {icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleOpenShare},
+        {icon: "clock-edit-outline", provider: IconProvider.MaterialCommunityIcons, text:"Modifier la fréquence", method: handleOpenEditFrequency},
     ]
 
     if(habitType === "Objectifs"){
@@ -125,29 +140,31 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Attacher à un objectif", method: openPinObjectifScreen})
     }
 
-    commands.push({icon: "trash", provider: IconProvider.Feather, text:"Supprimer l'habitude", method: handleDelete, color: error})
+    commands.push({icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleOpenShare})
+    commands.push({icon: "block", provider: IconProvider.Entypo, text:"Mettre fin à cette habitude", method: handleOpenFinishHabitBottomScreen, color: error})
 
     const bottomSheetModalRef_EditHabit: RefObject<BottomSheetModal> = useRef(null);
+    const bottomSheetModalRef_EditHabitFrequency: RefObject<BottomSheetModal> = useRef(null);
   
     const handleOpenEditHabit = useCallback(() => {
         bottomSheetModalRef_EditHabit.current?.present();
+    }, []);
+
+    const handleOpenEditHabitFrequency = useCallback(() => {
+        bottomSheetModalRef_EditHabitFrequency.current?.present();
       }, []);
   
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} onDismiss={additionnalClosedMethod}>
+        <CustomStaticBottomSheet 
+            footerMethod={() => bottomSheetModalRef.current?.close()}
+            footerText="Terminer"
+            bottomSheetModalRef={bottomSheetModalRef} onDismiss={additionnalClosedMethod}>
             <View style={styles.container}>
                 <View style={{}}>
                     {
-                        commands.map((command, index) => (
-                            <TouchableOpacity onPress={command.method} style={styles.displayRow} key={command.icon}>
-                                <Icon name={command.icon} provider={command.provider ?? "Feather"} color={command.color ?? fontGray}/>
-                                <SubTitleText text={command.text} style={{color: command.color ?? font}}/>
-                            </TouchableOpacity>      
-                        ))
+                        commands.map((command, index) => <Command {...command} key={index}/>)
                     }
                 </View>
-
-                <FooterBottomSheet text={"Terminer"} onPress={() => bottomSheetModalRef.current?.close()}/>
             </View>
             
             <PinToObjectifBottomScreen
@@ -162,10 +179,23 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 validationAdditionnalMethod={handleEdit}
                 editHabitCustomMethod={() => {}}
             />
+
+            <EditHabitFrequencyNav
+                additionnalCloseMethod={closeParentModal}
+                bottomSheetModalRef={bottomSheetModalRef_EditHabitFrequency}
+                habit={getSeriazableHabit(habit)}
+                validationAdditionnalMethod={handleOpenShare}
+            />
             
             <ShareHabitBottomScreen
                 bottomSheetModalRef={bottomSheetModalRef_ShareHabitScreen}
                 habit={habit}
+            />
+
+            <EndHabitBottomScreen
+                bottomSheetModalRef={bottomSheetModalRef_EndHabit}
+                habit={habit}
+                additionnalClosedMethod={closeParentModal}
             />
         </CustomStaticBottomSheet>
     );
@@ -192,7 +222,7 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         alignItems:"center", 
         gap: 20,
-        marginLeft: 5,
+        marginLeft: -5,
       },
 })
 

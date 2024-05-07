@@ -18,10 +18,11 @@ const cardStyle = () => {
     },
 
     card: {
-      borderRadius: 20,
+      borderRadius: 25,
       backgroundColor: secondary,
       padding: 20,
-
+      overflow: "visible",
+      
       shadowColor: "#000000",
       shadowOffset: {
         width: 0,

@@ -1,6 +1,6 @@
 import { sendPasswordResetEmail, signInWithEmailAndPassword } from "@firebase/auth"
 import { View } from "react-native"
-import { HugeText, NormalText, SubText } from "../../styles/StyledText"
+import { HugeText, NormalText } from "../../styles/StyledText"
 import { UsualScreen } from "../../components/View/Views"
 import { StyleSheet } from "react-native"
 import { CustomTextInputRefType, PasswordInputCustom, TextInputCustom } from "../../components/TextFields/TextInput"
@@ -8,23 +8,25 @@ import { BackgroundTextButton, TextButton } from "../../components/Buttons/Usual
 import { FC, useContext, useRef } from "react"
 import { useState } from "react"
 import { auth } from "../../firebase/InitialisationFirebase"
-import { Alert } from "react-native"
 import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
-import { useNavigation } from "@react-navigation/native"
 import SocialButton, { SocialConnectionWay } from "../../components/Buttons/SocialButton"
-import { useColorScheme } from "react-native"
 import { Success_Impact } from "../../constants/Impacts"
 import { AuthContext, AuthStates } from "../../data/AuthContext"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator"
 import Separator from "../../components/Other/Separator"
 import React from "react"
+import { AppContext } from "../../data/AppContext"
+import { useThemeColor } from "../../components/Themed"
 
 type LoginScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "LoginScreen">
 
 const LoginScreen: FC<LoginScreenProps> = ({navigation}) => {
 
     const {setUserAuthState} = useContext(AuthContext)
+    const {theme} = useContext(AppContext)
+
+    const fontGray = useThemeColor(theme, 'FontGray')
 
     const emailRef = useRef<CustomTextInputRefType>(null)
     const [isEmailWrong, setIsEmailWrong] = useState<boolean>(false)
@@ -33,7 +35,7 @@ const LoginScreen: FC<LoginScreenProps> = ({navigation}) => {
     const [isPasswordWrong, setIsPasswordWrong] = useState<boolean>(false)
 
     const handleGoToSignUpScreen = () => {
-        navigation.navigate("SignUpScreen")
+        navigation.navigate("BaseDetailsSignUpScreen")
     }
 
     const handleSignIn = async() => {
@@ -104,7 +106,7 @@ const LoginScreen: FC<LoginScreenProps> = ({navigation}) => {
 
 
                         <View style={styles.footer}>
-                            <NormalText text={"Pas de compte ? "}/> 
+                            <NormalText text={"Pas de compte ? "} style={{color: fontGray}}/> 
                             <TextButton semiBold noPadding text={"inscrivez-vous"} onPress={handleGoToSignUpScreen}/>
                         </View>
                     </View>

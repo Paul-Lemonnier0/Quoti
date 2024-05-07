@@ -7,15 +7,16 @@ import { AddHabitToObjectifStackType } from "./AddHabitToObjectifNav"
 import React from "react"
 import ChooseIconForm from "../../../components/Forms/ChooseIconForm"
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../../constants/BasicConstants"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 type ChooseIconScreenObjProps = NativeStackScreenProps<AddHabitToObjectifStackType, "ChooseIconScreenObj">
 
 export const ChooseIconScreenObj: FC<ChooseIconScreenObjProps> = ({route, navigation}) => {
     const {habit} = route.params
-    const {closeModal} = useContext(BottomSheetModalMethodsContext)
 
     const handleGoNext = (icon: FormIconedHabitValues) => {
         navigation.navigate("AddHabitStepsObj", {habit: {...habit, ...icon}})
+        BottomScreenOpen_Impact()
     }
 
     const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(habit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)

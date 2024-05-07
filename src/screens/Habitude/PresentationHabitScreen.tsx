@@ -4,47 +4,43 @@ import { HugeText, NormalGrayText, TitleText } from "../../styles/StyledText"
 import { useThemeColor } from "../../components/Themed"
 import { useState} from "react";
 import { CustomScrollView, UsualScreen } from "../../components/View/Views";
-import { TextButton } from "../../components/Buttons/UsualButton";
 import { useContext } from "react";
-import { HabitsContext } from "../../data/HabitContext";
 import HabitIcons from "../../data/HabitIcons";
-import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
+import { IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
 import ProgressBar from "../../components/Progress/ProgressBar";
 import StepsList from "../../components/Habitudes/Step/StepsList";
-import { addDays } from "date-fns";
-import { useEffect } from "react";
-import RangeActivity from "../../components/Calendars/RangeActivity";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
-import { Success_Impact } from "../../constants/Impacts";
 import HabitCompletedBottomScreen from "../BottomScreens/Habitudes/HabitCompletedBottomScreen";
 import { useRef } from "react";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Step } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { auth } from "../../firebase/InitialisationFirebase";
 import SettingHabitBottomScreen from "../BottomScreens/Habitudes/SettingsHabitBottomScreen";
-import { Habits_Skeleton } from "../../constants/HabitsPlaceholder";
 import { FrequencyDetails } from "../../components/Habitudes/FrequencyDetails";
 import Separator from "../../components/Other/Separator";
 import Quoti from "../../components/Other/Quoti";
 import { AppContext } from "../../data/AppContext";
-import { addHabitDoneDate } from "../../firebase/Firestore_Habits_Primitives";
-import { FormStep } from "../../types/FormHabitTypes";
-import BottomMenuStyle from "../../styles/StyledBottomMenu";
-import { toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods";
 import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
+import { SocialScreenStackType } from "../../navigation/SocialNavigator";
+import { HomeStackParamsList } from "../../navigation/HomeNavigator";
+import { UserContext } from "../../data/UserContext";
+import ProfilList from "../../components/Profil/ProfilList";
+import { UserDataBase } from "../../firebase/Database_User_Primitives";
+import { auth } from "../../firebase/InitialisationFirebase";
 
-type PresentationHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "PresentationHabitScreen">
+type PresentationHabitScreenProps = 
+    NativeStackScreenProps<SocialScreenStackType, "PresentationHabitScreen"> | 
+    NativeStackScreenProps<HomeStackParamsList, "PresentationHabitScreen">
 
 const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenProps) => {
 
-    const {habit: seriazableHabit} = route.params;
+    const {habit: seriazableHabit, detailledUser} = route.params;
+
     const {theme} = useContext(AppContext)
+    const {user: currentUser} = useContext(UserContext)
+
     const tertiary = useThemeColor(theme, "Tertiary")
     const secondary = useThemeColor(theme, "Secondary")
-
-    const {getHabitFromFilteredHabits, handleCheckStep, Objectifs, HabitsHistory} = useContext(HabitsContext)
 
     const habit = convertBackSeriazableHabit(seriazableHabit)
 
@@ -55,11 +51,6 @@ const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenP
 
     const doneSteps = steps.filter(step => step.isChecked).length
     const totalSteps = steps.length
-    const isCompleted = doneSteps === totalSteps
-
-    // const isNotToday = currentDate !== new Date()
-    const isNotToday = false //pour les tests
-    const isDisabled = isCompleted || isNotToday
 
     const pourcentage_value = doneSteps * 100 / totalSteps
 
@@ -67,42 +58,29 @@ const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenP
 
     const imageSize = 35
 
-    // const {user} = useContext(UserContext)
-    const user = auth.currentUser
-
-    const history = HabitsHistory[habit.habitID]
-
-    const currentDate = new Date()
-    const currentDateString = toISOStringWithoutTimeZone(currentDate)
-
-    const [last7DaysLogs, setLast7DaysLogs] = useState<string[]>([])
-    const startingDate = addDays(currentDate, -7);
-    const endingDate = currentDate;
-
-    useEffect(() => {
-        const last7DaysLogs_temp: Date[] = []
-        if(history) {
-            history.forEach(date => {
-                const date_temp = new Date(date)
-                if(date_temp.setHours(0,0,0,0) >= startingDate.setHours(0,0,0,0) && date_temp.setHours(0,0,0,0) <= endingDate.setHours(0,0,0,0)) {
-                    last7DaysLogs_temp.push(date)
-                }
-            })
-        
-            last7DaysLogs_temp.sort((date1, date2) => date1.valueOf() - date2.valueOf());
-        }
-
-        setLast7DaysLogs(last7DaysLogs_temp.map(log => toISOStringWithoutTimeZone(log)))
-
-    }, [HabitsHistory])
-
     const handleOpenSettings = useCallback(() => {
-        bottomSheetModalRef_Settings.current?.present();
     }, []);
 
     const goBack = () => {
         navigation.goBack()
     }
+
+    const currentUserDB: UserDataBase | null = (currentUser && currentUser.displayName && currentUser.email) ? {
+        displayName: currentUser.displayName,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        email: currentUser.email,
+        uid: currentUser.uid,
+        photoURL: currentUser.photoURL ?? undefined,
+    } : null
+
+    const notNullMembers = habit.members.filter(user => user !== null)
+    const fullMembers = [...notNullMembers]
+    if(currentUserDB) {
+        fullMembers.filter(user => user.uid !== currentUserDB.uid)
+    }
+
+    fullMembers.push(detailledUser)
 
     return(
         <UsualScreen>
@@ -129,7 +107,7 @@ const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenP
                                 </View>
                             </View>
 
-                            <ProgressBar progress={pourcentage_value/100} color={habit.color} inactiveColor={secondary} withPourcentage/>
+                            <ProgressBar progress={pourcentage_value/100} color={habit.color} withPourcentage/>
                         </View>
 
                         <View style={styles.bodyCore}>
@@ -142,42 +120,48 @@ const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenP
                                 </View>
                             </View>
 
-                            <View style={styles.groupContainer}>
-                                <TitleText text="Série"/>
-
-                                <View style={styles.streakContainer}>
-
-                                    <View style={styles.streakHeader}>
-                                        <View style={styles.streakLeftHeader}>
-                                            <Icon provider={IconProvider.FontAwesome5} size={30} color={habit.color} name="fire"/>
-
-                                            <HugeText text={habit.currentStreak}/>
-                                        </View>
-
-                                        <TextButton onPress={() => navigation.navigate("HabitStreakDetailsScreen", {habitID: habit.habitID, currentDateString: currentDateString})} text={"Voir plus"} isGray noPadding/>
-                                    </View>
-
-                                    <RangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
-                                </View>
-                            </View>
-
                             <Separator/>
 
                             <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
                                 <TitleText text={"Fréquence"}/>
                                 <FrequencyDetails frequency={habit.frequency} reccurence={habit.reccurence} occurence={habit.occurence}/>
                             </View>
+
+                            {
+                                habit.members.length > 0 && currentUser &&
+                                    <Separator/>
+                            }
+                            {
+                                habit.members.length > 0 && currentUser &&
+                                <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+                                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                                        <TitleText text={"Membres"}/>
+                                    </View>
+                                    <ProfilList users={fullMembers}
+                                        isPrimary
+                                        isBorderPrimary
+                                        nbVisibleUsers={10}
+                                    />
+                                </View>
+                            }
                         </View>
                     </View>
                 </CustomScrollView>
             </View>
 
-            <HabitCompletedBottomScreen bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} habit={habit} goBackHome={goBack}/>
-            <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef_Settings} habit={habit} 
-            deleteAdditionnalMethod={goBack} 
-            attachToObjectifAdditionnalMethod={goBack}
-            modifyAdditionnalMethod={goBack}/>
+            <HabitCompletedBottomScreen 
+                bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} 
+                habit={habit} 
+                goBackHome={goBack}
+            />
 
+            <SettingHabitBottomScreen 
+                bottomSheetModalRef={bottomSheetModalRef_Settings} 
+                habit={habit} 
+                deleteAdditionnalMethod={goBack} 
+                attachToObjectifAdditionnalMethod={goBack}
+                modifyAdditionnalMethod={goBack}
+            />
         </UsualScreen>
     )
 };

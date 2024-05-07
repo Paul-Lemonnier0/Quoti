@@ -1,35 +1,31 @@
-import { View } from "react-native";
-import { NormalGrayText, NormalText, SubTitleText } from "../../styles/StyledText";
-import React
-, { useContext } from "react";
-import { ErrorToast, InfoToast, SuccessToast, ToastConfig } from "react-native-toast-message";
+import React, { useContext } from "react";
+import { BaseToast, InfoToast, ToastConfig, ToastProps } from "react-native-toast-message";
 import { AppContext } from "../../data/AppContext";
 import { useThemeColor } from "../Themed";
-export const toastConfig: ToastConfig = {
-    success: (props: any) => <SuccessToast {...props} style/>,
-    error: (props: any) => <ErrorToast {...props}/>,
-    info: (props: any) => {
-    
-        const {theme} = useContext(AppContext)
-        const font = useThemeColor(theme, "Font")
-        const fontContrast = useThemeColor(theme, "FontContrast")
 
-        return (
-            <InfoToast 
+interface CustomToastProps extends ToastProps {
+    backgroundColor?: string,
+    fontColor?: string
+}
+
+const CustomBaseToast = (props: CustomToastProps) => {
+    const {theme} = useContext(AppContext)
+    const font = useThemeColor(theme, "Font")
+    const fontContrast = useThemeColor(theme, "FontContrast")
+
+    return (
+        <BaseToast
             {...props}
             
-            swipeable
-            autoHide
             style={{
                 height: 60, 
                 width: '70%', 
                 marginTop: 10, 
-                backgroundColor: font,
+                backgroundColor: props.backgroundColor ?? font,
                 flex: 1,
                 alignItems: "center",
                 borderRadius: 20,
                 justifyContent: "center",
-                border: "none",
                 borderLeftColor:"yellow",
                 borderLeftWidth: 0
             }} 
@@ -37,10 +33,37 @@ export const toastConfig: ToastConfig = {
             text1Style={{
                 fontFamily: "fontSemiBold",
                 fontSize: 16,
-                color: fontContrast,
+                color: props.fontColor ?? fontContrast,
                 textAlign: "center"
             }}
-            />
+        />
+    )
+}
+
+export const toastConfig: ToastConfig = {
+    success: (props: any) => {
+        const {theme} = useContext(AppContext)
+        const success = useThemeColor(theme, "Success")
+        const font = useThemeColor(theme, "Font")
+
+        return (
+            <CustomBaseToast {...props} backgroundColor={success} fontColor={font}/>
+        )
+    },
+
+    error: (props: any) => {
+        const {theme} = useContext(AppContext)
+        const error = useThemeColor(theme, "Error")
+        const font = useThemeColor(theme, "Font")
+
+        return(
+            <CustomBaseToast {...props} backgroundColor={error} fontColor={font}/>
+        )
+    },
+
+    info: (props: any) => {
+        return (
+            <CustomBaseToast {...props}/>
         )
     }
 }

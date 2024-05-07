@@ -7,18 +7,18 @@
    viewBox="0 0 339.725 735.01249"
    version="1.1"
    id="svg135"
-   inkscape:export-filename="DailySplash.png"
+   inkscape:export-filename="QuotiSplashDark.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96"
    inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
-   sodipodi:docname="Daily splash dark.svg"
+   sodipodi:docname="QuotiSplashDark.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
   <sodipodi:namedview
      id="namedview137"
-     pagecolor="#000000"
+     pagecolor="#1c1d1f"
      bordercolor="#000000"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
@@ -27,9 +27,9 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      showgrid="false"
-     inkscape:zoom="0.27622351"
-     inkscape:cx="316.77246"
-     inkscape:cy="1647.2168"
+     inkscape:zoom="0.19531952"
+     inkscape:cx="-325.10832"
+     inkscape:cy="783.33186"
      inkscape:window-width="1680"
      inkscape:window-height="1033"
      inkscape:window-x="160"
@@ -49,15 +49,21 @@
      inkscape:label="Calque 1"
      inkscape:groupmode="layer"
      id="layer1">
-    <text
-       xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,67.543829,290.57227)"
-       id="text358"
-       style="font-weight:500;font-size:192px;line-height:0;font-family:Poppins;-inkscape-font-specification:'Poppins Medium';white-space:pre;shape-inside:url(#rect360);fill:#071220"><tspan
-         x="120.31641"
-         y="339.83008"
-         id="tspan536"><tspan
-           style="fill:#ffffff"
-           id="tspan534">.Daily</tspan></tspan></text>
+    <g
+       id="g5490"
+       transform="matrix(1.3755316,0,0,1.3755316,25.295607,156.12374)">
+      <circle
+         style="fill:#000000;fill-opacity:0;stroke:#fafafa;stroke-width:19.901;stroke-dasharray:none;stroke-opacity:1"
+         id="path950"
+         cx="101.41737"
+         cy="141.33475"
+         r="28.305239" />
+      <circle
+         style="fill:#f3f3f3;fill-opacity:1;stroke:#1c1d1f;stroke-width:0;stroke-dasharray:none;stroke-opacity:0.960784"
+         id="path2458"
+         cx="134.49701"
+         cy="191.72842"
+         r="12.539204" />
+    </g>
   </g>
 </svg>

@@ -8,19 +8,18 @@ import { TextButton } from "../../components/Buttons/UsualButton";
 import { useContext } from "react";
 import { HabitsContext } from "../../data/HabitContext";
 import HabitIcons from "../../data/HabitIcons";
-import { Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
+import { BorderIconButton, Icon, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
 import ProgressBar from "../../components/Progress/ProgressBar";
 import StepsList from "../../components/Habitudes/Step/StepsList";
-import { addDays } from "date-fns";
+import { addDays, addMonths } from "date-fns";
 import { useEffect } from "react";
-import RangeActivity from "../../components/Calendars/RangeActivity";
+import RangeActivity, { MonthRangeActivity, WeekRangeActivity } from "../../components/Calendars/RangeActivity";
 import { getHeightResponsive, getWidthResponsive } from "../../styles/UtilsStyles";
-import { Success_Impact } from "../../constants/Impacts";
+import { BottomScreenOpen_Impact, Success_Impact } from "../../constants/Impacts";
 import HabitCompletedBottomScreen from "../BottomScreens/Habitudes/HabitCompletedBottomScreen";
 import { useRef } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
-import { Step } from "../../types/HabitTypes";
+import { FrequencyTypes, Habit, Step } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { auth } from "../../firebase/InitialisationFirebase";
 import SettingHabitBottomScreen from "../BottomScreens/Habitudes/SettingsHabitBottomScreen";
@@ -29,44 +28,74 @@ import { FrequencyDetails } from "../../components/Habitudes/FrequencyDetails";
 import Separator from "../../components/Other/Separator";
 import Quoti from "../../components/Other/Quoti";
 import { AppContext } from "../../data/AppContext";
-import { addHabitDoneDate } from "../../firebase/Firestore_Habits_Primitives";
 import { FormStep } from "../../types/FormHabitTypes";
-import BottomMenuStyle from "../../styles/StyledBottomMenu";
 import { toISOStringWithoutTimeZone } from "../../primitives/BasicsMethods";
+import BottomMenuStyle from "../../styles/StyledBottomMenu";
+import ProfilList from "../../components/Profil/ProfilList";
+import { UserDataBase } from "../../firebase/Database_User_Primitives";
+import { UserContext } from "../../data/UserContext";
+import { HomeStackParamsList } from "../../navigation/HomeNavigator";
+import { isHabitScheduledForDate } from "../../primitives/HabitudesReccurence";
+import StreakDayDetailsBottomScreen from "../BottomScreens/StreakDayDetailsBottomScreen";
+import DoneHabitSettingBottomScreen from "../BottomScreens/Habitudes/DoneHabitSettingsBottomScreen";
 
 type HabitudeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HabitudeScreen">
 
 const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
-    const {habitID, habitFrequency, objectifID, currentDateString} = route.params;
+    const {
+        habitID, 
+        habitFrequency, 
+        objectifID, 
+        currentDateString, 
+        noInteractions,
+        isPresentation,
+        isArchived,
+        isDone
+    } = route.params;
+
     const {theme} = useContext(AppContext)
+    const {user: currentUser} = useContext(UserContext)
+
     const tertiary = useThemeColor(theme, "Tertiary")
+    const fontGray = useThemeColor(theme, "FontGray")
     const secondary = useThemeColor(theme, "Secondary")
 
-    const {getHabitFromFilteredHabits, handleCheckStep, Objectifs, HabitsHistory} = useContext(HabitsContext)
+    const {
+        Habits, 
+        ArchivedHabits,
+        DoneHabits,
+        Objectifs, 
+        HabitsHistory,
+        getHabitFromFilteredHabits, 
+        handleCheckStep, 
+    } = useContext(HabitsContext)
 
 
     const bottomSheetModalRef_HabitCompleted = useRef<BottomSheetModal>(null)
     const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
-    
+
+    const [last7DaysLogs, setLast7DaysLogs] = useState<string[]>([])
 
     const currentDate = new Date(currentDateString)
     
-    const habit = getHabitFromFilteredHabits(habitFrequency, objectifID, habitID) ?? Habits_Skeleton[0]
+    const habit: Habit | undefined = 
+        isPresentation ? (
+            isArchived ? (ArchivedHabits ? ArchivedHabits[habitID] : null) :
+            (isDone ? DoneHabits[habitID] 
+            : Habits[habitID])
+        )
+        :
+        getHabitFromFilteredHabits(habitFrequency, objectifID, habitID) ?? Habits_Skeleton[0]
 
-    if(objectifID){
+    if(objectifID && habit){
         habit["color"] = Objectifs[objectifID].color ?? habit.color
     }
 
-    const [steps, setSteps] = useState<Step[]>(Object.values(habit.steps))
+    const [steps, setSteps] = useState<Step[]>(habit ? Object.values(habit.steps) : [])
 
-    const doneSteps = steps.filter(step => step.isChecked).length
-    const totalSteps = steps.length
-    const isCompleted = doneSteps === totalSteps
-
-    // const isNotToday = currentDate !== new Date()
-    const isNotToday = false //pour les tests
-    const isDisabled = isCompleted || isNotToday
+    const doneSteps = steps.filter(step => step.isChecked).length ?? 0
+    const totalSteps = steps ? steps.length : 0
 
     const pourcentage_value = doneSteps * 100 / totalSteps
 
@@ -96,13 +125,16 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
     const imageSize = 35
 
-    // const {user} = useContext(UserContext)
     const user = auth.currentUser
 
     const history = HabitsHistory[habitID]
 
-    const [last7DaysLogs, setLast7DaysLogs] = useState<string[]>([])
-    const startingDate = addDays(currentDate, -7);
+    const isHebdo = habitFrequency=== FrequencyTypes.Hebdo
+    const isMonthly = habitFrequency=== FrequencyTypes.Mensuel
+
+    const startingDate = isHebdo ? addDays(currentDate, -(7*7))
+                            : isMonthly ? addMonths(currentDate, -7)
+                                : addDays(currentDate, -7);
     const endingDate = currentDate;
 
     useEffect(() => {
@@ -123,12 +155,38 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
     }, [HabitsHistory])
 
     const handleOpenSettings = useCallback(() => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef_Settings.current?.present();
     }, []);
 
     const goBack = () => {
         navigation.goBack()
     }
+
+    if(!habit) return null
+
+    const currentUserDB: UserDataBase | null = (currentUser && currentUser.displayName && currentUser.email) ? {
+        displayName: currentUser.displayName,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        email: currentUser.email,
+        uid: currentUser.uid,
+        photoURL: currentUser.photoURL ?? undefined,
+    } : null
+
+    const notNullMembers = habit.members ? habit.members.filter(user => user !== null) : []
+    const fullMembers = [...notNullMembers]
+    if(currentUserDB) {
+        fullMembers.push(currentUserDB)
+    }
+
+    const isPlannedForToday = isHabitScheduledForDate(habit, new Date(currentDateString))
+
+    const startingDateString = habit.startingDate.toLocaleDateString("fr", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    })
 
     return(
         <UsualScreen>
@@ -137,7 +195,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                     <View style={styles.subHeader}>
                         <NavigationButton action={NavigationActions.goBack}/>
                         <Quoti/>
-                        <IconButton noPadding name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
+                        <BorderIconButton isTransparent isBorderGray name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 
@@ -155,7 +213,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                                 </View>
                             </View>
 
-                            <ProgressBar progress={pourcentage_value/100} color={habit.color} inactiveColor={secondary} withPourcentage/>
+                            <ProgressBar progress={pourcentage_value/100} color={habit.color} withPourcentage/>
                         </View>
 
                         <View style={styles.bodyCore}>
@@ -164,7 +222,8 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                                 <TitleText text="Progression"/>
 
                                 <View style={styles.displayColumn}>
-                                    <StepsList disabled={false} steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
+                                    <StepsList disabled={!isPlannedForToday || isDone || isArchived}
+                                        softDisabled={doneSteps === totalSteps} steps={steps} onStepChecked={onStepChecked} color={habit.color}/>
                                 </View>
                             </View>
 
@@ -180,30 +239,100 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                                             <HugeText text={habit.currentStreak}/>
                                         </View>
 
-                                        <TextButton onPress={() => navigation.navigate("HabitStreakDetailsScreen", {habitID: habit.habitID, currentDateString: currentDateString})} text={"Voir plus"} isGray noPadding/>
+                                        <TextButton 
+                                            small 
+                                            bold 
+                                            onPress={() => navigation.navigate("HabitStreakDetailsScreen", {
+                                                habitID: habit.habitID, 
+                                                currentDateString: currentDateString,
+                                                isDone: isDone,
+                                                isArchived: isArchived 
+                                            })} 
+                                            text={"Voir plus"} isGray noPadding/>
                                     </View>
-
-                                    <RangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
+                                    
+                                    {
+                                        isHebdo ?
+                                        <WeekRangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
+                                        :  
+                                            isMonthly ?
+                                            <MonthRangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
+                                            : <RangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
+                                    }
                                 </View>
                             </View>
 
                             <Separator/>
 
-                            <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+
+                            <View style={{ gap: 20, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
                                 <TitleText text={"Fréquence"}/>
-                                <FrequencyDetails frequency={habit.frequency} reccurence={habit.reccurence} occurence={habit.occurence}/>
+                                <FrequencyDetails frequency={habit.frequency} reccurence={habit.reccurence} occurence={habit.occurence}
+                                    daysOfWeek={habit.daysOfWeek}/>
+                            </View>
+
+                            {
+                                habit.members && habit.members.length > 0 && user &&
+                                    <Separator/>
+                            }
+                            {
+                                habit.members && habit.members.length > 0 && user &&
+                                <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+                                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>
+                                        <TitleText text={"Membres"}/>
+                                        <TextButton 
+                                            small
+                                            bold
+                                            onPress={() => navigation.navigate("MembersScreen", {users: fullMembers})} 
+                                            text={"Voir plus"} 
+                                            isGray 
+                                            noPadding
+                                        />
+                                    </View>
+                                    <ProfilList users={fullMembers}
+                                        isPrimary
+                                        isBorderPrimary
+                                        nbVisibleUsers={10}
+                                    />
+                                </View>
+                            }
+
+                            <Separator/>
+                            
+                            <View style={{ gap: 20, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+                                <TitleText text={"Date de début"}/>
+                                <TitleText text={startingDateString} style={{color: fontGray}}/>
                             </View>
                         </View>
                     </View>
                 </CustomScrollView>
             </View>
 
-            <HabitCompletedBottomScreen bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} habit={habit} goBackHome={goBack}/>
-            <SettingHabitBottomScreen bottomSheetModalRef={bottomSheetModalRef_Settings} habit={habit} 
-            deleteAdditionnalMethod={goBack} 
-            attachToObjectifAdditionnalMethod={goBack}
-            modifyAdditionnalMethod={goBack}/>
+            <HabitCompletedBottomScreen 
+                bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} 
+                habit={habit} 
+                goBackHome={goBack}
+            />
 
+            {
+                isArchived || isDone ? 
+                <DoneHabitSettingBottomScreen 
+                    bottomSheetModalRef={bottomSheetModalRef_Settings} 
+                    habit={habit as Habit} 
+                    isDone={isDone}
+                    isArchived={isArchived}
+                />
+                :
+                <SettingHabitBottomScreen 
+                    bottomSheetModalRef={bottomSheetModalRef_Settings}
+                    habit={habit} 
+                    deleteAdditionnalMethod={goBack} 
+                    attachToObjectifAdditionnalMethod={goBack}
+                    modifyAdditionnalMethod={goBack}
+                />
+            }
+
+            
         </UsualScreen>
     )
 };
@@ -214,7 +343,7 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: getHeightResponsive(20), 
         flex: 1, 
-        marginBottom: 0    
+        marginBottom: 10    
     },
 
     header: {

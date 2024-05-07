@@ -1,4 +1,4 @@
-import { startOfWeek } from "date-fns"
+import { differenceInDays, startOfWeek } from "date-fns"
 import { Habit } from "../types/HabitTypes"
 import { GlobalFirestoreHabit, GlobalHabit, UserFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes"
 
@@ -51,15 +51,15 @@ const isHabitPlannedThisDay = (daysOfActivity: number[], startingDate: Date, rec
     return daysOfActivity.includes(dayNumberInWeek)
 }
 
-const numberOfDayBetweenDates = (date1: Date, date2: Date): number => {
+export const numberOfDayBetweenDates = (date1: Date, date2: Date): number => {
     const differenceInMs = Math.abs(date1.getTime() - date2.getTime());
 
     return Math.floor(differenceInMs / (1000 * 60 * 60 * 24));
 }
 
 const numberOfWeekBetweenDates = (date1: Date, date2: Date): number => {
-    const differenceEnJours = numberOfDayBetweenDates(date1, date2)
-    const nombreSemaines = Math.floor(differenceEnJours / 7);
+    const differenceEnJours = differenceInDays(date1, date2)
+    const nombreSemaines = Math.floor(Math.abs(differenceEnJours) / 7);
 
     return nombreSemaines
 }   

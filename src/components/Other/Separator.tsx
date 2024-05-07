@@ -28,4 +28,12 @@ const Separator: FC<SeparatorProps> = ({color, opacity = 0.25, height = 2, borde
     )
 }
 
+export const HoleLineSeparator: FC<SeparatorProps> = ({color, opacity = 0.25, height = 2, borderRadius = 2}) => {
+    return(
+        <View style={{marginVertical: 30, marginHorizontal: -20}}>
+            <Separator color={color} opacity={opacity} height={height} borderRadius={borderRadius}/>
+        </View>
+    )
+}
+
 export default Separator

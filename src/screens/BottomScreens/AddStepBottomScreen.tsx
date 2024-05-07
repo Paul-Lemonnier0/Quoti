@@ -1,16 +1,13 @@
 import { View, StyleSheet } from "react-native"
-import { TitleText, SubTitleText, HugeText } from "../../styles/StyledText"
+import { SubTitleText, HugeText } from "../../styles/StyledText"
 import React, { Dispatch, FC, RefObject, useMemo, useState } from "react"
-import { Feather } from "@expo/vector-icons"
-import { useThemeColor } from "../../components/Themed"
-import CustomBottomSheet from "../../components/BottomSheets/CustomBottomSheet"
-import { BottomTextInputCustom, CustomTextInputRefType, TextInputCustom } from "../../components/TextFields/TextInput"
+import { CustomTextInputRefType, TextInputCustom } from "../../components/TextFields/TextInput"
 import { IncrementTime } from "../../components/Buttons/IncrementButtons"
-import { BackgroundTextButton, TextButton } from "../../components/Buttons/UsualButton"
+import { TextButton } from "../../components/Buttons/UsualButton"
 import { Keyboard } from "react-native"
 import { TouchableWithoutFeedback } from "react-native"
 import { useRef } from "react"
-import { CloseButton, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
+import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import Separator from "../../components/Other/Separator"
 import { BottomSheetModal } from "@gorhom/bottom-sheet"
 import { PrioritesType, Step } from "../../types/HabitTypes"
@@ -19,8 +16,8 @@ import { generateUniqueID, getHoursFromDuration, getMinutesFromDuration } from "
 import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet"
 import { UsualScreen } from "../../components/View/Views"
 import { PriorityRadioButtons } from "../../components/Priority/PriotityIndicator"
-import FooterBottomSheet from "../../components/BottomSheets/FooterBottomSheets"
 import Quoti from "../../components/Other/Quoti"
+import { BottomScreenOpen_Impact, Error_Impact } from "../../constants/Impacts"
 
 export interface AddStepBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -81,6 +78,7 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
                 else setSteps((previousSteps) => ([...previousSteps, {...newStep, numero: previousSteps.length}] as FormStep[]))
 
                 clearAll()
+                BottomScreenOpen_Impact()
                 closeModal() 
             }
 
@@ -91,28 +89,36 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
         }
 
         else {
+            Error_Impact()
             setIsTitleWrong(!titre)
             setIsDescriptionWrong(!description)
         }
     }
   
     const closeModal = () => {
+        clearAll()
+
+        BottomScreenOpen_Impact()
         bottomSheetModalRef.current?.close();
     }
 
     const handleSetNoDuration = () => {
+        BottomScreenOpen_Impact()
         setHourDuration(0)
         setMinutesDuration(0)
     }
 
     return (
-            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+            <SimpleFullBottomSheet 
+                footerMethod={handleValidate}
+                footerText="Ajouter"
+                bottomSheetModalRef={bottomSheetModalRef} isPrimary>
                 <UsualScreen hideMenu>    
                     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={{flex: 1}}>
 
                         <View style={styles.contentContainer}>
                             <View style={styles.header}>
-                                <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                                <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                                     <NavigationButton noPadding methode={closeModal} action={NavigationActions.close}/>
                                     <Quoti/>
                                     <NavigationButton noPadding action={NavigationActions.validation} methode={handleValidate}/>
@@ -135,7 +141,7 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
                                     <View style={styles.subBodyContainer}>
                                         <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                                             <SubTitleText text={"Durée"}/>
-                                            <TextButton text={"Aucune"} semiBold noPadding onPress={handleSetNoDuration}/>
+                                            <TextButton isGray text={"Aucune"} semiBold noPadding onPress={handleSetNoDuration}/>
                                         </View>
 
                                         <View style={styles.listContainer}>
@@ -147,7 +153,7 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
                                     <View style={styles.subBodyContainer}>
                                         <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
                                             <SubTitleText text={"Priorité"}/>
-                                            <TextButton text={"Aucune"} semiBold noPadding onPress={() => setSelectedPriority(PrioritesType.None)}/>
+                                            <TextButton isGray text={"Aucune"} semiBold noPadding onPress={() => setSelectedPriority(PrioritesType.None)}/>
                                         </View>
 
                                         <View style={styles.listContainer}>
@@ -156,9 +162,6 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
                                     </View>
                                 </View>
                             </View>
-
-                            <FooterBottomSheet text={"Ajouter"} onPress={handleValidate}/>
-
                         </View>
                     </TouchableWithoutFeedback>
                 </UsualScreen>
@@ -173,7 +176,7 @@ const AddStepBottomScreen: FC<AddStepBottomScreenProps> = ({bottomSheetModalRef,
         flexDirection: "column",
         flex: 1,
         gap: 30,
-        marginBottom: 30,
+        marginBottom: 60,
     },
 
     header: {

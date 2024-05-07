@@ -8,6 +8,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { AddHabitToObjectifStackType } from "./AddHabitToObjectifNav"
 import { FormDetailledHabitValues } from "../../../types/FormHabitTypes"
 import React from "react"
+import { Success_Impact } from "../../../constants/Impacts"
 
 type CreateObjectifHabitDetailsProps = NativeStackScreenProps<AddHabitToObjectifStackType, "CreateObjectifHabitDetails">
 
@@ -27,6 +28,8 @@ export const CreateObjectifHabitDetails: FC<CreateObjectifHabitDetailsProps> = (
             alertTime: ""
           };
         
+        Success_Impact()
+
         addHabitForObjectif(detailledHabit)
         closeModal()
     }

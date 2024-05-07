@@ -24,7 +24,7 @@ const CalendarMonthHeader: FC<CalendarMonthHeaderProps> = ({currentDateString}) 
 
     return (
         <View>
-          <SubTitleText text={header}/>
+          <SubTitleText bold text={header}/>
         </View>
     );
 }

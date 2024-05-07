@@ -4,13 +4,13 @@ const BottomMenuStyle = () => {
     return StyleSheet.create(
         {
             bottomMenuStyle: {
-                backgroundColor: "#000000",
-                marginHorizontal: 50,
-                position: "absolute", 
-                bottom: 35, 
-                borderRadius: 20,
-                borderTopWidth: 0, 
-                paddingBottom: 0,
+                // backgroundColor: "#0D0D0D",
+                // position: "absolute", 
+                // bottom: 35, 
+                // marginHorizontal: 30,
+                // borderRadius: 50,
+                // borderTopWidth: 0, 
+                // paddingBottom: 0,
             }        
     })
 }

@@ -1,5 +1,6 @@
 import React, { createContext, ReactNode, RefObject, useCallback } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { BottomScreenOpen_Impact } from "../constants/Impacts";
 
 export interface BottomSheetModalMethodsContextType {
   openModal: () => void;
@@ -14,15 +15,22 @@ export const BottomSheetModalMethodsContext = createContext<BottomSheetModalMeth
 export interface BottomSheetModalMethodsContextProviderProps {
   bottomSheetModalRef: RefObject<BottomSheetModal>;
   children: ReactNode;
+  additionnalCloseMethod?: () => void
 }
 
-export const BottomSheetModalMethodsContextProvider = ({ bottomSheetModalRef, children }: BottomSheetModalMethodsContextProviderProps) => {
+export const BottomSheetModalMethodsContextProvider = ({ bottomSheetModalRef, additionnalCloseMethod, children }: BottomSheetModalMethodsContextProviderProps) => {
 
   const openModal = useCallback(() => {
+    BottomScreenOpen_Impact()
+    
     bottomSheetModalRef.current?.present();
   }, [bottomSheetModalRef]);
 
   const closeModal = useCallback(() => {
+    BottomScreenOpen_Impact()
+
+    additionnalCloseMethod ? additionnalCloseMethod() : null
+
     bottomSheetModalRef.current?.close();
   }, [bottomSheetModalRef]);
 

@@ -5,6 +5,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack"
 import { FormBasicHabit } from "../../../types/FormHabitTypes"
 import { AddHabitToObjectifStackType } from "./AddHabitToObjectifNav"
 import React from "react"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 type AddBasicDetailsHabitObjectifProps = NativeStackScreenProps<AddHabitToObjectifStackType, "AddBasicsHabitDetailsObj">
 
@@ -14,6 +15,7 @@ export const AddBasicDetailsHabitObjectif: FC<AddBasicDetailsHabitObjectifProps>
 
     const handleGoNext = (values: FormBasicHabit) => {
         navigation.navigate("ChooseIconScreenObj", {habit: {...values, color}})
+        BottomScreenOpen_Impact()
     }
 
     return(

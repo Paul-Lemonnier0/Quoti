@@ -10,10 +10,16 @@ import React from "react"
 import { signInWithEmailAndPassword } from "firebase/auth"
 import { auth } from "../../firebase/InitialisationFirebase"
 import { AuthContext, AuthStates } from "../../data/AuthContext"
+import { AppContext } from "../../data/AppContext"
+import { useThemeColor } from "../../components/Themed"
 
 type WelcomeScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "WelcomeScreen">
 
 const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
+
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, 'FontGray')
+
     const {setUserAuthState} = useContext(AuthContext)
 
     const handleGoToLoginScreen = () => {
@@ -60,14 +66,15 @@ const WelcomeScreen: FC<WelcomeScreenProps> = ({navigation}) => {
 
                     <View style={styles.connexionContainer}>
 
-                    <View style={{flexDirection: 'row', justifyContent: 'center', gap: 20}}>
-                        <BackgroundTextButton text={"Zazou"} bold onPress={connectToDarkCreep}/>
-                        <BackgroundTextButton text={"Arzakal"} bold onPress={connectToArzakal}/>
-                    </View>
+                        <View style={{flexDirection: 'row', justifyContent: 'center', gap: 20}}>
+                            <BackgroundTextButton text={"Zazou"} bold onPress={connectToDarkCreep}/>
+                            <BackgroundTextButton text={"Arzakal"} bold onPress={connectToArzakal}/>
+                        </View>
+                        
                         <BackgroundTextButton bold text={"S'inscrire"} onPress={handleGoToBaseDetailsSignUpScreen}/>
                         
                         <View style={styles.footer}>
-                            <NormalText text={"Déjà membre ? "}/> 
+                            <NormalText text={"Déjà membre ? "} style={{color: fontGray}}/> 
                             <TextButton semiBold noPadding text={"Connectez vous"} onPress={handleGoToLoginScreen}/>
                         </View>
 

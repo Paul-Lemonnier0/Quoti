@@ -19,12 +19,14 @@ import { AuthNavigatorStackProps } from "../../navigation/AuthNavigator"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
 import { Database_setUser } from "../../firebase/Database_User_Primitives"
+import { useThemeColor } from "../../components/Themed"
 
 type SignUpScreenProps = NativeStackScreenProps<AuthNavigatorStackProps, "SignUpScreen">
 
 const SignUpScreen: FC<SignUpScreenProps> = ({navigation, route}) => {
 
-    const {setIsLoading} = useContext(AppContext)
+    const {setIsLoading, theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, 'FontGray')
 
     const {firstName, lastName, isPrivate} = route.params
 
@@ -121,7 +123,7 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation, route}) => {
                         <BackgroundTextButton text={"S'inscrire"} bold onPress={handleSignUp}/>
 
                         <View style={{justifyContent: "center", marginHorizontal: 30, display: "flex", alignItems: "center", flexDirection: "column"}}>
-                            <SubText style={{textAlign: "center"}} text={"En vous inscrivant, vous acceptez nos conditions d'utilisations "}/>
+                            <SubText style={{textAlign: "center"}} bold text={"En vous inscrivant, vous acceptez nos conditions d'utilisations "}/>
                         </View>
 
                     </View>
@@ -139,7 +141,7 @@ const SignUpScreen: FC<SignUpScreenProps> = ({navigation, route}) => {
                     <View style={{display: "flex", flexDirection: "column", gap: 20}}>
 
                         <View style={styles.footer}>
-                            <NormalText text={"Déjà membre ? "}/> 
+                            <NormalText text={"Déjà membre ? "} style={{color: fontGray}}/> 
                             <TextButton semiBold noPadding text={"Connectez vous"} onPress={handleGoToLoginScreen}/>
                         </View>
                     </View>

@@ -1,4 +1,4 @@
-import { StyleSheet } from "react-native"
+import { Animated, StyleSheet } from "react-native"
 import { getWidthResponsive } from "../../../styles/UtilsStyles"
 import { FlatList } from "react-native-gesture-handler"
 import { BorderIconButton, IconProvider } from "../../Buttons/IconButtons"
@@ -7,6 +7,7 @@ import { FrequencyTypes } from "../../../types/HabitTypes"
 import { Dispatch, FC } from "react"
 import { PeriodeType } from "../../../types/HomeScreenTypes"
 import React from "react"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 export interface RenderPeriode {
     periode: PeriodeType | "Calendar",
@@ -17,16 +18,26 @@ export interface RenderPeriode {
 
 
 const RenderPeriode: FC<RenderPeriode> = ({periode, selectedPeriode, setPeriode, handleOpenCalendar}) => {
-
+    
     if(periode === "Calendar") {
-      return <BorderIconButton onPress={handleOpenCalendar} name="calendar-range-outline" provider={IconProvider.MaterialCommunityIcons}/>
+        const onPressCalendar = () => {
+            BottomScreenOpen_Impact()
+            handleOpenCalendar()
+        }
+    
+        return <BorderIconButton onPress={onPressCalendar} name="calendar-range-outline" provider={IconProvider.MaterialCommunityIcons}/>
+    }
+
+    const onPressPeriode = () => {
+        BottomScreenOpen_Impact()
+        setPeriode(periode)
     }
 
     const isSelected = periode.frequency === selectedPeriode
 
     return(
       <BackgroundRadioButton bold isHighlight={isSelected} text={periode.displayedText} number={periode.nbElements}
-            handleOnClick={() => setPeriode(periode)}/>
+            handleOnClick={onPressPeriode}/>
     )
 }
 
@@ -34,12 +45,12 @@ export interface PeriodesProps {
     periodes: (PeriodeType | "Calendar")[],
     selectedPeriode: FrequencyTypes,
     setPeriode: Dispatch<PeriodeType>,
-    handleOpenCalendar: () => void
+    handleOpenCalendar: () => void,
 }
 
 export const Periodes: FC<PeriodesProps> = ({periodes, selectedPeriode, setPeriode, handleOpenCalendar}) => {
     return(
-        <FlatList 
+        <Animated.FlatList 
             data={periodes}
 
             renderItem={({item}) => (
@@ -54,7 +65,7 @@ export const Periodes: FC<PeriodesProps> = ({periodes, selectedPeriode, setPerio
             horizontal={true} 
             showsHorizontalScrollIndicator={false}
             
-            style={styles.periodesContainerStyle}
+            style={[styles.periodesContainerStyle]}
             contentContainerStyle={styles.periodesContentContainerStyle}
         />
     )

@@ -1,30 +1,24 @@
-import React, { useState, useEffect, useContext, FC, useCallback, useRef } from "react";
-import { View, StyleSheet } from "react-native";
-import { CommonActions, useNavigation, useRoute } from "@react-navigation/native";
-import { CustomScrollView, UsualScreen } from "../../components/View/Views";
-import { IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
-import {HugeText, NormalGrayText, TitleText} from "../../styles/StyledText";
-import HabitudesList from "../../components/Habitudes/HabitudesList";
-import ProgressBar from "../../components/Progress/ProgressBar";
-import { useThemeColor } from "../../components/Themed";
+import React, { useState, useEffect, useContext, FC } from "react";
+import { View } from "react-native";
+import { CommonActions } from "@react-navigation/native";
 import { HabitsContext } from "../../data/HabitContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
 import { Habit } from "../../types/HabitTypes";
-import SettingsObjectifBottomSheet from "../BottomScreens/Objectifs/SettingsObjectifBottomScreen";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { convertBackSeriazableObjectif, getSeriazableObjectif } from "../../primitives/ObjectifMethods";
-import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
-import Quoti from "../../components/Other/Quoti";
-import { AppContext } from "../../data/AppContext";
+import { HomeStackParamsList } from "../../navigation/HomeNavigator";
 import ObjectifDetailsComponent from "./ObjectifDetailsComponent";
 
 type ObjectifDetailsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ObjectifDetailsScreen">
 
 const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigation}) => {
 
-  const { filteredHabitsByDate } = useContext(HabitsContext);
-  const { seriazableObjectif, frequency, currentDateString } = route.params;
+  const { filteredHabitsByDate, Habits } = useContext(HabitsContext);
+  const { 
+    seriazableObjectif, 
+    frequency, 
+    currentDateString, 
+    noInteractions,
+    isPresentation 
+  } = route.params;
 
   const [isObjectifValid, setIsObjectifValid] = useState(false);
   const [displayedHabits, setDisplayedHabits] = useState<Habit[]>([]);
@@ -33,7 +27,7 @@ const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigatio
     let isMounted = true;
 
     const validateObjectif = async () => {
-      if (seriazableObjectif?.objectifID) {
+      if (seriazableObjectif?.objectifID && frequency) {
         const isObjectifVide =
             !filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(seriazableObjectif.objectifID);
 
@@ -54,7 +48,7 @@ const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigatio
       } 
       
       else {
-        if (isMounted)
+        if (isMounted && !isPresentation)
           navigation.goBack();
         
         setIsObjectifValid(false);
@@ -71,7 +65,14 @@ const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigatio
   const objectif = seriazableObjectif || {};
 
   useEffect(() => {
-    if (seriazableObjectif?.objectifID && filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(seriazableObjectif.objectifID)) {
+    if(isPresentation) {
+      setDisplayedHabits(
+          Object.values(Habits)
+          .filter(habit => habit.objectifID === objectif.objectifID)
+      )
+    }
+
+    else if (frequency && seriazableObjectif?.objectifID && filteredHabitsByDate[frequency]?.Objectifs?.hasOwnProperty(seriazableObjectif.objectifID)) {
 
       const habits_temp = Object.values(
         filteredHabitsByDate[frequency]?.Objectifs?.[seriazableObjectif.objectifID] ?? {}
@@ -91,20 +92,29 @@ const ObjectifDetailsScreen: FC<ObjectifDetailsScreenProps> = ({route, navigatio
   const pourcentage_value = (doneSteps * 100) / totalSteps;
 
   const handlePressOnHabit = (habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
-    navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
+    navigation.navigate("HabitudeScreen", {
+      habitID: habitude.habitID,
+      habitFrequency: habitude.frequency, 
+      objectifID, 
+      currentDateString,
+      noInteractions
+    })    
   }
 
   return (
     <>
       {
-        isObjectifValid ? <ObjectifDetailsComponent
+        (isObjectifValid || isPresentation) ? 
+        <ObjectifDetailsComponent
            objectif={objectif} 
            habits={displayedHabits} 
            pourcentage={pourcentage_value} 
            handlePressHabit={handlePressOnHabit}
            currentDateString={currentDateString}
+           isPresentation={isPresentation}
         />
-        : <View/>
+        : 
+        <View/>
       }
     </>
   )

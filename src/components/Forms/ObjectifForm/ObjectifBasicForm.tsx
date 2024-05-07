@@ -18,6 +18,7 @@ import { addDays } from "date-fns"
 import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 import Quoti from "../../Other/Quoti"
 import { toISOStringWithoutTimeZone } from "../../../primitives/BasicsMethods"
+import { Error_Impact } from "../../../constants/Impacts"
 
 export interface ObjectifBasicForm {
     objectif?: SeriazableObjectif,
@@ -30,10 +31,9 @@ export interface ObjectifBasicForm {
 export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext, currentStep, closeModal, totalSteps}) => {
 
     const startingDateBase = objectif ? new Date(objectif.startingDate) : new Date()
-    const endingDateBase = objectif ? new Date(objectif.startingDate) : addDays(new Date(), 14)
 
     const [startingDate, setStartingDate] = useState<Date>(startingDateBase)
-    const [endingDate, setEndingDate] = useState<Date>(endingDateBase)
+    const [endingDate, setEndingDate] = useState<Date | undefined>(undefined)
 
     const CURRENT_STEP_DETAILS = getAddObjectifStepsDetails(AddObjectifScreenType.AddBasicObjectifDetails)
     const total_steps = totalSteps ?? CURRENT_STEP_DETAILS.TOTAL_STEPS
@@ -54,10 +54,10 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
             if(titre.trim().length > 0 && description.trim().length > 0)
             {    
                 const detailledObjectif: FormBasicObjectif = {
-                    titre, 
-                    description, 
+                    titre: titre.trim(), 
+                    description: description.trim(), 
                     startingDate: toISOStringWithoutTimeZone(startingDate), 
-                    endingDate: toISOStringWithoutTimeZone(endingDate)
+                    endingDate: endingDate ? toISOStringWithoutTimeZone(endingDate) : undefined
                 }
 
                 handleGoNext(detailledObjectif)
@@ -70,6 +70,8 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
         }
         
         else {
+            Error_Impact()
+            
             setIsTitleWrong(!titre)
             setIsDescriptionWrong(!description)
         }
@@ -86,7 +88,7 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
             <View style={styles.container}>
 
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}> 
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}> 
                        { closeModal ?
                          <NavigationButton noPadding methode={closeModal} action={NavigationActions.close}/>
                             :
@@ -127,6 +129,9 @@ export const ObjectifBasicForm: FC<ObjectifBasicForm> = ({objectif, handleGoNext
 
             
             <SelectMultipleDateBottomScreen
+                disablePastDays
+                startingDate={startingDate}
+                endingDate={endingDate}
                 setStartingDate={setStartingDate}
                 setEndingDate={setEndingDate}
                 bottomSheetModalRef={bottomSheetModalRef_Calendar} 

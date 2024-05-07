@@ -9,8 +9,8 @@ import { Database_getAllUsers, Database_getUsersInfo, UserDataBase } from '../..
 import { UserContext } from '../../../data/UserContext'
 import ProfilItem from '../../../components/Profil/ProfilItem'
 import { FlatList } from 'react-native'
-import { BackgroundIconButton, BorderIconButton, CloseButton, IconProvider } from '../../../components/Buttons/IconButtons'
-import { LittleNormalText, NormalText, TitleText } from '../../../styles/StyledText'
+import { BackgroundIconButton, BorderIconButton, BottomSheetCloseButton, CloseButton, IconProvider } from '../../../components/Buttons/IconButtons'
+import { LittleNormalText, NormalGrayText, NormalText, TitleText } from '../../../styles/StyledText'
 import { UsualScreen } from '../../../components/View/Views'
 import Separator from '../../../components/Other/Separator'
 import { BackgroundTextButton } from '../../../components/Buttons/UsualButton'
@@ -25,12 +25,13 @@ import { sendHabitInvitation } from '../../../firebase/Firestore_User_Primitives
 interface ShareHabitBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     habit: Habit,
+    additionnalCloseMethod?: () => void
 }
 
-const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetModalRef, habit}) => {
+const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetModalRef, habit, additionnalCloseMethod}) => {
     const {user} = useContext(UserContext)
     const {theme, setIsLoading} = useContext(AppContext)
-    const fontGray = useThemeColor(theme, "FontGray")
+    const tertiary = useThemeColor(theme, "Tertiary")
 
     const link = user ? `exp://172.20.10.2:8081/--/SharedHabitScreen?habitID='50'&userID=${user.uid}` : ""
 
@@ -62,7 +63,7 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
     const handleCopyLink = () => {
         Success_Impact()
         Toast.show({
-            type: "info",
+            type: "success",
             text1: "Lien copié !",
             position: "top",
             visibilityTime: 3000,
@@ -79,8 +80,26 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
                 for (const receiver of selectedUserEmails) {
                     await sendHabitInvitation(user.uid, user.email ?? "", receiver, habit.habitID);
                 }
+
+                Toast.show({
+                    type: "success",
+                    text1: "L'invitation a été envoyée !",
+                    position: "top",
+                    visibilityTime: 3000,
+                    swipeable: true
+                })
+
                 Success_Impact();
             } catch (error) {
+
+                Toast.show({
+                    type: "error",
+                    text1: "Erreur lors de l'envoi",
+                    position: "top",
+                    visibilityTime: 3000,
+                    swipeable: true
+                })
+
                 console.error("Error while sending habit invitations:", error);
             } finally {
                 setIsLoading(false);
@@ -161,7 +180,6 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
 
                 <View style={{width: "100%", flexDirection: 'column', gap: 2, justifyContent: 'center', alignItems: 'center' }}>
                     <NormalText bold numberOfLines={1} text={item.displayName}/>
-                    <LittleNormalText style={{color: fontGray, flex: 1}} numberOfLines={1} text={item.firstName + " " + item.lastName}/>
                 </View>
             </View>
         )
@@ -170,19 +188,22 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
     const snapPoints = ["80%"]
 
     const closeModal = () => {
+        BottomScreenOpen_Impact()
+
         bottomSheetModalRef.current?.close()
+
+        additionnalCloseMethod ? additionnalCloseMethod() : null
     }
 
-
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints}>
-            <UsualScreen secondaryBackground hideMenu>
+        <CustomStaticBottomSheet onDismiss={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints}>
+            <UsualScreen hideMenu>
                 <View style={styles.container}>
                     <View style={styles.pageTitleContainer}>
                         <View style={{flex: 1}}>
                             <TitleText text="Partager l'habitude"/>
                         </View>
-                        <CloseButton noPadding methode={closeModal}/>
+                        <BottomSheetCloseButton methode={closeModal}/>
                     </View>
                     
                     <View>
@@ -190,7 +211,7 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
                             ref={searchValueRef} 
                             placeholder={"Rechercher un ami..."} 
                             onChangeText={updateUserList}
-                            isPrimary 
+                             
                         />
                     </View>
 
@@ -211,14 +232,25 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
                         />              
                     </ScrollView>
 
-                    <View style={{gap: 10, marginTop: -30, paddingTop: 0, marginHorizontal: -30, height: 80}}>
+                    <View style={{gap: 15, marginTop: -30, paddingTop: 10, marginHorizontal: -30, height: 120}}>
                         <Separator opacity={0.5}/>
+
                         <View style={{flex: 1, justifyContent: 'center'}}>
                         {
                             selectedUserEmails.length === 0 ?
                             <View style={{flexDirection: "row", gap: 20, justifyContent: 'center', alignItems: "center", padding: 5}}>
-                                <BorderIconButton isRound name="link" provider={IconProvider.Feather} onPress={handleCopyLink}/>
-                                <BorderIconButton isRound name="share" provider={IconProvider.Feather} onPress={handleShare}/>
+                                <View style={{flexDirection: "column", gap: 5}}>
+                                <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'center'}}>
+                                        <BorderIconButton isRound name="link" provider={IconProvider.Feather} onPress={handleCopyLink}/>
+                                    </View>
+                                    <LittleNormalText bold text="Copier le lien"/>
+                                </View>
+                                <View style={{flexDirection: "column", gap: 5}}>
+                                    <View style={{flexDirection: "row", alignItems: 'center', justifyContent: 'center'}}>
+                                        <BorderIconButton isRound name="share" provider={IconProvider.Feather} onPress={handleShare}/>
+                                    </View>
+                                    <LittleNormalText bold text="Partager dans"/>
+                                </View>
                             </View>
 
                             :

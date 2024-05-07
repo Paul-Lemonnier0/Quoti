@@ -4,11 +4,11 @@ import { HabitsContext } from "../../../data/HabitContext"
 import { Success_Impact } from "../../../constants/Impacts"
 import { AppContext } from "../../../data/AppContext"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import ObjectifHabitsForm from "../../../components/Forms/ObjectifForm/ObjectifHabitsForm"
 import { FormDetailledHabit } from "../../../types/FormHabitTypes"
 import React from "react"
 import { Habit } from "../../../types/HabitTypes"
+import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
 
 type AddHabitsToObjectifProps = NativeStackScreenProps<AddScreenStackType, "AddHabitsToObjectif">
 

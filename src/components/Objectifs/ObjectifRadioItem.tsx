@@ -1,5 +1,5 @@
 import { StyleSheet, TouchableOpacity, View } from "react-native"
-import { NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText"
+import { LittleNormalText, NormalGrayText, SubText, SubTitleText } from "../../styles/StyledText"
 import ItemIcon from "../Icons/ItemIcon"
 import { useThemeColor } from "../Themed"
 import cardStyle from "../../styles/StyledCard"
@@ -23,6 +23,7 @@ const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress
     
     const bgColor = backgroundColor ?? useThemeColor(theme, "Secondary")
     const contrast = useThemeColor(theme, "Contrast")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     const brColor = isSelected ? contrast : (borderColor ?? bgColor)
     
@@ -34,7 +35,7 @@ const ObjectifRadioItem: FC<ObjectifRadioItem> = ({objectif, isSelected, onPress
 
             <View style={[styles.displayColumn, {justifyContent: "center"}]}>
                 <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                <NormalGrayText bold numberOfLines={1} text={objectif.description}/>
+                <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={objectif.description}/>
             </View>
         </TouchableOpacity>
     )

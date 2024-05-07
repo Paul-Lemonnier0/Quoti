@@ -8,6 +8,7 @@ import { TextInput } from "react-native"
 import { IconButton, IconProvider } from "./IconButtons"
 import React, { FC, useContext } from "react"
 import { AppContext } from "../../data/AppContext"
+import { BottomScreenOpen_Impact } from "../../constants/Impacts"
 
 export interface BasicProps {
     value: number,
@@ -25,9 +26,18 @@ export const IncrementButtons: FC<BasicProps> = ({value, setValue, isBorderHidde
 
     const displayedValue = suffixe ? value + " " + suffixe : value
 
-    const handleIncrement = () => { if(value < 99) setValue(++value) }
-    const handleDecrement = () => { if(value > 1) setValue(--value) }
+    const handleIncrement = () => { 
+        BottomScreenOpen_Impact()
 
+        if(value < 99) 
+            setValue(++value) 
+    }
+    const handleDecrement = () => { 
+        BottomScreenOpen_Impact()
+        if(value > 1) 
+            setValue(--value) 
+    }
+    
     return(
         <View style={[styles.container, {backgroundColor: customBackgroundColor ?? secondary, borderColor: isBorderHidden ? secondary : font}]}>
             <IconButton noPadding onPress={handleDecrement} provider={IconProvider.Feather} name={"minus"} size={24}/>
@@ -56,10 +66,12 @@ export const IncrementTime: FC<IncrementTimeProps> = ({value, setValue, isDisabl
     const suffixe = isMinutes ? " min": " h"
 
     const handleIncrement = () => {
+        BottomScreenOpen_Impact()
         isMinutes ? setValue((value + 5) % 60) : setValue((value + 1) % 24)
     }
 
     const handleDecrement = () => {
+        BottomScreenOpen_Impact()
         isMinutes ? setValue((value - 5) < 0 ? 55 : (value - 5)) : setValue(value-1 < 0 ? 23 : value-1)
     }
 

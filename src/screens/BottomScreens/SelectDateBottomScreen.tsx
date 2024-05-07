@@ -2,24 +2,26 @@
 import { StyleSheet, View } from "react-native";
 import CalendarListCustom from "../../components/Calendars/CalendarListCustom";
 import { UsualScreen } from "../../components/View/Views";
-import { CloseButton } from "../../components/Buttons/IconButtons";
+import { BottomSheetCloseButton, CloseButton } from "../../components/Buttons/IconButtons";
 import { TitleText } from "../../styles/StyledText";
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import React, { Dispatch, FC, RefObject, useMemo } from "react";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet";
 import { CustomStaticBottomSheet } from "../../components/BottomSheets/CustomBottomSheet";
-import { TextButton } from "../../components/Buttons/UsualButton";
-import Separator from "../../components/Other/Separator";
-import FooterBottomSheet from "../../components/BottomSheets/FooterBottomSheets";
 
 export interface SelectDateBottomScreenProps {
   bottomSheetModalRef: RefObject<BottomSheetModal>,
   selectedDate: Date,
-  setSelectedDate: Dispatch<Date>
+  setSelectedDate: Dispatch<Date>,
+  disabledPastDays?: boolean
 }
 
-const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetModalRef, selectedDate, setSelectedDate}) => {
+const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({
+  bottomSheetModalRef,
+  selectedDate,
+  setSelectedDate,
+  disabledPastDays
+}) => {
 
     const closeModal = () => {
       bottomSheetModalRef.current?.close();
@@ -34,21 +36,31 @@ const SelectDateBottomScreen: FC<SelectDateBottomScreenProps> = ({bottomSheetMod
     const snapPoints_Default = useMemo(() => ['75%'], []);
 
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default}>
-          <UsualScreen secondaryBackground hideMenu>
+        <CustomStaticBottomSheet 
+          bottomSheetModalRef={bottomSheetModalRef} 
+          snapPoints={snapPoints_Default}
+          footerMethod={handleGoToday}
+          footerText={"Aujourd'hui"}>
+          <UsualScreen hideMenu>
             <View style={styles.container}>
+
               <View style={styles.pageTitleContainer}>
                   <View style={{flex: 1}}>
                       <TitleText text="Choisissez une date"/>
                   </View>
-                  <CloseButton noPadding methode={closeModal}/>
+                  <BottomSheetCloseButton methode={closeModal}/>
+
               </View>
 
               <View style={styles.calendarContainer}>
-                <CalendarListCustom closeModal={closeModal} selectedDate={selectedDate} setSelectedDate={setSelectedDate}/>
+                <CalendarListCustom 
+                  disablePastDays={disabledPastDays}
+                  closeModal={closeModal} 
+                  selectedDate={selectedDate} 
+                  setSelectedDate={setSelectedDate}
+                />
               </View>
 
-              <FooterBottomSheet text={"Aujourd'hui"} onPress={handleGoToday}/>
             </View>
           </UsualScreen>
         </CustomStaticBottomSheet>

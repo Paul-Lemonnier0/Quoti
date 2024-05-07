@@ -11,32 +11,51 @@ import { AppContext } from "../../data/AppContext";
 export interface MemoizedMultiSelectionDayComponentProps extends Omit<DayProps, 'date' | 'marking'> {
     date: DateData,
     onDayPress: (day: string) => void,
-    marking: MarkedMultipleDateType
+    marking: MarkedMultipleDateType,
+    disablePastDays?: boolean
 } 
 
-const MemoizedMultiSelectionDayComponent: FC<MemoizedMultiSelectionDayComponentProps> = memo(({ date, state, marking, onDayPress }) => {
+const MemoizedMultiSelectionDayComponent: FC<MemoizedMultiSelectionDayComponentProps> = memo(({ 
+    date,
+    state,
+    marking,
+    onDayPress,
+    disablePastDays 
+}) => {
     const {theme} = useContext(AppContext)
 
     const contrast = useThemeColor(theme, "Contrast");
     const fontContrast = useThemeColor(theme, "FontContrast");
     const font = useThemeColor(theme, "Font");
+    const fontGray = useThemeColor(theme, "FontGray");
+
     const selection = useThemeColor(theme, "Selection");
 
     const isToday = state === "today";
     const isSelected = marking && marking.selected
     const isFirstDaySelected = marking && marking.startingDate
     const isLastDaySelected = marking && marking.endingDate
+    const isOnlyDaySelected = marking && marking.onlyDaySelected
 
+    const today = new Date()
+    
+    let isDisabled = false
+    if(disablePastDays) {
+        isDisabled = new Date(date.dateString).setHours(0,0,0,0) < today.setHours(0,0,0,0)
+    }
+
+    const backgroundColor = isSelected ? contrast : null;
+    const color = (isFirstDaySelected || isLastDaySelected) ? fontContrast : (isDisabled ? fontGray : font);
 
     const firstDaySelectedStyle: ViewStyle = {
-        borderBottomLeftRadius: 50,
-        borderTopLeftRadius: 50,
+        borderBottomLeftRadius: 500,
+        borderTopLeftRadius: 500,
         backgroundColor: selection,
     }
 
     const lastDaySelectedStyle: ViewStyle = {
-        borderBottomRightRadius: 50,
-        borderTopRightRadius: 50,
+        borderBottomRightRadius: 500,
+        borderTopRightRadius: 500,
         backgroundColor: selection,
     }
 
@@ -46,19 +65,15 @@ const MemoizedMultiSelectionDayComponent: FC<MemoizedMultiSelectionDayComponentP
     }
 
     const firstDayAndOnlySelectedStyle: ViewStyle = {
-        borderRadius: 50,
+        borderRadius: 500,
         backgroundColor: 'transparent'
     }
     
-    
-    const actualStyle = 
-    isSelected && isFirstDaySelected ? firstDayAndOnlySelectedStyle :
+    const actualStyle = isOnlyDaySelected ? firstDayAndOnlySelectedStyle :
+    (isSelected && isFirstDaySelected ? firstDayAndOnlySelectedStyle :
         isFirstDaySelected ? firstDaySelectedStyle : 
             (isLastDaySelected ? lastDaySelectedStyle : 
-                isSelected ? selectedDaySelectedStyle : null)
-
-    const backgroundColor = isSelected ? contrast : null;
-    const color = (isFirstDaySelected || isLastDaySelected) ? fontContrast : font;
+                isSelected ? selectedDaySelectedStyle : null))
 
     const isPastilleDisplayed = (isFirstDaySelected || isLastDaySelected)
 
@@ -91,6 +106,7 @@ const MemoizedMultiSelectionDayComponent: FC<MemoizedMultiSelectionDayComponentP
 
     return (
         <Pressable 
+            disabled={isDisabled}
             onPress={() => onDayPress(date.dateString)} 
             style={[styles.dayContainer, {}]}>
 

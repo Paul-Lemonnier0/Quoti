@@ -1,14 +1,16 @@
-import { View } from "react-native"
-import { FC, useContext } from "react"
-import { BottomSheetModalMethodsContext, BottomSheetModalMethodsContextProvider } from "../../data/BottomSheetModalContext"
-import { useRef } from "react"
-import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen"
+import { ViewToken } from "react-native"
+import { FC, useContext, useEffect, useState } from "react"
 import { FlatList } from "react-native"
 import ObjectifBlock, { PresentationObjectifBlock } from "./ObjectifBlock"
 import { HabitsContext } from "../../data/HabitContext"
 import { InnerLogicObjectifType } from "../ScreenComponents/HomeScreenComponents/NotEmptyScreen"
-import { FrequencyTypes, Objectif, SeriazableObjectif, Step } from "../../types/HabitTypes"
+import { FrequencyTypes, Habit, Objectif, SeriazableObjectif, Step } from "../../types/HabitTypes"
 import React from "react"
+import Animated, { useAnimatedStyle, withTiming } from "react-native-reanimated"
+import { getSeriazableObjectif } from "../../primitives/ObjectifMethods"
+import { UserContext } from "../../data/UserContext"
+import AnimatedScrollComponent from "../ScrollView/AnimatedScrollComponent"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 export interface ObjectifListProps {
     objectifs: InnerLogicObjectifType[],
@@ -21,34 +23,6 @@ export interface ObjectifListProps {
 }
 
 const ObjectifsList: FC<ObjectifListProps> = ({objectifs, handleOnPress, currentDateString}) => {
-
-    const {filteredHabitsByDate} = useContext(HabitsContext)
-
-    let doneObjectifs: InnerLogicObjectifType[] = []
-
-    if(objectifs){
-        
-        doneObjectifs = objectifs.filter(objectif => {
-            let steps: Step[] = []
-
-            if(!filteredHabitsByDate[objectif.frequency]?.Objectifs?.hasOwnProperty(objectif.objectifID)){
-                return false
-            }
-
-            const habits = Object.values(filteredHabitsByDate[objectif.frequency]?.Objectifs?.[objectif.objectifID] ?? {})
-            for(const habit of habits){
-                steps = steps.concat(Object.values(habit.steps))
-
-                const doneSteps = steps ? steps.filter(step => step.isChecked).length : 0
-                const totalSteps = steps.length
-    
-                return totalSteps === doneSteps
-            }
-        })
-    }
-
-    const notDoneObjectifs = objectifs.filter(objectif => !doneObjectifs.includes(objectif))
-    const sortedObjectif = notDoneObjectifs.concat(doneObjectifs)
 
     const renderObjectifs = ({item, index}) => {
         const objectifID = item.objectifID
@@ -63,11 +37,11 @@ const ObjectifsList: FC<ObjectifListProps> = ({objectifs, handleOnPress, current
 
     return(
         <FlatList 
-            data={sortedObjectif} 
+            data={objectifs} 
             renderItem={renderObjectifs}
             showsHorizontalScrollIndicator={false}
-            style={{marginHorizontal: -30}}
-            contentContainerStyle={{paddingHorizontal: 30, gap: 15}}
+            style={{marginHorizontal: -30, marginVertical: -15}}
+            contentContainerStyle={{paddingHorizontal: 30, paddingVertical: 20, gap: 15}}
             horizontal
         />
     )
@@ -75,37 +49,120 @@ const ObjectifsList: FC<ObjectifListProps> = ({objectifs, handleOnPress, current
 
 export default ObjectifsList
 
-interface PresentationObjectifListProps {
-    objectifs: Objectif[],
-    handleOnPress: (seriazableObjectif: SeriazableObjectif) => void
+
+interface RenderPresentationObjectifItemProps {
+    item: Objectif,
+    index: number,
+    onPress: (seriazableObjectif: SeriazableObjectif) => void,
+    viewableItems?: Animated.SharedValue<ViewToken[]>,
+    habits: Habit[],
+    noEnteringAnimation?: boolean,
 }
 
-export const PresentationObjectifList: FC<PresentationObjectifListProps> = ({objectifs, handleOnPress}) => {
+const RenderPresentationObjectifs: FC<RenderPresentationObjectifItemProps> = ({
+    item: objectif, 
+    index,
+    onPress,
+    viewableItems,
+    habits,
+    noEnteringAnimation
+}) => {
+
+    const rStyle = useAnimatedStyle(() => {
+        const isVisible = viewableItems ? 
+            viewableItems.value.some((viewableItem) => 
+                viewableItem.item.objectifID === objectif.objectifID && viewableItem.isViewable) :
+            true;
+
+        return {
+            opacity: withTiming(isVisible ? 1 : 0),
+            transform: [{
+                scale: withTiming(isVisible ? 1 : 0.6) 
+            }]
+        }
+    }, [])
+    
+    const objectifID = objectif.objectifID
+
+    return (
+        <Animated.View key={index} style={viewableItems ? rStyle : undefined}>
+            <PresentationObjectifBlock 
+                key={objectifID} 
+                objectif={objectif}
+                index={index}
+                handleOnPress={() => onPress(getSeriazableObjectif(objectif))}
+                habits={habits}
+                noAnimation={noEnteringAnimation}/>
+        </Animated.View>
+    )
+}
+
+
+interface PresentationObjectifListProps {
+    objectifs: Objectif[],
+    handleOnPress: (seriazableObjectif: SeriazableObjectif) => void,
+    noEnteringAnimation?: boolean,
+    marginBottom?: number,
+    differentUserMail?: string,
+    habitsForObjectifs?: {[key: string]: Habit[]},
+    handleSearchObjectif?: (text: string) => void,
+    navigation?: NativeStackNavigationProp<any>,
+}
+
+
+export const PresentationObjectifList: FC<PresentationObjectifListProps> = ({
+    objectifs, 
+    handleOnPress,
+    noEnteringAnimation,
+    differentUserMail,
+    habitsForObjectifs,
+    handleSearchObjectif,
+    navigation
+}) => {
     const {Habits} = useContext(HabitsContext)
+    const {user} = useContext(UserContext)
+
     const habits = Object.values(Habits)
 
-    const renderObjectifs = ({item, index}) => {
-        
-        const objectifID = item.objectifID
+    const [habitsForObjectifsFinal, setHabitsForObjectifsFinal] = useState<{[key: string]: Habit[]}>({})
 
-        const habitsForObjectif = habits.filter((habit) => habit.objectifID === objectifID)
+    useEffect(() => {
+        if(user) {
+            if(differentUserMail && user.email !== differentUserMail && habitsForObjectifs)
+                setHabitsForObjectifsFinal(habitsForObjectifs)
 
-        return (
-            <PresentationObjectifBlock key={objectifID} 
-                index={index}
-                objectifID={objectifID}
-                handleOnPress={handleOnPress}
-                habits={habitsForObjectif}/>
-        )
-    }
+            else {
+                const objHabits: {[key: string]: Habit[]} = {}
+    
+                objectifs.map((obj) => {
+                    objHabits[obj.objectifID] = habits.filter((habit) => habit.objectifID === obj.objectifID)
+                })
+    
+                setHabitsForObjectifsFinal(objHabits)
+            }
+        }
+    }, [differentUserMail])    
 
     return(
-        <FlatList 
+        <AnimatedScrollComponent 
             data={objectifs} 
-            renderItem={renderObjectifs}
-            scrollEnabled={false}
-            style={{marginHorizontal: -30}}
-            contentContainerStyle={{paddingHorizontal: 30, gap: 10}}
+            renderItem={({item, index}) => 
+                <RenderPresentationObjectifs 
+                    item={item} 
+                    index={index} 
+                    onPress={handleOnPress}
+                    habits={habitsForObjectifsFinal[item.objectifID] ?? []}
+                    noEnteringAnimation={noEnteringAnimation}
+                />
+            }
+
+            searchBarMethod={handleSearchObjectif}
+            searchBarPlaceholder='Rechercher un objectif...'
+            navigation={navigation}
+
+            showsVerticalScrollIndicator={false}
+            style={{paddingTop: 100}}
+            contentContainerStyle={{paddingHorizontal: 0, paddingBottom: 260, gap: 20}}
         />
     )
 }

@@ -6,7 +6,6 @@ import { StyleSheet } from "react-native"
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet"
 import { Icon, IconProvider } from "../../../components/Buttons/IconButtons"
 import { SubTitleText } from "../../../styles/StyledText"
-import FooterBottomSheet from "../../../components/BottomSheets/FooterBottomSheets"
 import { useThemeColor } from "../../../components/Themed"
 import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts"
 import { AppContext } from "../../../data/AppContext"
@@ -15,6 +14,7 @@ import React from "react"
 import EditHabitNav from "../../EditScreens/Habits/EditHabitNav"
 import { getSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 import EditObjectifNav from "../../EditScreens/Objectifs/EditObjectifNav"
+import Command, { CommandType } from "../../../components/Other/Command"
 
 export interface SettingsObjectifBottomSheetProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -90,15 +90,7 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
     const font = useThemeColor(theme, "Font")
     const fontGray = useThemeColor(theme, "FontGray")
 
-    interface commandType {
-        icon: string,
-        provider: IconProvider,
-        text: string,
-        method: () => void,
-        color?: string
-    }
-
-    const commands: commandType[] = [
+    const commands: CommandType[] = [
         {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'objectif", method: handleOpenEdit},
         {icon: "share", provider: IconProvider.Feather, text:"Partager l'objectif", method: handleShare},
     ]
@@ -114,20 +106,16 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
       }, []);
   
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
+        <CustomStaticBottomSheet 
+            bottomSheetModalRef={bottomSheetModalRef}
+            footerMethod={() => bottomSheetModalRef.current?.close()}
+            footerText="Terminer">
             <View style={styles.container}>
                 <View style={{}}>
                     {
-                        commands.map((command, index) => (
-                            <TouchableOpacity onPress={command.method} style={styles.displayRow} key={command.icon}>
-                                <Icon name={command.icon} provider={command.provider ?? "Feather"} color={command.color ?? fontGray}/>
-                                <SubTitleText text={command.text} style={{color: command.color ?? font}}/>
-                            </TouchableOpacity>      
-                        ))
+                        commands.map((command, index) => <Command {...command} key={index}/>)
                     }
                 </View>
-
-                <FooterBottomSheet text={"Terminer"} onPress={() => bottomSheetModalRef.current?.close()}/>
             </View>
             
             <EditObjectifNav

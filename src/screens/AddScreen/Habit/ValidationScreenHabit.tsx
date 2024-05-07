@@ -4,15 +4,28 @@ import { UsualScreen } from "../../../components/View/Views"
 import { Image } from "react-native"
 import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
 import { BackgroundTextButton } from "../../../components/Buttons/UsualButton"
-import { FC, useEffect } from "react"
+import { FC, useContext, useEffect, useRef } from "react"
 import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import React from "react"
+import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
+import { IconButton, IconProvider } from "../../../components/Buttons/IconButtons"
+import { AppContext } from "../../../data/AppContext"
+import { useThemeColor } from "../../../components/Themed"
+import ShareHabitBottomScreen from "../../BottomScreens/Social/ShareHabitBottomScreen"
+import { convertBackSeriazableHabit } from "../../../primitives/HabitMethods"
+import { BottomSheetModal } from "@gorhom/bottom-sheet"
 
 type ValidationScreenHabitProps = NativeStackScreenProps<AddScreenStackType, "ValidationScreenHabit">
 
 const ValidationScreenHabit: FC<ValidationScreenHabitProps> = ({route, navigation}) => {
+
+    const {habit} = route.params
+
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
+
+    const bottomSheetModalRef_ShareHabitScreen = useRef<BottomSheetModal>(null)
 
     useEffect(() => {
         const disableGestures = () => {
@@ -29,13 +42,21 @@ const ValidationScreenHabit: FC<ValidationScreenHabitProps> = ({route, navigatio
         navigation.reset({index: 0, routes: [{ name: 'Home' }]})
     }
 
+    const handleOpenShare = () => {
+        bottomSheetModalRef_ShareHabitScreen.current?.present()
+    }
+
     return (
         <UsualScreen hideMenu>   
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
+                    <View>
                         <MassiveText text="Bravo !"/>
-                        <TitleText text="Nouvelle habitude ajoutée"/>
+                        <TitleText text="Nouvelle habitude" style={{color: fontGray}}/>
+                    </View>
+
+                    <View style={{padding: 0, marginRight: -10, marginTop: 5}}>
+                        <IconButton name="share-2" provider={IconProvider.Feather} onPress={handleOpenShare}/>
                     </View>
                 </View>
 
@@ -46,8 +67,8 @@ const ValidationScreenHabit: FC<ValidationScreenHabitProps> = ({route, navigatio
                         <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Validation]}/>
 
                         <View style={styles.emptyScreenSubContainer}>
-                            <NormalText text={"Continuez comme ça! "}/>
-                            <SubTitleText text={"vous êtes sur la bonne voie !"}/>
+                            <TitleText text="Continuez comme ça !"/>
+                            <NormalText bold text={"Vous êtes sur la bonne voie"} style={{color: fontGray}}/>
                         </View>
                     </View>
                 </View>
@@ -57,6 +78,11 @@ const ValidationScreenHabit: FC<ValidationScreenHabitProps> = ({route, navigatio
                 </View>
 
             </View>
+
+            <ShareHabitBottomScreen
+                bottomSheetModalRef={bottomSheetModalRef_ShareHabitScreen}
+                habit={convertBackSeriazableHabit(habit)}
+            />
         </UsualScreen>
     );
   };
@@ -74,8 +100,7 @@ const ValidationScreenHabit: FC<ValidationScreenHabitProps> = ({route, navigatio
     header: {
         display: "flex", 
         flexDirection: "row", 
-        alignItems:"center", 
-        justifyContent: "space-between"
+        justifyContent: "space-between",
     },
     
     body: {

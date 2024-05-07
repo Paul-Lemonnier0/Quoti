@@ -1,22 +1,19 @@
 import { SubTitleText } from "../../../styles/StyledText"
 import { FC, RefObject, useCallback, useContext, useRef } from "react";
-import FooterBottomSheet from "../../../components/BottomSheets/FooterBottomSheets";
-import { Share, View } from "react-native";
+import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import { Icon, IconProvider } from "../../../components/Buttons/IconButtons";
 import { TouchableOpacity } from "react-native";
 import { useThemeColor } from "../../../components/Themed";
-import { HabitsContext } from "../../../data/HabitContext";
-import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
-import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
-import PinToObjectifBottomScreen from "./PinToObjectifBottomScreen";
+import { Success_Impact } from "../../../constants/Impacts";
 import EditHabitNav from "../../EditScreens/Habits/EditHabitNav";
 import { AppContext } from "../../../data/AppContext";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Habit } from "../../../types/HabitTypes";
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import React from "react"
-import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../../types/FormHabitTypes";
+import { FormDetailledObjectifHabit } from "../../../types/FormHabitTypes";
+import Command, { CommandType } from "../../../components/Other/Command";
 
 
 export interface SettingNewObjectifHabitBottomScreenProps {
@@ -67,18 +64,8 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
     }
     
     const error = useThemeColor(theme, "Error")
-    const font = useThemeColor(theme, "Font")
-    const fontGray = useThemeColor(theme, "FontGray")
 
-    interface commandType {
-        icon: string,
-        provider: IconProvider,
-        text: string,
-        method: () => void,
-        color?: string
-    }
-
-    const commands: commandType[] = [
+    const commands: CommandType[] = [
         {icon: "edit-2", provider: IconProvider.Feather, text:"Modifier l'habitude", method: handleOpenEdit},
         {icon: "trash", provider: IconProvider.Feather, text:"Supprimer l'habitude", method: handleDelete, color: error}
     ]
@@ -90,20 +77,16 @@ const SettingNewObjectifHabitBottomScreen: FC<SettingNewObjectifHabitBottomScree
       }, []);
   
     return (
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} onDismiss={additionnalClosedMethod}>
+        <CustomStaticBottomSheet 
+            footerMethod={() => bottomSheetModalRef.current?.close()}
+            footerText="Terminer"
+            bottomSheetModalRef={bottomSheetModalRef} onDismiss={additionnalClosedMethod}>
             <View style={styles.container}>
                 <View style={{}}>
                     {
-                        commands.map((command, index) => (
-                            <TouchableOpacity onPress={command.method} style={styles.displayRow} key={command.icon}>
-                                <Icon name={command.icon} provider={command.provider ?? "Feather"} color={command.color ?? fontGray}/>
-                                <SubTitleText text={command.text} style={{color: command.color ?? font}}/>
-                            </TouchableOpacity>      
-                        ))
+                        commands.map((command, index) => <Command {...command} key={index}/>)
                     }
                 </View>
-
-                <FooterBottomSheet text={"Terminer"} onPress={() => bottomSheetModalRef.current?.close()}/>
             </View>
 
             <EditHabitNav

@@ -4,9 +4,9 @@ import { UsualScreen } from '../../../components/View/Views'
 import { IconProvider, NavigationActions, NavigationButton } from '../../../components/Buttons/IconButtons'
 import { HugeText } from '../../../styles/StyledText'
 import { StyleSheet } from 'react-native'
-import { RenderSettingsListItem, RenderSettingsListItemProps } from '../ProfilSettingsScreen'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { HomeStackParamsList } from '../../../navigation/BottomTabNavigator'
+import { HomeStackParamsList } from '../../../navigation/HomeNavigator'
+import Command, { CommandType } from '../../../components/Other/Command'
 
 type SecurityScreenProps = NativeStackScreenProps<HomeStackParamsList, "SecurityScreen">
 
@@ -14,12 +14,12 @@ const SecurityScreen: FC<SecurityScreenProps> = ({navigation}) => {
 
     const [taskedMasked, setTaskedMasked] = useState<boolean>(false)
 
-    const commands: RenderSettingsListItemProps[] = [ 
+    const commands: CommandType[] = [ 
         {
             icon: "eye-off",
             provider: IconProvider.Feather,
             text: "Masquer vos activités",
-            onPress: () => setTaskedMasked(!taskedMasked),
+            method: () => setTaskedMasked(!taskedMasked),
             switchButton: true,
             switchButtonValue: taskedMasked
         },
@@ -27,14 +27,16 @@ const SecurityScreen: FC<SecurityScreenProps> = ({navigation}) => {
         {
             icon: "block",
             provider: IconProvider.MaterialIcons,
-            text: "Compte bloqués",
-            onPress: () => navigation.navigate("ConditionUtilisationScreen")
+            text: "Comptes bloqués",
+            method: () => navigation.navigate('BlockedAccountsScreen'),
+            chevron: true
         },
         {
             icon: "lock",
             provider: IconProvider.Feather,
             text: "Modifier votre mot de passe",
-            onPress: () => navigation.navigate("ConditionUtilisationScreen")
+            method: () => navigation.navigate("ConditionUtilisationScreen"),
+            chevron: true
         },
     ]
 
@@ -59,7 +61,7 @@ const SecurityScreen: FC<SecurityScreenProps> = ({navigation}) => {
                         <View style={styles.bodyCore}>
                             <View style={{gap: 10}}>
                             {
-                                commands.map((command, index) => <RenderSettingsListItem key={index} {...command}/>)
+                                commands.map((command, index) => <Command key={index} {...command}/>)
                             }
                             </View>
 

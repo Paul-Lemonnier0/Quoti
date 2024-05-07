@@ -4,24 +4,20 @@ import { HugeText, SubTitleGrayText } from '../styles/StyledText';
 import { CustomScrollView, UsualScreen } from '../components/View/Views';
 import { HabitsContext } from '../data/HabitContext';
 import { useContext } from 'react';
-import { ObjectifPlaceholder_Meditation, ObjectifPlaceholder_SemiMarathon, habitsPlaceholder } from '../data/HabitsPlaceholder';
 import { getHeightResponsive } from '../styles/UtilsStyles';
 import {  getMonthString, shortDateStringFormat, shortWeekStringFormat } from '../primitives/DateBasicMethods';
 import SelectDateBottomScreen from './BottomScreens/SelectDateBottomScreen';
 import { NothingToDoScreen } from '../components/ScreenComponents/HomeScreenComponents/EmptyScreens';
 import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Periodes';
 import { RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
-import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { PeriodeType } from '../types/HomeScreenTypes';
 import { FrequencyTypes, Habit, SeriazableObjectif } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { HomeStackParamsList } from '../navigation/BottomTabNavigator';
-import ProfilItem from '../components/Profil/ProfilItem';
-import { auth } from '../firebase/InitialisationFirebase';
 import ProfilButton from '../components/Profil/ProfilButton';
 import { UserContext } from '../data/UserContext';
 import { toISOStringWithoutTimeZone } from '../primitives/BasicsMethods';
+import { HomeStackParamsList } from '../navigation/HomeNavigator';
 
 type HomeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HomeScreen">
 
@@ -139,7 +135,13 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
                     <HugeText text={displayedDate}/>  
                 </View> 
 
-                {user && <ProfilButton placeholderBorder user={user} noBadge={!hasNotifications} onPress={handleNavigationToDetailsScreen}/>}
+                {user && <ProfilButton 
+                  placeholderBorder 
+                  user={user} 
+                  noBadge={!hasNotifications} 
+                  isSelected={hasNotifications} 
+                  onPress={handleNavigationToDetailsScreen}/>
+                }
             </View>
 
             <Periodes 
@@ -219,28 +221,25 @@ const styles = StyleSheet.create({
   body: {
     gap: 10, 
     flex: 1, 
-    marginBottom: -30
   },
 
   subBody: {
     flex: 1, 
     gap: getHeightResponsive(20),
     flexDirection: "column",
+    marginBottom: -140,
   },
 
   center:{
-    display:"flex", 
     flexDirection: "column", 
     justifyContent: "center"
   },
 
   displayColumn:{
-    display: "flex", 
     flexDirection: "column"
   },
 
   displayRow:{
-    display: "flex", 
     flexDirection: "row"
   },
 });

@@ -11,77 +11,21 @@ import { TouchableOpacity } from "react-native"
 import { BottomScreenOpen_Impact } from "../../constants/Impacts"
 import { AppContext } from "../../data/AppContext"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator"
 import { signOut } from "firebase/auth"
 import React from "react"
 import ProfilButton from "../../components/Profil/ProfilButton"
 import BottomMenuStyle from "../../styles/StyledBottomMenu"
+import { HomeStackParamsList } from "../../navigation/HomeNavigator"
+import Command, { CommandType } from "../../components/Other/Command"
 
 type ProfilSettingsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilSettingsScreen">
 
-export interface RenderSettingsListItemProps {
-    icon: string,
-    provider: IconProvider,
-    text: string,
-    onPress: () => void,
-    noChevron?: boolean,
-    switchButton?: boolean,
-    switchButtonValue?: boolean,
-}
-
-export const RenderSettingsListItem: FC<RenderSettingsListItemProps> = ({
-    icon, 
-    provider, 
-    text, 
-    onPress, 
-    noChevron, 
-    switchButton,
-    switchButtonValue,
-}) => {
-    const {theme} = useContext(AppContext)
-    const fontGray = useThemeColor(theme, "FontGray")
-    const secondary = useThemeColor(theme, "Secondary")
-
-    const handleOnPress = () => {
-        if(switchButton) {
-            BottomScreenOpen_Impact()
-        }
-
-        onPress()
-    }
-    
-    return(
-        <TouchableOpacity disabled={switchButton} onPress={handleOnPress} style={{
-            flexDirection: "row", 
-            justifyContent: "space-between",
-            paddingVertical: 20
-        }}>
-            <View style={{flexDirection: "row", gap: 20, alignItems: "center", flex: 1}}>
-                <Icon name={icon} provider={provider} color={fontGray} size={26}/>
-                <SubTitleText text={text}/>
-            </View>
-            <View>
-            {
-                !noChevron && !switchButton ?
-                    <Icon provider={IconProvider.Feather} name={"chevron-right"} color={fontGray}/>
-                    :
-                switchButton && 
-                    <Switch 
-                        value={switchButtonValue} 
-                        onValueChange={handleOnPress} 
-                        trackColor={{false: secondary, true: secondary}}/>
-            }
-            </View>
-        </TouchableOpacity>
-    )
-}
-
-export interface RenderSettingListProps {
-    commands: RenderSettingsListItemProps[],
+export interface RenderCommandListProps {
+    commands: CommandType[],
     sectionTitle: string
 }
 
-export const RenderSettingList: FC<RenderSettingListProps> = ({commands, sectionTitle}) => {
+export const RenderCommandList: FC<RenderCommandListProps> = ({commands, sectionTitle}) => {
     return(
         <View key={sectionTitle} style={{gap: 20}}>
             <TitleText text={sectionTitle}/>
@@ -89,7 +33,7 @@ export const RenderSettingList: FC<RenderSettingListProps> = ({commands, section
             <View style={{gap: 10}}>
                 {
                     commands.map((command, index) => {
-                        return <RenderSettingsListItem key={index} {...command}/>
+                        return <Command key={index} {...command}/>
                     })
                 }
             </View>
@@ -122,32 +66,41 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
 
     const isDarkMode = theme.dark !== undefined
 
-    const generalCommands:  RenderSettingListProps = {
+    const generalCommands:  RenderCommandListProps = {
         sectionTitle: "Général",
         commands: [
             {
                 icon: "user",
                 provider: IconProvider.Feather,
                 text: "Mon Profil",
-                onPress: () => navigation.navigate("ProfilDataSettingsScreen")
+                method: () => navigation.navigate("ProfilDataSettingsScreen"),
+                chevron: true
             },
             {
                 icon: "staro",
                 provider: IconProvider.AntDesign,
                 text: "Abonnement",
-                onPress: () => navigation.navigate("SubscriptionScreen")
+                method: () => navigation.navigate("SubscriptionScreen"),
+                chevron: true
+            },
+            {
+                icon: "archive-outline",
+                provider: IconProvider.MaterialCommunityIcons,
+                text:"Habitudes archivées",
+                method: () => navigation.navigate("ArchivedHabitsScreen"),
+                chevron: true
             },
         ]
     }
 
-    const preferencesCommands: RenderSettingListProps = {
+    const preferencesCommands: RenderCommandListProps = {
         sectionTitle: "Préférences",
         commands: [
             {
                 icon: "bell",
                 provider: IconProvider.Feather,
                 text: "Notifications",
-                onPress: () => setNotificationEnabled(!notificationEnabled),
+                method: () => setNotificationEnabled(!notificationEnabled),
                 switchButton: true,
                 switchButtonValue: notificationEnabled
             },
@@ -155,7 +108,7 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
                 icon: "moon",
                 provider: IconProvider.Feather,
                 text: "Mode sombre",
-                onPress: () => handleSetTheme(theme.light ? {dark: "dark"} : {light: "light"}),
+                method: () => handleSetTheme(theme.light ? {dark: "dark"} : {light: "light"}),
                 switchButton: true,
                 switchButtonValue: isDarkMode
             },
@@ -163,33 +116,34 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
                 icon: "lock",
                 provider: IconProvider.Feather,
                 text: "Sécurité",
-                onPress: () => navigation.navigate("SecurityScreen")
+                method: () => navigation.navigate("SecurityScreen"),
+                chevron: true
             },
         ]
     }
 
-    const otherCommands: RenderSettingListProps = {
+    const otherCommands: RenderCommandListProps = {
         sectionTitle: "Autre",
         commands: [
-        
         {
             icon: "help-outline",
             provider: IconProvider.MaterialIcons,
             text: "Aide et support",
-            onPress: () => navigation.navigate("HelpAndSupportScreen")
+            method: () => navigation.navigate("HelpAndSupportScreen"),
+            chevron: true
         },
         {
             icon: "info",
             provider: IconProvider.Feather,
             text: "Conditions d'utilisation",
-            onPress: () => navigation.navigate("ConditionUtilisationScreen")
+            method: () => navigation.navigate("ConditionUtilisationScreen"),
+            chevron: true
         },
         {
             icon: "log-out",
             provider: IconProvider.Feather,
             text: "Déconnexion",
-            onPress: handleSignOut,
-            noChevron: true
+            method: handleSignOut,
         },
     ]}
 
@@ -218,7 +172,7 @@ const ProfilSettingsScreen: FC<ProfilSettingsScreenProps> = ({navigation}) => {
                             <View style={{gap: 30}}>
                             {
                                 commands.map((command, index) => 
-                                    <RenderSettingList key={index} {...command}/>
+                                    <RenderCommandList key={index} {...command}/>
                                 )
                             }
                             </View>

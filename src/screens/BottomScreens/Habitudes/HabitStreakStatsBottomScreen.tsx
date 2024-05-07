@@ -1,7 +1,7 @@
-import { MassiveText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
+import { HugeText, LittleNormalText, MassiveText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
-import { CloseButton, Icon, IconProvider } from "../../../components/Buttons/IconButtons";
+import { BottomSheetCloseButton, CloseButton, Icon, IconProvider } from "../../../components/Buttons/IconButtons";
 import Confetti from "../../../components/Other/Confetti";
 import { FC, RefObject, useContext, useRef } from "react";
 import { useEffect } from "react";
@@ -15,91 +15,77 @@ import { Habit } from "../../../types/HabitTypes";
 import AnimatedLottieView from "lottie-react-native";
 import React from "react"
 import CustomBottomSheet, { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
-import Separator from "../../../components/Other/Separator";
+import Separator, { HoleLineSeparator } from "../../../components/Other/Separator";
 import CustomCard from "../../../components/Other/Card";
 import { useThemeColor } from "../../../components/Themed";
 import { AppContext } from "../../../data/AppContext";
+import { RatioType } from "../../Habitude/HabitStreakDetailsScreen";
+import { isHabitPlannedThisMonth } from "../../../primitives/HabitudesReccurence";
+import ProgressBar, { ProgressPie } from "../../../components/Progress/ProgressBar";
 
 export interface HabitStreakDetailsBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     habit: Habit,
-    goBackHome?: () => void
+    ratio: RatioType
 }
 
-const HabitStreakDetailsBottomScreen: FC<HabitStreakDetailsBottomScreenProps> = ({bottomSheetModalRef, habit, goBackHome}) => {
+const HabitStreakDetailsBottomScreen: FC<HabitStreakDetailsBottomScreenProps> = ({bottomSheetModalRef, habit, ratio}) => {
     
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
-
-    const confettiRef = useRef<AnimatedLottieView>(null)
-
-    const triggerConfetti = () => {
-        if(confettiRef.current){
-            confettiRef.current.play(0);
-        }
-    }
-
-    useEffect(() => {
-        triggerConfetti()
-    }, [])
 
     const closeModal = () => {
         bottomSheetModalRef.current?.close()
     }
 
-    const handleGoBackHome = () => {
-        if(goBackHome) goBackHome()
-    }
-
     return (
-        <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+        <CustomBottomSheet
+            hideHandle
+            footerMethod={closeModal}
+            footerText="Terminer"
+            bottomSheetModalRef={bottomSheetModalRef}>
             <View style={styles.container}>
-                <View style={{flex: 1, gap: 30, marginTop: 30}}>
+                <View style={styles.pageTitleContainer}>
+                    <TitleText text={"Statistiques"}/>
+                    <BottomSheetCloseButton methode={closeModal}/>
+                </View>
 
-                    <View style={{gap: 40, flex: 1}}>
-                        <View style={{flexDirection: "row", justifyContent: "space-between", gap: 30}}>
-                            <View style={{flexDirection: "row", gap: 10, alignItems: "flex-end", justifyContent: "flex-start"}}>
-                                <View style={{marginVertical: 10}}>
-                                    <Icon provider={IconProvider.FontAwesome5} size={30} name="fire" color={habit.color}/>
-                                </View>
-                                <MassiveText text={habit.currentStreak} style={{fontSize: 50}}/>
-
+                <View style={{flexDirection: "column", gap: 20, marginBottom: 10, marginTop: 10, flex: 1}}>
+                    <View style={{gap: 20, flex: 1, flexDirection: "row"}}>
+                        <CustomCard flex style={{gap: 40}}>
+                            <TitleText text={"Série en cours"}/>
+                            <View style={{flexDirection: "row", gap: 5}}>
+                                <MassiveText text={habit.currentStreak}/>
+                                <MassiveText text={"j"} style={{color: fontGray}}/>
                             </View>
+                        </CustomCard>
 
-                            <View style={{flexDirection: "column", gap: 5, justifyContent: "center", flex: 1}}>
-                                <SubTitleText text={"Série en cours"}/>
-                                <NormalText bold style={{color: fontGray}} text={"04 avr. 2024 - 10 avr. 2024"}/>
+                        <CustomCard flex style={{gap: 40}}>
+                            <TitleText text={"Meilleure série"}/>
+                            <View style={{flexDirection: "row", gap: 5}}>
+                                <MassiveText text={"32"}/>
+                                <MassiveText text={"j"} style={{color: fontGray}}/>
                             </View>
+                        </CustomCard>
+                    </View>
+
+                    <CustomCard style={{flex: 1, gap: 50}}>
+                        <View style={{justifyContent: "space-between", flexDirection: "row"}}>
+                            <TitleText text={"Ratio "}/>
+                            <TitleText style={{color: fontGray}} text={ratio.done + "/" + ratio.total}/>
+
                         </View>
 
-                        <Separator/>
 
-                        <View style={{flexDirection: "row", justifyContent: "space-between", gap: 30}}>
-                            <View style={{flexDirection: "row", gap: 10, alignItems: "flex-end", justifyContent: "flex-start"}}>
-                                <View style={{marginVertical: 10}}>
-                                    <Icon provider={IconProvider.FontAwesome5} size={30} name="fire" color={habit.color}/>
-                                </View>
-                                <MassiveText text={habit.bestStreak} style={{fontSize: 50}}/>
 
+                        <View style={{marginTop: -10, gap: 20}}>
+                            <View style={{flexDirection: "row",gap: 5}}>
+                                <MassiveText bold text={Math.round((ratio.done / ratio.total) * 100)  + ""}/>
+                                <MassiveText text={"%"} style={{color: fontGray}}/>
                             </View>
-
-                            <View style={{flexDirection: "column", gap: 5, justifyContent: "center", flex: 1}}>
-                                <SubTitleText text={"Meilleure série"}/>
-                                <NormalText bold style={{color: fontGray}} text={"12 nov. 2023 - 27 dec. 2023"}/>
-                            </View>
+                            <ProgressBar progress={ratio ? (ratio.done / ratio.total) : 0} color={habit.color}/>
                         </View>
-                        
-
-                    </View>
-
-                    <View style={styles.sectionContainer}>
-           
-                    </View>
-
-                    
-                    <View style={styles.sectionContainer}>
-
-                    </View>
+                    </CustomCard>
                 </View>
             </View>
         </CustomBottomSheet>
@@ -110,22 +96,25 @@ const styles = StyleSheet.create({
     container: {
         display: "flex", 
         flexDirection: "column", 
-        gap: 20, 
-        flex: 1,
+        justifyContent: "space-between",
+        gap: 30, 
+        marginBottom: 80,
+        flex: 1
     },
 
     displayRow: {
         display: "flex",
         flexDirection: "row",
-        gap: 0
+        gap: 30,
+        marginVertical: 20
     },
 
     pageTitleContainer: {
         display: "flex", 
         flexDirection: "row", 
         alignItems:"center", 
+        justifyContent: "space-between",
         gap: 20,
-        marginLeft: 5,
       },
 
     emptySreenContainer: {

@@ -1,18 +1,25 @@
 import { View, StyleSheet } from "react-native"
-import { TitleText, NormalText, SubTitleText, MassiveText } from "../../../styles/StyledText"
+import { TitleText, NormalText, SubTitleText, MassiveText, NormalGrayText } from "../../../styles/StyledText"
 import { useNavigation } from "@react-navigation/native"
 import { UsualScreen } from "../../../components/View/Views"
 import { Image } from "react-native"
 import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
 import { BackgroundTextButton } from "../../../components/Buttons/UsualButton"
-import { FC, useEffect } from "react"
+import { FC, useContext, useEffect } from "react"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import React from "react"
+import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
+import { useThemeColor } from "../../../components/Themed"
+import { AppContext } from "../../../data/AppContext"
+import { IconButton, IconProvider } from "../../../components/Buttons/IconButtons"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 type ValidationScreenObjectifProps = NativeStackScreenProps<AddScreenStackType, "ValidationScreenObjectif">
 
 const ValidationScreenObjectif: FC<ValidationScreenObjectifProps> = ({navigation}) => {
+
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
 
     useEffect(() => {
 
@@ -26,6 +33,7 @@ const ValidationScreenObjectif: FC<ValidationScreenObjectifProps> = ({navigation
     }, [])
 
     const handleGoHome = () => {
+        BottomScreenOpen_Impact()
         navigation.reset({index: 0, routes: [{ name: 'Home' }]})
     }
 
@@ -33,9 +41,13 @@ const ValidationScreenObjectif: FC<ValidationScreenObjectifProps> = ({navigation
         <UsualScreen hideMenu>   
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{width: "80%"}}>
+                    <View>
                         <MassiveText text="Bravo !"/>
-                        <TitleText text="Nouvel objectif ajouté"/>
+                        <TitleText text="Nouvel objectif" style={{color: fontGray}}/>
+                    </View>
+
+                    <View style={{padding: 0, marginRight: -10, marginTop: 5}}>
+                        <IconButton name="share-2" provider={IconProvider.Feather} onPress={() => {}}/>
                     </View>
                 </View>
 
@@ -46,8 +58,8 @@ const ValidationScreenObjectif: FC<ValidationScreenObjectifProps> = ({navigation
                         <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Validation]}/>
 
                         <View style={styles.emptyScreenSubContainer}>
-                            <NormalText text={"Continuez comme ça! "}/>
-                            <SubTitleText text={"vous êtes sur la bonne voie !"}/>
+                            <TitleText text="Continuez comme ça !"/>
+                            <NormalGrayText bold text={"Vous êtes sur la bonne voie"}/>
                         </View>
                     </View>
                 </View>

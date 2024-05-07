@@ -57,6 +57,7 @@ export interface EditHabitNavProps {
     isNewObjectifHabit?: boolean,
     objectifColor?: string,
     constObjectifID?: string,
+    additionnalCloseMethod?: () => void
 }
 
 const EditHabitNav: FC<EditHabitNavProps> = ({
@@ -67,16 +68,17 @@ const EditHabitNav: FC<EditHabitNavProps> = ({
     isNewObjectifHabit, 
     objectifColor, 
     constObjectifID,
+    additionnalCloseMethod
 }) => {
 
     return(
-            <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+            <SimpleFullBottomSheet onDismiss={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef} isPrimary>
                 <EditHabitContextProvider validationAdditionnalMethod={(values: FormDetailledObjectifHabit) => {
                     validationAdditionnalMethod()
                     editHabitCustomMethod ? editHabitCustomMethod(values) : null
                 }}>
                     <BottomSheetModalProvider>
-                        <BottomSheetModalMethodsContextProvider bottomSheetModalRef={bottomSheetModalRef}>
+                        <BottomSheetModalMethodsContextProvider additionnalCloseMethod={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
                                 <EditHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="EditHabitDetailsScreen">
                                     <EditHabitStack.Screen name="EditHabitDetailsScreen" component={EditHabitDetailsScreen} initialParams={{

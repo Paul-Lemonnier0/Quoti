@@ -36,7 +36,6 @@ const usePrefetchListImages = () => {
     
       const addImages = (item: any) => {
         if(item.photoURL) {
-          console.log("hello")
           imagesToPrefetch.push(item.photoURL);
         }
       };

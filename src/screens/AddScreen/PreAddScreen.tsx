@@ -1,55 +1,80 @@
 import { Image, View } from "react-native"
 import { UsualScreen } from "../../components/View/Views"
-import { HugeText, NormalGrayText } from "../../styles/StyledText"
-import { FC, useState } from "react"
+import { HugeText, NormalGrayText, NormalText } from "../../styles/StyledText"
+import { FC, useContext, useState } from "react"
 import { StyleSheet } from "react-native"
 import StepIndicator from "../../components/Other/StepIndicator"
 import { NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons"
 import { RadioButtonsBar } from "../../components/RadioButtons/RadioButtonsBar"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../navigation/BottomTabNavigator"
 import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList"
 import React from "react"
 import Quoti from "../../components/Other/Quoti"
+import { BottomScreenOpen_Impact } from "../../constants/Impacts"
+import { AddScreenStackType } from "../../navigation/AddScreenNavigator"
+import { AppContext } from "../../data/AppContext"
+import { useThemeColor } from "../../components/Themed"
+
+enum ItemType {
+    Habitude = "Habitude",
+    Objectif = "Objectif"
+}
+
+enum NavItemType {
+    AddBasicDetails = "AddBasicDetails",
+    AddBasicDetailsObjectif = "AddBasicDetailsObjectif"
+}
 
 type PreAddScreenProps = NativeStackScreenProps<AddScreenStackType, "PreAddScreen">
 
 export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
 
-    const [selectedItem, setSelectedItem] = useState<string>("AddBasicDetails")
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
+    const font = useThemeColor(theme, "Font")
+
+    const [selectedItem, setSelectedItem] = useState<NavItemType>(NavItemType.AddBasicDetails)
     const [totalSteps, setTotalSteps] = useState(6)
 
-    type RadioType = { key: string, text: string }
+    type RadioType = { key: NavItemType, text: ItemType }
 
     const radios: RadioType[] = [
-        {key: "AddBasicDetails", text: "Habitude" },
-        {key: "AddBasicDetailsObjectif", text: "Objectif"},
+        {key: NavItemType.AddBasicDetails, text: ItemType.Habitude },
+        {key: NavItemType.AddBasicDetailsObjectif, text: ItemType.Objectif},
     ];
 
     const handleSetSelectedItem = (item: string) => {
-        setSelectedItem(item)
+        if(item !== selectedItem) {
+            BottomScreenOpen_Impact()
+            setSelectedItem(item as NavItemType)
 
-        if(item === "AddBasicDetails"){
-            setTotalSteps(6)
+            if(item === NavItemType.AddBasicDetails){
+                setTotalSteps(6)
+            }
+    
+            else setTotalSteps(5)
         }
-
-        else setTotalSteps(5)
     }
 
     const handleClose = () => {
+        BottomScreenOpen_Impact()
         navigation.navigate("Home")
     }
 
     const handleGoNext = () => {
-        if (selectedItem === "AddBasicDetails" || selectedItem === "AddBasicDetailsObjectif") {
-            navigation.navigate(selectedItem);
-        }
+        BottomScreenOpen_Impact()
+        navigation.navigate(selectedItem);
     }
+
+    const isSelected = (type: NavItemType): boolean => {
+        return type === selectedItem
+    }   
+
     return(
         <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         <NavigationButton noPadding action={NavigationActions.close} methode={handleClose}/>
                         <Quoti/>
                         <NavigationButton noPadding action={NavigationActions.goNext} methode={handleGoNext}/>
@@ -68,8 +93,18 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
                             <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Creative]}/>
 
                             <View style={styles.emptyScreenSubContainer}>
-                                <HugeText text={"Créer une habitude ou un objectif ?"} style={{textAlign: "center"}}/>
-                                <NormalGrayText style={{textAlign: "center"}} text={"Les habitudes font parties de votre routine. Les objectifs sont composés d'habitudes et permettent de structurer davantage votre quotidien et vos projets"}/>
+                                <HugeText text={"Créer une "} style={{textAlign: "center", color: fontGray}}>
+                                    <HugeText text={"habitude"} style={{textAlign: "center", color: isSelected(NavItemType.AddBasicDetails) ? font : fontGray}}/>
+                                    <HugeText text={" ou un "} style={{textAlign: "center", color: fontGray}}/>
+                                    <HugeText text={"objectif"} style={{textAlign: "center", color: isSelected(NavItemType.AddBasicDetailsObjectif) ? font : fontGray}}/>
+                                    <HugeText text={" ?"} style={{textAlign: "center", color: fontGray}}/>
+                                </HugeText>
+                                    
+                                <NormalGrayText bold style={{textAlign: "center"}} text={
+                                    selectedItem === NavItemType.AddBasicDetails ?
+                                    "Les habitudes forment la structure de vos actions quotidiennes et de vos projets. Elles constituent votre routine." :
+                                    "Les objectifs sont composés d'habitudes et permettent de structurer davantage votre quotidien et vos projets"
+                                }/>
                             </View>
                         </View>
                     </View>

@@ -61,7 +61,7 @@ async function removeStepLog(date: Date, userID: string, habitID: string, stepID
 async function changeStepStateFirestore(date: Date, userID: string, habitID: string, stepID: string, isChecked: boolean) {
 
     const dateString = toISOStringWithoutTimeZone(date)
-    console.log("step concerned at date : ", stepID, " | ", dateString)
+    console.log("Step concerned at date : ", stepID, " | ", dateString)
 
     try{
         if(isChecked){
@@ -70,7 +70,7 @@ async function changeStepStateFirestore(date: Date, userID: string, habitID: str
     
         else await removeStepLog(date, userID, habitID, stepID)
 
-        console.log("step successfully updated !")
+        console.log("Step successfully updated !")
     }
 
     catch(e){
@@ -132,6 +132,47 @@ async function getDateLogs(date: Date, userID: string): Promise<string[]> {
     for(const habitID in habitudes){
         doneSteps = doneSteps.concat(habitudes[habitID])
     }
+
+    return doneSteps
+}
+
+export const getHabitLogsInDateRange = async(habitID: string, start: Date, end: Date, userMail: string): Promise<string[]> => {
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
+
+    const qry = query(
+        collection(userDoc, FirestoreUserSubCollections.History), 
+        where("habitsID", 'array-contains', habitID), 
+        where("date", ">=", start),
+        where("date", "<=", end))
+
+    const qrySnap = await getDocs(qry)
+
+    let logs: string[] = []
+    qrySnap.docs.forEach(log => {
+        if("habitudes" in log.data()) {
+            if(log.data().habitudes.hasOwnProperty(habitID)) {
+                logs = logs.concat(log.data().habitudes[habitID])
+            }
+        }
+    })
+    
+    return logs
+}
+
+async function getHabitsDateLogs(habitsID: string[], date: Date, userID: string): Promise<string[]> {
+
+    //A voir si utile et fonctionnel
+    let doneSteps: string[] = [];
+    const date_string = toISOStringWithoutTimeZone(date)
+
+    const userDoc = doc(db, FirestoreCollections.Users, userID)
+
+    const snap = await Promise.all(habitsID.map(async(habitID) => {
+        const qry = query(collection(userDoc, FirestoreUserSubCollections.History), where(habitID, 'in', "habitsID"))
+        return getDocs(qry)
+    }))
+
+    const habitudesLogs = snap.map(logs => logs.docs.map(log => log.data()))
 
     return doneSteps
 }

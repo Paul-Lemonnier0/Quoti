@@ -14,16 +14,19 @@ interface ProfilListProps {
      * Le nombre d'utilisateurs à afficher dans la liste. Par défaut, 3.
      */
     isPrimary?: boolean,
-    nbVisibleUsers?: number
+    nbVisibleUsers?: number,
+    small?: boolean,
+    isBorderPrimary?: boolean
 }
 
 /**
  * Affiche une liste de X (par défault 3) profils d'utilisateurs puis le nombre restant de profils.
  */
 
-const ProfilList: FC<ProfilListProps> = ({users, isPrimary, nbVisibleUsers = 3}: ProfilListProps): JSX.Element => {
+const ProfilList: FC<ProfilListProps> = ({users, isPrimary, small, isBorderPrimary, nbVisibleUsers = 3}: ProfilListProps): JSX.Element => {
     const {theme} = useContext(AppContext)
     const secondary = useThemeColor(theme, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
 
     const displayedUsers: (User | UserFullType | UserDataBase)[] = users.slice(0, nbVisibleUsers);
 
@@ -33,9 +36,9 @@ const ProfilList: FC<ProfilListProps> = ({users, isPrimary, nbVisibleUsers = 3}:
                 {
                     displayedUsers.map((user, index) => 
                         <ProfilButton key={index} onPress={() => {}}
-                            noBadge small disabled 
+                            noBadge small={small} disabled 
                             user={user} isPrimary={isPrimary}
-                            borderColor={secondary} borderWidth={3}
+                            borderColor={isBorderPrimary ? primary : secondary} borderWidth={3}
                         />
                     )
                 }

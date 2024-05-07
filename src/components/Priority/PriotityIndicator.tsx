@@ -5,6 +5,7 @@ import { getPriorityDetails } from "../../primitives/StepMethods"
 import { PrioritesType } from "../../types/HabitTypes"
 import { useThemeColor } from "../Themed"
 import { AppContext } from "../../data/AppContext"
+import { BottomScreenOpen_Impact } from "../../constants/Impacts"
 
 interface PriorityIndicatorProps {
     priority?: PrioritesType,
@@ -50,6 +51,11 @@ interface PriorityRadioButtonProps {
 export const PriorityRadioButtons: FC<PriorityRadioButtonProps> = ({selectedPriority, setSelectedPriority}) => {
     const priorities = [PrioritesType.Low, PrioritesType.Medium, PrioritesType.High]
     
+    const handleOnPress = (priority: PrioritesType) => {
+        BottomScreenOpen_Impact()
+        setSelectedPriority(priority)
+    }
+
     return(
         <View style={{
             flexDirection: "row",
@@ -59,7 +65,12 @@ export const PriorityRadioButtons: FC<PriorityRadioButtonProps> = ({selectedPrio
         }}>
             {
                priorities.map((priority) => (
-                    <PriorityIndicator key={priority} priority={priority} selectedPriority={selectedPriority} setSelectedPriority={setSelectedPriority}/>
+                    <PriorityIndicator 
+                        key={priority} 
+                        priority={priority} 
+                        selectedPriority={selectedPriority} 
+                        setSelectedPriority={handleOnPress}
+                    />
                ))
             }
         </View>

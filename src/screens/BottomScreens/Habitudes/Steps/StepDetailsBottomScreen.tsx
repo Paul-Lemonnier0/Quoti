@@ -9,8 +9,6 @@ import CustomCheckBox from "../../../../components/CheckBox/CustomCheckBox"
 import Separator from "../../../../components/Other/Separator"
 import { durationToTimeString } from "../../../../primitives/BasicsMethods"
 import PriorityIndicator from "../../../../components/Priority/PriotityIndicator"
-import { BackgroundTextButton } from "../../../../components/Buttons/UsualButton"
-import FooterBottomSheet from "../../../../components/BottomSheets/FooterBottomSheets"
 
 export interface StepDetailsBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -48,11 +46,14 @@ const StepDetailsBottomScreen: FC<StepDetailsBottomScreenProps> = ({
 
     return(
 
-        <CustomBottomSheet bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+        <CustomBottomSheet 
+            footerText={checkStep ? checkStatement : undefined}
+            footerMethod={(disabled || areAllStepsChecked) ? closeModal : checkStep}
+            bottomSheetModalRef={bottomSheetModalRef}>
             <View style={styles.container}>
                 <View style={{flex: 1, gap: 30, marginVertical: 30}}>
                     <View style={{flex: 1, gap: 20, flexDirection: "row"}}>
-                        <CustomCheckBox onPress={checkStep} isChecked={isChecked} disabled={(disabled || areAllStepsChecked)} color={color} number={step.numero+1}/>
+                        <CustomCheckBox onPress={checkStep} isPrimary isChecked={isChecked} disabled={(disabled || areAllStepsChecked)} color={color} number={step.numero+1}/>
                         <View style={{gap: 5, flex: 1}}>
                             <TitleText text={convertedStep.titre}/>
 
@@ -75,11 +76,6 @@ const StepDetailsBottomScreen: FC<StepDetailsBottomScreenProps> = ({
 
 
                 </View>
-                { 
-                    checkStep &&
-                    <FooterBottomSheet text={checkStatement} onPress={(disabled || areAllStepsChecked) ? closeModal : checkStep}/>
-                }
-
             </View>
 
         </CustomBottomSheet>
@@ -92,7 +88,7 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 20, 
         flex: 1,
-        marginBottom: 30
+        marginBottom: 60
     },
 
     header: {

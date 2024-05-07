@@ -9,7 +9,7 @@ import { Dimensions } from "react-native";
 import { HabitsContext } from "../../data/HabitContext";
 import ProgressBar from "../Progress/ProgressBar";
 import Animated, { FadeInRight, useSharedValue, withSpring } from "react-native-reanimated";
-import { FrequencyTypes, Habit, SeriazableObjectif, Step } from "../../types/HabitTypes";
+import { FrequencyTypes, Habit, Objectif, SeriazableObjectif, Step } from "../../types/HabitTypes";
 import { getSeriazableObjectif } from "../../primitives/ObjectifMethods";
 import SettingsObjectifBottomSheet from "../../screens/BottomScreens/Objectifs/SettingsObjectifBottomScreen";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -17,6 +17,7 @@ import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 import { useThemeColor } from "../Themed";
 import React from "react"
 import { AppContext } from "../../data/AppContext";
+import { FormDetailledObjectif } from "../../types/FormObjectifTypes";
 
 export interface ObjectifBlockProps {
     objectifID: string,
@@ -34,7 +35,7 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
     const {theme} = useContext(AppContext)
 
     const {Objectifs, filteredHabitsByDate} = useContext(HabitsContext)
-    const font = useThemeColor(theme, "Font")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     const bottomSheetModalRef = useRef<BottomSheetModal>(null);
 
@@ -97,7 +98,7 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
 
                 <View style={styles.titleDescriptionContainer}>
                     <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                    <SubText bold numberOfLines={1} text={objectif.description}/>
+                    <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={objectif.description}/>
                 </View>
 
                 <View style={styles.progressContainer}>
@@ -121,13 +122,22 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
 }
 
 export interface PresentationObjectifBlockProps {
-    objectifID: string,
     index: number,
-    handleOnPress: (seriazableObjectif: SeriazableObjectif) => void,
-    habits: Habit[]
+    handleOnPress: () => void,
+    objectif: Objectif | FormDetailledObjectif,
+    habits: Habit[],
+    noAnimation?: boolean,
+    isSkeleton?: boolean
 }
 
-export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({objectifID, index, handleOnPress, habits}) => {
+export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({
+    objectif,
+    index, 
+    handleOnPress, 
+    habits,
+    noAnimation,
+    isSkeleton
+}) => {
     
     const {Objectifs} = useContext(HabitsContext)
 
@@ -148,14 +158,9 @@ export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({o
         openModal()
     }
 
-    const objectif = Objectifs[objectifID]
+    // const objectif = Objectifs[objectifID]
 
     const stylesCard = cardStyle()
-
-    const handlePress = () => {
-        const seriazableObjectif = getSeriazableObjectif(objectif)
-        handleOnPress(seriazableObjectif)
-    }
 
     const steps: Step[] = []
     for(const habit of habits){
@@ -170,9 +175,10 @@ export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({o
     }
 
     return(
-        <>
-        <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, flex: 1}} onPress={handlePress} delayLongPress={750} onLongPress={handleLongPress}>
-            <Animated.View entering={FadeInRight.duration(400).delay(index * 200)} 
+        <View>
+        <TouchableOpacity disabled={isSkeleton}
+            style={{opacity: isFinished ? 0.5 : 1, flex: 1}} onPress={handleOnPress} delayLongPress={750} onLongPress={handleLongPress}>
+            <Animated.View entering={noAnimation ? undefined : FadeInRight} 
                 style={[
                     stylesCard.card, 
                     styles.objectif,
@@ -204,9 +210,12 @@ export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({o
             </Animated.View>
         </TouchableOpacity>
 
-        <SettingsObjectifBottomSheet bottomSheetModalRef={bottomSheetModalRef} objectif={objectif}/>
+        {
+            (!isSkeleton) &&
+            <SettingsObjectifBottomSheet bottomSheetModalRef={bottomSheetModalRef} objectif={objectif as Objectif}/>
+        }
 
-        </>
+        </View>
     )
 }
 

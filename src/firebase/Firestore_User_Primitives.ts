@@ -1,11 +1,49 @@
-import { arrayRemove, arrayUnion, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore"
+import { arrayRemove, arrayUnion, collection, doc, getCountFromServer, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore"
 import { db } from "./InitialisationFirebase"
 import { Unsubscribe } from "firebase/auth"
 import { UserEventRequest, UserType } from "../data/UserContext"
 import { UserDataBase } from "./Database_User_Primitives"
 import { Habit } from "../types/HabitTypes"
-import { addRefHabitToFirestore } from "./Firestore_Habits_Primitives"
+import { addRefHabitToFirestore, HabitState } from "./Firestore_Habits_Primitives"
 import { FirestoreCollections, FirestoreSocialSubCollections, FirestoreUserSubCollections } from "../types/FirestoreTypes/FirestoreCollections"
+
+
+/**
+ * [FIRESTORE] Supprime un lien d'amitiée
+ */
+
+export const removeUserFriendFirestore = async(userID: string, userMail: string, friendID: string, friendMail: string) => {
+    try{
+        console.log("Removing friend...")
+
+        const userFriendsRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            userMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Friends
+        )
+
+        await updateDoc(userFriendsRef, {friends: arrayRemove(friendID)})
+
+        const friendFriendsRef = doc(
+            db, 
+            FirestoreCollections.Users, 
+            friendMail, 
+            FirestoreUserSubCollections.Social, 
+            FirestoreSocialSubCollections.Friends
+        )
+
+        await updateDoc(friendFriendsRef, {friends: arrayRemove(userID)})
+
+        console.log("Friend well accepted !")
+    }
+
+    catch(e){
+        console.log("Error while accepting friend invitation : ", e)
+    }
+}
+
 
 /**
  * [FIRESTORE] Envoie une demande d'amis
@@ -337,12 +375,13 @@ export const getHabitInvitationRequest = async(userMail: string): Promise<string
 }
 
 export interface VisitInfoUser extends UserDataBase {
-    isPrivate?: boolean,
-    nbHabits?: number,
-    nbObjectifs?: number,
-    nbHabitsFinished?: number,
-    nbObjectifsFinished?: number,
-    nbSucces?: number
+    isPrivate: boolean,
+    nbHabits: number,
+    nbObjectifs: number,
+    nbHabitsFinished: number,
+    nbObjectifsFinished: number,
+    friendsID: string[],
+    nbSucces: number
 }
 
 /**
@@ -405,8 +444,6 @@ export const acceptHabitInvitation = async(senderID: string, senderMail: string,
             FirestoreSocialSubCollections.HabitsInvitation
         )
 
-        console.log("data : ", data)
-
         await updateDoc(requestRef, {habits: arrayRemove(data)})
 
         //Ajouter dans les habits (en tant que ref)
@@ -451,8 +488,6 @@ export const refuseHabitInvitation = async(senderID: string, senderMail: string,
             habitID: habitID
         }
 
-        console.log("data : ", data)
-
         const requestRef = doc(
             db,
             FirestoreCollections.Users,
@@ -469,4 +504,47 @@ export const refuseHabitInvitation = async(senderID: string, senderMail: string,
     catch(e){
         console.log("Error while refusing friend invitation : ", e)
     }
+}
+
+const getNumberOfHabitsForUser = async(userMail: string, baseState = HabitState.Current): Promise<number> => {
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
+
+    const customCollection = 
+    baseState === HabitState.Archived ? FirestoreUserSubCollections.UserArchivedHabits
+        : baseState === HabitState.Done ? FirestoreUserSubCollections.UserDoneHabits
+            : FirestoreUserSubCollections.UserHabits
+
+    const userHabitsCollection = collection(userDoc, customCollection); 
+
+    const nbHabits = await getCountFromServer(userHabitsCollection)
+
+    return nbHabits.data().count
+}
+
+const getNumberOfObjectifsForUser = async(userID: string): Promise<number> => {
+    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userObjectifsCollection = collection(userDoc, FirestoreUserSubCollections.UserObjectifs); 
+
+    const nbObjectifs = await getCountFromServer(userObjectifsCollection)
+
+    return nbObjectifs.data().count
+}
+
+const getUserFriendsID = async(userID: string): Promise<string[]> => {
+    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userFriendsDoc = doc(userDoc, FirestoreUserSubCollections.Social, FirestoreSocialSubCollections.Friends); 
+
+    const friendsSnap = await getDoc(userFriendsDoc)
+
+    if(friendsSnap.exists()) {
+        return friendsSnap.data().friends ?? []
+    }
+
+    return []
+}
+
+export {
+    getNumberOfHabitsForUser,
+    getNumberOfObjectifsForUser,
+    getUserFriendsID
 }

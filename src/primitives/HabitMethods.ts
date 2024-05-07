@@ -1,46 +1,63 @@
+import { addDays, differenceInDays } from "date-fns";
 import { Database_getUsersInfo } from "../firebase/Database_User_Primitives";
-import { getDateLogs } from "../firebase/Firestore_Step_Primitives";
+import { getDateLogs, getHabitLogsInDateRange } from "../firebase/Firestore_Step_Primitives";
 import { MemberType, UserFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
-import { FilteredHabitsType, FrequencyTypes, HabitList, Habit, StreakValues, StepList, Step, SeriazableHabit } from "../types/HabitTypes";
+import { FilteredHabitsType, FrequencyTypes, HabitList, Habit, StreakValues, StepList, Step, SeriazableHabit, EMPTY_FILTERED_HABITS } from "../types/HabitTypes";
 import { toISOStringWithoutTimeZone } from "./BasicsMethods";
 import { calculateNextScheduledDate, isHabitScheduledForDate } from "./HabitudesReccurence";
+import { FormDetailledObjectifHabit, FormStepsHabit } from "../types/FormHabitTypes";
+
+//TODO: gérer le cache
 
 export const filterHabits = async (date: Date, userID: string, habits: HabitList) => {
 
-  let habitsScheduledForDate: FilteredHabitsType = { 
-      Quotidien: {Habitudes: {}, Objectifs: {}}, 
-      Hebdo: {Habitudes: {}, Objectifs: {}}, 
-      Mensuel: {Habitudes: {}, Objectifs: {}} 
-  };
+  let habitsScheduledForDate: FilteredHabitsType = EMPTY_FILTERED_HABITS;
 
-  const doneSteps = await getDateLogs(date, userID)
+  const currentDateDoneSteps = await getDateLogs(date, userID)
 
-  for(let habitID in habits){
+  const scheduledHabits = getScheduledHabits(date, Object.values(habits))
 
-    const habit: Habit = habits[habitID]
-    const habitPlannedForThisDate = isHabitScheduledForDate(habit, date)
+  const scheduledHabitsWithLogs = await Promise.all(scheduledHabits.map(async(habit) => {
+    const stepsWithLogs = await setHabitStepsLogs(date, habit, currentDateDoneSteps, userID)
+    return {...habit, steps: stepsWithLogs} as Habit
+  }));
 
-    if(habitPlannedForThisDate){
-      const habitStepsID = Object.keys(getValidHabitsStepsForDate(Object.values(habit.steps), habitID, date));
-      const stepsWithLogsArray = habitStepsID.map(habitStepID => {
-
-
-        const habitStep = habit.steps[habitStepID]
-        const isChecked = doneSteps.includes(habitStepID)
-
-        return { [habitStepID]: {...habitStep, isChecked}}
-      })
-
-      const stepsWithLogs = Object.assign({}, ...stepsWithLogsArray);
-
-      const habitWithLogs = {...habit, steps: stepsWithLogs}
-
-      habitsScheduledForDate = addPlannedHabitsToFilteredHabits(habitsScheduledForDate, habitWithLogs)
-    }
-  }
+  scheduledHabitsWithLogs.forEach(habit => {
+    habitsScheduledForDate = addPlannedHabitsToFilteredHabits(habitsScheduledForDate, habit)
+  })
 
   return habitsScheduledForDate;
+}
+
+const getScheduledHabits = (date: Date, habits: Habit[]): Habit[] => {
+  return habits.filter(habit => isHabitScheduledForDate(habit, date));
 };
+
+const setHabitStepsLogs = async(date: Date, habit: Habit, currentDateDoneSteps: string[], userID: string): Promise<StepList> => {
+
+  let periodLogs: string[] = []
+  const validHabitStepsID = Object.keys(getValidHabitsStepsForDate(Object.values(habit.steps), habit.habitID, date));
+ 
+  if(habit.frequency !== FrequencyTypes.Quotidien) {
+    const startPeriodeDay = getFirstDayOfHabitOccurenceFromDate(date, habit)
+    const endDay = date
+
+    periodLogs = await getHabitLogsInDateRange(habit.habitID, startPeriodeDay, endDay, userID)
+  }
+
+  const stepsWithLogsArray = validHabitStepsID.map(validHabitStepID => {
+    const habitStep = habit.steps[validHabitStepID]
+    const isChecked = currentDateDoneSteps.includes(validHabitStepID) || periodLogs.includes(validHabitStepID)
+
+    return {...habitStep, isChecked}
+  })
+
+  return stepsWithLogsArray.reduce((acc, step) => {
+    acc[step.stepID] = step;
+    return acc;
+  }, {});
+}
+
 
 export const getHabitType = (habit: Habit | UserFirestoreHabit): "Objectifs" | "Habitudes" => {
   const isObjective = habit.objectifID !== undefined && habit.objectifID !== null
@@ -232,16 +249,10 @@ export const getValidHabitsStepsForDate = (steps: Step[], habitID: string, curre
       const createdDate = new Date(step.created)
 
       if(currentDateTemp.setHours(0,0,0,0) >= createdDate.setHours(0,0,0,0)){
-        // console.log("2")
-
         if(step.deleted){
-          // console.log("3")
-
           const deletedDate = new Date(step.deleted)
   
           if(currentDateTemp.setHours(0,0,0,0) < deletedDate.setHours(0,0,0,0)){
-            // console.log("4")
-
             validSteps[step.stepID] = {...step}
           }
         }
@@ -315,4 +326,74 @@ export const getUsersDataBaseFromMember = async(members: MemberType[], userID?: 
     }
 
     return []
+}
+
+export const getFirstDayOfHabitOccurenceFromDate = (date: Date, habit: Habit): Date => {
+  const diffDays = differenceInDays(habit.startingDate, date)
+
+  if(habit.frequency === FrequencyTypes.Hebdo) {
+    const startDate = addDays(date, diffDays % 7)
+    return new Date(new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).setUTCHours(0, 0, 0, 0));
+  }
+
+  else if (habit.frequency === FrequencyTypes.Mensuel) {
+    return new Date(toISOStringWithoutTimeZone(new Date(date.getFullYear(), date.getMonth(), 1)))
+  }
+
+  return date
+}
+
+/**
+ * Compare deux habitudes ainsi que les valeurs qui sont censées avoir bougées afin de déterminer si elles sont identiques
+ */
+
+export const notSameHabit = (newValues: FormStepsHabit, newHabit: SeriazableHabit, oldHabit: SeriazableHabit | FormDetailledObjectifHabit): boolean => {
+  for(let oldKey of Object.keys(oldHabit)){
+      if(oldKey !== "steps" && (!newHabit.hasOwnProperty(oldKey) || newHabit[oldKey] !== oldHabit[oldKey])){
+          return true
+      }
+  }
+
+  if(newValues.steps) {
+      let oldSteps = Object.values((oldHabit as SeriazableHabit).steps)
+
+      if(oldSteps.length !== newValues.steps.length){
+          return true
+      }
+
+      const isOldStepPlaceholder = oldSteps.length === 1 && oldSteps[0].stepID === oldHabit.habitID
+      const isNewStepPlaceholder = newValues.steps.filter((step) => (step.numero === -1)).length > 0
+
+      if(isOldStepPlaceholder || isNewStepPlaceholder) {
+          return !(isOldStepPlaceholder && isNewStepPlaceholder)
+      }
+
+      oldSteps = oldSteps.map((step) => {
+          if(step.created){
+              const createdDate = new Date(step.created)
+              return {...step, created: toISOStringWithoutTimeZone(createdDate)}
+          }
+
+          if(step.deleted){
+              const deletedDate = new Date(step.deleted)
+              return {...step, deleted: toISOStringWithoutTimeZone(deletedDate)}
+          }
+
+          return {...step}
+      })
+
+      for(let i = 0; i < oldSteps.length; ++i){
+          for(let oldStepKey of Object.keys(newValues.steps[i])){
+              if(!oldSteps[i].hasOwnProperty(oldStepKey)){
+                  return true
+              }
+  
+              if(newValues.steps[i][oldStepKey] !== oldSteps[i][oldStepKey]){
+                  return true
+              }
+          }
+      }
+  }
+
+  return false
 }

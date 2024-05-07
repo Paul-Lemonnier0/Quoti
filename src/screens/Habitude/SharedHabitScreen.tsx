@@ -1,44 +1,41 @@
-import { useRoute } from "@react-navigation/native"
-import { FC, useContext, useEffect, useState } from "react";
+import { FC, useContext, useEffect } from "react";
 import { HabitsContext } from "../../data/HabitContext";
-import { HugeText, NormalGrayText, NormalText, SubTitleText, TitleText } from "../../styles/StyledText";
+import { HugeText, NormalGrayText, SubTitleText, TitleText } from "../../styles/StyledText";
 import { CustomScrollView, UsualScreen } from "../../components/View/Views";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
 import React from "react"
 import { StyleSheet, View } from "react-native";
 import { BorderIconButton, IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
 import ProfilButton from "../../components/Profil/ProfilButton";
 import { AppContext } from "../../data/AppContext";
 import { useThemeColor } from "../../components/Themed";
-import Separator from "../../components/Other/Separator";
+import Separator, { HoleLineSeparator } from "../../components/Other/Separator";
 import HabitIcons from "../../data/HabitIcons";
-import ProgressBar from "../../components/Progress/ProgressBar";
 import { FrequencyDetails } from "../../components/Habitudes/FrequencyDetails";
 import StepsList from "../../components/Habitudes/Step/StepsList";
 import { Image } from "react-native";
-import { Step } from "../../types/HabitTypes";
 import BottomMenuStyle from "../../styles/StyledBottomMenu";
-import { BackgroundTextButton, BorderTextButton, TextButton } from "../../components/Buttons/UsualButton";
 import Quoti from "../../components/Other/Quoti";
-import { acceptHabitInvitation, refuseHabitInvitation } from "../../firebase/Firestore_User_Primitives";
-import { auth } from "../../firebase/InitialisationFirebase";
+import { acceptHabitInvitation, refuseHabitInvitation, VisitInfoUser } from "../../firebase/Firestore_User_Primitives";
 import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
 import Toast from "react-native-toast-message";
 import { BottomScreenOpen_Impact, Success_Impact } from "../../constants/Impacts";
 import { UserContext } from "../../data/UserContext";
+import { HomeStackParamsList } from "../../navigation/HomeNavigator";
+import { BackgroundTextButton, BorderTextButton, TextButton } from "../../components/Buttons/UsualButton";
 
 type SharedHabitScreenProps = NativeStackScreenProps<HomeStackParamsList, "SharedHabitScreen">
 
 const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
     const {habit, user: senderUser} = route.params;
+
     const {addHabitIntern} = useContext(HabitsContext)
     const {setIsLoading} = useContext(AppContext)
-    const {user} = useContext(UserContext)
+    const {user, removeHabitRequest} = useContext(UserContext)
 
-    console.log("habitID:", habit.habitID )
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
+    const primary = useThemeColor(theme, "Primary")
 
     const imageSize = 35
 
@@ -59,10 +56,11 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
         setIsLoading(true)
         if(user && user.email) {
             if(await acceptHabitInvitation(senderUser.uid, senderUser.email, user.uid, user.email, habit.habitID)) {
-                addHabitIntern(convertBackSeriazableHabit(habit))
+                addHabitIntern(convertBackSeriazableHabit({...habit, objectifID: undefined}))
+                removeHabitRequest(habit.habitID, senderUser.uid)
 
                 Toast.show({
-                    type: "info",
+                    type: "success",
                     text1: "Invitation acceptée !",
                     position: "top",
                     visibilityTime: 3000,
@@ -85,8 +83,8 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
         }
 
         Toast.show({
-            type: "info",
-            text1: "Invitation refusée !",
+            type: "error",
+            text1: "Invitation refusée",
             position: "top",
             visibilityTime: 3000,
             swipeable: true
@@ -106,34 +104,36 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
                         <IconButton noPadding name="settings" provider={IconProvider.Feather} onPress={() => {}}/>
                     </View>
 
-                    <HugeText text="Invitation"/>
-
+                    {/* <HugeText text="Invitation"/>
+ */}
                 </View>
 
                 <CustomScrollView>     
                     <View style={styles.body}>
-                        <View style={{gap: 15, justifyContent: "center", alignItems: "center"}}>
-                            <ProfilButton
-                                huge
-                                user={senderUser}
-                                disabled
-                                noBadge
-                                isSelected
-                                onPress={() => {}}
-                            />
-                            <View style={styles.titreEtDescriptionContainer}>
-                                <TitleText text={senderUser.displayName}/>
-                                <SubTitleText bold style={{color: fontGray}}
-                                    text={"Te propose une nouvelle habitude"}/>
+                        <View style={{gap: 30, justifyContent: "center", alignItems: "center"}}>
+                            <View style={{gap: 20, justifyContent: "center", alignItems: "center"}}>
+                                <ProfilButton
+                                    huge
+                                    user={senderUser as VisitInfoUser}
+                                    disabled
+                                    noBadge
+                                    isSelected
+                                    onPress={() => {}}
+                                />
+                                <View style={styles.titreEtDescriptionContainer}>
+                                    <TitleText text={senderUser.displayName}/>
+                                    <SubTitleText bold style={{color: fontGray}}
+                                        text={"Te propose une nouvelle habitude"}/>
+                                </View>
                             </View>
 
-                            <View style={{flexDirection: "row", gap: 10}}>
-                                <BorderIconButton name="check" provider={IconProvider.Feather} onPress={handleAcceptHabitInvitation}/>
-                                <BorderIconButton name="x" provider={IconProvider.Feather} onPress={handleRefuseHabitInvitation}/>
+                            <View style={{display: "flex", flexDirection: "row", gap: 20, paddingHorizontal: 20}}>
+                                    <BorderTextButton isFlex bold text="Décliner" onPress={handleRefuseHabitInvitation}/>
+                                    <BackgroundTextButton isFlex bold text="Accepter" onPress={handleAcceptHabitInvitation}/>
                             </View>
                         </View>
 
-                        <View style={{marginBottom: -30}}>
+                        <View style={{marginBottom: -30, marginHorizontal: -30}}>
                             <Separator/>
                         </View>
                         
@@ -161,7 +161,9 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
                                     </View>
                                 </View>
 
-                                <Separator/>
+                                <View style={{marginHorizontal: -30}}>
+                                    <Separator/>
+                                </View>
 
                                 <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
                                     <TitleText text={"Fréquence"}/>
@@ -170,9 +172,12 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
                             </View>
                         </View>
                     </View>
+                    
                 </CustomScrollView>
 
+              
             </View>
+
         </UsualScreen>
     )
 }
@@ -181,9 +186,9 @@ const styles = StyleSheet.create({
     container: {
       display: "flex", 
       flexDirection: "column", 
-      gap: 30, 
+      gap: 10, 
       flex: 1, 
-      marginBottom: 30    
+      marginBottom: 30,
     },
 
     header: {
@@ -203,6 +208,7 @@ const styles = StyleSheet.create({
     body: {
         flex: 1, 
         gap: 30,
+        marginTop: 30
     },
 
     habitBody: {

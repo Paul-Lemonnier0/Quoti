@@ -1,6 +1,13 @@
 import { UserDataBase } from "../firebase/Database_User_Primitives"
 import { MemberType } from "./FirestoreTypes/FirestoreHabitTypes"
 
+export enum HabitActivityState {
+    Scheduled = "Scheduled",
+    Missed = "Missed",
+    Done = "Done",
+    None = "None"
+}
+
 export enum FrequencyTypes {
     Quotidien = "Quotidien",
     Hebdo = "Hebdo",
@@ -101,6 +108,12 @@ interface FilteredHabitsType {
     [FrequencyTypes.Quotidien]: HabitOrObjectif;
     [FrequencyTypes.Hebdo]: HabitOrObjectif;
     [FrequencyTypes.Mensuel]: HabitOrObjectif;
+}
+
+export const EMPTY_FILTERED_HABITS = {
+    Quotidien: {Habitudes: {}, Objectifs: {}}, 
+    Hebdo: {Habitudes: {}, Objectifs: {}}, 
+    Mensuel: {Habitudes: {}, Objectifs: {}}
 }
 
 

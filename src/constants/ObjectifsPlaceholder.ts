@@ -1,4 +1,5 @@
 import { FormDetailledObjectif } from "../types/FormObjectifTypes"
+import { Objectif } from "../types/HabitTypes"
 
 const Objectif_Skeleton: FormDetailledObjectif ={
     titre: "A",

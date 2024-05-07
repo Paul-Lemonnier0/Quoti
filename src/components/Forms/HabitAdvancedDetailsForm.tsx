@@ -14,6 +14,7 @@ import { FormDetailledHabitValues, FormStepsHabit } from "../../types/FormHabitT
 import { FrequencyTypes, SeriazableHabit } from "../../types/HabitTypes";
 import React from "react"
 import Quoti from "../Other/Quoti";
+import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 
 export interface HabitAdvancedDetailsFormProps {
     isNewObjectifHabit?: boolean,
@@ -54,6 +55,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     const [reccurence, setReccurence] = useState<number>(baseReccurence)
 
     const handleValidation = async() => {
+        BottomScreenOpen_Impact()
 
         const newValues = {
             frequency: selectedFrequency.key,
@@ -68,6 +70,8 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     }
 
     const handleSelectDay = (dayIndex: number) => {
+        BottomScreenOpen_Impact()
+
         if(selectedDays.includes(dayIndex)){
             const indexOfElement = selectedDays.indexOf(dayIndex)
             setSelectedDays(previousSelectedDays => previousSelectedDays.filter(day => day !== dayIndex))
@@ -78,6 +82,8 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
       };
 
     const handleChangeFrequency = (frequency: FrequenciesCustomType) => {
+        BottomScreenOpen_Impact()
+
         setSelectedFrequency(frequency)
     } 
 
@@ -90,6 +96,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     else isRecurrenceIncrementBorderHidden = reccurence === 1
 
     const handleSetReccurence = (rec: number) => {
+
         if(selectedFrequency.key === "Quotidien"){
             setSelectedDays([])
         }
@@ -106,10 +113,10 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
         <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
+                    <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
                         <NavigationButton noPadding action={NavigationActions.goBack}/>
                         <Quoti/>
-                        <NavigationButton noPadding action={NavigationActions.goNext} methode={handleValidation}/>
+                        <NavigationButton noPadding action={NavigationActions.validation} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="À quelle fréquence ?"/>
@@ -138,7 +145,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
                             <View style={styles.listContainer}>
                                 <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
                                     <SubTitleText text="Récurrence :"/>
-                                    <SubText text="Ex : Tous les 2 jours"/>
+                                    <SubText bold text="Ex : Tous les 2 jours"/>
                                 </View>
 
                                 <IncrementButtons isBorderHidden={isRecurrenceIncrementBorderHidden} value={reccurence} setValue={handleSetReccurence} suffixe={selectedFrequency.suffixe}/>
@@ -149,7 +156,10 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
                                 selectedFrequency.key === "Quotidien" ?
                                     <SelectWeekDays selectedDays={selectedDays} handleSelectDay={handleSelectDay}/> :
 
-                                    <BorderRadioButton hideInactiveBorder isHighlight={reccurence === 1} handleOnClick={() => setReccurence(1)}
+                                    <BorderRadioButton hideInactiveBorder isHighlight={reccurence === 1} handleOnClick={() => {
+                                            BottomScreenOpen_Impact()
+                                            setReccurence(1)
+                                        }}
                                         text={selectedFrequency.key === FrequencyTypes.Mensuel ? "Tous les mois" : "Toutes les semaines"} />
                             }
                         </View>
@@ -159,7 +169,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
                             <View style={styles.listContainer}>
                                 <View style={{flex: 1, display: "flex", flexDirection: "column", marginRight: 10}}>
                                     <SubTitleText text="Occurences :"/>
-                                    <SubText text="Ex : 2 fois par jour"/>
+                                    <SubText bold text="Ex : 2 fois par jour"/>
                                 </View>
 
                                 <IncrementButtons value={occurences} setValue={setOccurences}/>

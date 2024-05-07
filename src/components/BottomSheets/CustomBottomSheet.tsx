@@ -1,27 +1,45 @@
-import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetModal, BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet"
+import { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetFooterProps, BottomSheetModal, BottomSheetScrollView, BottomSheetView } from "@gorhom/bottom-sheet"
 import { useThemeColor } from "../Themed"
-import { useState, useCallback, RefObject, ReactNode, FC, useContext } from "react";
+import { useState, useCallback, ReactNode, FC, useContext } from "react";
 import { StyleSheet } from "react-native";
 import { View } from "react-native";
-import { SharedValue } from "react-native-reanimated";
 import { BackdropBehaviorType, BasicCustomBottomSheetProps } from "../../types/BottomScreenTypes";
 import React from "react"
 import { AppContext } from "../../data/AppContext";
+import { CustomFooterComponent } from "./FooterBottomSheets";
 
 export  interface CustomBottomSheetProps extends BasicCustomBottomSheetProps {
   noBackdrop?: boolean,
   onDismiss?: () => void,
-  isPrimary?: boolean
+  footerText?: string,
+  footerMethod?: () => void,
+  checkError?: () => boolean
+  customFooterComponent?: ReactNode,
+  isPrimary?: boolean,
+  noPressBackdrop?: boolean,
+  hideHandle?: boolean,
+  noPanDownToClose?: boolean
 }
 
-const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, children, isPrimary}) => {
+const CustomBottomSheet: FC<CustomBottomSheetProps> = ({
+  bottomSheetModalRef, 
+  snapPoints, 
+  noBackdrop, 
+  onDismiss,
+  footerMethod,
+  checkError,
+  footerText,
+  customFooterComponent, 
+  isPrimary,
+  hideHandle,
+  children
+}) => {
     const {theme} = useContext(AppContext)
 
     const fontGray = useThemeColor(theme, "FontGray")
-    const popupColor = useThemeColor(theme, "Popup")
-    const secondary = useThemeColor(theme, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
 
-    const backgroundColor = isPrimary ? secondary : popupColor
+    const backgroundColor = isPrimary ? primary : primary
 
     const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
 
@@ -30,23 +48,41 @@ const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, sna
       ),
       [backdropPressBehavior]
     );
+
+      
+    const FooterComponent = (props: BottomSheetFooterProps) => (
+      (footerText && footerMethod) && (
+        customFooterComponent || (
+          <CustomFooterComponent 
+            footerMethod={footerMethod} 
+            footerText={footerText} 
+            checkError={checkError}
+            props={props}
+            isPrimary
+          />
+        )
+      )
+    );
   
     // renders
     return (
         <BottomSheetModal
-        keyboardBlurBehavior="restore"
+            keyboardBlurBehavior="restore"
             ref={bottomSheetModalRef}
             style={{flex: 1}}
             backgroundStyle={{backgroundColor: backgroundColor}}
-            handleIndicatorStyle={{backgroundColor: fontGray}}
+            handleIndicatorStyle={{backgroundColor: hideHandle ? "transparent" : fontGray}}
             index={0}
             snapPoints={snapPoints}
+            footerComponent={FooterComponent}
             enablePanDownToClose={true}
+            onDismiss={onDismiss ?? undefined}
             enableDynamicSizing={snapPoints === undefined}
             backdropComponent={noBackdrop ? null : renderBackdrop}>
 
                 <BottomSheetScrollView scrollEnabled={false} style={styles.container}>
-                    <View style={{flex: 1, marginBottom: 0}}>
+                    <View style={{flex: 1, marginBottom: footerMethod && footerText ? 30 : 0}}>
+                      
                       {children}
                     </View>
                 </BottomSheetScrollView>
@@ -55,22 +91,55 @@ const CustomBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, sna
   );
 };
 
-export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheetModalRef, snapPoints, noBackdrop, onDismiss, children}) => {
+export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({
+  bottomSheetModalRef, 
+  snapPoints, 
+  noBackdrop, 
+  onDismiss,
+  footerMethod,
+  footerText,
+  checkError,
+  customFooterComponent, 
+  noPressBackdrop,
+  noPanDownToClose,
+  children
+}) => {
   
   const {theme} = useContext(AppContext)
 
   const secondary = useThemeColor(theme, "Secondary")
+  const primary = useThemeColor(theme, "Primary")
 
 
   const [backdropPressBehavior, setBackdropPressBehavior] = useState<BackdropBehaviorType>('close');
 
   const renderBackdrop = useCallback((props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop {...props} appearsOnIndex={0} disappearsOnIndex={-1} pressBehavior={backdropPressBehavior} />
+      <BottomSheetBackdrop 
+        {...props} 
+        appearsOnIndex={0} 
+        disappearsOnIndex={-1} 
+        pressBehavior={noPressBackdrop ? "none" : backdropPressBehavior} 
+      />
     ),
     [backdropPressBehavior]
   );
 
-  const backgroundColor = secondary
+  const backgroundColor = primary
+
+  
+  const FooterComponent = (props: BottomSheetFooterProps) => (
+    (footerText && footerMethod) && (
+      customFooterComponent || (
+        <CustomFooterComponent 
+          footerMethod={footerMethod} 
+          footerText={footerText} 
+          checkError={checkError} 
+          props={props}
+          isPrimary
+        />
+      )
+    )
+  );
 
   // renders
   return (
@@ -82,13 +151,17 @@ export const CustomStaticBottomSheet: FC<CustomBottomSheetProps> = ({bottomSheet
           index={0}
           snapPoints={snapPoints}
           onDismiss={onDismiss ?? undefined}
-          enablePanDownToClose={true}
+          enablePanDownToClose={!noPanDownToClose}
+          footerComponent={FooterComponent}
           keyboardBehavior="interactive"
+          
           enableHandlePanningGesture={false}
           enableDynamicSizing={snapPoints === undefined}
           backdropComponent={noBackdrop ? null : renderBackdrop}>
 
-              <BottomSheetView style={[styles.container, {flex: snapPoints ? 1 : undefined}]}>
+              <BottomSheetView style={[styles.container, {
+                flex: snapPoints ? 1 : undefined,
+                paddingBottom: footerMethod && footerText ? 80 : 0}]}>
                     {children}
               </BottomSheetView>
 
@@ -103,7 +176,12 @@ const styles = StyleSheet.create({
       paddingHorizontal:30, 
       paddingTop: 0,
       display:"flex",
-    }
+    },
+    footerContainer: {
+      padding: 12,
+      margin: 0,
+      backgroundColor: '#80f',
+    },
 });
   
   export default CustomBottomSheet;

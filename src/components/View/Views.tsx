@@ -1,9 +1,11 @@
 import { useThemeColor } from "../Themed";
-import { View, StyleSheet, SafeAreaView, KeyboardAvoidingView } from "react-native";
-import React, { FC, Fragment, ReactNode, useContext } from "react";
+import { View, StyleSheet, SafeAreaView, KeyboardAvoidingView, NativeSyntheticEvent, NativeScrollEvent } from "react-native";
+import React, { FC, Fragment, ReactNode, useContext, useState } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from "react-native-gesture-handler";
 import { AppContext } from "../../data/AppContext";
+import Animated from "react-native-reanimated";
+import { RefreshControl } from "react-native";
 
 export interface BasicViewProps {
     hideMenu?: boolean,
@@ -30,23 +32,86 @@ export const UsualScreen: FC<UsualScreenProps> = ({hideMenu, secondaryBackground
                     {children}
                 </View>
             </SafeAreaView>
-            {!hideMenu && <LinearGradient colors={[linearGradientOpacityStart, linearGradientOpacityEnd]} style={styles.linearGradient}/>}
+            {/* {!hideMenu && <LinearGradient colors={[linearGradientOpacityStart, linearGradientOpacityEnd]} style={styles.linearGradient}/>} */}
         </View>
     )
 }
 
-export const CustomScrollView: FC<BasicViewProps> = ({hideMenu, children}) => {
+interface CustomScrollViewProps extends BasicViewProps {
+    onRefresh?: () => void
+    refreshing?: boolean
+    onScroll?: (e: NativeSyntheticEvent<NativeScrollEvent>) => void
+}
 
-    const marginBottom = hideMenu ? 0 : -100
+export const CustomScrollView: FC<CustomScrollViewProps> = ({
+    hideMenu,
+    refreshing,
+    onRefresh,
+    onScroll,
+    children
+}) => {
+
+    const marginBottom = hideMenu ? 0 : -130
     const marginHorizontal = -25
     /*KeyboardAvoidView => warn override anim*/
-    
+
     return(
-        <ScrollView showsVerticalScrollIndicator={false} style={{marginBottom, marginHorizontal}}>
+        <ScrollView 
+            onScroll={onScroll}
+            scrollEventThrottle={50}
+            refreshControl={
+                onRefresh ? 
+                    <RefreshControl 
+                        colors={["#9Bd35A", "#689F38"]}
+                        refreshing={refreshing ?? false}
+                        onRefresh={onRefresh}
+                    />          
+                    : undefined
+                }
+            showsVerticalScrollIndicator={false} style={{
+                marginBottom, 
+                marginHorizontal
+            }}>
             <View style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}> 
                 {children}
             </View>
         </ScrollView>
+    )
+}
+
+export const AnimatedCustomScrollView: FC<CustomScrollViewProps> = ({
+    hideMenu,
+    refreshing,
+    onRefresh,
+    onScroll,
+    children
+}) => {
+
+    const marginBottom = hideMenu ? 0 : -100
+    const marginHorizontal = -25
+    /*KeyboardAvoidView => warn override anim*/
+
+    return(
+        <Animated.ScrollView 
+            onScroll={onScroll}
+            scrollEventThrottle={50}
+            refreshControl={
+                onRefresh ? 
+                    <RefreshControl 
+                        colors={["#9Bd35A", "#689F38"]}
+                        refreshing={refreshing ?? false}
+                        onRefresh={onRefresh}
+                    />          
+                    : undefined
+                }
+            showsVerticalScrollIndicator={false} style={{
+                marginBottom, 
+                marginHorizontal
+            }}>
+            <View style={{marginBottom: -marginBottom, paddingHorizontal: -marginHorizontal}}> 
+                {children}
+            </View>
+        </Animated.ScrollView>
     )
 }
 

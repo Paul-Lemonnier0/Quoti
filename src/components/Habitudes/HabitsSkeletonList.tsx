@@ -20,7 +20,7 @@ const HabitudesSkeletonList = () => {
 
     return(
         <Skeleton.Group show={true}>
-            <View style={{gap: 20}}>
+            <View style={{gap: 20, paddingTop: 20}}>
             {
                 habits.map((habit, index) => {
 

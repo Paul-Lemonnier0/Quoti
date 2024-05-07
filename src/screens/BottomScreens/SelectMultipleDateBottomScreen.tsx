@@ -1,171 +1,120 @@
-import { Dimensions, StyleSheet, View } from "react-native";
-import SimpleFullBottomSheet from "../../components/BottomSheets/SimpleFullBottomSheet";
+import { StyleSheet, View } from "react-native";
 import { UsualScreen } from "../../components/View/Views";
-import { CloseButton } from "../../components/Buttons/IconButtons";
-import { NormalGrayText, SubText, TitleText } from "../../styles/StyledText";
+import { BottomSheetCloseButton, CloseButton } from "../../components/Buttons/IconButtons";
+import { NormalGrayText, TitleText } from "../../styles/StyledText";
 import { BottomScreenOpen_Impact, Error_Impact } from "../../constants/Impacts";
 import { FC, RefObject, useMemo, useRef, useState } from "react";
 import MultipleSelectionCalendarListCustom from "../../components/Calendars/MultipleSelectionCalendarListCustom";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import React from "react"
 import { CustomStaticBottomSheet } from "../../components/BottomSheets/CustomBottomSheet";
-import FooterBottomSheet from "../../components/BottomSheets/FooterBottomSheets";
+import Toast from "react-native-toast-message";
+import { addDays } from "date-fns";
 
-export interface SelectMultipleDateBottomScreen {
+export interface SelectMultipleDateBottomScreenProps {
   bottomSheetModalRef: RefObject<BottomSheetModal>,
   setStartingDate: (date: Date) => void,
-  setEndingDate: (date: Date) => void,
+  setEndingDate: (date: Date | undefined) => void,
+  startingDate?: Date,
+  endingDate?: Date,
+  disablePastDays?: boolean
 }
 
-// const SelectMultipleDateBottomScreen: FC<SelectMultipleDateBottomScreen> = ({bottomSheetModalRef, setStartingDate, setEndingDate}) => {
+  const SelectMultipleDateBottomScreen: FC<SelectMultipleDateBottomScreenProps> = ({
+    bottomSheetModalRef, 
+    setStartingDate,
+    setEndingDate,
+    startingDate,
+    endingDate,
+    disablePastDays
+}) => {
 
-//     const closeModal = () => {
-//       bottomSheetModalRef.current?.close();
-//     }
+  const snapPoints_Default = useMemo(() => ['85%'], []);
 
-//     const snapPoints_Default = useMemo(() => ['85%'], []);
+  interface CalendarRefType {
+    getStartingDate: () => Date | undefined;
+    getEndingDate: () => Date | undefined;
+  }
 
-//     const [isError, setIsError] = useState(false)
+  const calendarRef = useRef<CalendarRefType | null>(null)
 
-//     interface CalendarRefType {
-//       getStartingDate: () => Date | undefined;
-//       getEndingDate: () => Date | undefined;
-//     }
+  const checkError = (): boolean => {
+    const startingDate_temp = calendarRef.current?.getStartingDate()
 
-//     const calendarRef = useRef<CalendarRefType | null>(null)
+    const isError = (!startingDate_temp || startingDate_temp <= addDays(new Date(), -1))
 
-//     const handleValidateDates = () => {
-//       const startingDate_temp = calendarRef.current?.getStartingDate()
-//       const endingDate_temp = calendarRef.current?.getEndingDate()
-
-//       if(!startingDate_temp){
-//         Error_Impact()
-//         setIsError(true)
-//       }
-
-//       else{
-//         setIsError(false)
-//         if(!endingDate_temp){
-//           setStartingDate(new Date(startingDate_temp))
-//           setEndingDate(new Date(startingDate_temp))
-//         }
-  
-//         else{
-//           setStartingDate(new Date(startingDate_temp))
-//           setEndingDate(new Date(endingDate_temp))
-//         }
-  
-//         closeModal()
-//         BottomScreenOpen_Impact()
-//       }
-//     }
-
-//     return (
-//         <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default}
-//             footerText={"Valider"} isError={isError} setIsError={setIsError} footerMethod={handleValidateDates}>
-//           <UsualScreen secondaryBackground>
-//             <View style={{flex: 1, gap: 30, marginBottom: 60, flexDirection: "column", justifyContent: "space-between"}}>
-//               <View style={styles.pageTitleContainer}>
-//                   <View style={{flex: 1, gap: 5}}>
-//                       <TitleText text="Choisissez vos dates"/>
-//                       <SubText text={"La date de fin n'est pas obligatoire"}/>
-
-//                   </View>
-//                   <CloseButton noPadding methode={closeModal}/>
-//               </View>
-
-
-
-//               <View style={{flex: 1, marginHorizontal: -10}}>
-//                 <MultipleSelectionCalendarListCustom ref={calendarRef}/>
-//               </View>
-//             </View>
-//           </UsualScreen>
-//         </SimpleFullBottomSheet>
-//     );
-//   };
-  
-//   export default SelectMultipleDateBottomScreen;
-
-//   const styles = StyleSheet.create({
-    
-//     pageTitleContainer: {
-//       display: "flex", 
-//       flexDirection: "row", 
-//       alignItems:"center", 
-//       gap: 20,
-//       marginBottom: 130, 
-//       marginLeft: 5,
-//     },
-
-//     footer: {
-//       display: "flex",
-//       flexDirection: "column",
-//       gap: 10,
-//     },
-//   })
-
-
-  const SelectMultipleDateBottomScreen: FC<SelectMultipleDateBottomScreen> = ({bottomSheetModalRef, setStartingDate, setEndingDate}) => {
-
-    const closeModal = () => {
-      bottomSheetModalRef.current?.close();
+    if(isError) {
+      Toast.show({
+        type: "error",
+        text1: "Date de début invalide",
+        position: "top"
+      })
     }
 
-    const snapPoints_Default = useMemo(() => ['85%'], []);
+    return isError
+  }
 
-    const [isError, setIsError] = useState(false)
+  const closeModal = () => {
+    bottomSheetModalRef.current?.close();
+  }
 
-    interface CalendarRefType {
-      getStartingDate: () => Date | undefined;
-      getEndingDate: () => Date | undefined;
+  const closeAndSave = () => {
+    if(checkError()) {
+      Error_Impact()
     }
 
-    const calendarRef = useRef<CalendarRefType | null>(null)
+    else {
+      handleValidateDates()
+      closeModal()
+    }
+  }
 
-    const handleValidateDates = () => {
-      const startingDate_temp = calendarRef.current?.getStartingDate()
-      const endingDate_temp = calendarRef.current?.getEndingDate()
+  const handleValidateDates = () => {
+    const startingDate_temp = calendarRef.current?.getStartingDate()
+    const endingDate_temp = calendarRef.current?.getEndingDate()
 
-      if(!startingDate_temp){
-        Error_Impact()
-        setIsError(true)
+    if(startingDate_temp){
+      if(!endingDate_temp){
+        setStartingDate(new Date(startingDate_temp))
+        setEndingDate(undefined)
       }
 
       else{
-        setIsError(false)
-        if(!endingDate_temp){
-          setStartingDate(new Date(startingDate_temp))
-          setEndingDate(new Date(startingDate_temp))
-        }
-  
-        else{
-          setStartingDate(new Date(startingDate_temp))
-          setEndingDate(new Date(endingDate_temp))
-        }
-  
-        closeModal()
-        BottomScreenOpen_Impact()
+        setStartingDate(new Date(startingDate_temp))
+        setEndingDate(new Date(endingDate_temp))
       }
+
+      closeModal()
+      BottomScreenOpen_Impact()
     }
+  }
 
   return (
-    <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints_Default}>
-      <UsualScreen secondaryBackground hideMenu>
+    <CustomStaticBottomSheet 
+      bottomSheetModalRef={bottomSheetModalRef} 
+      snapPoints={snapPoints_Default}
+      footerText="Valider"
+      footerMethod={handleValidateDates}
+      checkError={checkError}
+      noPressBackdrop
+      noPanDownToClose>
+      <UsualScreen hideMenu>
         <View style={styles.container}>
           <View style={styles.pageTitleContainer}>
               <View style={{flex: 1, gap: 5}}>
                   <TitleText text="Choisissez vos dates"/>
                   <NormalGrayText bold text={"La date de fin n'est pas obligatoire"}/>
               </View>
-              <CloseButton noPadding methode={closeModal}/>
+              <BottomSheetCloseButton methode={closeAndSave}/>
           </View>
 
           <View style={{flex: 1, marginHorizontal: -10}}>
-            <MultipleSelectionCalendarListCustom ref={calendarRef}/>
+            <MultipleSelectionCalendarListCustom 
+              disablePastDays={disablePastDays}
+              startingDate={startingDate}
+              endingDate={endingDate}
+              ref={calendarRef}/>
           </View>
-
-          <FooterBottomSheet text={"Valider"} onPress={handleValidateDates}/>
         </View>
       </UsualScreen>
     </CustomStaticBottomSheet>

@@ -1,9 +1,10 @@
 import { ImageStyle, StyleSheet, TextStyle, View, ViewStyle } from "react-native"
 import { useThemeColor } from "../Themed"
-import Animated, { AnimatedStyleProp, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
-import { FC, useContext } from "react"
+import Animated, { AnimatedStyleProp, Easing, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming } from "react-native-reanimated"
+import { FC, useContext, useEffect } from "react"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
+import { useAnimatedFill } from "../../hooks/useAnimatedFill"
 
 export interface StepIndicatorProps {
     totalSteps: number,
@@ -19,15 +20,21 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
     const font = useThemeColor(theme, "Font")
     const tertiary = useThemeColor(theme, "Tertiary")
 
+    const {rStyle, fill} = useAnimatedFill()
+
     const finalInactiveColor = inactiveColor ? inactiveColor : tertiary
 
     const highlightColor = color ?? font
-    const finalHeight = height ? height : 4
+    const finalHeight = height ?? 4
+
+    useEffect(() => {
+        fill()
+    }, [])
+
 
     return(
         <View style={styles.horizontalContainer}>
             {
-
                 Array.from({ length: totalSteps }).map((item, index) => {
 
                     const isJustDoneStep = index === currentStep - 1
@@ -38,13 +45,14 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
                                 style={[
                                     styles.singleBar,
                                     {
-                                        backgroundColor: index < currentStep ? highlightColor : finalInactiveColor,
+                                        backgroundColor: index < currentStep - 1 ? highlightColor : finalInactiveColor,
                                         height: finalHeight
                                     },
                                 ]}
                             />
 
-                            {isJustDoneStep && <View style={[
+                            {isJustDoneStep && <Animated.View style={[
+                                    rStyle,
                                     styles.singleBar,
                                     {
                                         position: "absolute",
@@ -54,7 +62,6 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
                                 ]}
                             />}
                         </View>
-
                     )
                 })
 

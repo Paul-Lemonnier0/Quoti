@@ -1,24 +1,24 @@
 import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBottomSheet"
 import { CustomScrollView, UsualScreen } from "../../../components/View/Views"
-import { CloseButton, IconButton, IconProvider } from "../../../components/Buttons/IconButtons"
+import { BorderIconButton, BottomSheetCloseButton, CloseButton, IconButton, IconProvider } from "../../../components/Buttons/IconButtons"
 import { StyleSheet, View } from "react-native"
-import { FrequencyTypes, Habit, Step } from "../../../types/HabitTypes"
+import { Habit, Step } from "../../../types/HabitTypes"
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import React, { FC, RefObject, useCallback, useContext, useRef } from "react"
 import { FormDetailledHabit, FormDetailledObjectifHabit, FormStep } from "../../../types/FormHabitTypes"
 import StepsList from "../../../components/Habitudes/Step/StepsList"
 import { Image } from "react-native"
-import { HugeText, MassiveText, NormalGrayText, SubTitleText, TitleText } from "../../../styles/StyledText"
+import { HugeText, NormalGrayText, SubTitleText, TitleText } from "../../../styles/StyledText"
 import IllustrationsList, { IllustrationsType } from "../../../data/IllustrationsList"
 import EditHabitNav from "../../EditScreens/Habits/EditHabitNav"
 import { useThemeColor } from "../../../components/Themed"
-import Separator from "../../../components/Other/Separator"
 import HabitIcons from "../../../data/HabitIcons"
 import ProgressBar from "../../../components/Progress/ProgressBar"
 import { FrequencyDetails } from "../../../components/Habitudes/FrequencyDetails"
 import Quoti from "../../../components/Other/Quoti"
 import { getSeriazableHabit } from "../../../primitives/HabitMethods"
 import { AppContext } from "../../../data/AppContext"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 export interface HabitStepDetailsBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -52,12 +52,14 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
     }
 
     const closeModal = () => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef.current?.close()
     }
 
     const bottomSheetModalRef_EditHabit: RefObject<BottomSheetModal> = useRef(null);
   
     const handleOpenEditHabit = useCallback(() => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef_EditHabit.current?.present();
       }, []);
   
@@ -85,7 +87,7 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
         )
     }
 
-    const isPlaceholder = steps[0].numero === -1
+    const isPlaceholder = steps.length === 0 || steps.filter(step => step.numero === -1).length > 0
     const seriazabledHabit = getSeriazableHabit(habit as Habit)
 
     return(
@@ -96,9 +98,9 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
                 <View style={styles.container}>
                     <View style={styles.header}>
                         <View style={styles.subHeader}>
-                            <CloseButton noPadding methode={closeModal}/>
+                            <CloseButton methode={closeModal}/>
                             <Quoti/>
-                            <IconButton name="edit-3" provider={IconProvider.Feather} noPadding onPress={handleOpenEditHabit}/>
+                            <BorderIconButton isBorderGray isTransparent name="edit-3" provider={IconProvider.Feather} onPress={handleOpenEditHabit}/>
                         </View>
                     </View>
 
@@ -116,7 +118,7 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
                                     </View>
                                 </View>
 
-                                <ProgressBar progress={1} color={habit.color} inactiveColor={secondary} withPourcentage/>
+                                <ProgressBar progress={1} color={habit.color} withPourcentage/>
                             </View>
 
                             <View style={{flex: 1, gap: 30}}>

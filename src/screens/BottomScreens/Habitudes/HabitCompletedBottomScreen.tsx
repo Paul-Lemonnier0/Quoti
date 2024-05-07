@@ -1,7 +1,7 @@
 import { MassiveText, TitleText } from "../../../styles/StyledText"
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
-import { CloseButton } from "../../../components/Buttons/IconButtons";
+import { BottomSheetCloseButton, CloseButton } from "../../../components/Buttons/IconButtons";
 import Confetti from "../../../components/Other/Confetti";
 import { FC, RefObject, useRef } from "react";
 import { useEffect } from "react";
@@ -50,7 +50,7 @@ const HabitCompletedBottomScreen: FC<HabitCompletedBottomScreenProps> = ({bottom
             <UsualScreen hideMenu>
                 <View style={styles.container}>
                     <View style={styles.pageTitleContainer}>
-                        <CloseButton noPadding methode={closeModal}/>
+                        <BottomSheetCloseButton methode={closeModal}/>
                     </View>
 
 
@@ -89,6 +89,7 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 20, 
         flex: 1,
+        marginBottom: 30
     },
 
     displayRow: {

@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useContext, useRef } from 'react'
 import { CustomScrollView, UsualScreen } from '../../components/View/Views';
 import { Image, StyleSheet, View } from 'react-native';
-import { IconButton, IconProvider, NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons';
+import { BorderIconButton, IconButton, IconProvider, NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons';
 import Quoti from '../../components/Other/Quoti';
 import { HugeText, NormalGrayText, NormalText, SubTitleText, TitleText } from '../../styles/StyledText';
 import ProgressBar from '../../components/Progress/ProgressBar';
@@ -14,6 +14,7 @@ import PresentationHabitList from '../../components/Habitudes/PresentationHabitL
 import { convertBackSeriazableObjectif } from '../../primitives/ObjectifMethods';
 import HabitudesList from '../../components/Habitudes/HabitudesList';
 import IllustrationsList, { IllustrationsType } from '../../data/IllustrationsList';
+import { BottomScreenOpen_Impact } from '../../constants/Impacts';
 
 interface ObjectifDetailsComponentProps {
     objectif: SeriazableObjectif,
@@ -33,12 +34,10 @@ const ObjectifDetailsComponent: FC<ObjectifDetailsComponentProps> = ({
     isPresentation
 }) => {
 
-    const {theme} = useContext(AppContext)
-    const secondary = useThemeColor(theme, "Secondary")
-
     const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
 
     const handleOpenSettings = useCallback(() => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef_Settings.current?.present();
     }, []);
 
@@ -50,8 +49,8 @@ const ObjectifDetailsComponent: FC<ObjectifDetailsComponentProps> = ({
                     <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.Education]}/>
 
                     <View style={styles.emptyScreenSubContainer}>
-                        <NormalText text={"Objectif vide"}/>
-                        <SubTitleText text={"Aucune habitude associée"}/>
+                        <SubTitleText bold text={"Objectif vide"}/>
+                        <NormalGrayText bold text={"Aucune habitude associée"}/>
                     </View>
                 </View>
             </View>
@@ -66,7 +65,7 @@ const ObjectifDetailsComponent: FC<ObjectifDetailsComponentProps> = ({
                     <View style={styles.subHeader}>
                         <NavigationButton action={NavigationActions.goBack} />
                         <Quoti/>
-                        <IconButton noPadding name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
+                        <BorderIconButton isBorderGray isTransparent name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
                     </View>
                 </View>
 
@@ -85,7 +84,6 @@ const ObjectifDetailsComponent: FC<ObjectifDetailsComponentProps> = ({
                                 <ProgressBar
                                     progress={pourcentage ? pourcentage/100 : 1}
                                     color={objectif.color}
-                                    inactiveColor={secondary}
                                     withPourcentage
                                 />
                             </View>
@@ -97,14 +95,21 @@ const ObjectifDetailsComponent: FC<ObjectifDetailsComponentProps> = ({
                             <View style={{ flex: 1 }}>
                                 {
                                     currentDateString && handlePressHabit && !isPresentation ?
-                                    <HabitudesList habits={habits} handleOnPress={handlePressHabit} currentDateString={currentDateString}/>
-                                    : <PresentationHabitList 
-                                            isNotNewObjectifHabit 
-                                            isNotObjectifIDConst 
-                                            habits={habits} 
-                                            deleteHabit={() => {}} 
-                                            editHabit={() => {}}
-                                        />
+                                    <HabitudesList 
+                                        habits={habits} 
+                                        handleOnPress={handlePressHabit} 
+                                        currentDateString={currentDateString}
+                                        noAnimation
+                                    />
+                                    : 
+                                    <PresentationHabitList 
+                                        isNotNewObjectifHabit 
+                                        isNotObjectifIDConst 
+                                        habits={habits} 
+                                        deleteHabit={() => {}} 
+                                        editHabit={() => {}}
+                                        noAnimation
+                                    />
                                 }
                             </View>
                         </View>

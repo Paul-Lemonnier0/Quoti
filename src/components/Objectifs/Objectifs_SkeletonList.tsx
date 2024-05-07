@@ -9,37 +9,61 @@ import { Objectif } from "../../types/HabitTypes"
 import { FormDetailledObjectif } from "../../types/FormObjectifTypes"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
+import { View } from "react-native"
+import { PresentationObjectifBlock } from "./ObjectifBlock"
 
+interface RenderSkeletonObjectifsProps {
+    item: FormDetailledObjectif,
+    index: number,
+    isPresentation?: boolean
+}
 
-const Objectifs_SkeletonList = memo(() => {
+const RenderSkeletonObjectifs: FC<RenderSkeletonObjectifsProps> = ({item, index, isPresentation}) => {
+
     const {theme} = useContext(AppContext)
 
     const primary = useThemeColor(theme, "Primary")
     const secondary = useThemeColor(theme, "Secondary")
 
-    const renderObjectifs: ListRenderItem<FormDetailledObjectif> = ({item, index}) => {
-
-        return (
-            <Skeleton radius={20} colorMode="dark" colors={[secondary, primary, secondary]}>
+    return (
+        <Skeleton radius={20} colorMode="dark" colors={[secondary, primary, secondary]}>
+            {
+                isPresentation ?
+                <PresentationObjectifBlock isSkeleton index={index} handleOnPress={() => {}} habits={[]} objectif={item}/> :
                 <ObjectifSkeletonBlock key={index} objectif={item}/>
-            </Skeleton>
-        )
-    }
+            }
+        </Skeleton>
+    )
+}
+
+interface RenderSkeletonObjectifsListProps {
+    isPresentation?: boolean
+}
+
+const Objectifs_SkeletonList = memo(({isPresentation}: RenderSkeletonObjectifsListProps) => {
 
     const objectifs_placeholder = useMemo(() => [...Objectifs_Skeleton], [])
 
     return(
         <Skeleton.Group show={true} >
-            <MotiView transition={{type: 'timing', duration: 3}}>
-            <FlatList 
-                data={objectifs_placeholder} 
-                renderItem={renderObjectifs}
-                showsHorizontalScrollIndicator={false}
-                style={{marginHorizontal: -30}}
-                contentContainerStyle={{paddingHorizontal: 30, gap: 15}}
-                horizontal
-            />
-            </MotiView>
+            {/* <MotiView transition={{type: 'timing', duration: 3}}> */}
+            <View style={{gap: 20, paddingTop: 20}}>
+                <FlatList 
+                    data={objectifs_placeholder} 
+                    renderItem={({item, index}) => 
+                        <RenderSkeletonObjectifs 
+                            item={item} 
+                            index={index} 
+                            isPresentation={isPresentation}
+                        />
+                    }
+                    showsHorizontalScrollIndicator={false}
+                    style={{marginHorizontal: -30}}
+                    contentContainerStyle={{paddingHorizontal: 30, gap: 15}}
+                    horizontal
+                />
+            </View>
+            {/* </MotiView> */}
         </Skeleton.Group>
     )
 })

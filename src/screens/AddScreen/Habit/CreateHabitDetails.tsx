@@ -4,11 +4,12 @@ import { getSeriazableHabit } from "../../../primitives/HabitMethods"
 import { HabitsContext } from "../../../data/HabitContext"
 import { AppContext } from "../../../data/AppContext"
 import HabitAdvancedDetailsForm from "../../../components/Forms/HabitAdvancedDetailsForm"
-import { Success_Impact } from "../../../constants/Impacts"
+import { Error_Impact, Success_Impact } from "../../../constants/Impacts"
 import { NativeStackScreenProps } from "@react-navigation/native-stack"
-import { AddScreenStackType } from "../../../navigation/BottomTabNavigator"
 import { FormDetailledHabitValues } from "../../../types/FormHabitTypes"
 import React from "react"
+import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
+import Toast from "react-native-toast-message"
 
 type CreateHabitDetailsProps = NativeStackScreenProps<AddScreenStackType, "CreateHabitDetails">
 
@@ -44,6 +45,16 @@ const CreateHabitDetails: FC<CreateHabitDetailsProps> = ({navigation, route}) =>
         }
 
         catch (e){
+            Error_Impact()
+
+            Toast.show({
+                type: "error",
+                text1: "Impossible d'ajouter l'habitude",
+                position: "top",
+                visibilityTime: 3000,
+                swipeable: true
+            })
+
             console.log("Erreur dans l'ajout de l'habitude : ", e)
             setIsLoading(false)
         }

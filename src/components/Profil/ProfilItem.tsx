@@ -20,7 +20,11 @@ export interface ProfilItemProps {
     handleRefuse?: () => void,
     isPrimary?: boolean,
     isSelected?: boolean,
-    expand?: boolean
+    expand?: boolean,
+    small?: boolean,
+    noSubTitle?: boolean,
+    customSubTitle?: string,
+    boldSubTitle?: boolean
 }
 
 const ProfilItem: FC<ProfilItemProps> = ({ 
@@ -31,6 +35,10 @@ const ProfilItem: FC<ProfilItemProps> = ({
     handleRefuse,
     isSelected,
     expand,
+    small,
+    noSubTitle,
+    customSubTitle,
+    boldSubTitle
 }) => {
 
     const {theme} = useContext(AppContext)
@@ -50,18 +58,32 @@ const ProfilItem: FC<ProfilItemProps> = ({
                 {  
                     user.photoURL ?
                          <Image placeholder={"disk"} source={{ uri: user.photoURL}} 
-                             style={[styles.image, {borderColor: isSelected ? "transparent" : "transparent"}]} />
+                             style={[styles.image, {
+                                borderColor: isSelected ? "transparent" : "transparent",
+                                width: small ? 45 : 60,
+                                aspectRatio: 1
+                             }]} />
                          : 
                         
-                        <PlaceholderProfilPicture borderColor={contrast} isSelected={isSelected} isPrimary={isPrimary} name={user.displayName ?? ""}/>
+                        <PlaceholderProfilPicture 
+                            borderColor={contrast} 
+                            isSelected={isSelected} 
+                            isPrimary={isPrimary} 
+                            name={user.displayName ?? ""}
+                            small={small}
+                        />
                 
                 }
                 <View style={styles.detailsContainer}>
                     <SubTitleText text={user.displayName} />
                     {
-                        user.firstName && user.lastName ?
-                        <SubText text={user.firstName + " " + user.lastName}/>: 
-                        <SubText text={""}/>
+                        noSubTitle ? null :
+                        customSubTitle ?
+                        <SubText bold text={customSubTitle}/> : 
+
+                        (user.firstName && user.lastName ?
+                        <SubText bold text={user.firstName + " " + user.lastName}/>: 
+                        <SubText text={""}/>)
                     }
                 </View>
             </View>

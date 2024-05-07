@@ -1,5 +1,6 @@
 import { GlobalFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
-import { FilteredHabitsType, Habit, PrioritesType, Step, StepList, StreakValues } from "../types/HabitTypes";
+import { FormDetailledObjectifHabit, FormFullStep, FormStep, FormStepsHabitValues } from "../types/FormHabitTypes";
+import { FilteredHabitsType, Habit, PrioritesType, SeriazableHabit, Step, StepList, StreakValues } from "../types/HabitTypes";
 import { toISOStringWithoutTimeZone } from "./BasicsMethods";
 
 export const updateHabitStepState = (
@@ -127,4 +128,68 @@ export const getPriorityDetails = (priority: PrioritesType | undefined): Priorit
         icon: "chevrons-up"
       }
   }
+}
+
+export const setNewSteps = (values: FormStepsHabitValues, habit: SeriazableHabit | FormDetailledObjectifHabit) => {
+  let oldStepsArray = Object.values(habit.steps)
+
+  //On filtre pour enlever le placeholder
+  let updatedStepsArray = oldStepsArray.filter((step) => (step as Step).stepID !== habit.habitID)
+
+  if(values.steps){
+      const today = new Date().toISOString()
+      const newStepIDs: string[] = values.steps.map((step) => (step as (Step | FormFullStep)).stepID);
+      
+      //les deleted
+      const deletedSteps = updatedStepsArray.map((step) => {
+          if(step as (Step | FormFullStep)){
+              //Si les nouvelles steps ne contiennent pas une step d'avant on met à jour le deleted
+              if(!newStepIDs.includes((step as (Step | FormFullStep)).stepID)) {
+                  return step = {...step, deleted: today}
+              }
+          }
+      }).filter(step => step != undefined)
+
+
+      //les added, intact, modified
+      const otherSteps = values.steps.map(step => {
+          //Si l'étape est déjà connue
+          if("created" in step){
+              //Si l'étape n'éxistait pas avant dans l'habit (normalement on rentre pas dedans)
+              if(!habit.steps.hasOwnProperty((step as Step).stepID))
+                  return {...step, created: today}
+
+              else {
+                  //Si l'étape a simplement été modifiée
+                  if(habit.steps[(step as Step).stepID] != step) {
+                      return {...step, created: today}
+                  }
+
+                  else {
+                      //Sinon on ajoute sans mettre à jour la date de création
+                      return {...step}
+                  }
+              }
+          }
+
+          //Si c'est une nouvelle étape
+          else {
+              return {...step, created: today}
+          }
+      });
+
+      updatedStepsArray = [...deletedSteps, ...otherSteps] as (Step | FormStep)[]
+      
+      //Suppression du placeholder
+      if(updatedStepsArray.filter(step => step.numero !== -1 && !("deleted" in step)).length > 0) {
+          updatedStepsArray = updatedStepsArray.map(step => step.numero === -1 ? {...step, deleted: today} : {...step})
+      }
+
+      //Ajout du placeholder
+      if(updatedStepsArray.filter(step => !("deleted" in step)).length === 0) {
+          updatedStepsArray = [{created: today, numero: -1}]
+      }
+  }
+
+  return updatedStepsArray
 }

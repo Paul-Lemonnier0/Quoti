@@ -44,8 +44,6 @@ export const saveProfilePictureLocally = async (uri: string, uid: string): Promi
         const result = await downloadResumable.downloadAsync()
 
         if(result) {
-            console.log("result")
-
             await AsyncStorage.removeItem('picture_'+uid)
             await AsyncStorage.setItem('picture_'+uid, result.uri);
 
@@ -53,11 +51,11 @@ export const saveProfilePictureLocally = async (uri: string, uid: string): Promi
 
             return result.uri;
         }
-
-        else console.log("no result")
         
         return null
-    } catch (error) {
+    }
+    
+    catch (error) {
         console.error('Erreur lors de la sauvegarde de la photo de profil:', error);
         return null;
     }

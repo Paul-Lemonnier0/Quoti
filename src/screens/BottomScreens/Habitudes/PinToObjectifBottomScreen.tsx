@@ -1,32 +1,42 @@
 import { FC, RefObject, useContext, useMemo, useState } from "react";
 import { TitleText } from "../../../styles/StyledText"
-import { ScrollView, StyleSheet, View } from "react-native";
-import { CloseButton } from "../../../components/Buttons/IconButtons";
-import { Success_Impact } from "../../../constants/Impacts";
+import { FlatList, ScrollView, StyleSheet, View } from "react-native";
+import { BottomSheetCloseButton, CloseButton } from "../../../components/Buttons/IconButtons";
+import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
 import ObjectifRadioItem from "../../../components/Objectifs/ObjectifRadioItem";
-import FooterBottomSheets from "../../../components/BottomSheets/FooterBottomSheets";
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import Separator from "../../../components/Other/Separator";
 import { AppContext } from "../../../data/AppContext";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Habit, Objectif } from "../../../types/HabitTypes";
 import React from "react"
+import { AnimatedFlatList } from "../../../components/Stats/AnimatedFlatList";
 
 export interface PinToObjectifBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     displayedObjectifs: Objectif[],
     updateHabitRelationWithObjectif: (habit: Habit, selectedPinObjectifID: string | null) => Promise<void>,
-    habit: Habit
+    habit: Habit,
+    additionnalCloseMethod?: () => void
 }
 
+const CustomSeparator = () => {
+    return (
+        <View style={{marginVertical: 10, marginHorizontal: -20}}>
+        </View>
+    )
+}
 const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> = 
-    ({bottomSheetModalRef, displayedObjectifs, updateHabitRelationWithObjectif, habit}) => {
+    ({bottomSheetModalRef, displayedObjectifs, updateHabitRelationWithObjectif, habit, additionnalCloseMethod}) => {
     
     const {setIsLoading} = useContext(AppContext)
 
     const snapPoints = useMemo(() => ['75%'], []);
 
     const closeModal = () => {
+        BottomScreenOpen_Impact()
+
+        additionnalCloseMethod ? additionnalCloseMethod() : null
         bottomSheetModalRef.current?.close()
     }
 
@@ -46,6 +56,7 @@ const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> =
     const RenderObjectif = ({item}) => {
 
         const onPress = () => {
+            BottomScreenOpen_Impact()
             if(item.objectifID === selectedPinObjectifID){
                 setSelectedPinObjectifID(undefined)
             }
@@ -59,31 +70,39 @@ const PinToObjectifBottomScreen: FC<PinToObjectifBottomScreenProps> =
         )
     }
 
-
     return(
-        <CustomStaticBottomSheet bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints}>
+        <CustomStaticBottomSheet 
+            footerMethod={handleChooseObjectif}
+            footerText="Valider"
+            bottomSheetModalRef={bottomSheetModalRef} snapPoints={snapPoints}>
             <View style={styles.container}>
                 <View style={styles.pageTitleContainer}>
                     <View style={{flex: 1}}>
                         <TitleText text="Choisissez un objectif"/>
                     </View>
-                    <CloseButton noPadding methode={closeModal}/>
+                    <BottomSheetCloseButton methode={closeModal}/>
                 </View>
+                {/* <ScrollView style={{display: "flex", flexDirection: "column", gap: 0}} showsVerticalScrollIndicator={false}> */}
+                <View style={{gap: 0, marginBottom: 30, marginHorizontal: -30}}>
+                    <Separator/>
 
-                <ScrollView style={{display: "flex", flexDirection: "column", gap: 0}} showsVerticalScrollIndicator={false}>
-                    <View style={{gap: 15, marginBottom: 30}}>
                     {
-                        displayedObjectifs.map((obj, index) => (
-                            <View key={index} style={{gap: 15}}>
-                                <RenderObjectif key={index} item={obj}/>
-                                { index !== displayedObjectifs.length - 1 && <Separator/> }
-                            </View>
-                        )) 
+                        <FlatList
+                            data={displayedObjectifs}
+                            renderItem={({item, index}) => <RenderObjectif key={index} item={item}/>}
+                            ItemSeparatorComponent={CustomSeparator}
+                            style={{marginBottom: -5}}
+                            contentContainerStyle={{paddingHorizontal: 20, paddingBottom: 20, paddingTop: 15}}
+                        />
+                        // displayedObjectifs.map((obj, index) => (
+                        //     <View key={index} style={{gap: 15}}>
+                                
+                        //         { index !== displayedObjectifs.length - 1 && <Separator/> }
+                        //     </View>
+                        // )) 
                     }
-                    </View>
-                </ScrollView>  
-
-                <FooterBottomSheets text={"Valider"} onPress={handleChooseObjectif}/>
+                </View>
+                {/* </ScrollView>   */}
             </View>
         </CustomStaticBottomSheet>
     )
@@ -104,8 +123,8 @@ const styles = StyleSheet.create({
       flexDirection: "row", 
       alignItems:"center", 
       gap: 20,
-      marginLeft: 5,
-      marginBottom: 30
+      marginLeft: -5,
+      marginBottom: 15
     },
 
     footer: {

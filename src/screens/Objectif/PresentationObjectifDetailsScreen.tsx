@@ -1,26 +1,15 @@
-import React, { useState, useEffect, useContext, FC, useCallback, useRef } from "react";
-import { View, StyleSheet } from "react-native";
-import { CommonActions, useNavigation, useRoute } from "@react-navigation/native";
-import { CustomScrollView, UsualScreen } from "../../components/View/Views";
-import { IconButton, IconProvider, NavigationActions, NavigationButton } from "../../components/Buttons/IconButtons";
-import {HugeText, NormalGrayText, TitleText} from "../../styles/StyledText";
-import HabitudesList from "../../components/Habitudes/HabitudesList";
-import ProgressBar from "../../components/Progress/ProgressBar";
-import { useThemeColor } from "../../components/Themed";
+import React, { useState, useEffect, useContext, FC } from "react";
 import { HabitsContext } from "../../data/HabitContext";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { HomeStackParamsList } from "../../navigation/BottomTabNavigator";
 import { Habit } from "../../types/HabitTypes";
-import SettingsObjectifBottomSheet from "../BottomScreens/Objectifs/SettingsObjectifBottomScreen";
-import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { convertBackSeriazableObjectif, getSeriazableObjectif } from "../../primitives/ObjectifMethods";
-import { convertBackSeriazableHabit } from "../../primitives/HabitMethods";
-import Quoti from "../../components/Other/Quoti";
-import { AppContext } from "../../data/AppContext";
 import ObjectifDetailsComponent from "./ObjectifDetailsComponent";
+import { SocialScreenStackType } from "../../navigation/SocialNavigator";
+import { HomeStackParamsList } from "../../navigation/HomeNavigator";
 
-type PresentationObjectifDetailsScreenProps = NativeStackScreenProps<HomeStackParamsList, "PresentationObjectifDetailsScreen">
-
+type PresentationObjectifDetailsScreenProps = 
+  NativeStackScreenProps<SocialScreenStackType, "PresentationObjectifDetailsScreen"> | 
+  NativeStackScreenProps<HomeStackParamsList, "PresentationObjectifDetailsScreen">
+  
 const PresentationObjectifDetailsScreen: FC<PresentationObjectifDetailsScreenProps> = ({route, navigation}) => {
   const { Habits, Objectifs } = useContext(HabitsContext);
   const { seriazableObjectif } = route.params;

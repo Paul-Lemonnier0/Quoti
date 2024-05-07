@@ -23,7 +23,8 @@ import { updateEmail, updateProfile } from 'firebase/auth'
 import { UserContext, UserType } from '../../../data/UserContext'
 import { Error_Impact, Success_Impact } from '../../../constants/Impacts'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { HomeStackParamsList } from '../../../navigation/BottomTabNavigator'
+import { HomeStackParamsList } from '../../../navigation/HomeNavigator'
+import Toast from 'react-native-toast-message'
 
 type ProfilDataSettingsScreenProps = NativeStackScreenProps<HomeStackParamsList, "ProfilDataSettingsScreen">
 
@@ -106,10 +107,26 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
                     navigation.goBack()
                 }
 
+                Toast.show({
+                    type: "success",
+                    text1: "Modifications effectuées !",
+                    position: "top",
+                    visibilityTime: 3000,
+                    swipeable: true
+                })
+
                 setIsLoading(false)
             }
 
             catch(e) {
+                Toast.show({
+                    type: "error",
+                    text1: "Erreur lors de la modification",
+                    position: "top",
+                    visibilityTime: 3000,
+                    swipeable: true
+                })
+
                 console.log("Erreur lors de la mise à jour du profil : ", e)   
                 Error_Impact()
                 setIsLoading(false)
@@ -140,7 +157,7 @@ const ProfilDataSettingsScreen: FC<ProfilDataSettingsScreenProps> = ({navigation
                             {user && <ProfilButton placeholderBorder tall modificationBadge user={{...user, photoURL: profilPicture}} onPress={handleEditProfilPicture}/>}
                             <View style={styles.titreEtDescriptionContainer}>
                                 <HugeText text={user?.displayName ?? "unknown"}/>
-                                <NormalGrayText text={user?.email ?? "unknown"} />
+                                <NormalGrayText bold text={user?.email ?? "unknown"} />
                             </View>
                         </View>
 

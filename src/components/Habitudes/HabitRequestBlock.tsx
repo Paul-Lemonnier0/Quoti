@@ -1,6 +1,6 @@
 import React, { FC } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import Animated, { FadeInDown, FadeInRight } from 'react-native-reanimated'
+import Animated, { FadeInDown, FadeInRight, FadeOutDown } from 'react-native-reanimated'
 import cardStyle from '../../styles/StyledCard'
 import { Habit } from '../../types/HabitTypes'
 import IconImage from '../Other/IconImage'
@@ -31,7 +31,7 @@ const HabitRequestBlock: FC<HabitRequestBlockProps> = ({
 
     return (
         <TouchableOpacity style={{flex: 1}} onPress={handleOnPress} delayLongPress={750}>
-            <Animated.View entering={FadeInDown.duration(400).delay(index * 200)} 
+            <Animated.View entering={FadeInDown.duration(400).delay(index * 200)} exiting={FadeOutDown} 
                 style={[
                     stylesCard.card, 
                     styles.habit,

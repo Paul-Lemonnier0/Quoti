@@ -5,18 +5,23 @@ export interface Theme {
   Contrast: string;
   Primary: string;
   Secondary: string;
-  SecondaryLowOpacity: string,
   Tertiary: string;
-  Popup: string;
-  Error: string;
-  InputBackground: string;
   InputDisabledBackground: string;
   DisabledButtonBackground: string;
   DisabledButtonText: string;
   Selection: string;
   LinearGradientOpacityStart: string;
   LinearGradientOpacityEnd: string;
-  ContrastLowOpacity: string
+  ContrastLowOpacity: string,
+
+  BottomTabBar: string,
+
+  Error: string,
+  Success: string,
+
+  MissedDay: string,
+  ScheduledDay: string,
+  NoneDay: string
 }
 
 export interface ThemeObject {
@@ -30,58 +35,57 @@ const theme: ThemeObject = {
       Font: "#071220",
       FontContrast: "#fff",
       Contrast: "#000000",
+
       Primary: "#f6f6f9",
       Secondary: "#fff",
-      SecondaryLowOpacity: "rgba(255, 255, 255, 0.5)",
-      ContrastLowOpacity: "rgba(0, 0, 0, 0.25)",
       Tertiary: "#bfbfbf",
-      Popup: "#f6f6f9",
-      Error: "#ee1b15",
-      InputBackground: "#f9f9f9",
+
+      ContrastLowOpacity: "rgba(0, 0, 0, 0.25)",
       InputDisabledBackground: "#ededed",
       DisabledButtonBackground: "#7b7b7b",
       DisabledButtonText: "#afafaf",
-      Selection: 'rgba(246, 246, 249, 0.5)',
+
+      Selection: 'rgba(191, 191, 191, 0.5)',
+
+      Error: "#ee1b15",
+      Success: "#4DAB9A",
+
+      BottomTabBar: "#121212",
       LinearGradientOpacityStart: 'rgba(256,256,256,0)',
-      LinearGradientOpacityEnd: 'rgba(256,256,256,1)'
+      LinearGradientOpacityEnd: 'rgba(256,256,256,0.5)',
+      
+      MissedDay: "#6B6B6B",
+      ScheduledDay: "#B8B8B8",
+      NoneDay: "#E7E7E7",
   },
+
   dark: {
-      FontGray: "#696969",
+      FontGray: "#979A9B",
       Font: "#fff",
       FontContrast: "#071220",
       Contrast: "#fff",
-      Primary: "#000000",
-      Secondary: "#12161b",
-      SecondaryLowOpacity: "rgba(18, 22, 27, 0.5)",
+
+      Primary: "#1c1d1f",
+      Secondary: "#2e3133",
+      Tertiary: "#414447",
+      
       ContrastLowOpacity: "rgba(255, 255, 255, 0.25)",
-      Selection: 'rgba(65, 68, 71, 0.5)',
-      InputBackground: "#f9f9f9",
       InputDisabledBackground: "#ededed",
       DisabledButtonBackground: "#12161b",
       DisabledButtonText: "#fff",
-      Tertiary: "#414447",
-      Popup: "#181b1f",
-      Error: "#851405",
+      
+      Selection: 'rgba(65, 68, 71, 0.5)',
+
+      Error: "#FF7369",
+      Success: "#4DAB9A",
+
+      BottomTabBar: "#0D0D0D",
       LinearGradientOpacityStart: 'rgba(0,0,0,0)',
-      LinearGradientOpacityEnd: 'rgba(0,0,0,1)'
-      // FontGray: "#7c7c7c",
-      // Font: "#fff",
-      // FontContrast: "#091823",
-      // Contrast: "#fafafa",
-      // Primary: "#1a1a1a",
-      // Secondary: "#1e2126",
-      // SecondaryLowOpacity: "rgba(30, 33, 38, 0.5)",
-      // ContrastLowOpacity: "rgba(250, 250, 250, 0.25)",
-      // Selection: 'rgba(65, 68, 71, 0.5)',
-      // InputBackground: "#f0f0f0",
-      // InputDisabledBackground: "#e0e0e0",
-      // DisabledButtonBackground: "#1e2126",
-      // DisabledButtonText: "#fafafa",
-      // Tertiary: "#464a4f",
-      // Popup: "#212529",
-      // Error: "#b71c1c",
-      // LinearGradientOpacityStart: 'rgba(0,0,0,0)',
-      // LinearGradientOpacityEnd: 'rgba(0,0,0,1)'
+      LinearGradientOpacityEnd: 'rgba(0,0,0,1)',
+
+      MissedDay: "#131518",
+      ScheduledDay: "#26292e",
+      NoneDay: "#212224",
   },
 };
 

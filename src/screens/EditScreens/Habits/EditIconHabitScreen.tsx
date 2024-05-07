@@ -6,6 +6,7 @@ import { FC } from "react";
 import { FormIconedHabitValues } from "../../../types/FormHabitTypes";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../../constants/BasicConstants";
 import React from "react"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts";
 
 type EditIconHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditIconHabitScreen">
 
@@ -13,6 +14,7 @@ const EditIconHabitScreen: FC<EditIconHabitScreenProps> = ({route, navigation}) 
     const {newValues, oldHabit, isNewObjectifHabit} = route.params
     
     const handleGoNext = (values: FormIconedHabitValues) => {
+        BottomScreenOpen_Impact()
         navigation.navigate("EditHabitStepsScreen", {
             newValues: {...newValues, ...values}, 
             oldHabit,
@@ -22,7 +24,7 @@ const EditIconHabitScreen: FC<EditIconHabitScreenProps> = ({route, navigation}) 
 
     const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(oldHabit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)
 
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS + (isNewObjectifHabit ? 0 : -1)
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     return(

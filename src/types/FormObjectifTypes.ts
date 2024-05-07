@@ -2,7 +2,7 @@ interface FormBasicObjectif {
     titre: string,
     description: string,
     startingDate: string,
-    endingDate: string
+    endingDate?: string
 }
 
 interface FormColoredObjectif extends FormBasicObjectif {

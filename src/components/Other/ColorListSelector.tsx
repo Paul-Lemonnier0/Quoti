@@ -4,6 +4,8 @@ import { ColorsList } from "../../data/ColorsList"
 import { Dispatch, FC, useContext } from "react"
 import React from "react"
 import { AppContext } from "../../data/AppContext"
+import { CustomCarousel } from "../Carousel/CustomCarousel"
+import { splitArrayIntoChunks } from "../../primitives/BasicsMethods"
 
 interface ColorBlockProps {
     color: string,
@@ -29,20 +31,66 @@ export interface ColorListSelectorProps {
     setSelectedColor: Dispatch<string>
 }
 
-const ColorListSelector: FC<ColorListSelectorProps> = ({selectedColor, setSelectedColor}) => {
+interface RenderColorProps extends ColorListSelectorProps {
+    item: string,
+}
 
-    const renderColor = ({ item }) => {
-        const isSelected = item === selectedColor
+const RenderColor: FC<RenderColorProps> = ({ item, selectedColor, setSelectedColor }) => {
+    const isSelected = item === selectedColor
 
-        return <ColorBlock color={item} isSelected={isSelected} setSelectedColor={setSelectedColor}/>
-    };
+    return <ColorBlock color={item} isSelected={isSelected} setSelectedColor={setSelectedColor}/>
+};
 
+interface RenderColorListProps extends ColorListSelectorProps {
+    item: string[],
+}
+
+const RenderColorList: FC<RenderColorListProps> = ({item, selectedColor, setSelectedColor}) => {
     return(
         <FlatList
-            data={ColorsList} renderItem={renderColor} 
+            data={item} renderItem={({item}) => 
+                <RenderColor 
+                    item={item} 
+                    selectedColor={selectedColor}
+                    setSelectedColor={setSelectedColor}
+                />
+            } 
             scrollEnabled={false}
             numColumns={5}
-            contentContainerStyle={styles.colorListContainer}/>
+            contentContainerStyle={styles.colorListContainer}
+        />
+    )
+}
+
+const ColorListSelector: FC<ColorListSelectorProps> = ({selectedColor, setSelectedColor}) => {
+
+    const splitHabitsColorData = splitArrayIntoChunks(ColorsList, 40);
+
+    return(
+        // <CustomCarousel
+        //     data={splitHabitsColorData}
+        //     pagination={false}
+        //     renderItem={({item}) => 
+        //         <RenderColorList 
+        //             item={item} 
+        //             selectedColor={selectedColor}
+        //             setSelectedColor={setSelectedColor}
+        //         />
+        //     }
+        // />
+
+        <FlatList
+        data={ColorsList} renderItem={({item}) => 
+            <RenderColor 
+                item={item} 
+                selectedColor={selectedColor}
+                setSelectedColor={setSelectedColor}
+            />
+        } 
+        scrollEnabled={false}
+        numColumns={5}
+        contentContainerStyle={styles.colorListContainer}
+    />
     )
 }
 
@@ -50,7 +98,6 @@ const styles = StyleSheet.create({
     colorListContainer: {
         flex: 1,
         justifyContent: "center",
-        marginHorizontal: -8,
     },
     
     colorContainer: {
@@ -63,7 +110,7 @@ const styles = StyleSheet.create({
     colorBlock: {
         borderRadius: 15, 
         width: "100%", 
-        borderWidth: 2,
+        borderWidth: 3,
         aspectRatio: 1
     },
 

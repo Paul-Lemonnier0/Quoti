@@ -22,22 +22,21 @@ import Quoti from "../../../components/Other/Quoti";
 import EditHabitFrequencyConfirmationBottomScreen from "../../BottomScreens/Habitudes/EditHabitFrequencyConfirmationBottomScreen";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { convertBackSeriazableHabit } from "../../../primitives/HabitMethods";
+import StepIndicator from "../../../components/Other/StepIndicator";
+import { EditHabitContext } from "./EditHabitContext";
 
 type InformationEditFrequencyHabitProps = NativeStackScreenProps<EditHabitFrequencyStackProps, "InformationEditFrequencyHabit">
 
 const InformationEditFrequencyHabit: FC<InformationEditFrequencyHabitProps> = ({route, navigation}) => {
     
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
+    const {validationAdditionnalMethod} = useContext(EditHabitContext)
 
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
     const error = useThemeColor(theme, "Error")
     
-    const {habit} = route.params
-
-    const handleGoNext = () => {
-        navigation.navigate("EditHabitFrequencyScreen", {oldHabit: habit})
-    }
+    const {newHabit, oldHabit} = route.params
 
     const confirmationBottomScreenRef = useRef<BottomSheetModal>(null)
 
@@ -46,17 +45,24 @@ const InformationEditFrequencyHabit: FC<InformationEditFrequencyHabitProps> = ({
         confirmationBottomScreenRef.current?.present()
     }
 
+    const validationMethod = () => {
+        validationAdditionnalMethod ? validationAdditionnalMethod() : null
+        closeModal()
+    }
+
     return(
         <UsualScreen hideMenu>   
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                        <CloseButton noPadding methode={closeModal}/>
+                        <NavigationButton action={NavigationActions.goBack} noPadding/>
                         <Quoti/>
                         <NavigationButton noPadding action={NavigationActions.validation} methode={openConfirmationModal}/>
                     </View>
 
                     <HugeText text="Êtes-vous sûr.e ?"/>
+                    <StepIndicator totalSteps={2} currentStep={1}/>
+
                 </View>
 
 
@@ -88,8 +94,9 @@ const InformationEditFrequencyHabit: FC<InformationEditFrequencyHabitProps> = ({
 
             <EditHabitFrequencyConfirmationBottomScreen
                 bottomSheetModalRef={confirmationBottomScreenRef}
-                habit={convertBackSeriazableHabit(habit)}
-                additionnalClosedMethod={closeModal}
+                newHabit={convertBackSeriazableHabit(newHabit)}
+                oldHabit={convertBackSeriazableHabit(oldHabit)}
+                additionnalClosedMethod={validationMethod}
             />
         </UsualScreen>
     )

@@ -1,94 +1,116 @@
 import React, { createContext, useState, useEffect, useContext, FC, ReactNode, Dispatch } from "react";
-import { addHabitDoneDate, addHabitToFireStore, archiveUserHabit, getBackUserHabit, HabitState, markUserHabitAsDone, removeHabitInFirestore, updateCompletedHabit, updateHabitInFirestore } from "../firebase/Firestore_Habits_Primitives";
-import { changeStepStateFirestore } from "../firebase/Firestore_Step_Primitives";
-import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, getValidHabitsStepsForDate, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
-import { createDefaultStepFromHabit, setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
-import { addObjectifToFirestore, fetchAllObjectifs, removeObjectifInFirestore, updateObjectifInFirestore } from "../firebase/Firestore_Objectifs_Primitives";
+import { HabitState } from "../firebase/Firestore_Habits_Primitives";
+import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
+import { setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
+import { fetchAllObjectifs } from "../firebase/Firestore_Objectifs_Primitives";
 import { UserContext, UserContextType } from "./UserContext";
-import { EMPTY_FILTERED_HABITS, FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList, Step, StepList, StreakValues } from "../types/HabitTypes";
-import { FormDetailledHabit } from "../types/FormHabitTypes";
-import { FormDetailledObjectif } from "../types/FormObjectifTypes";
-import { DefaultHabit } from "../types/DefaultHabit";
+import { EMPTY_FILTERED_HABITS, FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList } from "../types/HabitTypes";
+import { DEFAULT_HABIT, DEFAULT_OBJECTIF } from "../types/DefaultHabit";
 import { removeObjectifFromFilteredHabits, removeObjectifFromObjectifs } from "../primitives/ObjectifMethods";
-import { auth } from "../firebase/InitialisationFirebase";
 import { calculateNextScheduledDate, isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
-import { toISOStringWithoutTimeZone } from "../primitives/BasicsMethods";
 import { fetchUserHabits } from "../firebase/Firestore_Fetch_Habits_Primitives";
+import { HabitPostFirestore } from "../firebase/Firestore_Posts_Primitives";
 
 export interface HabitContextType {
+  selectedDate: Date,
+
+  //Data
   Habits: HabitList,
   ArchivedHabits: HabitList,
   DoneHabits: HabitList,
-  
   HabitsHistory: {[key: string]: Date[]},
   Objectifs: ObjectifList,
   ObjectifsHistory: {[key: string]: Date[]}
-
   filteredHabitsByDate: FilteredHabitsType,
 
+  //State
   isFetched: boolean,
   isArchivedHabitsFetched: boolean,
   setIsArchivedHabitsFetched: Dispatch<boolean>,
   isDoneHabitsFetched: boolean,
   setIsDoneHabitsFetched: Dispatch<boolean>
 
+  //Basic methods
   changeDate: (date: Date) => Promise<void>,
-  addHabit: (habit: FormDetailledHabit) => Promise<Habit | undefined>,
-  removeHabit: (habit: Habit) => Promise<void>,
-  updateHabitRelationWithObjectif: (habit: Habit, destination_objectifID: string | null) => Promise<Habit>,
-  updateHabit: (oldHabit: Habit, newValues: { [key: string]: any }, currentDate?: Date) => Promise<Habit>,
-  addObjectif: (objectif: FormDetailledObjectif) => Promise<Objectif | undefined>,
-  handleCheckStep: (habitID: string, stepID: string, date: Date, isChecked: boolean, isHabitNowCompleted: boolean) => Promise<void>,
-  getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => Habit | undefined,
-  removeObjectif: (objectifID: string, deletePinnedHabit?: boolean) => Promise<void>,
-  updateObjectif: (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => Promise<Objectif>,
-  retrieveHabitsLinkToObjectif: (objectifID: string) => Habit[],
-  addHabitIntern: (habit: Habit) => Habit,
 
+  //Fetchs
   fetchArchivedHabits: () => Promise<Habit[]>,
   fetchDoneHabits: () => Promise<Habit[]>,
+  fetchPosts: () => Promise<HabitPostFirestore[]>,
 
-  archiveHabit: (habit: Habit, habitState?: HabitState) => Promise<void>,
-  markHabitAsDone: (habit: Habit, habitState?: HabitState) => Promise<void>,
-  getBackHabit: (habit: Habit, habitState?: HabitState) => Promise<void>,
+  //Utils
+  addDayToHabitHistory: (habitID: string, date: Date) => void,
+  addArchivedHabitIntern: (habit: Habit) => void,
+  removeArchivedHabitIntern: (habit: Habit) => void,
+  markHabitAsDoneIntern: (habit: Habit) => void,
+  removeHabitFromMarkedAsDoneIntern: (habit: Habit) => void,
+
+  //Habits intern
+  addHabitIntern: (habit: Habit) => void,
+  removeHabitIntern: (habit: Habit) => void,
+  updateHabitIntern: (oldHabit: Habit, newHabit: Habit, currentDate: Date) => void,
+
+  //Objectifs intern
+  addObjectifIntern: (objectif: Objectif) => void,
+  removeObjectifIntern: (objectifID: string, deletePinnedHabit?: boolean) => void,
+  updateObjectifIntern: (newObjectif: Objectif) => void,
+
+  //Steps intern
+  checkHabitStepIntern: (habit: Habit, date: Date, stepID: string, isChecked: boolean) => void,
+
+  //Gets
+  getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => Habit | undefined,
+  getHabitsByObjectifID: (objectifID: string) => Habit[]
 }
 
 const defaultHabitContext: HabitContextType = {
+  selectedDate: new Date(),
+
+  //Data
   Habits: {}, 
   ArchivedHabits: {},
   DoneHabits: {},
-
   HabitsHistory: {},
-
   Objectifs: {}, 
   ObjectifsHistory: {},
-
   filteredHabitsByDate: EMPTY_FILTERED_HABITS,
 
+  //States
   isFetched: false,
   isArchivedHabitsFetched: false,
-  setIsArchivedHabitsFetched: () => {},
   isDoneHabitsFetched: false,
+  setIsArchivedHabitsFetched: () => {},
   setIsDoneHabitsFetched: () => {},
-
   changeDate: async () => {},
-  addHabit: async () => undefined,
-  removeHabit: async () => {},
-  updateHabitRelationWithObjectif: async (habit: Habit, destination_objectifID: string | null) => habit,
-  updateHabit: async (oldHabit: Habit, newValues: { [key: string]: any }, currentDate?: Date) => oldHabit,
-  addObjectif: async (objectif: FormDetailledObjectif) => undefined,
-  handleCheckStep: async () => {},
-  getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => DefaultHabit,
-  removeObjectif: async() => {},
-  updateObjectif: async (oldObjectif: Objectif, newValues: { [key: string]: any }, currentDate?: Date) => oldObjectif,
-  retrieveHabitsLinkToObjectif: (objectifID: string) => [],
-  addHabitIntern: (habit: Habit) => habit,
+
+  //Habits intern
+  addHabitIntern: () => {},
+  removeHabitIntern: () => {},
+  updateHabitIntern: () => {},
+
+  //Objectifs intern
+  addObjectifIntern: async () => undefined,
+  removeObjectifIntern: async() => {},
+  updateObjectifIntern: async () => DEFAULT_OBJECTIF,
+
+  //Step intern
+  checkHabitStepIntern: () => {},
+
+  //Gets
+  getHabitFromFilteredHabits: () => DEFAULT_HABIT,
+  getHabitsByObjectifID: () => [],
+
+  //Fetchs
   fetchArchivedHabits: async() => [],
   fetchDoneHabits: async() => [],
+  fetchPosts: async() => [],
 
-  archiveHabit: async() => {},
-  markHabitAsDone: async() => {},
-  getBackHabit: async() => {},
+  //Utils
+  addDayToHabitHistory: () => {},
+  addArchivedHabitIntern: () => {},
+  removeArchivedHabitIntern: () => {},
+  markHabitAsDoneIntern: () => {},
+  removeHabitFromMarkedAsDoneIntern: () => {},
 }
 
 const HabitsContext = createContext<HabitContextType>(defaultHabitContext);
@@ -193,80 +215,141 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       catch(e) { console.log("error while changing date : ", e)}
     }
 
-    const handleCheckStep = async(habitID: string, stepID: string, date: Date, isChecked: boolean, isHabitNowCompleted: boolean) => {
-      let habit = Habits[habitID]
+    /*
+      Fetch methods
+    */
 
-      const promises: Promise<void>[] = []
-      promises.push(changeStepStateFirestore(date, userID, habitID, stepID, isChecked))
-
-      let newStreakValues: StreakValues = {
-        currentStreak: habit.currentStreak,
-        lastCompletionDate: habit.lastCompletionDate,
-        bestStreak: habit.bestStreak
-      }
-
-      if(isHabitNowCompleted){
-        if(auth.currentUser && auth.currentUser.email)
-          addHabitDoneDate(auth?.currentUser.email as string, habit.habitID, toISOStringWithoutTimeZone(date))
-
-        setHabitsHistory((prevHabitHistory) => {
-          if(prevHabitHistory[habitID]) {
-            prevHabitHistory[habitID].push(date)
-          }
-
-          else prevHabitHistory[habitID] = [date]
-
-          return {...prevHabitHistory}
-        })
-
-        newStreakValues = getUpdatedStreakOfHabit(habit, date)
-        promises.push(updateCompletedHabit(userID, habitID, newStreakValues))
-
-        setHabits(previousHabits => ({
-          ...previousHabits,
-          [habitID]: {...habit, ...newStreakValues}
-        }))
-
-        habit = {...habit, ...newStreakValues}
-      }
-
-      if(isHabitScheduledForDate(habit, date)){       
-        const habitType = getHabitType(habit)
-
-        setFilteredHabitsByDate(previousFilteredHabits => (updateHabitStepState(previousFilteredHabits, habit, habitType, stepID, isChecked, newStreakValues)))
-      }
-
-      await Promise.all(promises)
-      console.log("End of check step transactions.")
-    }
-
-    /**
-     * Ajoute une nouvelle habitude dans le stockage interne et dans firestore
-     */
-
-    const addHabit = async(habit: FormDetailledHabit): Promise<Habit | undefined> => {
-      try{
-          if(auth.currentUser && auth.currentUser.email) {
-            const habitWithID = await addHabitToFireStore(habit, auth.currentUser.email, auth.currentUser.uid)    
-            if(habitWithID) {
-              const finalHabit = addHabitIntern(habitWithID)
+      const fetchArchivedHabits = async(): Promise<Habit[]> => {
+        if(user.email) {
+          const {habits, history} = await fetchUserHabits(user.email, HabitState.Archived)
   
-              console.log("habit well added !")
-              return finalHabit
-            }
-          }
+          setArchivedHabits(habits)
+  
+          setHabitsHistory(prevHistory => ({
+            ...prevHistory,
+            ...history
+          }))
+  
+          return Object.values(habits)
+        }
+  
+        return []
+      }
+  
+      const fetchDoneHabits = async(): Promise<Habit[]> => {
+        if(user.email) {
+          const {habits, history} = await fetchUserHabits(user.email, HabitState.Done)
+  
+          setDoneHabits(habits)
+  
+          setHabitsHistory(prevHistory => ({
+            ...prevHistory,
+            ...history
+          }))
+  
+          return Object.values(habits)
+        }
+  
+        return []
       }
 
-      catch(e) {
-        console.log("Error while adding habit : ", e)
+      const fetchPosts = async(): Promise<HabitPostFirestore[]> => {
+        return []
       }
+
+    /*
+      Get methods
+    */
+
+    const getHabitFromFilteredHabits = (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string): Habit | undefined => {
+      return getHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
     }
 
-    /**
-     * Ajoute une nouvelle habitude dans le stockage interne
-     */
+    const getHabitsByObjectifID = (objectifID: string): Habit[] => {
+      return Object.values(Habits).filter((habit => habit.objectifID === objectifID))
+    }
 
-    const addHabitIntern = (habit: Habit): Habit => {
+    /*
+      Basics utils
+    */
+
+    const addDayToHabitHistory = (habitID: string, date: Date) => {
+      setHabitsHistory((prevHabitHistory) => {
+        if(prevHabitHistory[habitID]) {
+          prevHabitHistory[habitID].push(date)
+        }
+
+        else prevHabitHistory[habitID] = [date]
+
+        return {...prevHabitHistory}
+      })
+    }
+
+    const addArchivedHabitIntern = (habit: Habit) => {
+      setArchivedHabits(prevArchivedHabits => ({
+        ...prevArchivedHabits,
+        [habit.habitID]: {...habit}
+      }))
+    }
+
+    const removeArchivedHabitIntern = (habit: Habit) => {
+      setArchivedHabits(prevHabits => {
+        const updatedHabits = { ...prevHabits };
+        delete updatedHabits[habit.habitID]
+        return updatedHabits
+      })
+    }
+
+    const markHabitAsDoneIntern = (habit: Habit) => {
+      setDoneHabits(prevArchivedHabits => ({
+        ...prevArchivedHabits,
+        [habit.habitID]: {...habit}
+      }))
+    }
+
+    const removeHabitFromMarkedAsDoneIntern = (habit: Habit) => {
+      setDoneHabits(prevHabits => {
+        const updatedHabits = { ...prevHabits };
+        delete updatedHabits[habit.habitID]
+        return updatedHabits
+      })
+    }
+
+    /*
+      Steps actions methods
+    */
+
+    const checkHabitStepIntern = (habit: Habit, date: Date, stepID: string, isChecked: boolean) => {
+        const {habitID} = habit
+        const newStreakValues = getUpdatedStreakOfHabit(habit, date)
+  
+        setHabits(previousHabits => ({
+            ...previousHabits,
+            [habitID]: {...habit, ...newStreakValues}
+          }))
+  
+        const updatedHabit = {...habit, ...newStreakValues} 
+        
+        if(isHabitScheduledForDate(habit, date)){       
+          const habitType = getHabitType(habit)
+  
+          setFilteredHabitsByDate(previousFilteredHabits => 
+            updateHabitStepState(
+              previousFilteredHabits, 
+              updatedHabit, 
+              habitType,
+              stepID, 
+              isChecked, 
+              newStreakValues
+          ))
+        }
+    }
+
+    /*
+      Habits actions methods
+    */
+
+    const addHabitIntern = (habit: Habit) => {
       const finalHabit = setHabitWithDefaultStep(habit)
   
       setHabits((prevHabits) => (updateHabitsWithNewHabit(prevHabits, finalHabit)));
@@ -277,267 +360,44 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
 
       return finalHabit
     }
+    
+    const removeHabitIntern = (habit: Habit) => {
+      const {habitID} = habit
 
-
-    const addObjectif = async(objectif: FormDetailledObjectif): Promise<Objectif | undefined> => {
-      try{
-        console.log("Adding objectif...")
-        const addedObjectif = await addObjectifToFirestore(objectif, userID)
-
-        setObjectifs(prevObjs => ({...prevObjs, [addedObjectif.objectifID]: addedObjectif}))
-
-        console.log("Objectif well added !")
-
-        return addedObjectif
-      }
-
-      catch(e) { console.log("Error while adding objectif : ", e) }
+      setHabits(previousHabits => removeHabitFromHabits(previousHabits, habitID))
+      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
     }
 
-    /**
-     * Supprime l'habitude spécifiée pour l'utilisateur courant en interne et sur firestore
-     */
+    const updateHabitIntern = (oldHabit: Habit, newHabit: Habit, currentDate: Date) => {
+      setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, oldHabit))
 
-    const removeHabit = async(habit: Habit) => {
-      if(auth.currentUser && auth.currentUser.email) {
-        console.log("Deleting habit : ", habit.titre, "...")
-        const habitID = habit.habitID
-  
-        await removeHabitInFirestore(habit, auth.currentUser.email, userID)
-  
-        setHabits(previousHabits => removeHabitFromHabits(previousHabits, habitID))
-        setFilteredHabitsByDate(previousFilteredHabits => removeHabitFromFilteredHabits(previousFilteredHabits, habit))
-  
-        console.log("Habit : ", habit.titre, " succesfully deleted !")
-      }
+      setFilteredHabitsByDate(previousFilteredHabits => updateFilteredHabitsWithNewHabit(previousFilteredHabits, newHabit, currentDate))
+      setHabits(previousHabits => updateHabitsWithNewHabit(previousHabits, newHabit))
     }
 
+    /*
+      Objectifs actions methods
+    */
 
-    const updateHabitRelationWithObjectif = async(habit: Habit, destination_objectifID: string | null) => {
-      return await updateHabit(habit, { objectifID: destination_objectifID }, selectedDate)
+    const addObjectifIntern = (objectif: Objectif) => {
+      setObjectifs(prevObjs => ({...prevObjs, [objectif.objectifID]: objectif}))
     }
 
-
-    const updateHabit = async(oldHabit: Habit, newValues: {[key: string]: any}, currentDate: Date = selectedDate): Promise<Habit> => {
-
-      setFilteredHabitsByDate(previousFilteredHabits =>  removeHabitFromFilteredHabits(previousFilteredHabits, oldHabit))
-
-      console.log("Updating habit : ", oldHabit.titre, "...")
-
-      if(newValues.hasOwnProperty("steps")){
-        newValues["steps"] = Object.values(newValues.steps)
-      }
-      
-      await updateHabitInFirestore(userID, oldHabit, newValues)
-
-      //On créer une habit qui a les valeurs updated
-      let updatedHabit: Habit = {...oldHabit, ...newValues}
-
-      let newSteps = Object.values(updatedHabit.steps)
-
-      const deletedSteps = Object.values(updatedHabit.steps).filter((step) => !("deleted" in step))
-
-      const isNewStepPlaceholder = 
-        ((deletedSteps.length === 1) && deletedSteps[0].numero === -1) 
-        || deletedSteps.length === 0;
-
-      if(isNewStepPlaceholder){
-        const placeholderStep: StepList = {}
-        placeholderStep[oldHabit.habitID] = createDefaultStepFromHabit(updatedHabit, updatedHabit.habitID, updatedHabit.startingDate)
-        updatedHabit["steps"] = {...placeholderStep}
-      }
-
-      else {
-        const validSteps = getValidHabitsStepsForDate(newSteps, oldHabit.habitID, currentDate)
-        updatedHabit["steps"] = {...validSteps}
-      } 
-        
-      setFilteredHabitsByDate(previousFilteredHabits => updateFilteredHabitsWithNewHabit(previousFilteredHabits, updatedHabit, currentDate))
-      setHabits(previousHabits => updateHabitsWithNewHabit(previousHabits, updatedHabit))
-
-      console.log("Habit : ", updatedHabit.titre, " successfully updated !")
-
-      return oldHabit
+    const removeObjectifIntern = (objectifID: string) => {
+      setObjectifs(previousObjectifs => removeObjectifFromObjectifs(previousObjectifs, objectifID))
+      setFilteredHabitsByDate(previousFilteredHabits => removeObjectifFromFilteredHabits(previousFilteredHabits, objectifID))
     }
 
-    const getHabitFromFilteredHabits = (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string): Habit | undefined => {
-      return getHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
-    }
-
-    const removeObjectif = async(objectifID: string, deletePinnedHabit?: boolean) => {
-        const habits = Object.values(Habits).filter((habit => habit.objectifID === objectifID))
-        const promises: Promise<void | Habit>[] = [removeObjectifInFirestore(objectifID, userID)]
-
-        setObjectifs(previousObjectifs => removeObjectifFromObjectifs(previousObjectifs, objectifID))
-        setFilteredHabitsByDate(previousFilteredHabits => removeObjectifFromFilteredHabits(previousFilteredHabits, objectifID))
-
-        await Promise.all(promises);
-
-        const updatePromises = habits.map((habit) => {
-            if (deletePinnedHabit) {
-                return removeHabit(habit);
-            } else {
-                return updateHabitRelationWithObjectif(habit, null);
-            }
-        });
-
-        await Promise.all(updatePromises)
-    }
-
-    const updateObjectif = async(oldObjectif: Objectif, newValues: {[key: string]: any}, currentDate: Date = selectedDate): Promise<Objectif> => {
-      
-      console.log("Updating objectif...")
-
-      const updatedObjectif: Objectif = {...oldObjectif, ...newValues}
-      
+    const updateObjectifIntern = (updatedObjectif: Objectif)=> {
       setObjectifs((previousObjectifs) => {
-          previousObjectifs[oldObjectif.objectifID] = {...updatedObjectif}
+          previousObjectifs[updatedObjectif.objectifID] = {...updatedObjectif}
           return {...previousObjectifs}
       })
-
-      await updateObjectifInFirestore(userID, oldObjectif, newValues)
-
-      console.log("Objectif updated")
-      return updatedObjectif
-    }
-
-    const retrieveHabitsLinkToObjectif = (objectifID: string): Habit[] => {
-      const habits = Object.values(Habits)
-      return habits.filter((habit) => habit.objectifID === objectifID)
-    }
-
-    const fetchArchivedHabits = async(): Promise<Habit[]> => {
-      if(user.email) {
-        const {habits, history} = await fetchUserHabits(user.email, HabitState.Archived)
-
-        setArchivedHabits(habits)
-
-        setHabitsHistory(prevHistory => ({
-          ...prevHistory,
-          ...history
-        }))
-
-        return Object.values(habits)
-      }
-
-      return []
-    }
-
-    const fetchDoneHabits = async(): Promise<Habit[]> => {
-      if(user.email) {
-        const {habits, history} = await fetchUserHabits(user.email, HabitState.Done)
-
-        setDoneHabits(habits)
-
-        setHabitsHistory(prevHistory => ({
-          ...prevHistory,
-          ...history
-        }))
-
-        return Object.values(habits)
-      }
-
-      return []
-    }
-
-    const archiveHabit = async(habit: Habit, habitState = HabitState.Current) => {
-      if(user.email) {
-        if(habitState !== HabitState.Archived) {
-          setArchivedHabits(prevArchivedHabits => ({
-            ...prevArchivedHabits,
-            [habit.habitID]: {...habit}
-          }))
-
-          if(habitState === HabitState.Done) {
-            setDoneHabits(prevHabits => {
-              const updatedHabits = { ...prevHabits };
-              delete updatedHabits[habit.habitID]
-              return updatedHabits
-            })
-          }
-
-          else {
-              setFilteredHabitsByDate(removeHabitFromFilteredHabits(filteredHabitsByDate, habit))
-
-              setHabits(prevHabits => {
-              const updatedHabits = { ...prevHabits };
-              delete updatedHabits[habit.habitID]
-              return updatedHabits
-            })
-          }
-
-          await archiveUserHabit(habit, user.email, user.uid, habitState)
-        }
-
-        else console.log("habit already archived")
-      }
-    }
-
-    const markHabitAsDone = async(habit: Habit, habitState = HabitState.Current) => {
-      if(user.email) {
-        if(habitState !== HabitState.Done) {
-          setDoneHabits(prevArchivedHabits => ({
-            ...prevArchivedHabits,
-            [habit.habitID]: {...habit}
-          }))
-  
-          if(habitState === HabitState.Archived) {
-            setArchivedHabits(prevHabits => {
-              const updatedHabits = { ...prevHabits };
-              delete updatedHabits[habit.habitID]
-              return updatedHabits
-            })
-          }
-  
-          else {
-              setFilteredHabitsByDate(removeHabitFromFilteredHabits(filteredHabitsByDate, habit))
-  
-              setHabits(prevHabits => {
-              const updatedHabits = { ...prevHabits };
-              delete updatedHabits[habit.habitID]
-              return updatedHabits
-            })
-          }
-  
-          await markUserHabitAsDone(habit, user.email, user.uid, habitState)
-        }
-        
-        else console.log("habit alreay marked as done")
-      }
-    }
-
-    
-    const getBackHabit = async(habit: Habit, habitState = HabitState.Current) => {
-      if(user.email) {
-        if(habitState === HabitState.Current) {
-          console.log("Habit already current")
-        }
-
-        else {
-          if(habitState === HabitState.Archived) {
-            setArchivedHabits(prevHabits => {
-              const updatedHabits = { ...prevHabits };
-              delete updatedHabits[habit.habitID]
-              return updatedHabits
-            })
-          }
-
-          else {
-            setDoneHabits(prevHabits => {
-              const updatedHabits = { ...prevHabits };
-              delete updatedHabits[habit.habitID]
-              return updatedHabits
-            })
-          }
-        }
-
-        addHabitIntern(habit)
-
-        await getBackUserHabit(habit, user.email, user.uid, habitState)
-      }
     }
 
     const exportedValues: HabitContextType = {
+      selectedDate,
+
       Habits,
       ArchivedHabits,
       DoneHabits,
@@ -557,23 +417,30 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       setIsDoneHabitsFetched,
 
       changeDate,
-      addHabit, addHabitIntern,
-      removeHabit,
-      updateHabitRelationWithObjectif,
-      updateHabit,
-      addObjectif,
-      handleCheckStep,
+      addHabitIntern,
+      removeHabitIntern,
+
+      updateHabitIntern,
+
+      addObjectifIntern,
+      checkHabitStepIntern,
+
       getHabitFromFilteredHabits,
-      removeObjectif,
-      updateObjectif,
-      retrieveHabitsLinkToObjectif,
+      removeObjectifIntern,
+      updateObjectifIntern,
 
       fetchArchivedHabits,
       fetchDoneHabits,
 
-      archiveHabit,
-      markHabitAsDone,
-      getBackHabit
+      addArchivedHabitIntern,
+      removeArchivedHabitIntern,
+      markHabitAsDoneIntern,
+      removeHabitFromMarkedAsDoneIntern,
+
+      fetchPosts,
+      addDayToHabitHistory,
+
+      getHabitsByObjectifID
     }
 
     return (

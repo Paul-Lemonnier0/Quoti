@@ -1,47 +1,42 @@
-import { FC, RefObject, useCallback, useContext, useRef } from "react";
+import { FC, RefObject, useContext } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import { useThemeColor } from "../../../components/Themed";
-import { HabitsContext } from "../../../data/HabitContext";
-import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
 import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
-import PinToObjectifBottomScreen from "./PinToObjectifBottomScreen";
-import EditHabitNav from "../../EditScreens/Habits/EditHabitNav";
 import { AppContext } from "../../../data/AppContext";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Habit, Step } from "../../../types/HabitTypes";
 import { CustomStaticBottomSheet } from "../../../components/BottomSheets/CustomBottomSheet";
 import React from "react"
-import ShareHabitBottomScreen from "../Social/ShareHabitBottomScreen";
 import Command, { CommandType } from "../../../components/Other/Command";
 import { IconProvider } from "../../../components/Buttons/IconButtons";
-import EditHabitFrequencyScreen from "../../EditScreens/Habits/EditHabitFrequencyScreen";
-import EditHabitFrequencyNav from "../../EditScreens/Habits/EditHabitFrequencyNav";
-import { archiveUserHabit } from "../../../firebase/Firestore_Habits_Primitives";
 import { auth } from "../../../firebase/InitialisationFirebase";
 import { FormDetailledHabit, FormStep } from "../../../types/FormHabitTypes";
 import { toISOStringWithoutTimeZone } from "../../../primitives/BasicsMethods";
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions";
 
 
 export interface EditHabitFrequencyConfirmationBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
-    habit: Habit,
+    newHabit: Habit,
+    oldHabit: Habit,
     additionnalClosedMethod?: () => void
 }
 
 const EditHabitFrequencyConfirmationBottomScreen: FC<EditHabitFrequencyConfirmationBottomScreenProps> = ({
     bottomSheetModalRef, 
-    habit, 
+    newHabit,
+    oldHabit, 
     additionnalClosedMethod
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const {removeHabit, archiveHabit, markHabitAsDone, addHabit} = useContext(HabitsContext)
+    const {removeHabit, archiveHabit, markHabitAsDone, addHabit} = useHabitActions()
 
     const error = useThemeColor(theme, "Error")
 
-    const steps: (FormStep | Step)[] = Object.values(habit.steps).filter(step => step.stepID === habit.habitID).length > 0 ?
-    [{numero: -1, stepID: habit.habitID}] : [...Object.values(habit.steps)]
+    const steps: (FormStep | Step)[] = Object.values(newHabit.steps).filter(step => step.stepID === newHabit.habitID).length > 0 ?
+    [{numero: -1, stepID: newHabit.habitID}] : [...Object.values(newHabit.steps)]
 
     const closeModal = () => {
         BottomScreenOpen_Impact()
@@ -51,8 +46,8 @@ const EditHabitFrequencyConfirmationBottomScreen: FC<EditHabitFrequencyConfirmat
     const deleteOldHabit = async() => {
         setIsLoading(true)
 
-        await removeHabit(habit);
-        await addHabit({...habit, startingDate: toISOStringWithoutTimeZone(new Date()), steps} as FormDetailledHabit)
+        await removeHabit(oldHabit);
+        await addHabit({...newHabit, startingDate: toISOStringWithoutTimeZone(new Date()), steps} as FormDetailledHabit)
 
         setIsLoading(false)
         closeModal()
@@ -63,8 +58,8 @@ const EditHabitFrequencyConfirmationBottomScreen: FC<EditHabitFrequencyConfirmat
 
     const archiveOldHabit = async() => {
         setIsLoading(true)
-        await archiveHabit(habit)
-        await addHabit({...habit, startingDate: toISOStringWithoutTimeZone(new Date()), steps} as FormDetailledHabit)
+        await archiveHabit(oldHabit)
+        await addHabit({...newHabit, startingDate: toISOStringWithoutTimeZone(new Date()), steps} as FormDetailledHabit)
 
         setIsLoading(false)
 
@@ -75,8 +70,8 @@ const EditHabitFrequencyConfirmationBottomScreen: FC<EditHabitFrequencyConfirmat
     const markOldHabitAsDone = async() => {
         if(auth && auth.currentUser?.email) {
             setIsLoading(true)
-            await markHabitAsDone(habit)
-            await addHabit({...habit, startingDate: toISOStringWithoutTimeZone(new Date()), steps} as FormDetailledHabit)
+            await markHabitAsDone(oldHabit)
+            await addHabit({...newHabit, startingDate: toISOStringWithoutTimeZone(new Date()), steps} as FormDetailledHabit)
             setIsLoading(false)
         }
 

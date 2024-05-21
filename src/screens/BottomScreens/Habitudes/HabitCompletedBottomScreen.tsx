@@ -1,9 +1,9 @@
-import { MassiveText, TitleText } from "../../../styles/StyledText"
-import { View } from "react-native";
+import { HugeText, MassiveText, NormalGrayText, TitleText } from "../../../styles/StyledText"
+import { Keyboard, View } from "react-native";
 import { StyleSheet } from "react-native";
-import { BottomSheetCloseButton, CloseButton } from "../../../components/Buttons/IconButtons";
+import { BorderIconButton, BottomSheetCloseButton, CloseButton } from "../../../components/Buttons/IconButtons";
 import Confetti from "../../../components/Other/Confetti";
-import { FC, RefObject, useRef } from "react";
+import { FC, RefObject, useContext, useRef, useState } from "react";
 import { useEffect } from "react";
 import { Image } from "react-native";
 import SimpleFullBottomSheet from "../../../components/BottomSheets/SimpleFullBottomSheet";
@@ -14,72 +14,74 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Habit } from "../../../types/HabitTypes";
 import AnimatedLottieView from "lottie-react-native";
 import React from "react"
+import { BackgroundTextButton, BorderTextButton } from "../../../components/Buttons/UsualButton";
+import { CustomTextInputRefType, TextInputCustom, TextInputCustomProps } from "../../../components/TextFields/TextInput";
+import { AppContext } from "../../../data/AppContext";
+import { useThemeColor } from "../../../components/Themed";
+import HabitIcons from "../../../data/HabitIcons";
+import ProgressBar from "../../../components/Progress/ProgressBar";
+import Separator from "../../../components/Other/Separator";
+import { TouchableWithoutFeedback } from "react-native";
+import CheckedAnimation from "../../../components/Other/CheckedAnimation";
+import { CommonActions, useNavigation } from "@react-navigation/native";
+import { HomeStackParamsList } from "../../../navigation/HomeNavigator";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
+import { HabitCompletedBottomScreenStackProps } from "./HabitCompletedBottomScreenNav";
+import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext";
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts";
 
-export interface HabitCompletedBottomScreenProps {
-    bottomSheetModalRef: RefObject<BottomSheetModal>,
-    habit: Habit,
-    goBackHome?: () => void
-}
+type HabitCompletedBottomScreenProps = NativeStackScreenProps<HabitCompletedBottomScreenStackProps, "HabitCompletedBottomScreen">
 
-const HabitCompletedBottomScreen: FC<HabitCompletedBottomScreenProps> = ({bottomSheetModalRef, habit, goBackHome}) => {
+const HabitCompletedBottomScreen: FC<HabitCompletedBottomScreenProps> = ({route, navigation}) => {
+    const {closeModal} = useContext(BottomSheetModalMethodsContext)
     
-    const confettiRef = useRef<AnimatedLottieView>(null)
+    const {theme} = useContext(AppContext)
+    const fontGray = useThemeColor(theme, "FontGray")
 
-    const triggerConfetti = () => {
-        if(confettiRef.current){
-            confettiRef.current.play(0);
-        }
-    }
+    const checkedAnimationRef = useRef<AnimatedLottieView>(null)
 
-    useEffect(() => {
-        triggerConfetti()
-    }, [])
+    const {habit} = route.params
 
-    const closeModal = () => {
-        bottomSheetModalRef.current?.close()
-    }
-
-    const handleGoBackHome = () => {
-        //navigation.navigate("HomeScreen")
-        if(goBackHome) goBackHome()
+    const handlePost = () => {
+        BottomScreenOpen_Impact()
+        navigation.navigate("PostCompletedHabitScreen", {habit: habit})
     }
 
     return (
-        <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}  isPrimary
-            footerText={"Retour"} footerMethod={closeModal}>
-            <UsualScreen hideMenu>
-                <View style={styles.container}>
-                    <View style={styles.pageTitleContainer}>
-                        <BottomSheetCloseButton methode={closeModal}/>
+        <UsualScreen hideMenu>
+            <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()} style={{flex: 1}}>
+            <View style={styles.container}>
+                <View style={{flexDirection: "column"}}>
+                    <View style={{flexDirection: "row", justifyContent: "space-between"}}>     
+                        <CloseButton methode={closeModal}/> 
                     </View>
-
-
-
-                    <View style={{flex: 0.75, flexGrow: 0.75}}>
-                        <View style={styles.emptySreenContainer}>
-
-                            <Image style={styles.emptyScreenImageContainer} source={IllustrationsList[IllustrationsType.WorkingFullSpeed]}/>
-
-                            <View style={styles.emptyScreenSubContainer}>
-                                <MassiveText text={"Bravo !"}/>
-                                <TitleText text={"Habitude complétée"}/>
-                            </View>
+                </View>
+            
+                <View style={{flex: 1, gap: 20, paddingBottom: 60}}>
+                    <View style={styles.bodyHeader}>
+                        <View style={styles.emptyScreenSubContainer}>
+                            <MassiveText text={"Bravo !"}/>
+                            <TitleText style={{color: fontGray}} bold text={"Habitude complétée"}/>
                         </View>
                     </View>
 
-                    <View style={styles.footer}>
-                        {/* <Animated.View style={{position: "absolute", bottom: 0}} entering={FadeInDown.delay(200)}> */}
-                            <HabitudeListItemPresentation habitude={habit}/>
-                        {/* </Animated.View> */}
+                    <CheckedAnimation ref={checkedAnimationRef}/>
+
+                    <View style={styles.titreEtDescriptionContainer}>
+                        <HugeText style={{textAlign: "center"}} numberOfLines={3} text={habit.titre}/>
+                        <TitleText style={{color: fontGray, textAlign: "center"}} numberOfLines={3} bold text={habit.description}/>
                     </View>
                 </View>
 
+                <View style={styles.footer}>
+                    <View style={{display: "flex", flexDirection: "row", gap: 20}}>
+                        <BackgroundTextButton isFlex text={"Partager votre réussite"} onPress={handlePost} bold/>
+                    </View>
+                </View>
+            </View>
+            </TouchableWithoutFeedback>
 
-            </UsualScreen>
-
-            <Confetti ref={confettiRef}/>
-
-        </SimpleFullBottomSheet>
+        </UsualScreen>
     );
 };
 
@@ -89,7 +91,6 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: 20, 
         flex: 1,
-        marginBottom: 30
     },
 
     displayRow: {
@@ -98,13 +99,24 @@ const styles = StyleSheet.create({
         gap: 0
     },
 
+    titreEtDescriptionContainer:{
+        display: "flex", 
+        flexDirection: "column", 
+        justifyContent: "center",
+    },
+
     pageTitleContainer: {
         display: "flex", 
         flexDirection: "row", 
         alignItems:"center", 
         gap: 20,
-        marginLeft: 5,
-      },
+    },
+
+    bodyHeader: {
+        gap: 15,
+        display: "flex",
+        flexDirection: "column"
+    },
 
     emptySreenContainer: {
         flex: 1, 
@@ -123,13 +135,11 @@ const styles = StyleSheet.create({
 
     emptyScreenSubContainer: {
         justifyContent: "space-evenly", 
-        alignItems: "center",
         gap: 5
     },
 
     footer: {
         justifyContent: "center",
-        flex: 0.25,
     }
 })
   

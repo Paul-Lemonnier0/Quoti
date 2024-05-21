@@ -2,7 +2,6 @@ import { FC, RefObject, useContext } from "react";
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import { useThemeColor } from "../../../components/Themed";
-import { HabitsContext } from "../../../data/HabitContext";
 import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
 import { AppContext } from "../../../data/AppContext";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -13,6 +12,7 @@ import Command, { CommandType } from "../../../components/Other/Command";
 import { IconProvider } from "../../../components/Buttons/IconButtons";
 import { auth } from "../../../firebase/InitialisationFirebase";
 import Toast from "react-native-toast-message";
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions";
 
 
 export interface EndHabitBottomScreenProps {
@@ -28,7 +28,7 @@ const EndHabitBottomScreen: FC<EndHabitBottomScreenProps> = ({
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const {removeHabit, archiveHabit, markHabitAsDone} = useContext(HabitsContext)
+    const {removeHabit, archiveHabit, markHabitAsDone} = useHabitActions()
 
     const error = useThemeColor(theme, "Error")
 

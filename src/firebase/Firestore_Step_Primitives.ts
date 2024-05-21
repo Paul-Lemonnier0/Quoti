@@ -7,11 +7,11 @@ import { toISOStringWithoutTimeZone } from "../primitives/BasicsMethods";
  * [FIRESTORE] Ajoute le log d'une étape d'une habitude à une date donnée pour un utilisateur
  */
 
-async function addStepLog(date: Date, userID: string, habitID: string, stepID: string) {
+async function addStepLog(date: Date, userMail: string, habitID: string, stepID: string) {
 
     const date_string = toISOStringWithoutTimeZone(date)
 
-    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
 
     const dateDocRef = doc(userDoc, FirestoreUserSubCollections.History, date_string)
 
@@ -37,11 +37,11 @@ async function addStepLog(date: Date, userID: string, habitID: string, stepID: s
  * [FIRESTORE] Supprime le log d'une étape d'une habitude à une date donnée pour un utilisateur
  */
 
-async function removeStepLog(date: Date, userID: string, habitID: string, stepID: string){
+async function removeStepLog(date: Date, userMail: string, habitID: string, stepID: string){
     const date_string = toISOStringWithoutTimeZone(date)
     
     
-    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
 
     const dateDocRef = doc(userDoc, FirestoreUserSubCollections.History, date_string)
 
@@ -58,17 +58,17 @@ async function removeStepLog(date: Date, userID: string, habitID: string, stepID
  * [FIRESTORE] Met à jour l'état d'une étape d'une habitude pour une utilisateur à une date donnée pour un utilisateur
  */
 
-async function changeStepStateFirestore(date: Date, userID: string, habitID: string, stepID: string, isChecked: boolean) {
+async function changeStepStateFirestore(date: Date, userMail: string, habitID: string, stepID: string, isChecked: boolean) {
 
     const dateString = toISOStringWithoutTimeZone(date)
     console.log("Step concerned at date : ", stepID, " | ", dateString)
 
     try{
         if(isChecked){
-            await addStepLog(date, userID, habitID, stepID)
+            await addStepLog(date, userMail, habitID, stepID)
         }
     
-        else await removeStepLog(date, userID, habitID, stepID)
+        else await removeStepLog(date, userMail, habitID, stepID)
 
         console.log("Step successfully updated !")
     }
@@ -82,10 +82,10 @@ async function changeStepStateFirestore(date: Date, userID: string, habitID: str
  * Supprime tous les logs des étapes d'une habitude pour un utilisateur
  */
 
-async function removeHabitLogs (userID: string, habitID: string){
+async function removeHabitLogs (userMail: string, habitID: string){
     console.log("Deleting logs of habit : ", habitID, "...")
     
-    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
 
     const qry = query(
         collection(userDoc, FirestoreUserSubCollections.History), 
@@ -117,13 +117,13 @@ async function removeHabitLogs (userID: string, habitID: string){
  * Récupère les logs d'une date pour un utilisateur
  */
 
-async function getDateLogs(date: Date, userID: string): Promise<string[]> {
+async function getDateLogs(date: Date, userMail: string): Promise<string[]> {
 
     let doneSteps: string[] = [];
     const date_string = toISOStringWithoutTimeZone(date)
 
     
-    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
 
     const dateDocRef = doc(userDoc, FirestoreUserSubCollections.History, date_string)
     const dateDocSnap = await getDoc(dateDocRef);
@@ -159,13 +159,13 @@ export const getHabitLogsInDateRange = async(habitID: string, start: Date, end: 
     return logs
 }
 
-async function getHabitsDateLogs(habitsID: string[], date: Date, userID: string): Promise<string[]> {
+async function getHabitsDateLogs(habitsID: string[], date: Date, userMail: string): Promise<string[]> {
 
     //A voir si utile et fonctionnel
     let doneSteps: string[] = [];
     const date_string = toISOStringWithoutTimeZone(date)
 
-    const userDoc = doc(db, FirestoreCollections.Users, userID)
+    const userDoc = doc(db, FirestoreCollections.Users, userMail)
 
     const snap = await Promise.all(habitsID.map(async(habitID) => {
         const qry = query(collection(userDoc, FirestoreUserSubCollections.History), where(habitID, 'in', "habitsID"))

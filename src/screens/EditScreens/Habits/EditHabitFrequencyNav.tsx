@@ -12,11 +12,13 @@ import InformationEditFrequencyHabit from "./InformationEditFrequencyHabit";
 
 export type EditHabitFrequencyStackProps = {
     InformationEditFrequencyHabit: {
-        habit: SeriazableHabit,
+        newHabit: SeriazableHabit,
+        oldHabit: SeriazableHabit,
     },
 
     EditHabitFrequencyScreen: {
         oldHabit: SeriazableHabit,
+        onlyFrequencyChange?: boolean
     },
 }
 
@@ -37,16 +39,16 @@ const EditHabitFrequencyNav: FC<EditHabitFrequencyNavProps> = ({
 }) => {
 
     return(
-            <SimpleFullBottomSheet onDismiss={additionnalCloseMethod } bottomSheetModalRef={bottomSheetModalRef} isPrimary>
-                <EditHabitContextProvider validationAdditionnalMethod={(values: FormDetailledObjectifHabit) => {
+            <SimpleFullBottomSheet onDismiss={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef} isPrimary>
+                <EditHabitContextProvider validationAdditionnalMethod={() => {
                     validationAdditionnalMethod()
                 }}>
                     <BottomSheetModalProvider>
                         <BottomSheetModalMethodsContextProvider additionnalCloseMethod={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef}>
                             <NavigationContainer independent>
-                                <EditHabitFrequencyStack.Navigator screenOptions={{headerShown: false}} initialRouteName="InformationEditFrequencyHabit">
-                                    <EditHabitFrequencyStack.Screen name="InformationEditFrequencyHabit" component={InformationEditFrequencyHabit} initialParams={{ habit }}/>
-                                    <EditHabitFrequencyStack.Screen name="EditHabitFrequencyScreen" component={EditHabitFrequencyScreen}/>
+                                <EditHabitFrequencyStack.Navigator screenOptions={{headerShown: false}} initialRouteName="EditHabitFrequencyScreen">
+                                    <EditHabitFrequencyStack.Screen name="EditHabitFrequencyScreen" component={EditHabitFrequencyScreen} initialParams={{ oldHabit: habit, onlyFrequencyChange: true }}/>
+                                    <EditHabitFrequencyStack.Screen name="InformationEditFrequencyHabit" component={InformationEditFrequencyHabit}/>
                                 </EditHabitFrequencyStack.Navigator>
                             </NavigationContainer>
                         </BottomSheetModalMethodsContextProvider>

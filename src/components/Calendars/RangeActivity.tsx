@@ -210,7 +210,7 @@ const RangeActivityList: FC<RangeActivityListProps> = ({activities, highlightCol
                         <View key={index} style={styles.subContainer}>
                             <TouchableOpacity onPress={handleOpenStreakDayDetails} style={[styles.day, {backgroundColor: color, borderColor, borderWidth: 2}]}/>
                             <View style={styles.center}>
-                                <LittleNormalText bold text={day.label}/>
+                                <LittleNormalText bold text={day.label} style={{fontSize: 14}}/>
                             </View>
 
                             <StreakDayDetailsBottomScreen

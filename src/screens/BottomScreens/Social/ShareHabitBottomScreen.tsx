@@ -157,6 +157,7 @@ const ShareHabitBottomScreen: FC<ShareHabitBottomScreenProps> = ({bottomSheetMod
         if(!item) return null
 
         const onPress = () => {
+            BottomScreenOpen_Impact()
             setSelectedUserEmails((prevSelectedUserEmails) => {
                 if(prevSelectedUserEmails.includes(item.email)) {
                     return prevSelectedUserEmails.filter(email => email !== item.email);
@@ -273,7 +274,7 @@ const styles = StyleSheet.create({
         marginBottom: 30, 
         flexDirection: "column", 
         justifyContent: "space-between",
-        marginHorizontal: -20,
+        marginHorizontal: -30,
     },
 
     displayRow: {

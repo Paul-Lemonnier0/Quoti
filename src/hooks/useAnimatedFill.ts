@@ -3,12 +3,12 @@ import { Easing, useAnimatedStyle, useDerivedValue, useSharedValue, withTiming }
 export const useAnimatedFill = () => {
     const width = useSharedValue(0)
 
-    const timingConfig = {
-        duration: 500
+    const reset = () => {
+        width.value = 0
     }
 
-    const fill = () => {
-        width.value = withTiming(100, timingConfig)
+    const fill = (customTiming?: number) => {
+        width.value = withTiming(100, {duration: customTiming ?? 500, easing: Easing.linear})
     }
 
     const fillPercentage = useDerivedValue(() => {
@@ -19,5 +19,5 @@ export const useAnimatedFill = () => {
         return {width: fillPercentage.value as any} 
     }, [])
 
-    return {fill, fillPercentage, rStyle}
+    return {fill, fillPercentage, reset, rStyle}
 }

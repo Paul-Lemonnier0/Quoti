@@ -32,14 +32,16 @@ const ProfilList: FC<ProfilListProps> = ({users, isPrimary, small, isBorderPrima
 
     return (
         <View style={{flexDirection: "row", gap: 10, alignItems: 'center'}}>
-            <View style={{flexDirection: "row", gap: -20}}>
+            <View style={{flexDirection: "row", gap: 0}}>
                 {
                     displayedUsers.map((user, index) => 
-                        <ProfilButton key={index} onPress={() => {}}
-                            noBadge small={small} disabled 
-                            user={user} isPrimary={isPrimary}
-                            borderColor={isBorderPrimary ? primary : secondary} borderWidth={3}
-                        />
+                        <View key={index} style={{marginRight: index === displayedUsers.length-1 ? 0 : -20}}>
+                            <ProfilButton onPress={() => {}}
+                                noBadge small={small} disabled 
+                                user={user as User} isPrimary={isPrimary}
+                                borderColor={isBorderPrimary ? primary : secondary} borderWidth={3}
+                            />
+                        </View>
                     )
                 }
             </View>

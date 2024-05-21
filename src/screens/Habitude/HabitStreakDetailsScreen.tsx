@@ -18,6 +18,7 @@ import { AppContext } from '../../data/AppContext'
 import { useThemeColor } from '../../components/Themed'
 import HabitMonthDetails from '../../components/Habitudes/HabitMonthDetails'
 import { BottomScreenOpen_Impact } from '../../constants/Impacts'
+import StreakFlame from '../../components/Other/Flames'
 
 export interface RatioType {
     total: number,
@@ -66,19 +67,22 @@ const HabitStreakDetailsScreen: FC<HabitStreakDetailsScreenProps> = ({route, nav
 
     useEffect(() => {
         if(habit) {
-            let date = new Date(habit.startingDate)
+            let date = new Date(habit.startingDate.setHours(0,0,0,0))
             const today = new Date()
     
             const ratio_temp = {total: 1, done: 0}
-    
+            console.log(historyString)
             if(historyString.includes(toISOStringWithoutTimeZone(date))) {
                 ratio_temp.done += 1
             }
     
             while(date <= today) {
                 date = calculateNextScheduledDate(habit, date)
-                if(historyString.includes(toISOStringWithoutTimeZone(date))) {
+                const dateString = date.toISOString().split("T")[0]
+
+                if(historyString.includes(dateString)) {
                     ratio_temp.done += 1
+                    console.log("ok")
                 }
     
                 if(date < today) {
@@ -103,10 +107,7 @@ const HabitStreakDetailsScreen: FC<HabitStreakDetailsScreenProps> = ({route, nav
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton action={NavigationActions.goBack}/>
-                        <View style={{flexDirection: "row", gap: 10, alignItems: 'center', justifyContent: 'center'}}>
-                            <Icon provider={IconProvider.FontAwesome5} name="fire" color={habit.color}/>
-                            <TitleText text={habit.currentStreak}/>
-                        </View>
+                        <StreakFlame value={habit.currentStreak} color={habit.color}/>
                         <BorderIconButton isBorderGray isTransparent name='bar-chart-2' provider={IconProvider.Feather} onPress={openModal} />
                     </View>
 

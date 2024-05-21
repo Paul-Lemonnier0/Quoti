@@ -9,6 +9,8 @@ import { FormDetailledHabit } from "../../../types/FormHabitTypes"
 import React from "react"
 import { Habit } from "../../../types/HabitTypes"
 import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions"
+import { useGoalsActions } from "../../../hooks/Habits/useGoalActions"
 
 type AddHabitsToObjectifProps = NativeStackScreenProps<AddScreenStackType, "AddHabitsToObjectif">
 
@@ -17,15 +19,16 @@ const AddHabitsToObjectif: FC<AddHabitsToObjectifProps> = ({route, navigation}) 
     const {objectif} = route.params
 
     const {setIsLoading} = useContext(AppContext)
-    const {addObjectif, addHabit} = useContext(HabitsContext)
-    
+    const {addHabit} = useHabitActions();
+    const {addGoal} = useGoalsActions();    
+
     const handleGoNext = async(habitsForObjectif: (Habit | FormDetailledHabit)[]) => {
 
         // const startingDate = objectif.startingDate
         // const endingDate = objectif.endingDate
 
         setIsLoading(true)
-        const objectifWithID = await addObjectif(objectif) 
+        const objectifWithID = await addGoal(objectif) 
         
         if(objectifWithID){
             const updatedHabitsForObjectif = habitsForObjectif.map(habit => ({...habit, objectifID: objectifWithID.objectifID} as FormDetailledHabit))

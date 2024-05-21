@@ -65,6 +65,8 @@ export const saveProfilePictureLocally = async (uri: string, uid: string): Promi
 export const getProfilePictureLocalPath = async (uid: string): Promise<string | null> => {
     try {
         const profilPicture = await AsyncStorage.getItem("picture_"+uid)
+
+        console.log(profilPicture)
         return profilPicture
     } catch (error) {
         console.error('Erreur lors de la récupération de la photo de profil:', error);

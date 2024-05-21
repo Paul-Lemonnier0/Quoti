@@ -8,6 +8,7 @@ import { fontPixel, getHeightResponsive, getWidthResponsive } from "../../styles
 import { BottomSheetTextInput } from "@gorhom/bottom-sheet";
 import React from "react"
 import { AppContext } from "../../data/AppContext";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 export interface TextInputCustomProps {
     startingValue?: string,
@@ -20,6 +21,9 @@ export interface TextInputCustomProps {
     isWrong?: boolean,
     errorMessage?: string,
     placeholder?: string,
+    multiline?: boolean,
+    hideErrorIcon?: boolean,
+    showAmountOfChars?: boolean
 }
 
 export interface CustomTextInputRefType {
@@ -37,7 +41,10 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
     onBlur, 
     isWrong, 
     errorMessage, 
-    placeholder
+    placeholder,
+    multiline,
+    hideErrorIcon,
+    showAmountOfChars
 }, ref) => {
     const {theme} = useContext(AppContext)
 
@@ -59,36 +66,49 @@ export const TextInputCustom = forwardRef<CustomTextInputRefType, TextInputCusto
         getValue: () => value,
     }));
 
+    const flex = multiline ? 1 : undefined
+
+    const maxChars = 250
+
     return(
-        <View style={styles.container}>
+        <View style={[styles.container, {flex}]}>
             {labelName !== undefined ? 
                 <View style={{marginLeft: 5}}>
                     {boldLabel ? <SubTitleText text={labelName}/> : 
                         <NormalText bold={semiBold} text={labelName}/>}
                 </View>
             : null}
-            
-            <View style={[styles.textInputContainer, {borderColor, backgroundColor}]}>
-                <TextInput editable={!disabled} placeholder={placeholder ?? ""} placeholderTextColor={fontGray} selectionColor={font}
-                    value={value} onChangeText={setValue} autoCorrect={false}
-                    
-                    
-                    onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
-                    onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
 
-                    style={[
-                        styles.textInput, 
-                        {
-                            paddingRight: isWrong ? 0 : getWidthResponsive(18), color: font
-                        },
+            <View style={[styles.textInputContainer, {borderColor, backgroundColor, flex}]}>
+                    <TextInput editable={!disabled} placeholder={placeholder ?? ""} placeholderTextColor={fontGray} selectionColor={font}
+                        value={value} onChangeText={setValue} autoCorrect={false}
+                        maxLength={maxChars}
+                        multiline={multiline}
+                        onFocus={() => {setIsFieldFocus(true); onFocus && onFocus()}}
+                        onBlur={() => {setIsFieldFocus(false); onBlur && onBlur()}}
+                        
+                        numberOfLines={10}
+                        style={[
+                            styles.textInput, 
+                            {
+                                flex,
+                                paddingRight: isWrong ? 0 : getWidthResponsive(18), color: font,
+                            },
 
-                    ]}
-                />
+                        ]}
+                    />
 
-                {isWrong && <IconButton isShaking onPress={() => {}} provider={IconProvider.Feather} name={"x-circle"} color={errorColor} noPadding/>}
+                    {isWrong && !hideErrorIcon && <IconButton isShaking onPress={() => {}} provider={IconProvider.Feather} name={"x-circle"} color={errorColor} noPadding/>}
             </View>
 
-            {errorMessage && <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>}
+            {
+                errorMessage && 
+                    <SubText text={errorMessage} style={{color: isWrong ? errorColor : "transparent"}}/>
+            }
+            {
+                showAmountOfChars && 
+                    <SubText style={{alignSelf: "flex-end"}} bold text={value.length + "/" + maxChars}/>
+            }
         </View>
     )
 })
@@ -311,16 +331,18 @@ const styles = StyleSheet.create({
         flexDirection: "column", 
         gap: getHeightResponsive(10),
         width: "100%",
-        marginVertical: 0,   
+        marginVertical: 0, 
+        flex: 1  
     },
 
     textInput: {
         flex: 1,
         fontSize: fontPixel(16), 
-        paddingHorizontal: getWidthResponsive(20), 
-        paddingVertical: getHeightResponsive(20), 
+        padding: getWidthResponsive(15), 
         borderRadius: getWidthResponsive(18), 
         fontFamily: "fontSemiBold", 
+        margin: 5
+
     },
 
     textInputContainer: {

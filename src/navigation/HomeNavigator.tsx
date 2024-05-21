@@ -10,7 +10,7 @@ import ConditionUtilisationScreen from '../screens/ProfilScreens/ProfilSettingsS
 import HelpAndSupportScreen from '../screens/ProfilScreens/ProfilSettingsScreens/HelpAndSupportScreen';
 import SecurityScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SecurityScreen';
 import SubscriptionScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SubscriptionScreen';
-import AnyUserProfilScreen from '../screens/ProfilScreens/AnyUserProfilScreen';
+import AnyUserProfilScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilScreen';
 import PresentationHabitScreen from '../screens/Habitude/PresentationHabitScreen';
 import PresentationObjectifDetailsScreen from '../screens/Objectif/PresentationObjectifDetailsScreen';
 import ProfilHabitsScreen from '../screens/ProfilScreens/ProfilHabitsScreen';
@@ -21,17 +21,17 @@ import MembersScreen from '../screens/MembersScreen';
 import { FrequencyTypes, Habit, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { UserDataBase } from '../firebase/Database_User_Primitives';
-import AnyUserProfilHabitsScreen from '../screens/ProfilScreens/AnyUserProfilHabitsScreen';
-import AnyUserProfilObjectifsScreen from '../screens/ProfilScreens/AnyUserProfilObjectifsScreen';
-import AnyUserProfilSuccessScreen from '../screens/ProfilScreens/AnyUserProfilSuccessScreen';
-import AnyUserProfilFriendsScreen from '../screens/ProfilScreens/AnyUserProfilFriendsScreen';
+import AnyUserProfilHabitsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilHabitsScreen';
+import AnyUserProfilObjectifsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilObjectifsScreen';
+import AnyUserProfilSuccessScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilSuccessScreen';
+import AnyUserProfilFriendsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilFriendsScreen';
 import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
 import BlockedAccountsScreen from '../screens/ProfilScreens/ProfilSettingsScreens/BlockedAccountsScreen';
 import ArchivedHabitsScreen from '../screens/Habitude/ArchivedHabitsScreen';
 import ProfilDoneObjectifsScreen from '../screens/ProfilScreens/ProfilDoneObjectifsScreen';
 import ProfilDoneHabitsScreen from '../screens/ProfilScreens/ProfilDoneHabitsScreen';
-import AnyUserProfilDoneHabitsScreen from '../screens/ProfilScreens/AnyUserProfilDoneHabitsScreen';
-import AnyUserProfilDoneObjectifsScreen from '../screens/ProfilScreens/AnyUserProfilDoneObjectifsScreen';
+import AnyUserProfilDoneHabitsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneHabitsScreen';
+import AnyUserProfilDoneObjectifsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneObjectifsScreen';
 
 export type HomeStackParamsList = {
     HomeScreen: undefined,

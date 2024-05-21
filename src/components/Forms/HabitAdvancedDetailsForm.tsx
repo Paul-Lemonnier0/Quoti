@@ -20,7 +20,11 @@ export interface HabitAdvancedDetailsFormProps {
     isNewObjectifHabit?: boolean,
     isForModifyingHabit?: boolean,
     habit: FormStepsHabit | SeriazableHabit,
-    handleGoNext: (detailledHabit: FormDetailledHabitValues) => void
+    handleGoNext: (detailledHabit: FormDetailledHabitValues) => void,
+    notFinalStep?: boolean,
+    closeModal?: () => void,
+    customTotalStep?: number,
+    customCurrentStep?: number,
 }
 
 const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
@@ -28,6 +32,10 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     habit,
     isNewObjectifHabit,
     handleGoNext,
+    notFinalStep,
+    closeModal,
+    customCurrentStep,
+    customTotalStep
 }) => {
 
     interface FrequenciesCustomType {
@@ -44,7 +52,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     const frequency_default = "frequency" in habit ? frequencies.filter((freq) => freq.key === (habit as SeriazableHabit).frequency)[0] : frequencies[0]
 
     const baseDaysOfWeek = "daysOfWeek" in habit ? (habit as SeriazableHabit).daysOfWeek ?? [] : []
-    const [selectedDays, setSelectedDays] = useState<number[]>(baseDaysOfWeek);
+    const [selectedDays, setSelectedDays] = useState<number[]>([...baseDaysOfWeek]);
 
     const [selectedFrequency, setSelectedFrequency] = useState<FrequenciesCustomType>(frequency_default)
     
@@ -106,17 +114,17 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
 
     const CURRENT_STEP_DETAILS = getAddHabitStepsDetails((isForModifyingHabit && !isNewObjectifHabit) ? null : habit.objectifID ?? null, AddHabitScreenType.CreateHabitDetails)
 
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
-    const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
+    const totalSteps = customTotalStep ?? CURRENT_STEP_DETAILS.TOTAL_STEPS
+    const currentStep = customCurrentStep ?? CURRENT_STEP_DETAILS.CURRENT_STEP
 
     return(
         <UsualScreen hideMenu>
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center"}}>
-                        <NavigationButton noPadding action={NavigationActions.goBack}/>
+                        <NavigationButton noPadding action={closeModal ? NavigationActions.close : NavigationActions.goBack} methode={() => closeModal ? closeModal() : null}/>
                         <Quoti/>
-                        <NavigationButton noPadding action={NavigationActions.validation} methode={handleValidation}/>
+                        <NavigationButton noPadding action={notFinalStep ? NavigationActions.goNext : NavigationActions.validation} methode={handleValidation}/>
                     </View>
 
                     <HugeText text="À quelle fréquence ?"/>

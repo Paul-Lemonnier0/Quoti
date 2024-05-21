@@ -230,9 +230,9 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
     const isShared =  notNullMembers.length > 1
 
     return(
-        <View>    
+        <Animated.View entering={noAnimation ? undefined : FadeInDown}>    
             <TouchableOpacity delayLongPress={750} onLongPress={handleLongPress} onPress={onPress ?? openModalStepsDetails}>
-                <Animated.View entering={noAnimation ? undefined : FadeInDown} 
+                <Animated.View 
                     style={[
                         stylesCard.card, 
                         styles.container,
@@ -319,7 +319,7 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
             }
 
 
-        </View>
+        </Animated.View>
 )};
 
 const styles = StyleSheet.create(

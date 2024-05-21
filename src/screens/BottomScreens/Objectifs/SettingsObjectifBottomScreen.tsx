@@ -15,6 +15,7 @@ import EditHabitNav from "../../EditScreens/Habits/EditHabitNav"
 import { getSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 import EditObjectifNav from "../../EditScreens/Objectifs/EditObjectifNav"
 import Command, { CommandType } from "../../../components/Other/Command"
+import { useGoalsActions } from "../../../hooks/Habits/useGoalActions"
 
 export interface SettingsObjectifBottomSheetProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -32,7 +33,7 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
     modifyAdditionnalMethod
 }) => {
     const {setIsLoading, theme} = useContext(AppContext)
-    const {removeObjectif} = useContext(HabitsContext)
+    const {removeGoal} = useGoalsActions()
 
     const closeModal = () => bottomSheetModalRef.current?.close()
     const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
@@ -42,7 +43,7 @@ const SettingsObjectifBottomSheet: FC<SettingsObjectifBottomSheetProps> = ({
         deleteAdditionnalMethod ? deleteAdditionnalMethod() : null
 
         const deletePinnedHabits = false
-        await removeObjectif(objectif.objectifID, deletePinnedHabits);
+        await removeGoal(objectif.objectifID, deletePinnedHabits);
 
         setIsLoading(false)
         

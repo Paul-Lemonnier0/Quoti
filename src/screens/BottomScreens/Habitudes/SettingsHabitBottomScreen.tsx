@@ -14,11 +14,10 @@ import { CustomStaticBottomSheet } from "../../../components/BottomSheets/Custom
 import React from "react"
 import ShareHabitBottomScreen from "../Social/ShareHabitBottomScreen";
 import Command, { CommandType } from "../../../components/Other/Command";
-import { BottomSheetCloseButton, IconButton, IconProvider } from "../../../components/Buttons/IconButtons";
-import EditHabitFrequencyScreen from "../../EditScreens/Habits/EditHabitFrequencyScreen";
+import { IconProvider } from "../../../components/Buttons/IconButtons";
 import EditHabitFrequencyNav from "../../EditScreens/Habits/EditHabitFrequencyNav";
-import { TitleText } from "../../../styles/StyledText";
 import EndHabitBottomScreen from "./EndHabitBottomScreen";
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions";
 
 
 export interface SettingHabitBottomScreenProps {
@@ -27,7 +26,8 @@ export interface SettingHabitBottomScreenProps {
     attachToObjectifAdditionnalMethod?: () => void, 
     deleteAdditionnalMethod?: () => void, 
     modifyAdditionnalMethod?: () => void,
-    additionnalClosedMethod?: () => void
+    additionnalClosedMethod?: () => void,
+    handleEditFrequencyAdditionnalMethod?: () => void
 }
 
 const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
@@ -36,34 +36,25 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     attachToObjectifAdditionnalMethod, 
     deleteAdditionnalMethod,
     modifyAdditionnalMethod,
-    additionnalClosedMethod
+    additionnalClosedMethod,
+    handleEditFrequencyAdditionnalMethod
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const {removeHabit, updateHabitRelationWithObjectif, Objectifs, archiveHabit} = useContext(HabitsContext)
+    const { Objectifs } = useContext(HabitsContext)
+    const { updateHabitRelationWithObjectif } = useHabitActions()
 
     const habitType = getHabitType(habit)
 
     const displayedObjectifs = Object.values(Objectifs)
 
-
     const closeModal = () => {
          bottomSheetModalRef.current?.close()
-        // additionnalClosedMethod ? additionnalClosedMethod() : null
     }
 
     const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_ShareHabitScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_EndHabit: RefObject<BottomSheetModal> = useRef(null)
-
-    const handleDelete = async() => {
-        setIsLoading(true)
-        deleteAdditionnalMethod ? deleteAdditionnalMethod() : null
-        await removeHabit(habit);
-        setIsLoading(false)
-        closeModal()
-        Success_Impact()
-    }
     
     const handleOpenEdit = () => {
         handleOpenEditHabit()
@@ -71,10 +62,6 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
 
     const handleOpenEditFrequency = () => {
         handleOpenEditHabitFrequency()
-    }
-
-    const handleEditFrequency = () => {
-        modifyAdditionnalMethod ? modifyAdditionnalMethod() : null
     }
 
     const handleEdit = () => {
@@ -91,15 +78,6 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         await updateHabitRelationWithObjectif(habit, null)
         setIsLoading(false)
         Success_Impact()
-    }
-
-    const archiveOldHabit = async() => {
-        setIsLoading(true)
-        await archiveHabit(habit)
-        setIsLoading(false)
-
-        closeModal()
-        additionnalClosedMethod ? additionnalClosedMethod() : null
     }
 
     const openPinObjectifScreen = () => {
@@ -184,7 +162,7 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 additionnalCloseMethod={closeParentModal}
                 bottomSheetModalRef={bottomSheetModalRef_EditHabitFrequency}
                 habit={getSeriazableHabit(habit)}
-                validationAdditionnalMethod={handleOpenShare}
+                validationAdditionnalMethod={() => { handleEditFrequencyAdditionnalMethod ? handleEditFrequencyAdditionnalMethod() : null}}
             />
             
             <ShareHabitBottomScreen

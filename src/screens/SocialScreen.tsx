@@ -1,9 +1,9 @@
-import React, { FC, useContext } from 'react'
+import React, { FC, useContext, useEffect } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useState } from 'react'
 
 import AnimatedHeader from '../components/Other/AnimatedHeader'
-import { UserDataBase } from '../firebase/Database_User_Primitives';
+import { Database_GetSpecificUser, Database_getUsersInfo, UserDataBase } from '../firebase/Database_User_Primitives';
 import { UserContext } from '../data/UserContext';
 import { AppContext } from '../data/AppContext';
 import { HabitsContext } from '../data/HabitContext';
@@ -17,6 +17,9 @@ import AnimatedScrollComponent from '../components/ScrollView/AnimatedScrollComp
 import { IconButton, IconProvider } from '../components/Buttons/IconButtons';
 import { Habit } from '../types/HabitTypes';
 import { getSeriazableHabit } from '../primitives/HabitMethods';
+import { getPosts, HabitPostType, HabitPostFirestore } from '../firebase/Firestore_Posts_Primitives';
+import { NormalText } from '../styles/StyledText';
+import StoriesBar, { UserStory } from '../components/Profil/StoriesBar';
 
 const CONTAINER_HEIGHT = 70;
 
@@ -24,33 +27,43 @@ type SocialScreenProps = NativeStackScreenProps<SocialScreenStackType, "SocialSc
 
 const SocialScreen: FC<SocialScreenProps> = ({navigation}) => {
 
-    const {Habits} = useContext(HabitsContext);
     const {user} = useContext(UserContext)
 
     const {theme} = useContext(AppContext)
     const primary = useThemeColor(theme, "Primary")
 
-    const [posts, setPosts] = useState<TestPostHabit[]>([
-        // {
-        //   habit: Object.values(Habits)[0],
-        //   user: user as UserDataBase,
-        //   date: new Date(),
-        //   bio: "Une bonne journée ! Les habitudes rentrent de mieux en mieux dans le quotidien"
-        // },
-        // {
-        //   habit: Object.values(Habits)[0],
-        //   user: user as UserDataBase,
-        //   date: new Date(),
-        // },
-    
-        // {
-        //   habit: Object.values(Habits)[0],
-        //   user: user as UserDataBase,
-        //   date: new Date(),
-        // },
-      
-    ])
+    const [posts, setPosts] = useState<HabitPostType[]>([])
+    const [users, setUsers] = useState<{[userID: string]: UserDataBase}>({})
 
+    useEffect(() => {
+      const handleFetchPosts = async() => {
+        if(user) {
+          setPosts(await getPosts(user?.uid, user?.friends ?? []))
+        }
+      }
+
+      handleFetchPosts()
+    }, [])
+
+    useEffect(() => {
+      const fetchUsers = async() => {
+        const newUsers = {...users}
+
+        for (const post of posts) {
+          if(!users.hasOwnProperty(post.userID)) {
+           const user = await Database_GetSpecificUser(post.userID)
+           if(user) {
+            newUsers[post.userID] = {...user}
+           }
+          }
+        }
+
+        setUsers({...newUsers})
+      }
+
+      fetchUsers()
+    }, [posts])
+    
     const handleGoToInteractions = () => {
       navigation.navigate("InteractionsScreen")
     }
@@ -74,27 +87,52 @@ const SocialScreen: FC<SocialScreenProps> = ({navigation}) => {
       navigation.navigate("AnyUserProfilScreen", {detailledUser})
     }
 
+
+    const [friends, setFriends] = useState<UserDataBase[]>([])
+
+    useEffect(() => {
+      const getUsers = async(userIDs: string[]) => {
+        const usersData = await Database_getUsersInfo(userIDs)
+        setFriends(usersData.filter(user => user !== null))
+      }
+
+      getUsers(user?.friends ?? [])
+    }, [])
+
+    
+    const stories: UserStory[] = friends.map(friend => ({
+      user: friend,
+      stories: []
+    }))
+    
+    stories.unshift({user: user as UserDataBase, stories: []})
+    
     return (
       <View style={{backgroundColor: primary, flex: 1, paddingTop: 10}}>
         <View style={[styles.container, {backgroundColor: primary}]}>
             <AnimatedScrollComponent
-                data={posts}
+                data={[...posts, ...posts, ...posts, ...posts]}
 
                 renderItem={({ item }) => 
                   <HabitPost {...item} 
-                    onPress={() => handleGoToHabitDetails(item.user, item.habit)}
-                    onPressProfil={() => handleGoToProfilDetails(item.user as UserDataBase)}
+                    habitPost={item}
+                    user={users[item.userID]}
+                    onPress={() => handleGoToHabitDetails(users[item.userID], item.habit)}
+                    onPressProfil={() => handleGoToProfilDetails(users[item.userID] as UserDataBase)}
                   />
                 }
-                ItemSeparatorComponent={() => <HoleLineSeparator/>}
-                // navigation={navigation}
+
+                flatListHeader={() => (
+                  <StoriesBar stories={stories}/>
+                )}
+                navigation={navigation}
 
                 style={{paddingTop: 100}}
-                contentContainerStyle={{paddingHorizontal: 20, paddingBottom: 260}}
+                contentContainerStyle={{paddingHorizontal: 20, paddingBottom: 260, gap: 40}}
                 
                 headerHeight={CONTAINER_HEIGHT}
                 HeaderComponent={({opacity}) => 
-                  <AnimatedHeader title='Feed' opacity={opacity}> 
+                  <AnimatedHeader title='quoti.' opacity={opacity}> 
                       <IconButton name="hearto" provider={IconProvider.AntDesign} onPress={handleGoToInteractions}/>
                       <IconButton name="search" provider={IconProvider.Feather} onPress={handleGoToSearchUser}/>
                   </AnimatedHeader>

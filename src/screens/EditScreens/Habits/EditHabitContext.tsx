@@ -4,7 +4,7 @@ import { FormDetailledObjectifHabit } from "../../../types/FormHabitTypes"
 import { Habit } from "../../../types/HabitTypes"
 
 export interface EditHabitContextProps {
-    validationAdditionnalMethod?: (values: FormDetailledObjectifHabit) => void,
+    validationAdditionnalMethod?: (values?: FormDetailledObjectifHabit) => void,
 }
 
 export interface EditHabitContextProviderProps extends EditHabitContextProps {
@@ -13,7 +13,7 @@ export interface EditHabitContextProviderProps extends EditHabitContextProps {
 
 
 export const EditHabitContext = createContext<EditHabitContextProps>({
-    validationAdditionnalMethod: (values: FormDetailledObjectifHabit) => {}
+    validationAdditionnalMethod: () => {}
 })
 
 export const EditHabitContextProvider: FC<EditHabitContextProviderProps> = ({validationAdditionnalMethod, children}) => {

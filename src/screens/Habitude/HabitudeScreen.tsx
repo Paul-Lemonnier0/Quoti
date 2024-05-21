@@ -38,6 +38,10 @@ import { HomeStackParamsList } from "../../navigation/HomeNavigator";
 import { isHabitScheduledForDate } from "../../primitives/HabitudesReccurence";
 import StreakDayDetailsBottomScreen from "../BottomScreens/StreakDayDetailsBottomScreen";
 import DoneHabitSettingBottomScreen from "../BottomScreens/Habitudes/DoneHabitSettingsBottomScreen";
+import StreakFlame from "../../components/Other/Flames";
+import HabitCompletedBottomScreenNav from "../BottomScreens/Habitudes/HabitCompletedBottomScreenNav";
+import { getSeriazableHabit } from "../../primitives/HabitMethods";
+import { useStepActions } from "../../hooks/Habits/useStepActions";
 
 type HabitudeScreenProps = NativeStackScreenProps<HomeStackParamsList, "HabitudeScreen">
 
@@ -68,9 +72,9 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
         Objectifs, 
         HabitsHistory,
         getHabitFromFilteredHabits, 
-        handleCheckStep, 
     } = useContext(HabitsContext)
 
+    const { handleCheckStep } = useStepActions()
 
     const bottomSheetModalRef_HabitCompleted = useRef<BottomSheetModal>(null)
     const bottomSheetModalRef_Settings = useRef<BottomSheetModal>(null)
@@ -156,7 +160,9 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
 
     const handleOpenSettings = useCallback(() => {
         BottomScreenOpen_Impact()
-        bottomSheetModalRef_Settings.current?.present();
+        // bottomSheetModalRef_Settings.current?.present();
+        bottomSheetModalRef_HabitCompleted.current?.present();
+        
     }, []);
 
     const goBack = () => {
@@ -180,13 +186,30 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
         fullMembers.push(currentUserDB)
     }
 
+    if(!habit) {
+        navigation.goBack()
+    }
+
     const isPlannedForToday = isHabitScheduledForDate(habit, new Date(currentDateString))
 
-    const startingDateString = habit.startingDate.toLocaleDateString("fr", {
+    const startingDateString = habit.startingDate ? habit.startingDate.toLocaleDateString("fr", {
         day: "numeric",
         month: "long",
         year: "numeric"
-    })
+    }) : "Non-définie"
+
+    const handleEditFrequencyAdditionnalMethod = () => {
+        navigation.goBack()
+    }
+
+    const handleSeeActivity = () => {
+        navigation.navigate("HabitStreakDetailsScreen", {
+            habitID: habit.habitID, 
+            currentDateString: currentDateString,
+            isDone: isDone,
+            isArchived: isArchived 
+        })
+    }
 
     return(
         <UsualScreen>
@@ -194,7 +217,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                 <View style={styles.header}>
                     <View style={styles.subHeader}>
                         <NavigationButton action={NavigationActions.goBack}/>
-                        <Quoti/>
+                        <StreakFlame value={habit.currentStreak} color={habit.color}/>
                         <BorderIconButton isTransparent isBorderGray name={"settings"} provider={IconProvider.Feather} onPress={handleOpenSettings}/>
                     </View>
                 </View>
@@ -228,29 +251,11 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                             </View>
 
                             <View style={styles.groupContainer}>
-                                <TitleText text="Série"/>
-
-                                <View style={styles.streakContainer}>
-
-                                    <View style={styles.streakHeader}>
-                                        <View style={styles.streakLeftHeader}>
-                                            <Icon provider={IconProvider.FontAwesome5} size={30} color={habit.color} name="fire"/>
-
-                                            <HugeText text={habit.currentStreak}/>
-                                        </View>
-
-                                        <TextButton 
-                                            small 
-                                            bold 
-                                            onPress={() => navigation.navigate("HabitStreakDetailsScreen", {
-                                                habitID: habit.habitID, 
-                                                currentDateString: currentDateString,
-                                                isDone: isDone,
-                                                isArchived: isArchived 
-                                            })} 
-                                            text={"Voir plus"} isGray noPadding/>
-                                    </View>
-                                    
+                                <View style={styles.streakHeader}>
+                                    <TitleText text="Série"/>
+                                    <TextButton small bold text={"Voir plus"} isGray noPadding onPress={handleSeeActivity}/>
+                                </View>
+                                <View style={styles.streakContainer}>  
                                     {
                                         isHebdo ?
                                         <WeekRangeActivity habit={habit} start={currentDate} history={last7DaysLogs} activityColor={habit.color}/>
@@ -308,9 +313,9 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                 </CustomScrollView>
             </View>
 
-            <HabitCompletedBottomScreen 
+            <HabitCompletedBottomScreenNav 
                 bottomSheetModalRef={bottomSheetModalRef_HabitCompleted} 
-                habit={habit} 
+                habit={getSeriazableHabit(habit)} 
                 goBackHome={goBack}
             />
 
@@ -329,6 +334,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                     deleteAdditionnalMethod={goBack} 
                     attachToObjectifAdditionnalMethod={goBack}
                     modifyAdditionnalMethod={goBack}
+                    handleEditFrequencyAdditionnalMethod={handleEditFrequencyAdditionnalMethod}
                 />
             }
 
@@ -415,14 +421,6 @@ const styles = StyleSheet.create({
         flexDirection: "row", 
         justifyContent: "space-between"
     },
-
-    streakLeftHeader: {
-        display: "flex", 
-        flexDirection: "row", 
-        alignItems: "center", 
-        gap: getWidthResponsive(10),
-        marginLeft: 5
-    }
 })
 
 export default HabitudeScreen

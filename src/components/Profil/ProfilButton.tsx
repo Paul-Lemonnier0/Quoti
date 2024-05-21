@@ -6,15 +6,17 @@ import { TouchableOpacity } from "react-native"
 import { User } from "firebase/auth"
 import { FC, useContext } from "react"
 import React from "react"
-import Badge from "../Other/Badge"
+import Badge, { AddStoryBadge } from "../Other/Badge"
 import { useThemeColor } from "../Themed"
 import { AppContext } from "../../data/AppContext"
 import FastImage from 'react-native-fast-image';
 import {Image} from "expo-image"
 import { VisitInfoUser } from "../../firebase/Firestore_User_Primitives"
+import { UserDataBase } from "../../firebase/Database_User_Primitives"
+import { auth } from "../../firebase/InitialisationFirebase"
 
 export interface ProfilButtonProps {
-    user: User | VisitInfoUser,
+    user: User | VisitInfoUser | UserDataBase,
     onPress: () => void,
     noBadge?: boolean,
     modificationBadge?: boolean,
@@ -27,7 +29,21 @@ export interface ProfilButtonProps {
     small?: boolean,
     borderColor?: string,
     placeholderBorder?: boolean,
-    borderWidth?: number
+    borderWidth?: number,
+    story?: boolean,
+    allStoriesSeen?: boolean,
+    label?: string
+}
+
+interface UserProfilPictureProps {
+    user: User | VisitInfoUser | UserDataBase,
+    width: number
+}
+
+export const UserProfilPicture: FC<UserProfilPictureProps> = ({width, user}) => {
+    return(
+        <Image cachePolicy={"disk"} style={[styles.image, {width}]} source={{ uri: user.photoURL ?? undefined }}/>
+    )
 }
 
 interface PlaceholderProfilPictureProps {
@@ -95,9 +111,11 @@ const ProfilButton: FC<ProfilButtonProps> = ({
     isSelected,
     isPrimary,
     small,
-    borderColor,
-    borderWidth,
-    placeholderBorder
+    borderColor: bdColor,
+    borderWidth: bdWidth,
+    allStoriesSeen,
+    story,
+    label
 }) => {
 
     const {theme} = useContext(AppContext)
@@ -105,28 +123,47 @@ const ProfilButton: FC<ProfilButtonProps> = ({
     const font = useThemeColor(theme, "Font")
     const primary = useThemeColor(theme, "Primary")
     const contrast = useThemeColor(theme, "Contrast")
+    const tertiary = useThemeColor(theme, "Tertiary")
 
     const width = huge ? 100 : (tall ? 70 : (small ? 45  : 60))
-    const bdColor = isSelected ? contrast : (borderColor ?? "transparent")
+    const backgroundColor = isSelected ? contrast : (bdColor ?? "transparent")
+    const borderWidth = bdWidth ?? 2
+
+    const storyStyle = {
+        borderColor: allStoriesSeen ? tertiary : contrast,
+        borderWidth: 3,
+        padding: 4
+    }
+
+    const isCurrentUser = auth.currentUser && user.uid === auth.currentUser.uid
+
+    const globalWidth = label ? 80 : undefined
 
     return (
-        <View style={{flexDirection: "row", alignItems: "center"}}>
-            <TouchableOpacity onPress={onPress} disabled={disabled}
-            style={[styles.container, {
-                borderRadius: 500, 
-                backgroundColor: bdColor, 
-                borderWidth: borderWidth ?? 2,
-                borderColor: isSelected ? contrast : (borderColor ?? "transparent")
-            }]}>
+        <View style={{flexDirection: "column", alignItems: "center", gap: 5, maxWidth: globalWidth, width: globalWidth}}>
+            <TouchableOpacity onPress={onPress} disabled={disabled} style={{flexDirection: "column", alignItems: "center"}}>
+                <View
+                    style={[styles.container, { backgroundColor,  borderWidth, borderColor: backgroundColor }, story ? storyStyle : undefined]}>
+                    {
+                        user && user.photoURL ?
+                        <UserProfilPicture width={width} user={user}/> :
+                        <PlaceholderProfilPicture isSelected={isSelected} name={user.displayName ?? "A"} 
+                            isPrimary={isPrimary} small={small} tall={tall} huge={huge}/>
+                    }
+                </View>
                 {
-                    user && user.photoURL ?
-                    <Image cachePolicy={"disk"} style={[styles.image, {width}]} source={{ uri: user.photoURL ?? undefined }}/>
-                    :
-                    <PlaceholderProfilPicture isSelected={isSelected} name={user.displayName ?? "A"} 
-                        isPrimary={isPrimary} small={small} tall={tall} huge={huge}/>
+                    !noBadge && 
+                        <Badge huge={hugeBadge} modificationBadge={modificationBadge} fillColor={font} bgColor={primary}/>
+                }
+                {
+                    story && isCurrentUser &&
+                        <AddStoryBadge/>
                 }
             </TouchableOpacity>
-            {!noBadge && (modificationBadge ? <Badge huge={hugeBadge} modificationBadge fillColor={font} bgColor={primary}/> : <Badge huge={hugeBadge} fillColor={font} bgColor={primary}/>) }
+            {
+                label &&
+                <LittleNormalText bold text={label} style={{fontSize: 14}} numberOfLines={1}/>
+            }
         </View>
     )
 }
@@ -136,6 +173,7 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "row",
         gap: 20, 
+        borderRadius: 500, 
     },
 
     image: {

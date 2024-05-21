@@ -3,6 +3,8 @@ import { useThemeColor } from "../Themed";
 import { LittleNormalText, NormalText, SubTitleText } from "../../styles/StyledText";
 import React, { FC, useContext } from "react";
 import { AppContext } from "../../data/AppContext";
+import { Icon, IconProvider } from "./IconButtons";
+import { View } from "react-native";
 
 export interface BasicButtonProps {
     onPress(): void,
@@ -43,10 +45,11 @@ export const BorderTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, 
 
 export interface BackgroundTextButtonProps extends BasicButtonProps {
     color?: string,
-    bgColor?: string
+    bgColor?: string,
+    chevron?: boolean
 }
 
-export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, bgColor, color, bold, disabled, extend, isFlex}) => {
+export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, text, bgColor, color, bold, disabled, extend, isFlex, chevron}) => {
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
@@ -63,7 +66,10 @@ export const BackgroundTextButton: FC<BackgroundTextButtonProps> = ({onPress, te
 
     return(
     <TouchableOpacity disabled={disabled} onPress={onPress} style={[styles.borderButton, {opacity, backgroundColor, width, borderColor: backgroundColor, flex: isFlex ? 1 : 0,}]}>
+        <View style={{flexDirection: "row", gap: 5}}>
         {bold ? <SubTitleText text={text} style={{color: colorBase}}/> : <NormalText text={text} style={{color: colorBase}}/>}
+        {chevron && <Icon name="chevron-right" color={fontContrast} provider={IconProvider.Feather}/>}
+        </View>
     </TouchableOpacity>);
 }
 

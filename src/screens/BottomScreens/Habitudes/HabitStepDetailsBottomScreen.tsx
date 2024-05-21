@@ -42,7 +42,7 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
 }) => {
 
     const {theme} = useContext(AppContext)
-    const secondary = useThemeColor(theme, "Secondary")
+    const fontGray = useThemeColor(theme, "FontGray")
 
     const handleEdit = (newHabit: (FormDetailledObjectifHabit | Habit)) => {
         if("habitID" in habit){
@@ -90,6 +90,19 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
     const isPlaceholder = steps.length === 0 || steps.filter(step => step.numero === -1).length > 0
     const seriazabledHabit = getSeriazableHabit(habit as Habit)
 
+    // const startingDateString = habit.startingDate.toLocaleDateString("fr", {
+    //     day: "numeric",
+    //     month: "long",
+    //     year: "numeric"
+    // })
+
+    const startingDate = habit.startingDate ? new Date(habit.startingDate) : new Date()
+    const startingDateString = startingDate.toLocaleDateString("fr", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    })
+
     return(
         
         <SimpleFullBottomSheet bottomSheetModalRef={bottomSheetModalRef}>
@@ -123,14 +136,23 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
 
                             <View style={{flex: 1, gap: 30}}>
 
-                                <View style={{gap: 30}}>
-                                    <TitleText text={"Étapes"}/>
-                                    { isPlaceholder ? <NoStepScreen/> : <StepScreen/> }
-                                </View>
+                                {
+                                    !isPlaceholder &&
+                                    <View style={{gap: 30}}>
+                                        <TitleText text={"Étapes"}/>
+                                        <StepScreen/>
+                                    </View>
+                                }
+
 
                                 <View style={{ gap: 30, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
                                     <TitleText text={"Fréquence"}/>
                                     <FrequencyDetails frequency={habit.frequency} reccurence={habit.reccurence} occurence={habit.occurence}/>
+                                </View>
+
+                                <View style={{ gap: 20, flex: 1, flexWrap: 'wrap', flexDirection: 'column' }}>
+                                    <TitleText text={"Date de début"}/>
+                                    <TitleText text={startingDateString} style={{color: fontGray}}/>
                                 </View>
 
                             </View>

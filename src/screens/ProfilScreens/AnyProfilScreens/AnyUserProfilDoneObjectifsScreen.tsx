@@ -1,27 +1,27 @@
 import { NativeStackNavigationProp, NativeStackScreenProps } from '@react-navigation/native-stack'
 import React, { FC, useEffect, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { Habit, Objectif, SeriazableObjectif } from '../../types/HabitTypes'
-import { CustomTextInputRefType, SearchBarCustom } from '../../components/TextFields/TextInput'
-import { HugeText } from '../../styles/StyledText'
-import { IconButton, IconProvider, NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons'
-import { PresentationObjectifList } from '../../components/Objectifs/ObjectifsList'
-import { SocialScreenStackType } from '../../navigation/SocialNavigator'
-import { fetchAllObjectifs } from '../../firebase/Firestore_Objectifs_Primitives'
-import { HomeStackParamsList } from '../../navigation/HomeNavigator'
-import SortBottomScreen from '../BottomScreens/SortBottomScreen'
-import { BottomScreenOpen_Impact } from '../../constants/Impacts'
-import { sortDate, sortString } from '../../primitives/BasicsMethods'
+import { Habit, Objectif, SeriazableObjectif } from '../../../types/HabitTypes'
+import { CustomTextInputRefType, SearchBarCustom } from '../../../components/TextFields/TextInput'
+import { HugeText } from '../../../styles/StyledText'
+import { IconButton, IconProvider, NavigationActions, NavigationButton } from '../../../components/Buttons/IconButtons'
+import { PresentationObjectifList } from '../../../components/Objectifs/ObjectifsList'
+import { SocialScreenStackType } from '../../../navigation/SocialNavigator'
+import { fetchAllObjectifs } from '../../../firebase/Firestore_Objectifs_Primitives'
+import { HomeStackParamsList } from '../../../navigation/HomeNavigator'
+import SortBottomScreen from '../../BottomScreens/SortBottomScreen'
+import { BottomScreenOpen_Impact } from '../../../constants/Impacts'
+import { sortDate, sortString } from '../../../primitives/BasicsMethods'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
-import { UsualScreen } from '../../components/View/Views'
-import { getUserHabitsForObjectif } from '../../firebase/Firestore_Habits_Primitives'
-import Objectifs_SkeletonList from '../../components/Objectifs/Objectifs_SkeletonList'
+import { UsualScreen } from '../../../components/View/Views'
+import { getUserHabitsForObjectif } from '../../../firebase/Firestore_Habits_Primitives'
+import Objectifs_SkeletonList from '../../../components/Objectifs/Objectifs_SkeletonList'
 
-type AnyUserProfilObjectifsScreenProps =
-  NativeStackScreenProps<SocialScreenStackType, "AnyUserProfilObjectifsScreen"> | 
-  NativeStackScreenProps<HomeStackParamsList, "AnyUserProfilObjectifsScreen">
+type AnyUserProfilDoneObjectifsScreenProps =
+  NativeStackScreenProps<SocialScreenStackType, "AnyUserProfilDoneObjectifsScreen"> | 
+  NativeStackScreenProps<HomeStackParamsList, "AnyUserProfilDoneObjectifsScreen">
 
-const AnyUserProfilObjectifsScreen: FC<AnyUserProfilObjectifsScreenProps> = ({navigation, route}) => {
+const AnyUserProfilDoneObjectifsScreen: FC<AnyUserProfilDoneObjectifsScreenProps> = ({navigation, route}) => {
 
   const { detailledUser } = route.params
 
@@ -162,7 +162,7 @@ const AnyUserProfilObjectifsScreen: FC<AnyUserProfilObjectifsScreenProps> = ({na
 
             {
               isLoading ?
-              <Objectifs_SkeletonList isPresentation/> :
+              <Objectifs_SkeletonList isPresentation={true} /> :
               <PresentationObjectifList 
                 objectifs={objectifsToDisplay} 
                 handleOnPress={handlePressOnObjectif}
@@ -217,4 +217,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AnyUserProfilObjectifsScreen
+export default AnyUserProfilDoneObjectifsScreen

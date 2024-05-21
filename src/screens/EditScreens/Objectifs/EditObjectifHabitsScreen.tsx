@@ -11,6 +11,8 @@ import { HabitsContext } from "../../../data/HabitContext"
 import { convertBackSeriazableObjectif } from "../../../primitives/ObjectifMethods"
 import { Habit } from "../../../types/HabitTypes"
 import { Success_Impact } from "../../../constants/Impacts"
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions"
+import { useGoalsActions } from "../../../hooks/Habits/useGoalActions"
 
 type EditObjectifHabitsScreenProps = NativeStackScreenProps<EditObjectifStackProps, 'EditObjectifHabitsScreen'>
 
@@ -18,13 +20,14 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
 
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
     const {setIsLoading} = useContext(AppContext)
-    const {validationAdditionnalMethod} = useContext(EditHabitContext)
 
-    const {updateObjectif, retrieveHabitsLinkToObjectif, updateHabitRelationWithObjectif, addHabit} = useContext(HabitsContext)
+    const {getHabitsByObjectifID} = useContext(HabitsContext)
+    const { updateHabitRelationWithObjectif, addHabit } = useHabitActions()
+    const {updateGoal} = useGoalsActions()
 
     const {newValues, oldObjectif} = route.params
 
-    const baseHabits = retrieveHabitsLinkToObjectif(oldObjectif.objectifID)
+    const baseHabits = getHabitsByObjectifID(oldObjectif.objectifID)
 
     const handleGoNext = async(newHabits: (FormDetailledObjectifHabit | Habit)[]) => {
 
@@ -37,7 +40,7 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
             if(habit as Habit) {
                 if (!baseHabits.includes(habit as Habit)) {
                     const updatedHabit = {...habit, objectifID: oldObjectif.objectifID, startingDate}
-                    addedHabits.push(updatedHabit as FormDetailledObjectifHabit)
+                    addedHabits.push({...updatedHabit, startingDate: updatedHabit.startingDate.toISOString()} as FormDetailledObjectifHabit)
                 }
             }
         });
@@ -56,9 +59,9 @@ const EditObjectifHabitsScreen: FC<EditObjectifHabitsScreenProps> = ({route}) =>
         const deseriazableOldObjectif = convertBackSeriazableObjectif(oldObjectif)
 
         const startingDate = new Date(newValues.startingDate)
-        const endingDate = new Date(newValues.endingDate)
+        const endingDate = newValues.endingDate ? new Date(newValues.endingDate) : undefined
 
-        await updateObjectif(deseriazableOldObjectif, {...newValues, startingDate, endingDate})
+        await updateGoal(deseriazableOldObjectif, {...newValues, startingDate, endingDate})
         
         closeModal()
 

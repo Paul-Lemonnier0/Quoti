@@ -73,9 +73,9 @@ const EditHabitNav: FC<EditHabitNavProps> = ({
 
     return(
             <SimpleFullBottomSheet onDismiss={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef} isPrimary>
-                <EditHabitContextProvider validationAdditionnalMethod={(values: FormDetailledObjectifHabit) => {
+                <EditHabitContextProvider validationAdditionnalMethod={(values?: FormDetailledObjectifHabit) => {
                     validationAdditionnalMethod()
-                    editHabitCustomMethod ? editHabitCustomMethod(values) : null
+                    values ? editHabitCustomMethod(values) : null
                 }}>
                     <BottomSheetModalProvider>
                         <BottomSheetModalMethodsContextProvider additionnalCloseMethod={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef}>

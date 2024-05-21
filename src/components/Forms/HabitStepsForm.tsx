@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo, useRef, useState } from "react";
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { generateUniqueID } from "../../primitives/BasicsMethods";
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants";
 import { Image, View } from "react-native";
@@ -104,8 +104,14 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
         )
     }
 
-    const isStepsEmpty = steps.length === 0 || steps.filter(step => step.numero === -1).length > 0
+    useEffect(() => {
+        if(steps.length > 1 && steps.filter(step => step.numero === -1).length > 0) {
+            setSteps(prevSteps => prevSteps.filter(step => step.numero !== -1))
+        }
+    }, [steps])
 
+    const isStepsEmpty = steps.length === 0 || (steps.filter(step => step.numero === -1).length > 0 && steps.length === 1)
+    
     return(
         <UsualScreen hideMenu>
             <View style={styles.container}>

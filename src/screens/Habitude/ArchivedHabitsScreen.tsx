@@ -40,7 +40,7 @@ const ArchivedHabitsScreen: FC<ArchivedHabitsScreenProps> = ({navigation}) => {
           setIsLoading(true)
 
           const archivedHabits = await fetchArchivedHabits()
-          setHabitsToDisplay(archivedHabits)
+          setHabitsToDisplay([...archivedHabits])
           setIsArchivedHabitsFetched(true)
 
           setIsLoading(false)

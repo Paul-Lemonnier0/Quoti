@@ -11,19 +11,21 @@ import * as Notifications from 'expo-notifications';
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { useState } from "react";
 import { onAuthStateChanged } from "@firebase/auth";
-import { AuthContextProvider, AuthStates } from "./data/AuthContext";
-import { auth } from "./firebase/InitialisationFirebase";
-import { habitIconRequires } from "./data/HabitIcons";
-import IllustrationsList from "./data/IllustrationsList";
-import { AppContextProvider } from "./data/AppContext";
-import LinkingConfiguration from "./navigation/LinkingConfiguration";
-import AuthNavigator from "./navigation/AuthNavigator";
-import { UserContextProvider } from "./data/UserContext";
-import { HabitsProvider } from "./data/HabitContext";
-import Navigation from "./navigation";
+import { AuthContextProvider, AuthStates } from "./src/data/AuthContext";
+import { auth } from "./src/firebase/InitialisationFirebase";
+import { habitIconRequires } from "./src/data/HabitIcons";
+import IllustrationsList from "./src/data/IllustrationsList";
+import { AppContextProvider } from "./src/data/AppContext";
+import LinkingConfiguration from "./src/navigation/LinkingConfiguration";
+import AuthNavigator from "./src/navigation/AuthNavigator";
+import { UserContextProvider } from "./src/data/UserContext";
+import { HabitsProvider } from "./src/data/HabitContext";
+import Navigation from "./src/navigation";
 import React from "react"
 import Toast from "react-native-toast-message";
-import { toastConfig } from "./components/Toasts/CustomBaseToast";
+import { toastConfig } from "./src/components/Toasts/CustomBaseToast";
+import 'react-native-reanimated';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -90,15 +92,15 @@ export default function App() {
 
 
   const [isFontLoaded] = useFonts({
-    "fontLight": require("./assets/fonts/WorkSans/WorkSans-Light.ttf"),
-    "fontMedium": require("./assets/fonts/WorkSans/WorkSans-Medium.ttf"),
-    "fontSemiBold": require("./assets/fonts/WorkSans/WorkSans-SemiBold.ttf"),
-    "fontBold": require("./assets/fonts/WorkSans/WorkSans-Bold.ttf"),
+    "fontLight": require("./src/assets/fonts/WorkSans/WorkSans-Light.ttf"),
+    "fontMedium": require("./src/assets/fonts/WorkSans/WorkSans-Medium.ttf"),
+    "fontSemiBold": require("./src/assets/fonts/WorkSans/WorkSans-SemiBold.ttf"),
+    "fontBold": require("./src/assets/fonts/WorkSans/WorkSans-Bold.ttf"),
 
-    // "fontLight": require("./assets/fonts/Poppins-Light.ttf"),
-    "fontMediumPoppins": require("./assets/fonts/Poppins-Medium.ttf"),
-    "fontSemiBoldPoppins": require("./assets/fonts/Poppins-SemiBold.ttf"),
-    // "fontBold": require("./assets/fonts/Poppins-Bold.ttf"),
+    // "fontLight": require("./src/assets/fonts/Poppins-Light.ttf"),
+    "fontMediumPoppins": require("./src/assets/fonts/Poppins-Medium.ttf"),
+    "fontSemiBoldPoppins": require("./src/assets/fonts/Poppins-SemiBold.ttf"),
+    // "fontBold": require("./src/assets/fonts/Poppins-Bold.ttf"),
 
   });
 

@@ -59,4 +59,45 @@ const Badge: FC<BadgeProps> = ({huge, fillColor, bgColor, modificationBadge}) =>
     )
 }
 
+export const AddStoryBadge = () =>
+    {
+        const {theme} = useContext(AppContext)
+        const fontContrast = useThemeColor(theme, "FontContrast")
+        const contrast = useThemeColor(theme, "Contrast")
+        const primary = useThemeColor(theme, "Primary")
+    
+        const styles = StyleSheet.create(
+            {
+                backgroundBadgeStyle: {
+                    marginTop: 0, 
+                    marginRight: 0,
+                    height: 24, 
+                    aspectRatio: 1,
+                    borderRadius: 20, 
+                    display: "flex", 
+                    alignItems: "center", 
+                    justifyContent: "center"
+                },
+    
+                badgeStyle: {
+                    height: 18, 
+                    aspectRatio: 1,
+                    borderRadius: 20,
+                    justifyContent: "center",
+                    alignItems: "center"
+                }
+            }
+        )
+    
+        return(
+            <View style={{position: "absolute", bottom: -0, zIndex: 5000, right: 0,  alignItems: "center", justifyContent: "center"}}>
+                <View style={[styles.backgroundBadgeStyle, {backgroundColor: primary}]}>
+                    <View style={[styles.badgeStyle, {backgroundColor: contrast}]}>
+                        <Icon name="plus" provider={IconProvider.Entypo} color={fontContrast} size={15}/>
+                    </View>
+                </View>
+            </View>
+        )
+    }
+
 export default Badge

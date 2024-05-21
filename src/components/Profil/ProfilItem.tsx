@@ -60,9 +60,9 @@ const ProfilItem: FC<ProfilItemProps> = ({
                          <Image placeholder={"disk"} source={{ uri: user.photoURL}} 
                              style={[styles.image, {
                                 borderColor: isSelected ? "transparent" : "transparent",
-                                width: small ? 45 : 60,
+                                width: small ? 50 : 60,
                                 aspectRatio: 1
-                             }]} />
+                             }]} /> 
                          : 
                         
                         <PlaceholderProfilPicture 

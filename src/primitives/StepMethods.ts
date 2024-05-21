@@ -2,6 +2,7 @@ import { GlobalFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitType
 import { FormDetailledObjectifHabit, FormFullStep, FormStep, FormStepsHabitValues } from "../types/FormHabitTypes";
 import { FilteredHabitsType, Habit, PrioritesType, SeriazableHabit, Step, StepList, StreakValues } from "../types/HabitTypes";
 import { toISOStringWithoutTimeZone } from "./BasicsMethods";
+import { getValidHabitsStepsForDate } from "./HabitMethods";
 
 export const updateHabitStepState = (
   previousHabits: FilteredHabitsType, habit: Habit,
@@ -192,4 +193,24 @@ export const setNewSteps = (values: FormStepsHabitValues, habit: SeriazableHabit
   }
 
   return updatedStepsArray
+}
+
+export const updateHabitSteps = (updatedHabit: Habit, currentDate: Date): StepList => {
+    const {habitID, startingDate, steps} = updatedHabit
+    const newSteps = Object.values(steps)
+
+    const deletedSteps = newSteps.filter((step) => !("deleted" in step))
+
+    const isNewStepPlaceholder = 
+      ((deletedSteps.length === 1) && deletedSteps[0].numero === -1) 
+      || deletedSteps.length === 0;
+
+    if(isNewStepPlaceholder){
+      const placeholderStep: StepList = {}
+      placeholderStep[updatedHabit.habitID] = createDefaultStepFromHabit(updatedHabit, habitID, startingDate)
+      return {...placeholderStep}
+    }
+
+    const validSteps = getValidHabitsStepsForDate(newSteps, habitID, currentDate)
+    return {...validSteps}
 }

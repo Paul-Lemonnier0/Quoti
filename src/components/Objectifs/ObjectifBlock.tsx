@@ -81,43 +81,43 @@ const ObjectifBlock: FC<ObjectifBlockProps> = ({objectifID, frequency, index, ha
     }
 
     return(
-        <>
-        <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, width}} onPress={handlePress} delayLongPress={750} onLongPress={handleLongPress}>
-            <Animated.View entering={FadeInRight.duration(400).delay(index * 200)} 
-                style={[
-                    stylesCard.card, 
-                    styles.objectif,
-                    {transform: [{scale}]}
-                ]}>
-                    
-                <View style={styles.header}>
-                    <View style={[styles.iconContainer, {borderColor: objectif.color}]}>
-                        <IconImage image={objectif.icon}/>
-                    </View>
-                </View>
-
-                <View style={styles.titleDescriptionContainer}>
-                    <SubTitleText numberOfLines={1} text={objectif.titre}/>
-                    <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={objectif.description}/>
-                </View>
-
-                <View style={styles.progressContainer}>
-
-
-                    <View style={{flex: 1}}>
-                        <ProgressBar progress={pourcentage_value ? pourcentage_value/100 : 0} color={objectif.color}/>
+        <Animated.View entering={FadeInRight.duration(400).delay(index * 200)}>
+            <TouchableOpacity style={{opacity: isFinished ? 0.5 : 1, width}} onPress={handlePress} delayLongPress={750} onLongPress={handleLongPress}>
+                <Animated.View 
+                    style={[
+                        stylesCard.card, 
+                        styles.objectif,
+                        {transform: [{scale}]}
+                    ]}>
+                        
+                    <View style={styles.header}>
+                        <View style={[styles.iconContainer, {borderColor: objectif.color}]}>
+                            <IconImage image={objectif.icon}/>
+                        </View>
                     </View>
 
-                    <LittleNormalText text={pourcentage_value + "%"} bold/>
-                </View>
+                    <View style={styles.titleDescriptionContainer}>
+                        <SubTitleText numberOfLines={1} text={objectif.titre}/>
+                        <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={objectif.description}/>
+                    </View>
+
+                    <View style={styles.progressContainer}>
 
 
-            </Animated.View>
-        </TouchableOpacity>
+                        <View style={{flex: 1}}>
+                            <ProgressBar progress={pourcentage_value ? pourcentage_value/100 : 0} color={objectif.color}/>
+                        </View>
 
-        <SettingsObjectifBottomSheet bottomSheetModalRef={bottomSheetModalRef} objectif={objectif}/>
+                        <LittleNormalText text={pourcentage_value + "%"} bold/>
+                    </View>
 
-        </>
+
+                </Animated.View>
+            </TouchableOpacity>
+
+            <SettingsObjectifBottomSheet bottomSheetModalRef={bottomSheetModalRef} objectif={objectif}/>
+
+        </Animated.View>
     )
 }
 
@@ -175,10 +175,10 @@ export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({
     }
 
     return(
-        <View>
+        <Animated.View entering={noAnimation ? undefined : FadeInRight}>
         <TouchableOpacity disabled={isSkeleton}
             style={{opacity: isFinished ? 0.5 : 1, flex: 1}} onPress={handleOnPress} delayLongPress={750} onLongPress={handleLongPress}>
-            <Animated.View entering={noAnimation ? undefined : FadeInRight} 
+            <Animated.View 
                 style={[
                     stylesCard.card, 
                     styles.objectif,
@@ -215,7 +215,7 @@ export const PresentationObjectifBlock: FC<PresentationObjectifBlockProps> = ({
             <SettingsObjectifBottomSheet bottomSheetModalRef={bottomSheetModalRef} objectif={objectif as Objectif}/>
         }
 
-        </View>
+        </Animated.View>
     )
 }
 

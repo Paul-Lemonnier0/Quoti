@@ -15,6 +15,7 @@ import ProfilButton from './ProfilButton'
 import UserSettingsBottomScreen from '../../screens/BottomScreens/Social/UserSettings'
 import { UserDataBase } from '../../firebase/Database_User_Primitives'
 import { BottomSheetModal } from '@gorhom/bottom-sheet'
+import StreakFlame from '../Other/Flames'
 
 interface ProfilHeaderProps {
     user: UserType | VisitInfoUser,
@@ -291,11 +292,7 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
                         <View style={styles.subHeader}>
                             <NavigationButton noPadding action={NavigationActions.goBack}/>
 
-                            <View style={{flexDirection: "row", gap: 10, alignItems: 'center', justifyContent: 'center'}}>
-                                {/* <Icon provider={IconProvider.Feather} name={streakIcon} color={streakColor}/> */}
-                                <Icon provider={IconProvider.FontAwesome5} name="fire" color={streakColor}/>
-                                <TitleText text={currentStreak}/>
-                            </View>
+                            <StreakFlame value={12} color={streakColor}/>
                             {
                                 <BorderIconButton isBorderGray isTransparent name={"settings"} provider={IconProvider.Feather} onPress={
                                     auth && auth.currentUser && user && (user.uid === auth.currentUser.uid ) && handleOpenSettings ?

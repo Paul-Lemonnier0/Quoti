@@ -12,6 +12,7 @@ import { useThemeColor } from "../../Themed"
 import { Icon, IconButton, IconProvider } from "../../Buttons/IconButtons"
 import { getPriorityDetails } from "../../../primitives/StepMethods"
 import { AppContext } from "../../../data/AppContext"
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 
 export interface StepItemProps {
     step: Step | FormStep,
@@ -55,6 +56,11 @@ const StepItem: FC<StepItemProps> = ({
 
     const priorityDetails = getPriorityDetails((step as Step | FormFullStep).priority ?? undefined)
 
+    const handleOnPress = () => {
+        BottomScreenOpen_Impact()
+        onPress ? onPress() : null
+    }
+
     return( 
         <View style={[styles.renderStepContainer, {opacity: disabled ? 0.5 : 1, 
             backgroundColor: secondary
@@ -62,7 +68,7 @@ const StepItem: FC<StepItemProps> = ({
 
             <View style={{flexDirection: "row", gap: 20, alignItems: "center", flex: 1}}>
                 <CustomCheckBox isPrimary disabled={(disabled || areAllStepsChecked)} color={color} isChecked={isChecked} isBorderHidden={borderHidden} number={index+1} noPress={noPress} 
-                    onPress={onPress}/>
+                    onPress={handleOnPress}/>
 
                 <View style={styles.titreEtDescriptionContainer}>
                     <SubTitleText text={(step as FormFullStep | Step).titre ?? ""}/>

@@ -21,6 +21,7 @@ import { TitleText } from "../../../styles/StyledText";
 import EndHabitBottomScreen from "./EndHabitBottomScreen";
 import { getBackUserHabit, HabitState } from "../../../firebase/Firestore_Habits_Primitives";
 import Toast from "react-native-toast-message";
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions";
 
 
 export interface DoneHabitSettingBottomScreenProps {
@@ -46,16 +47,10 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const {
-        removeHabit, 
-        updateHabitRelationWithObjectif, 
-        Objectifs, 
-        archiveHabit,
-        markHabitAsDone,
-        getBackHabit
-    } = useContext(HabitsContext)
+    const { Objectifs } = useContext(HabitsContext)
+    const { updateHabitRelationWithObjectif } = useHabitActions()
 
-    const habitType = getHabitType(habit)
+    const { removeHabit, archiveHabit, markHabitAsDone, getBackHabit } = useHabitActions()
 
     const displayedObjectifs = Object.values(Objectifs)
 
@@ -77,18 +72,6 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
         closeModal()
         Success_Impact()
     }
-    
-    const handleOpenEdit = () => {
-        handleOpenEditHabit()
-    }
-
-    const handleOpenEditFrequency = () => {
-        handleOpenEditHabitFrequency()
-    }
-
-    const handleEditFrequency = () => {
-        modifyAdditionnalMethod ? modifyAdditionnalMethod() : null
-    }
 
     const handleEdit = () => {
         modifyAdditionnalMethod ? modifyAdditionnalMethod() : null
@@ -96,33 +79,6 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
 
     const handleOpenShare = () => {
         bottomSheetModalRef_ShareHabitScreen.current?.present() 
-    }
-
-    const handleBreakObjectifRelation = async() => {
-        setIsLoading(true)
-        attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
-        await updateHabitRelationWithObjectif(habit, null)
-        setIsLoading(false)
-        Success_Impact()
-    }
-
-    const archiveOldHabit = async() => {
-        setIsLoading(true)
-        await archiveHabit(habit)
-        setIsLoading(false)
-
-        closeModal()
-        additionnalClosedMethod ? additionnalClosedMethod() : null
-    }
-
-    const openPinObjectifScreen = () => {
-        BottomScreenOpen_Impact()
-        bottomSheetModalRef_PinObjectifScreen.current?.present() 
-    }
-
-    const handleOpenFinishHabitBottomScreen = () => {
-        BottomScreenOpen_Impact()
-        bottomSheetModalRef_EndHabit.current?.present()
     }
 
     const closeParentModal = () => {

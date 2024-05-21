@@ -40,9 +40,11 @@ export interface SelectMultipleDateBottomScreenProps {
 
   const checkError = (): boolean => {
     const startingDate_temp = calendarRef.current?.getStartingDate()
+    const endingDate_temp = calendarRef.current?.getEndingDate()
 
     const isError = (!startingDate_temp || startingDate_temp <= addDays(new Date(), -1))
-
+    const rangeTooShort = (!isError && (endingDate_temp && endingDate_temp < addDays(startingDate_temp, 7))) as boolean
+    
     if(isError) {
       Toast.show({
         type: "error",
@@ -51,7 +53,15 @@ export interface SelectMultipleDateBottomScreenProps {
       })
     }
 
-    return isError
+    if(rangeTooShort) {
+      Toast.show({
+        type: "error",
+        text1: "Minimum 7 jours d'interval",
+        position: "top"
+      })
+    }
+
+    return isError || rangeTooShort
   }
 
   const closeModal = () => {

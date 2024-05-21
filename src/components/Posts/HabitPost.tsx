@@ -1,4 +1,4 @@
-import React, { FC, useContext, useEffect, useRef, useState } from 'react'
+import React, { FC, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Habit } from '../../types/HabitTypes'
 import { UserDataBase } from '../../firebase/Database_User_Primitives'
 import { Dimensions, StyleSheet, View } from 'react-native'
@@ -6,7 +6,7 @@ import cardStyle from '../../styles/StyledCard'
 import HabitIcons from '../../data/HabitIcons'
 import ItemIcon from '../Icons/ItemIcon'
 import ProfilItem from '../Profil/ProfilItem'
-import { LittleNormalText, NormalGrayText, NormalText, SubTitleText } from '../../styles/StyledText'
+import { HugeText, LittleNormalText, NormalGrayText, NormalText, SubTitleText, TitleText } from '../../styles/StyledText'
 import { AppContext } from '../../data/AppContext'
 import { useThemeColor } from '../Themed'
 import { Icon, IconButton, IconProvider } from '../Buttons/IconButtons'
@@ -19,6 +19,10 @@ import { BottomSheetModal } from '@gorhom/bottom-sheet'
 import PostSettingsBottomScreen from '../../screens/BottomScreens/Social/PostSettingsBottomScreen'
 import { TapGestureHandler } from 'react-native-gesture-handler'
 import Animated, { useSharedValue, withSpring } from 'react-native-reanimated'
+import { HabitPostType, PostStateType } from '../../firebase/Firestore_Posts_Primitives'
+import CustomCard from '../Other/Card'
+import Separator from '../Other/Separator'
+import { PostState } from './PostState'
 
 interface HabitPostProps {
     habit: Habit,
@@ -26,12 +30,12 @@ interface HabitPostProps {
 }
 
 interface RenderSingleHabitPostProps {
-    habit: Habit,
+    habitPost: HabitPostType,
     handleLongPress: () => void,
     handleOnPress: () => void
 }
 
-const RenderSingleHabitPost: FC<RenderSingleHabitPostProps> = ({habit, handleLongPress, handleOnPress}) => {
+const RenderSingleHabitPost: FC<RenderSingleHabitPostProps> = ({habitPost, handleLongPress, handleOnPress}) => {
 
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
@@ -47,40 +51,43 @@ const RenderSingleHabitPost: FC<RenderSingleHabitPostProps> = ({habit, handleLon
     return(
         <TouchableOpacity onLongPress={handleLongPress} onPress={onPress} style={[styleCard, {gap: 50, backgroundColor: secondary}]}>
             <View style={{flexDirection: 'row', justifyContent: "space-between", alignItems: 'center'}}>
-                <ItemIcon icon={habit.icon} color={habit.color}/>
+                <ItemIcon icon={habitPost.icon} color={habitPost.color}/>
             </View>
 
             <View style={styles.habitTitleStateContainer}>
-                <SubTitleText numberOfLines={1} text={habit.titre}/>
-                <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={habit.description}/>
+                <SubTitleText numberOfLines={1} text={habitPost.titre}/>
+                <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={habitPost.description}/>
             </View>
         </TouchableOpacity>
     )
 }
 
-interface HabitPostProps extends TestPostHabit {
+interface HabitPostProps {
+    habitPost: HabitPostType,
+    user: UserDataBase,
     onPress: () => void,
     onPressProfil: () => void,
 }
 
 const HabitPost: FC<HabitPostProps> = ({
-    habit,
+    habitPost,
     user,
-    bio,
-    date,
     onPress,
     onPressProfil,
 }) => {
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
-    const secondary = useThemeColor(theme, "Secondary")
+    const primary = useThemeColor(theme, "Primary")
     const font = useThemeColor(theme, "Font")
+    const tertiary = useThemeColor(theme, "Tertiary")
 
     const [isLiked, setIsLiked] = useState<boolean>(false)
+    const [isSaved, setIsSaved] = useState<boolean>(false)
 
     const commentsBottomScreenRef = useRef<BottomSheetModal>(null)
     const settingsBottomScreenRef = useRef<BottomSheetModal>(null)
     const scale = useSharedValue(1);
+    const saveScale = useSharedValue(1);
 
     const handleLike = () => {
         scale.value = withSpring(1.1, {}, () => {
@@ -89,6 +96,15 @@ const HabitPost: FC<HabitPostProps> = ({
         
         BottomScreenOpen_Impact()
         setIsLiked(!isLiked)
+    }
+
+    const handleSave = () => {
+        saveScale.value = withSpring(1.1, {}, () => {
+            saveScale.value = withSpring(1);
+        });
+        
+        BottomScreenOpen_Impact()
+        setIsSaved(!isSaved)
     }
     
     const handleOpenComments = () => {
@@ -101,6 +117,7 @@ const HabitPost: FC<HabitPostProps> = ({
         settingsBottomScreenRef.current?.present()
     }
 
+    const date = new Date()
 
     const currentDateString = date.toLocaleDateString("fr", {
         month: 'short',
@@ -108,9 +125,14 @@ const HabitPost: FC<HabitPostProps> = ({
         year: "numeric"
     })
 
+    const states: PostStateType[] = [PostStateType.Done, PostStateType.Ended, PostStateType.Started]
+
+    const randomStateIndex = useMemo(() => Math.floor(Math.random() * 3), []) 
+    const randomState = states[randomStateIndex]
+
     return (
         <>
-            <View style={[styles.container, {}]}>
+            <CustomCard style={{borderRadius: 30, paddingVertical: 25, borderColor: tertiary, borderWidth: 2}}>
                 <View style={[styles.userInfos]}>
                     <View style={styles.userInfosHeader}>
                         <ProfilItem onPress={onPressProfil} user={user} small boldSubTitle/>
@@ -123,36 +145,66 @@ const HabitPost: FC<HabitPostProps> = ({
                             />
                         </View>
                     </View>
+{/* 
+                    <View style={{marginHorizontal: -25,marginTop: -20}}>
+                        <Separator/>
+                    </View> */}
 
-                    <View style={styles.body}>
-                        <RenderSingleHabitPost handleLongPress={handleOpenSettings} handleOnPress={onPress} habit={habit}/> 
-                    </View>
+                    <TouchableOpacity style={[styles.body, { margin: -20, padding: 20, backgroundColor: primary,
+                        borderColor: tertiary,
+                        borderWidth: 2,
+                        borderLeftWidth: 0,
+                        borderRightWidth: 0,
+                    }]}>
+                        <View style={{flexDirection: "column", gap: 20, justifyContent: 'space-between'}}>
+                            <View style={{flexDirection: 'row', justifyContent: "space-between"}}>
+                                <ItemIcon icon={habitPost.icon} color={habitPost.color}/>
+                                <PostState state={randomState}/>
+
+                            </View>
+
+                            <View style={styles.habitTitleStateContainer}>
+                                <HugeText numberOfLines={1} text={habitPost.titre}/>
+                                <LittleNormalText style={{color: fontGray}} bold numberOfLines={1} text={habitPost.description}/>
+                            </View>
+
+                        </View>
+                    </TouchableOpacity>
 
                     <View style={styles.footer}>
+                        <View style={{flexDirection: "row", justifyContent: 'space-between', alignItems: 'center'}}>
+                            <View style={{gap: 5, width: "100%"}}>
 
-                        <View style={{flexDirection: "row", justifyContent: 'space-between'}}>
-                            <View style={styles.subFooter}>
-                                <Animated.View style={{transform: [{scale}]}}>
-                                    <IconButton noPadding name={isLiked ? "heart" : "hearto"} color={isLiked ? '#D44C47' : font} provider={IconProvider.AntDesign} onPress={handleLike}/>
-                                </Animated.View>
-                                <IconButton noPadding name='message1' provider={IconProvider.AntDesign} onPress={handleOpenComments}/>
+                                <View style={{flexDirection: "row", justifyContent: "space-between", marginBottom: 10, marginTop: 5, alignItems: 'center'}}>
+                                    <View style={styles.subFooter}>
+                                        <Animated.View style={{transform: [{scale}]}}>
+                                            <IconButton noPadding name={isLiked ? "heart" : "hearto"} color={isLiked ? '#D44C47' : font} provider={IconProvider.AntDesign} onPress={handleLike}/>
+                                        </Animated.View>
+                                        <IconButton noPadding name='message1' provider={IconProvider.AntDesign} onPress={handleOpenComments}/>
+                                    </View>
+
+                                    <Animated.View style={{transform: [{scale: saveScale}]}}>
+                                        <IconButton noPadding name={isSaved ? 'bookmark' : "bookmark-o"} provider={IconProvider.FontAwesome} onPress={handleSave}/>
+                                        </Animated.View>
+                                </View>
+
+                                {
+                                    habitPost.legend && 
+                                    <TouchableOpacity onPress={handleOpenComments}>
+                                        <SubTitleText bold numberOfLines={1} text={habitPost.legend}/>
+                                    </TouchableOpacity>
+                                }
+
+                                <LittleNormalText style={{color:fontGray, fontSize: 14}} bold text={currentDateString}/>
                             </View>
+                        
                         </View>
 
-                        <View style={{gap: 10}}>
-                            {
-                                bio && 
-                                <TouchableOpacity onPress={handleOpenComments}>
-                                    <NormalText numberOfLines={1} text={bio}/>
-                                </TouchableOpacity>
-                            }
-
-                            <LittleNormalText style={{color:fontGray}} bold text={currentDateString}/>
-                        </View>
 
                     </View>
                 </View>
-            </View>
+            </CustomCard>
+
             <CommentsBottomScreen
                 bottomSheetModalRef={commentsBottomScreenRef}
                 postID={""}/>
@@ -166,13 +218,13 @@ const HabitPost: FC<HabitPostProps> = ({
 
 const styles = StyleSheet.create({   
     container: {
-        gap: 40,
+        gap: 20,
         flexDirection: "column",
     },
 
 
     userInfos: {
-        gap: 40
+        gap: 30,
     },
 
     userInfosHeader: {
@@ -181,18 +233,17 @@ const styles = StyleSheet.create({
     },
 
     body: {
-        marginVertical: -10
+        marginVertical: -10,
     },
 
     footer: {
-        paddingHorizontal: 10,
         flexDirection: "column", 
         gap: 20,
     },
 
     subFooter: {
         flexDirection: "row", 
-        gap: 20
+        gap: 20,
     },
 
     postContent: {
@@ -206,7 +257,8 @@ const styles = StyleSheet.create({
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        gap: 5
+        gap: 5,
+        flex: 1
     },     
     
     habit: {

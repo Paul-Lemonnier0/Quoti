@@ -205,20 +205,26 @@
             
             const handleLoadProfilPicture = async() => {
                 setIsLoading(true)
-                const profilPicturePath = await getProfilePictureLocalPath(user.uid)
-                if(profilPicturePath) {
-                    setUser((prevUser) => (prevUser ? {...prevUser, photoURL: profilPicturePath} : null))
-                    Image.prefetch(profilPicturePath)
-                }
-
-                else {
-                    if(user.photoURL) {
-                        const profilPicturePath = await saveProfilePictureLocally(user.photoURL, user.uid)
-                        if(profilPicturePath) {
-                            setUser((prevUser) => (prevUser ? {...prevUser, photoURL: profilPicturePath} : null))
-                            Image.prefetch(profilPicturePath)
+                try {
+                    const profilPicturePath = await getProfilePictureLocalPath(user.uid)
+                    if(profilPicturePath) {
+                        setUser((prevUser) => (prevUser ? {...prevUser, photoURL: profilPicturePath} : null))
+                        Image.prefetch(profilPicturePath)
+                    }
+    
+                    else {
+                        if(user.photoURL) {
+                            const profilPicturePath = await saveProfilePictureLocally(user.photoURL, user.uid)
+                            if(profilPicturePath) {
+                                setUser((prevUser) => (prevUser ? {...prevUser, photoURL: profilPicturePath} : null))
+                                Image.prefetch(profilPicturePath)
+                            }
                         }
                     }
+                }
+                
+                catch(e) {
+                    console.log("Erreur : ", e)
                 }
 
                 setIsLoading(false)

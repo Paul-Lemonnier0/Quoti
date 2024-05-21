@@ -12,24 +12,31 @@ export interface StepIndicatorProps {
     color?: string,
     inactiveColor?: string,
     height?: number
+    customAnimDuration?: number
 }
 
-const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, inactiveColor, height}) => {
+// const RenderStep = () => {
+//     return(
+
+//     )
+// }
+
+const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, inactiveColor, height, customAnimDuration}) => {
     const {theme} = useContext(AppContext)
 
     const font = useThemeColor(theme, "Font")
     const tertiary = useThemeColor(theme, "Tertiary")
 
-    const {rStyle, fill} = useAnimatedFill()
+    // const {rStyle, fill} = useAnimatedFill()
 
     const finalInactiveColor = inactiveColor ? inactiveColor : tertiary
 
     const highlightColor = color ?? font
     const finalHeight = height ?? 4
 
-    useEffect(() => {
-        fill()
-    }, [])
+    // useEffect(() => {
+    //     fill(customAnimDuration)
+    // }, [currentStep, totalSteps])
 
 
     return(
@@ -38,6 +45,15 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
                 Array.from({ length: totalSteps }).map((item, index) => {
 
                     const isJustDoneStep = index === currentStep - 1
+                    const { rStyle, fill, reset } = useAnimatedFill();
+
+                    useEffect(() => {
+                        if (index === currentStep - 1) {
+                            fill(customAnimDuration);
+                        } 
+
+                        else reset()
+                    }, [currentStep]);
 
                     return(
                         <View key={index} style={[styles.singleBar, {height: finalHeight}]}>
@@ -73,7 +89,8 @@ const StepIndicator: FC<StepIndicatorProps> = ({totalSteps, currentStep, color, 
 
 const styles = StyleSheet.create({
     horizontalContainer: {
-        display: "flex", flexDirection: "row",
+        display: "flex", 
+        flexDirection: "row",
         justifyContent: "space-between",
         gap: 10,
     },

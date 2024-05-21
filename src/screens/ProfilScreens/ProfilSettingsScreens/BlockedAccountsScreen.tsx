@@ -72,36 +72,32 @@ const BlockedAccountsScreen: FC<BlockedAccountsScreenProps> = ({route, navigatio
       sortTypeBottomSheetRef.current?.close()
     }
   
-    const sortByName = () => {
-      setUsersToDisplay((prevUsers) => 
-          [...prevUsers].sort((a, b) => sortString(a?.displayName ?? "", b?.displayName ?? "", true))
-      );
-    
-      BottomScreenOpen_Impact();
-      closeSortModal();
-    };
-    
-    const sortByNameDesc = () => {
-      setUsersToDisplay((prevUsers) => 
-        [...prevUsers].sort((a, b) => sortString(a?.displayName ?? "", b?.displayName ?? "", false))
-      );
-    
-      BottomScreenOpen_Impact();
-      closeSortModal();
-    };
-  
-    const noSort = () => {
-      const filteredUsers = users.filter((user) => {
-        return user?.displayName.startsWith(searchValue)
-      })
-
-      setUsersToDisplay(filteredUsers)
+    const handleSetUsersToDisplay = (users: (UserDataBase | null)[]) => {
+      setUsersToDisplay(users)
 
       BottomScreenOpen_Impact()
       closeSortModal()
     }
 
-    return(
+    const sortByName = () => {
+      const sortedUsers = usersToDisplay.sort((a, b) => sortString(a?.displayName ?? "", b?.displayName ?? "", true))    
+      handleSetUsersToDisplay([...sortedUsers])
+    };
+    
+    const sortByNameDesc = () => {
+      const sortedUsers = usersToDisplay.sort((a, b) => sortString(a?.displayName ?? "", b?.displayName ?? "", false))    
+      handleSetUsersToDisplay([...sortedUsers])
+    };
+  
+    const noSort = () => {
+      const sortedUsers = users.filter((user) => {
+        return user?.displayName.startsWith(searchValue)
+      })
+
+      handleSetUsersToDisplay(sortedUsers)
+    }
+
+    return (
         <UsualScreen hideMenu>
           <View style={styles.container}>
           <View style={[styles.header, {zIndex: 10, backgroundColor: primary, paddingBottom: 10}]}>  

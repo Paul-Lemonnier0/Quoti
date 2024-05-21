@@ -64,6 +64,7 @@ const RenderStep: FC<RenderStepProps> = ({
     const bottomSheetModalRef = useRef<BottomSheetModal>(null)
 
     const openModal = () => {
+        BottomScreenOpen_Impact()
         bottomSheetModalRef.current?.present()
     }
 

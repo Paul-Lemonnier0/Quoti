@@ -1,9 +1,9 @@
-import { FrequencyTypes, Habit } from "./HabitTypes";
+import { FrequencyTypes, Habit, Objectif } from "./HabitTypes";
 
-export const DefaultHabit: Habit = {
-    habitID: "habitDefaultID",
-    titre: "Habit par défaut",
-    description: "Description habit par défaut",
+export const DEFAULT_HABIT: Habit = {
+    habitID: "defaut",
+    titre: "defaut",
+    description: "defaut",
     icon: "run",
     color: "#ffffff",
     frequency: FrequencyTypes.Quotidien,
@@ -15,5 +15,16 @@ export const DefaultHabit: Habit = {
     bestStreak: 0,
     currentStreak: 0,
     lastCompletionDate: "none",
-    objectifID: undefined
+    objectifID: undefined,
+    members: []
+}
+
+export const DEFAULT_OBJECTIF: Objectif = {
+    objectifID: "defaut",
+    titre: "default",
+    description: "default",
+    startingDate: new Date(),
+    endingDate: new Date(),
+    icon: "run",
+    color: "#ffffff",
 }

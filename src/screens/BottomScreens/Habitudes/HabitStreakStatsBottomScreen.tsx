@@ -1,4 +1,4 @@
-import { HugeText, LittleNormalText, MassiveText, NormalText, SubTitleText, TitleText } from "../../../styles/StyledText"
+import { HugeText, LittleNormalText, MassiveText, NormalGrayText, NormalText, SubText, SubTitleGrayText, SubTitleText, TitleText } from "../../../styles/StyledText"
 import { View } from "react-native";
 import { StyleSheet } from "react-native";
 import { BottomSheetCloseButton, CloseButton, Icon, IconProvider } from "../../../components/Buttons/IconButtons";
@@ -20,8 +20,70 @@ import CustomCard from "../../../components/Other/Card";
 import { useThemeColor } from "../../../components/Themed";
 import { AppContext } from "../../../data/AppContext";
 import { RatioType } from "../../Habitude/HabitStreakDetailsScreen";
-import { isHabitPlannedThisMonth } from "../../../primitives/HabitudesReccurence";
-import ProgressBar, { ProgressPie } from "../../../components/Progress/ProgressBar";
+import ProgressBar, { CustomHabitStatProgressBar, ProgressPie } from "../../../components/Progress/ProgressBar";
+
+interface StatComponentProps {
+    title: string,
+    value: number | string,
+    massive?: boolean,
+    legend?: boolean,
+    legendBorderColor?: string,
+    legendBackgroundColor?: string,
+    percent?: boolean,
+    streak?: boolean,
+    flex?: boolean
+}
+
+
+const StatComponent: FC<StatComponentProps> = ({
+    title,
+    value,
+    massive,
+    percent,
+    streak,
+    legend,
+    legendBackgroundColor,
+    legendBorderColor,
+    flex
+}) => {
+    const {theme} = useContext(AppContext)
+    const secondary = useThemeColor(theme, "Secondary")
+    const fontGray = useThemeColor(theme, "FontGray")
+    
+    return(
+        <View style={{gap: 5, justifyContent: "space-between", flex: flex ? 1 : undefined}}>
+            <NormalGrayText bold text={title}/>
+            <View style={{flexDirection: "row", gap: 10, alignItems: legend ? undefined : "center"}}>
+                {
+                    streak &&
+                    <Icon provider={IconProvider.FontAwesome5} name="fire" color={fontGray}/>
+                }
+                {
+                    percent &&
+                    <HugeText style={{color: fontGray}} text="%"/>
+                }
+                {
+                    legend &&
+                    <View
+                        style={{
+                            marginTop: 10,
+                            height: 10,
+                            borderRadius: 10,
+                            width: 20,
+                            borderWidth: 2,
+                            backgroundColor: legendBackgroundColor ?? secondary,
+                            borderColor: legendBorderColor ?? secondary,
+                        }}/>
+                }
+                {
+                    massive ? 
+                    <MassiveText text={value} style={{fontSize: 90}}/> :
+                    <HugeText text={value}/>
+                }
+            </View>
+        </View>
+    )
+}
 
 export interface HabitStreakDetailsBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
@@ -32,17 +94,19 @@ export interface HabitStreakDetailsBottomScreenProps {
 const HabitStreakDetailsBottomScreen: FC<HabitStreakDetailsBottomScreenProps> = ({bottomSheetModalRef, habit, ratio}) => {
     
     const {theme} = useContext(AppContext)
+    const contrast = useThemeColor(theme, "Contrast")
     const fontGray = useThemeColor(theme, "FontGray")
 
     const closeModal = () => {
         bottomSheetModalRef.current?.close()
     }
 
+    const skipped = 2
+    const pourcentage = parseFloat((ratio.done * 100 / ratio.total).toString()).toFixed(1)
+
     return (
         <CustomBottomSheet
             hideHandle
-            footerMethod={closeModal}
-            footerText="Terminer"
             bottomSheetModalRef={bottomSheetModalRef}>
             <View style={styles.container}>
                 <View style={styles.pageTitleContainer}>
@@ -50,26 +114,51 @@ const HabitStreakDetailsBottomScreen: FC<HabitStreakDetailsBottomScreenProps> = 
                     <BottomSheetCloseButton methode={closeModal}/>
                 </View>
 
-                <View style={{flexDirection: "column", gap: 20, marginBottom: 10, marginTop: 10, flex: 1}}>
-                    <View style={{gap: 20, flex: 1, flexDirection: "row"}}>
-                        <CustomCard flex style={{gap: 40}}>
-                            <TitleText text={"Série en cours"}/>
-                            <View style={{flexDirection: "row", gap: 5}}>
-                                <MassiveText text={habit.currentStreak}/>
-                                <MassiveText text={"j"} style={{color: fontGray}}/>
-                            </View>
-                        </CustomCard>
-
-                        <CustomCard flex style={{gap: 40}}>
-                            <TitleText text={"Meilleure série"}/>
-                            <View style={{flexDirection: "row", gap: 5}}>
-                                <MassiveText text={"32"}/>
-                                <MassiveText text={"j"} style={{color: fontGray}}/>
-                            </View>
-                        </CustomCard>
+                <View style={{flexDirection: "column", gap: 50, marginBottom: -20, marginTop: 0, flex: 1}}>
+                    <View style={{flexDirection: "column", justifyContent: "space-between", marginBottom: -20}}>
+                        <NormalGrayText text={"Taux de réussite"} bold/>
+                        <MassiveText text={pourcentage} style={{fontSize: 70}}>
+                            <MassiveText text={"%"} style={{fontSize: 60, color: fontGray}}/>
+                        </MassiveText>
+                    </View>
+                    <View style={{flexDirection: "column", justifyContent: "space-between", gap: 15}}>
+                        <NormalGrayText text={"Ratio"} bold/>
+                        <CustomHabitStatProgressBar
+                            total={ratio.total}
+                            done={ratio.done}
+                            skipped={skipped}
+                            color={habit.color}
+                        />
                     </View>
 
-                    <CustomCard style={{flex: 1, gap: 50}}>
+
+                    <View style={{flexDirection: "row", justifyContent: "space-between", gap: 40}}>
+                        <StatComponent 
+                            title={"Réalisées"} 
+                            value={ratio.done}
+                            legend legendBackgroundColor={habit.color} legendBorderColor={habit.color}
+                        />
+                        
+                        <StatComponent 
+                            title={"Passées"} value={skipped}
+                            legend legendBorderColor={habit.color}
+                        />
+                        <StatComponent 
+                            title={"Manquées"} value={ratio.total}
+                            legend legendBorderColor={fontGray}
+                        />
+                    </View>
+
+
+                    <View style={{flexDirection: "row", justifyContent: "space-between", gap: 40}}>
+                        <StatComponent title={"Série en cours"} flex value={habit.currentStreak}/>
+                        <StatComponent title={"Meilleure série"} flex value={habit.bestStreak}/>
+                    </View>
+
+
+                    {/* <ProgressBar progress={ratio ? (ratio.done / ratio.total) : 0} color={habit.color}/> */}
+
+                    {/* <View style={{flex: 1, gap: 50}}>
                         <View style={{justifyContent: "space-between", flexDirection: "row"}}>
                             <TitleText text={"Ratio "}/>
                             <TitleText style={{color: fontGray}} text={ratio.done + "/" + ratio.total}/>
@@ -85,7 +174,7 @@ const HabitStreakDetailsBottomScreen: FC<HabitStreakDetailsBottomScreenProps> = 
                             </View>
                             <ProgressBar progress={ratio ? (ratio.done / ratio.total) : 0} color={habit.color}/>
                         </View>
-                    </CustomCard>
+                    </View> */}
                 </View>
             </View>
         </CustomBottomSheet>

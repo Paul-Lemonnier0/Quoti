@@ -12,7 +12,6 @@ const Confetti = forwardRef((props, ref: LegacyRef<AnimatedLottieView> | undefin
                 ref={ref}
                 source={require("../../assets/Animations/Confetti-Animation-bis.json")}
                 autoPlay
-                autoSize
                 loop={false}
                 style={{flex: 1}} 
             />

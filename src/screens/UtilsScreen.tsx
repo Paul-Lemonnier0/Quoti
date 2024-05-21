@@ -18,11 +18,14 @@ import { generateRandomUsers } from '../primitives/UserPrimitives';
 import { auth, db } from '../firebase/InitialisationFirebase';
 import { Success_Impact } from '../constants/Impacts';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useHabitActions } from '../hooks/Habits/useHabitActions';
+import { useGoalsActions } from '../hooks/Habits/useGoalActions';
 
 
 const UtilsScreen = () => {
 
-    const {addHabit, addObjectif} = useContext(HabitsContext);
+    const {addHabit} = useHabitActions();
+    const {addGoal} = useGoalsActions();
 
     const {setIsLoading} = useContext(AppContext)
 
@@ -34,13 +37,13 @@ const UtilsScreen = () => {
         const obj_hab_SemiMarathon = ObjectifPlaceholder_SemiMarathon()
         const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
   
-        const objectifWithID_Semi = await addObjectif(obj_hab_SemiMarathon["objectif"]) 
+        const objectifWithID_Semi = await addGoal(obj_hab_SemiMarathon["objectif"]) 
         if(objectifWithID_Semi?.objectifID){
           const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
           await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
         }
   
-        const objectifWithID_BienEtre = await addObjectif(obj_hab_BienEtre["objectif"]) 
+        const objectifWithID_BienEtre = await addGoal(obj_hab_BienEtre["objectif"]) 
         if(objectifWithID_BienEtre?.objectifID){
           const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
           await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));

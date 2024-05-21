@@ -1,7 +1,5 @@
 import { FC, useContext } from "react"
-import { useNavigation, useRoute } from "@react-navigation/native"
 import { getSeriazableHabit } from "../../../primitives/HabitMethods"
-import { HabitsContext } from "../../../data/HabitContext"
 import { AppContext } from "../../../data/AppContext"
 import HabitAdvancedDetailsForm from "../../../components/Forms/HabitAdvancedDetailsForm"
 import { Error_Impact, Success_Impact } from "../../../constants/Impacts"
@@ -10,13 +8,14 @@ import { FormDetailledHabitValues } from "../../../types/FormHabitTypes"
 import React from "react"
 import { AddScreenStackType } from "../../../navigation/AddScreenNavigator"
 import Toast from "react-native-toast-message"
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions"
 
 type CreateHabitDetailsProps = NativeStackScreenProps<AddScreenStackType, "CreateHabitDetails">
 
 const CreateHabitDetails: FC<CreateHabitDetailsProps> = ({navigation, route}) => {
 
     const {setIsLoading} = useContext(AppContext)
-    const {addHabit} = useContext(HabitsContext)
+    const {addHabit} = useHabitActions()
 
     const {habit} = route.params
 

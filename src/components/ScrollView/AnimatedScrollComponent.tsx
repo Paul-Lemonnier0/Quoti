@@ -14,7 +14,7 @@ type AnimatedScrollComponentProps = {
 
     data?: Array<any>,
     renderItem?: ListRenderItem<any>,
-
+    flatListHeader?: React.ComponentType<any>
     children?: ReactNode,
 
     style?: ViewStyle,
@@ -38,6 +38,7 @@ const AnimatedScrollComponent: FC<AnimatedScrollComponentProps> = ({
     headerHeight,
     data, 
     renderItem,
+    flatListHeader,
     children,
     scrollEventThrottle,
     contentContainerStyle,
@@ -165,6 +166,7 @@ const AnimatedScrollComponent: FC<AnimatedScrollComponentProps> = ({
                     { useNativeDriver: true }
                 )}
                     
+                ListHeaderComponent={flatListHeader}
                 onMomentumScrollBegin={onMomentumScrollBegin}
                 onMomentumScrollEnd={onMomentumScrollEnd}
                 onScrollEndDrag={onScrollEndDrag}

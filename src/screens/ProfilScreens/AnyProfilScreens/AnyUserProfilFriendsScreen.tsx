@@ -1,18 +1,18 @@
 import React from "react"
 import {FlatList, StyleSheet, View} from 'react-native';
-import { UsualScreen } from '../../components/View/Views';
-import { HugeText } from '../../styles/StyledText';
+import { UsualScreen } from '../../../components/View/Views';
+import { HugeText } from '../../../styles/StyledText';
 import { FC, useEffect, useRef, useState } from 'react';
-import { CustomTextInputRefType, SearchBarCustom } from '../../components/TextFields/TextInput'
+import { CustomTextInputRefType, SearchBarCustom } from '../../../components/TextFields/TextInput'
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { IconButton, IconProvider, NavigationActions, NavigationButton } from '../../components/Buttons/IconButtons';
-import { TextButton } from '../../components/Buttons/UsualButton';
-import { Database_getUsersInfo, UserDataBase } from '../../firebase/Database_User_Primitives';
-import { HomeStackParamsList } from '../../navigation/HomeNavigator';
-import ProfilItem from '../../components/Profil/ProfilItem';
-import SortBottomScreen from "../BottomScreens/SortBottomScreen";
-import { BottomScreenOpen_Impact } from "../../constants/Impacts";
-import { sortString } from "../../primitives/BasicsMethods";
+import { IconButton, IconProvider, NavigationActions, NavigationButton } from '../../../components/Buttons/IconButtons';
+import { TextButton } from '../../../components/Buttons/UsualButton';
+import { Database_getUsersInfo, UserDataBase } from '../../../firebase/Database_User_Primitives';
+import { HomeStackParamsList } from '../../../navigation/HomeNavigator';
+import ProfilItem from '../../../components/Profil/ProfilItem';
+import SortBottomScreen from "../../BottomScreens/SortBottomScreen";
+import { BottomScreenOpen_Impact } from "../../../constants/Impacts";
+import { sortString } from "../../../primitives/BasicsMethods";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 type AnyUserProfilFriendsScreenProps = NativeStackScreenProps<HomeStackParamsList, "AnyUserProfilFriendsScreen">

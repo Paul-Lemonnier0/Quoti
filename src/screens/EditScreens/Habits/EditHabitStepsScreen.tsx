@@ -12,6 +12,7 @@ import { HabitsContext } from "../../../data/HabitContext";
 import { EditHabitContext } from "./EditHabitContext";
 import { BottomSheetModalMethodsContext } from "../../../data/BottomSheetModalContext";
 import { setNewSteps } from "../../../primitives/StepMethods";
+import { useHabitActions } from "../../../hooks/Habits/useHabitActions";
 
 type EditHabitStepsScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditHabitStepsScreen">
 
@@ -21,7 +22,7 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
     const {setIsLoading} = useContext(AppContext)
     const {validationAdditionnalMethod} = useContext(EditHabitContext)
 
-    const {updateHabit} = useContext(HabitsContext)
+    const {updateHabit} = useHabitActions()
     
     const {newValues, oldHabit, isNewObjectifHabit} = route.params
 

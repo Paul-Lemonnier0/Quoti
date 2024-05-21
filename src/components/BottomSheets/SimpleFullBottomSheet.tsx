@@ -17,7 +17,7 @@ export interface SimpleFullBottomSheetProps extends BasicCustomBottomSheetProps 
 }
 
 const SimpleFullBottomSheet: FC<SimpleFullBottomSheetProps> = 
-  ({bottomSheetModalRef, snapPoints, footerMethod, footerText, customFooterComponent, isPrimary, isError, setIsError, onDismiss, children}) => {
+  ({bottomSheetModalRef, snapPoints, footerMethod, footerText, customFooterComponent, isPrimary, isError, onDismiss, children}) => {
     
     const {theme} = useContext(AppContext)
     
@@ -43,7 +43,6 @@ const SimpleFullBottomSheet: FC<SimpleFullBottomSheetProps> =
             footerMethod={footerMethod} 
             footerText={footerText} 
             isPrimary
-            setIsError={setIsError} 
             props={props}
           />
         )

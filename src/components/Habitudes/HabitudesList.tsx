@@ -53,8 +53,8 @@ const HabitudesList: FC<HabitudesListProps> = ({
       const delay = index * 200 > 600 ? 600 : index * 200
 
       return(
-          <Animated.View key={index} style={(noAnimation || basicAnimation) ? undefined : rStyle}
-              entering={FadeInDown.delay(delay)}>
+        <Animated.View entering={FadeInDown.delay(delay)}>
+          <Animated.View key={index} style={(noAnimation || basicAnimation) ? undefined : rStyle}>
               <HabitudeListItem 
                   habitude={habit} 
                   key={habit.habitID} 
@@ -64,6 +64,7 @@ const HabitudesList: FC<HabitudesListProps> = ({
                   currentDateString={currentDateString}
               />
           </Animated.View>
+        </Animated.View>
       )
   })
 

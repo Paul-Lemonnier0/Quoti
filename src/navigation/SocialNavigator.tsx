@@ -3,18 +3,18 @@ import SocialScreen from "../screens/SocialScreen";
 import UtilsScreen from "../screens/UtilsScreen";
 import AnyUserProfilScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilScreen";
 import AnyUserProfilHabitsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilHabitsScreen";
-import AnyUserProfilObjectifsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilObjectifsScreen";
+import AnyUserProfilGoalsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilGoalsScreen";
 import AnyUserProfilSuccessScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilSuccessScreen";
 import AnyUserProfilFriendsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilFriendsScreen";
 import PresentationHabitScreen from "../screens/Habitude/PresentationHabitScreen";
-import PresentationObjectifDetailsScreen from "../screens/Objectif/PresentationObjectifDetailsScreen";
+import PresentationGoalDetailsScreen from "../screens/Goal/PresentationGoalDetailsScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { UserDataBase } from "../firebase/Database_User_Primitives";
-import { SeriazableHabit, SeriazableObjectif } from "../types/HabitTypes";
+import { SeriazableHabit, SeriazableGoal } from "../types/HabitTypes";
 import SearchUserScreen from "../screens/SocialScreens/SearchUserScreen";
 import InteractionsScreen from "../screens/SocialScreens/InteractionsScreen";
 import AnyUserProfilDoneHabitsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneHabitsScreen";
-import AnyUserProfilDoneObjectifsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneObjectifsScreen";
+import AnyUserProfilDoneGoalsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneGoalsScreen";
 
 export type SocialScreenStackType = {
     SocialScreen: undefined,
@@ -32,11 +32,11 @@ export type SocialScreenStackType = {
         detailledUser: UserDataBase
     },
 
-    AnyUserProfilObjectifsScreen: {
+    AnyUserProfilGoalsScreen: {
         detailledUser: UserDataBase
     },
 
-    AnyUserProfilDoneObjectifsScreen: {
+    AnyUserProfilDoneGoalsScreen: {
         detailledUser: UserDataBase
     },
     
@@ -53,8 +53,8 @@ export type SocialScreenStackType = {
         habit: SeriazableHabit
     },
 
-    PresentationObjectifDetailsScreen: {
-        seriazableObjectif: SeriazableObjectif
+    PresentationGoalDetailsScreen: {
+        seriazableGoal: SeriazableGoal
     },
 
     InteractionsScreen: undefined,
@@ -77,13 +77,13 @@ function SocialScreenNavigator() {
             <SocialScreenStack.Screen name="AnyUserProfilScreen" component={AnyUserProfilScreen}/>
             <SocialScreenStack.Screen name="AnyUserProfilHabitsScreen" component={AnyUserProfilHabitsScreen}/>
             <SocialScreenStack.Screen name="AnyUserProfilDoneHabitsScreen" component={AnyUserProfilDoneHabitsScreen}/>
-            <SocialScreenStack.Screen name="AnyUserProfilObjectifsScreen" component={AnyUserProfilObjectifsScreen}/>
-            <SocialScreenStack.Screen name="AnyUserProfilDoneObjectifsScreen" component={AnyUserProfilDoneObjectifsScreen}/>
+            <SocialScreenStack.Screen name="AnyUserProfilGoalsScreen" component={AnyUserProfilGoalsScreen}/>
+            <SocialScreenStack.Screen name="AnyUserProfilDoneGoalsScreen" component={AnyUserProfilDoneGoalsScreen}/>
             <SocialScreenStack.Screen name="AnyUserProfilSuccessScreen" component={AnyUserProfilSuccessScreen}/>
             <SocialScreenStack.Screen name="AnyUserProfilFriendsScreen" component={AnyUserProfilFriendsScreen}/>
 
             <SocialScreenStack.Screen name="PresentationHabitScreen" component={PresentationHabitScreen}/>
-            <SocialScreenStack.Screen name="PresentationObjectifDetailsScreen" component={PresentationObjectifDetailsScreen}/>
+            <SocialScreenStack.Screen name="PresentationGoalDetailsScreen" component={PresentationGoalDetailsScreen}/>
         </SocialScreenStack.Navigator>
     );
 }

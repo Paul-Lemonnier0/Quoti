@@ -70,8 +70,8 @@ export const useHabitActions = () => {
         return oldHabit
     }
 
-    const updateHabitRelationWithObjectif = async(habit: Habit, newObjectifID: string | null) => {
-        return await updateHabit(habit, { objectifID: newObjectifID }, selectedDate)
+    const updateHabitRelationWithGoal = async(habit: Habit, newGoalID: string | null) => {
+        return await updateHabit(habit, { goalID: newGoalID }, selectedDate)
     }
 
     const archiveHabit = async(habit: Habit, habitState = HabitState.Current) => {
@@ -144,7 +144,7 @@ export const useHabitActions = () => {
     }
 
     return {
-        addHabit, removeHabit, updateHabit, updateHabitRelationWithObjectif,
+        addHabit, removeHabit, updateHabit, updateHabitRelationWithGoal,
         archiveHabit, markHabitAsDone, getBackHabit
     }
 }

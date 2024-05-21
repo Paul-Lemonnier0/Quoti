@@ -189,11 +189,11 @@ type ProfilDetailsFormProps = {
     friends: string[],
     nb_habits: number,
     nb_habits_done: number,
-    nb_objectifs: number,
-    nb_objectifs_done: number,
+    nb_goals: number,
+    nb_goals_done: number,
     handleSeeFriends: () => void,
-    handleSeeObjectifs: () => void,
-    handleSeeDoneObjectifs: () => void,
+    handleSeeGoals: () => void,
+    handleSeeDoneGoals: () => void,
     handleSeeHabits: () => void,
     handleSeeDoneHabits: () => void,
     handleSeeSucces: () => void,
@@ -210,11 +210,11 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
     friends,
     nb_habits,
     nb_habits_done,
-    nb_objectifs,
-    nb_objectifs_done,
+    nb_goals,
+    nb_goals_done,
     handleSeeFriends,
-    handleSeeObjectifs,
-    handleSeeDoneObjectifs,
+    handleSeeGoals,
+    handleSeeDoneGoals,
     handleSeeHabits,
     handleSeeDoneHabits,
     handleSeeSucces,
@@ -261,19 +261,19 @@ const ProfilDetailsForm: FC<ProfilDetailsFormProps> = ({
 
     
         {
-            number: nb_objectifs,
-            title: "Objectifs",
+            number: nb_goals,
+            title: "Goals",
             subTitle: "En cours",
-            onPress: handleSeeObjectifs,
+            onPress: handleSeeGoals,
         },
 
 
         {
-            number: nb_objectifs_done,
-            title: "Objectifs",
+            number: nb_goals_done,
+            title: "Goals",
             subTitle: "Terminés",
             color: fontGray,
-            onPress: handleSeeDoneObjectifs,
+            onPress: handleSeeDoneGoals,
         }
     ]
 

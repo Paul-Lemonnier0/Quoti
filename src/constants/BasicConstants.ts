@@ -12,9 +12,9 @@ export enum AddHabitScreenType {
 const ADD_HABIT_WITHOUT_ASSOCIATED_OBJ_STEP_ORDER: AddHabitScreenType[] = [AddHabitScreenType.PreAddScreen, AddHabitScreenType.AddBasicDetails, AddHabitScreenType.ChooseColorScreen, AddHabitScreenType.ChooseIconScreen, AddHabitScreenType.AddHabitSteps, AddHabitScreenType.CreateHabitDetails]
 const ADD_HABIT_WITH_ASSOCIATED_OBJ_STEP_ORDER: AddHabitScreenType[] = [AddHabitScreenType.PreAddScreen, AddHabitScreenType.AddBasicDetails, AddHabitScreenType.ChooseIconScreen, AddHabitScreenType.AddHabitSteps, AddHabitScreenType.CreateHabitDetails]
 
-export function getAddHabitStepsDetails(objectifID: string | null, currentScreen: AddHabitScreenType){
+export function getAddHabitStepsDetails(goalID: string | null, currentScreen: AddHabitScreenType){
 
-    return objectifID === null || objectifID === undefined ?
+    return goalID === null || goalID === undefined ?
         {
             TOTAL_STEPS: ADD_HABIT_WITHOUT_ASSOCIATED_OBJ_STEP_ORDER.length,
             CURRENT_STEP: ADD_HABIT_WITHOUT_ASSOCIATED_OBJ_STEP_ORDER.indexOf(currentScreen)
@@ -28,21 +28,21 @@ export function getAddHabitStepsDetails(objectifID: string | null, currentScreen
         }
 }
 
-export enum AddObjectifScreenType {
+export enum AddGoalScreenType {
     PreAddScreen = "PreAddScreen",
-    AddBasicObjectifDetails = "AddBasicObjectifDetails",
-    ChooseColorScreenObjectif = "ChooseColorScreenObjectif",
-    ChooseIconScreenObjectif = "ChooseIconScreenObjectif",
-    AddHabitsToObjectif = "AddHabitsToObjectif"
+    AddBasicGoalDetails = "AddBasicGoalDetails",
+    ChooseColorScreenGoal = "ChooseColorScreenGoal",
+    ChooseIconScreenGoal = "ChooseIconScreenGoal",
+    AddHabitsToGoal = "AddHabitsToGoal"
 }
 
-const ADD_OBJECTIF_STEP_ORDER: AddObjectifScreenType[] = [AddObjectifScreenType.PreAddScreen, AddObjectifScreenType.AddBasicObjectifDetails, AddObjectifScreenType.ChooseColorScreenObjectif, AddObjectifScreenType.ChooseIconScreenObjectif, AddObjectifScreenType.AddHabitsToObjectif]
+const ADD_GOAL_STEP_ORDER: AddGoalScreenType[] = [AddGoalScreenType.PreAddScreen, AddGoalScreenType.AddBasicGoalDetails, AddGoalScreenType.ChooseColorScreenGoal, AddGoalScreenType.ChooseIconScreenGoal, AddGoalScreenType.AddHabitsToGoal]
 
-export function getAddObjectifStepsDetails(currentScreen: AddObjectifScreenType){
+export function getAddGoalStepsDetails(currentScreen: AddGoalScreenType){
 
     return {
-            TOTAL_STEPS: ADD_OBJECTIF_STEP_ORDER.length,
-            CURRENT_STEP: ADD_OBJECTIF_STEP_ORDER.indexOf(currentScreen)
+            TOTAL_STEPS: ADD_GOAL_STEP_ORDER.length,
+            CURRENT_STEP: ADD_GOAL_STEP_ORDER.indexOf(currentScreen)
         }
 }
 

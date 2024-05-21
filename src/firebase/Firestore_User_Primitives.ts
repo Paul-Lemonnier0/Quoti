@@ -377,9 +377,9 @@ export const getHabitInvitationRequest = async(userMail: string): Promise<string
 export interface VisitInfoUser extends UserDataBase {
     isPrivate: boolean,
     nbHabits: number,
-    nbObjectifs: number,
+    nbGoals: number,
     nbHabitsFinished: number,
-    nbObjectifsFinished: number,
+    nbGoalsFinished: number,
     friendsID: string[],
     nbSucces: number
 }
@@ -521,13 +521,13 @@ const getNumberOfHabitsForUser = async(userMail: string, baseState = HabitState.
     return nbHabits.data().count
 }
 
-const getNumberOfObjectifsForUser = async(userID: string): Promise<number> => {
+const getNumberOfGoalsForUser = async(userID: string): Promise<number> => {
     const userDoc = doc(db, FirestoreCollections.Users, userID)
-    const userObjectifsCollection = collection(userDoc, FirestoreUserSubCollections.UserObjectifs); 
+    const userGoalsCollection = collection(userDoc, FirestoreUserSubCollections.UserGoals); 
 
-    const nbObjectifs = await getCountFromServer(userObjectifsCollection)
+    const nbGoals = await getCountFromServer(userGoalsCollection)
 
-    return nbObjectifs.data().count
+    return nbGoals.data().count
 }
 
 const getUserFriendsID = async(userID: string): Promise<string[]> => {
@@ -545,6 +545,6 @@ const getUserFriendsID = async(userID: string): Promise<string[]> => {
 
 export {
     getNumberOfHabitsForUser,
-    getNumberOfObjectifsForUser,
+    getNumberOfGoalsForUser,
     getUserFriendsID
 }

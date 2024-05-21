@@ -3,19 +3,19 @@ import { HabitudeListItemPresentation } from "./HabitudeListItem"
 import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated"
 import { Habit } from "../../types/HabitTypes"
 import { FC, useCallback } from "react"
-import { FormDetailledObjectifHabit } from "../../types/FormHabitTypes"
+import { FormDetailledGoalHabit } from "../../types/FormHabitTypes"
 import React from "react"
 import { UserDataBase } from "../../firebase/Database_User_Primitives"
 
 interface RenderPresentationHabitItemProps {
-    item: Habit | FormDetailledObjectifHabit,
+    item: Habit | FormDetailledGoalHabit,
     index: number,
     viewableItems?: Animated.SharedValue<ViewToken[]>,
     baseColor?: string,
-    deleteHabit: (habit: Habit | FormDetailledObjectifHabit) => void,
-    editHabit: (habitID: string, newHabit: Habit | FormDetailledObjectifHabit) => void,
-    isNotObjectifIDConst?: boolean,
-    isNotNewObjectifHabit?: boolean,
+    deleteHabit: (habit: Habit | FormDetailledGoalHabit) => void,
+    editHabit: (habitID: string, newHabit: Habit | FormDetailledGoalHabit) => void,
+    isNotGoalIDConst?: boolean,
+    isNotNewGoalHabit?: boolean,
     noAnimation?: boolean,
     onPress?: (habit: Habit) => void,
     marginBottom?: number,
@@ -25,12 +25,12 @@ interface RenderPresentationHabitItemProps {
 }
 
 export interface PresentationHabitListProps {
-    habits: (Habit | FormDetailledObjectifHabit)[],
+    habits: (Habit | FormDetailledGoalHabit)[],
     baseColor?: string,
-    deleteHabit: (habit: Habit | FormDetailledObjectifHabit) => void,
-    editHabit: (habitID: string, newHabit: Habit | FormDetailledObjectifHabit) => void,
-    isNotObjectifIDConst?: boolean,
-    isNotNewObjectifHabit?: boolean,
+    deleteHabit: (habit: Habit | FormDetailledGoalHabit) => void,
+    editHabit: (habitID: string, newHabit: Habit | FormDetailledGoalHabit) => void,
+    isNotGoalIDConst?: boolean,
+    isNotNewGoalHabit?: boolean,
     noAnimation?: boolean,
     onPress?: (habit: Habit) => void,
     marginBottom?: number,
@@ -46,8 +46,8 @@ export const RenderPresentationHabitItem: FC<RenderPresentationHabitItemProps> =
     baseColor, 
     deleteHabit,
     editHabit,
-    isNotObjectifIDConst,
-    isNotNewObjectifHabit,
+    isNotGoalIDConst,
+    isNotNewGoalHabit,
     onPress,
     noAnimation,
     marginBottom,
@@ -73,8 +73,8 @@ export const RenderPresentationHabitItem: FC<RenderPresentationHabitItemProps> =
         <Animated.View key={index} style={((noAnimation || !viewableItems) ? undefined : rStyle)}>
             <HabitudeListItemPresentation 
                 key={index} 
-                isNotObjectifIDConst={isNotObjectifIDConst}
-                isNotNewObjectifHabit={isNotNewObjectifHabit}
+                isNotGoalIDConst={isNotGoalIDConst}
+                isNotNewGoalHabit={isNotNewGoalHabit}
                 habitude={baseColor ? {...habit, color: baseColor} : habit}                             
                 deleteHabit={() => deleteHabit(habit)}
                 editHabit={editHabit}
@@ -93,8 +93,8 @@ const PresentationHabitList: FC<PresentationHabitListProps> = ({
     baseColor, 
     deleteHabit,
     editHabit,
-    isNotObjectifIDConst,
-    isNotNewObjectifHabit,
+    isNotGoalIDConst,
+    isNotNewGoalHabit,
     onPress,
     noAnimation,
     marginBottom,
@@ -124,8 +124,8 @@ const PresentationHabitList: FC<PresentationHabitListProps> = ({
                     baseColor={baseColor} 
                     deleteHabit={deleteHabit}
                     editHabit={editHabit}
-                    isNotObjectifIDConst={isNotObjectifIDConst}
-                    isNotNewObjectifHabit={isNotNewObjectifHabit}
+                    isNotGoalIDConst={isNotGoalIDConst}
+                    isNotNewGoalHabit={isNotNewGoalHabit}
                     onPress={onPress}
                     noAnimation={noAnimation}
                     marginBottom={marginBottom}

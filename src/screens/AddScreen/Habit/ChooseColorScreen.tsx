@@ -18,7 +18,7 @@ export const ChooseColorScreen: FC<ChooseColorScreenProps> = ({navigation, route
         BottomScreenOpen_Impact()
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(habit.objectifID ?? null, AddHabitScreenType.ChooseColorScreen)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(habit.goalID ?? null, AddHabitScreenType.ChooseColorScreen)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP

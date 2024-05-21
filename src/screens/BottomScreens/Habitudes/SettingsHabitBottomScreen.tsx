@@ -5,7 +5,7 @@ import { useThemeColor } from "../../../components/Themed";
 import { HabitsContext } from "../../../data/HabitContext";
 import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
 import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
-import PinToObjectifBottomScreen from "./PinToObjectifBottomScreen";
+import PinToGoalBottomScreen from "./PinToGoalBottomScreen";
 import EditHabitNav from "../../EditScreens/Habits/EditHabitNav";
 import { AppContext } from "../../../data/AppContext";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -23,7 +23,7 @@ import { useHabitActions } from "../../../hooks/Habits/useHabitActions";
 export interface SettingHabitBottomScreenProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
     habit: Habit,
-    attachToObjectifAdditionnalMethod?: () => void, 
+    attachToGoalAdditionnalMethod?: () => void, 
     deleteAdditionnalMethod?: () => void, 
     modifyAdditionnalMethod?: () => void,
     additionnalClosedMethod?: () => void,
@@ -33,7 +33,7 @@ export interface SettingHabitBottomScreenProps {
 const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
     bottomSheetModalRef, 
     habit, 
-    attachToObjectifAdditionnalMethod, 
+    attachToGoalAdditionnalMethod, 
     deleteAdditionnalMethod,
     modifyAdditionnalMethod,
     additionnalClosedMethod,
@@ -41,18 +41,18 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const { Objectifs } = useContext(HabitsContext)
-    const { updateHabitRelationWithObjectif } = useHabitActions()
+    const { Goals } = useContext(HabitsContext)
+    const { updateHabitRelationWithGoal } = useHabitActions()
 
     const habitType = getHabitType(habit)
 
-    const displayedObjectifs = Object.values(Objectifs)
+    const displayedGoals = Object.values(Goals)
 
     const closeModal = () => {
          bottomSheetModalRef.current?.close()
     }
 
-    const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
+    const bottomSheetModalRef_PinGoalScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_ShareHabitScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_EndHabit: RefObject<BottomSheetModal> = useRef(null)
     
@@ -72,17 +72,17 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         bottomSheetModalRef_ShareHabitScreen.current?.present() 
     }
 
-    const handleBreakObjectifRelation = async() => {
+    const handleBreakGoalRelation = async() => {
         setIsLoading(true)
-        attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
-        await updateHabitRelationWithObjectif(habit, null)
+        attachToGoalAdditionnalMethod ? attachToGoalAdditionnalMethod() : null
+        await updateHabitRelationWithGoal(habit, null)
         setIsLoading(false)
         Success_Impact()
     }
 
-    const openPinObjectifScreen = () => {
+    const openPinGoalScreen = () => {
         BottomScreenOpen_Impact()
-        bottomSheetModalRef_PinObjectifScreen.current?.present() 
+        bottomSheetModalRef_PinGoalScreen.current?.present() 
     }
 
     const handleOpenFinishHabitBottomScreen = () => {
@@ -96,10 +96,10 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         }, 200)
     }
 
-    const handleMakeObjectifRelation = async(habit: Habit, selectedPinObjectifID: string | null) => 
+    const handleMakeGoalRelation = async(habit: Habit, selectedPinGoalID: string | null) => 
     {
-        attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
-        await updateHabitRelationWithObjectif(habit, selectedPinObjectifID)
+        attachToGoalAdditionnalMethod ? attachToGoalAdditionnalMethod() : null
+        await updateHabitRelationWithGoal(habit, selectedPinGoalID)
     }
 
 
@@ -110,12 +110,12 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
         {icon: "clock-edit-outline", provider: IconProvider.MaterialCommunityIcons, text:"Modifier la fréquence", method: handleOpenEditFrequency},
     ]
 
-    if(habitType === "Objectifs"){
-        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Détacher de l'objectif", method: handleBreakObjectifRelation})
+    if(habitType === "Goals"){
+        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Détacher de l'goal", method: handleBreakGoalRelation})
     }
 
     else {
-        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Attacher à un objectif", method: openPinObjectifScreen})
+        commands.push({icon: "pin", provider: IconProvider.Octicons, text:"Attacher à un goal", method: openPinGoalScreen})
     }
 
     commands.push({icon: "share", provider: IconProvider.Feather, text:"Partager l'habitude", method: handleOpenShare})
@@ -145,10 +145,10 @@ const SettingHabitBottomScreen: FC<SettingHabitBottomScreenProps> = ({
                 </View>
             </View>
             
-            <PinToObjectifBottomScreen
-                bottomSheetModalRef={bottomSheetModalRef_PinObjectifScreen}
-                displayedObjectifs={displayedObjectifs}
-                updateHabitRelationWithObjectif={handleMakeObjectifRelation}
+            <PinToGoalBottomScreen
+                bottomSheetModalRef={bottomSheetModalRef_PinGoalScreen}
+                displayedGoals={displayedGoals}
+                updateHabitRelationWithGoal={handleMakeGoalRelation}
                 habit={habit}/>
 
             <EditHabitNav

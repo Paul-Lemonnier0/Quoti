@@ -17,12 +17,12 @@ import { useThemeColor } from "../../components/Themed"
 
 enum ItemType {
     Habitude = "Habitude",
-    Objectif = "Objectif"
+    Goal = "Goal"
 }
 
 enum NavItemType {
     AddBasicDetails = "AddBasicDetails",
-    AddBasicDetailsObjectif = "AddBasicDetailsObjectif"
+    AddBasicDetailsGoal = "AddBasicDetailsGoal"
 }
 
 type PreAddScreenProps = NativeStackScreenProps<AddScreenStackType, "PreAddScreen">
@@ -40,7 +40,7 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
 
     const radios: RadioType[] = [
         {key: NavItemType.AddBasicDetails, text: ItemType.Habitude },
-        {key: NavItemType.AddBasicDetailsObjectif, text: ItemType.Objectif},
+        {key: NavItemType.AddBasicDetailsGoal, text: ItemType.Goal},
     ];
 
     const handleSetSelectedItem = (item: string) => {
@@ -96,14 +96,14 @@ export const PreAddScreen: FC<PreAddScreenProps> = ({navigation}) => {
                                 <HugeText text={"Créer une "} style={{textAlign: "center", color: fontGray}}>
                                     <HugeText text={"habitude"} style={{textAlign: "center", color: isSelected(NavItemType.AddBasicDetails) ? font : fontGray}}/>
                                     <HugeText text={" ou un "} style={{textAlign: "center", color: fontGray}}/>
-                                    <HugeText text={"objectif"} style={{textAlign: "center", color: isSelected(NavItemType.AddBasicDetailsObjectif) ? font : fontGray}}/>
+                                    <HugeText text={"goal"} style={{textAlign: "center", color: isSelected(NavItemType.AddBasicDetailsGoal) ? font : fontGray}}/>
                                     <HugeText text={" ?"} style={{textAlign: "center", color: fontGray}}/>
                                 </HugeText>
                                     
                                 <NormalGrayText bold style={{textAlign: "center"}} text={
                                     selectedItem === NavItemType.AddBasicDetails ?
                                     "Les habitudes forment la structure de vos actions quotidiennes et de vos projets. Elles constituent votre routine." :
-                                    "Les objectifs sont composés d'habitudes et permettent de structurer davantage votre quotidien et vos projets"
+                                    "Les goals sont composés d'habitudes et permettent de structurer davantage votre quotidien et vos projets"
                                 }/>
                             </View>
                         </View>

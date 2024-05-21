@@ -11,39 +11,39 @@ import EditHabitAdvancedDetailsScreen from "./EditHabitAdvancedDetailsScreen";
 import EditHabitStepsScreen from "./EditHabitStepsScreen";
 import { EditHabitContextProvider } from "./EditHabitContext";
 import { Habit, SeriazableHabit } from "../../../types/HabitTypes";
-import { FormBasicHabit, FormColoredHabit, FormDetailledHabit, FormDetailledObjectifHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
+import { FormBasicHabit, FormColoredHabit, FormDetailledHabit, FormDetailledGoalHabit, FormIconedHabit, FormStepsHabit } from "../../../types/FormHabitTypes";
 import { View } from "react-native";
 
 export type EditHabitStackProps = {
     EditHabitDetailsScreen: {
-        habit: (SeriazableHabit | FormDetailledObjectifHabit),
-        isNewObjectifHabit?: boolean,
-        constObjectifID?: string,
-        objectifColor?: string
+        habit: (SeriazableHabit | FormDetailledGoalHabit),
+        isNewGoalHabit?: boolean,
+        constGoalID?: string,
+        goalColor?: string
     },
 
     EditColorHabitScreen: {
         newValues:  FormBasicHabit,
-        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
-        isNewObjectifHabit?: boolean
+        oldHabit: (SeriazableHabit | FormDetailledGoalHabit),
+        isNewGoalHabit?: boolean
     },
 
     EditIconHabitScreen: {
         newValues:  FormColoredHabit,
-        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
-        isNewObjectifHabit?: boolean
+        oldHabit: (SeriazableHabit | FormDetailledGoalHabit),
+        isNewGoalHabit?: boolean
     },
 
     EditHabitStepsScreen: {
         newValues:  FormIconedHabit,
-        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
-        isNewObjectifHabit?: boolean
+        oldHabit: (SeriazableHabit | FormDetailledGoalHabit),
+        isNewGoalHabit?: boolean
     },
 
     EditHabitAdvancedDetailsScreen: {
         newValues:  FormStepsHabit,
-        oldHabit: (SeriazableHabit | FormDetailledObjectifHabit),
-        isNewObjectifHabit?: boolean
+        oldHabit: (SeriazableHabit | FormDetailledGoalHabit),
+        isNewGoalHabit?: boolean
     },
 }
 
@@ -51,12 +51,12 @@ const EditHabitStack = createNativeStackNavigator<EditHabitStackProps>()
 
 export interface EditHabitNavProps {
     bottomSheetModalRef: RefObject<BottomSheetModal>,
-    habit: (SeriazableHabit | FormDetailledObjectifHabit),
+    habit: (SeriazableHabit | FormDetailledGoalHabit),
     validationAdditionnalMethod: () => void,
-    editHabitCustomMethod: (values: FormDetailledObjectifHabit) => void,
-    isNewObjectifHabit?: boolean,
-    objectifColor?: string,
-    constObjectifID?: string,
+    editHabitCustomMethod: (values: FormDetailledGoalHabit) => void,
+    isNewGoalHabit?: boolean,
+    goalColor?: string,
+    constGoalID?: string,
     additionnalCloseMethod?: () => void
 }
 
@@ -65,15 +65,15 @@ const EditHabitNav: FC<EditHabitNavProps> = ({
     habit, 
     validationAdditionnalMethod, 
     editHabitCustomMethod, 
-    isNewObjectifHabit, 
-    objectifColor, 
-    constObjectifID,
+    isNewGoalHabit, 
+    goalColor, 
+    constGoalID,
     additionnalCloseMethod
 }) => {
 
     return(
             <SimpleFullBottomSheet onDismiss={additionnalCloseMethod} bottomSheetModalRef={bottomSheetModalRef} isPrimary>
-                <EditHabitContextProvider validationAdditionnalMethod={(values?: FormDetailledObjectifHabit) => {
+                <EditHabitContextProvider validationAdditionnalMethod={(values?: FormDetailledGoalHabit) => {
                     validationAdditionnalMethod()
                     values ? editHabitCustomMethod(values) : null
                 }}>
@@ -83,9 +83,9 @@ const EditHabitNav: FC<EditHabitNavProps> = ({
                                 <EditHabitStack.Navigator screenOptions={{headerShown: false}} initialRouteName="EditHabitDetailsScreen">
                                     <EditHabitStack.Screen name="EditHabitDetailsScreen" component={EditHabitDetailsScreen} initialParams={{
                                         habit, 
-                                        isNewObjectifHabit, 
-                                        objectifColor,
-                                        constObjectifID
+                                        isNewGoalHabit, 
+                                        goalColor,
+                                        constGoalID
                                     }}/>
                                     <EditHabitStack.Screen name="EditColorHabitScreen" component={EditColorHabitScreen}/>
                                     <EditHabitStack.Screen name="EditIconHabitScreen" component={EditIconHabitScreen}/>

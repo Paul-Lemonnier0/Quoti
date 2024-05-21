@@ -5,7 +5,7 @@ import { MemberType, UserFirestoreHabit } from "../types/FirestoreTypes/Firestor
 import { FilteredHabitsType, FrequencyTypes, HabitList, Habit, StreakValues, StepList, Step, SeriazableHabit, EMPTY_FILTERED_HABITS } from "../types/HabitTypes";
 import { toISOStringWithoutTimeZone } from "./BasicsMethods";
 import { calculateNextScheduledDate, isHabitScheduledForDate } from "./HabitudesReccurence";
-import { FormDetailledObjectifHabit, FormStepsHabit } from "../types/FormHabitTypes";
+import { FormDetailledGoalHabit, FormStepsHabit } from "../types/FormHabitTypes";
 
 //TODO: gérer le cache
 
@@ -59,9 +59,9 @@ const setHabitStepsLogs = async(date: Date, habit: Habit, currentDateDoneSteps: 
 }
 
 
-export const getHabitType = (habit: Habit | UserFirestoreHabit): "Objectifs" | "Habitudes" => {
-  const isObjective = habit.objectifID !== undefined && habit.objectifID !== null
-  const habitType = isObjective ? "Objectifs" : "Habitudes";
+export const getHabitType = (habit: Habit | UserFirestoreHabit): "Goals" | "Habitudes" => {
+  const isObjective = habit.goalID !== undefined && habit.goalID !== null
+  const habitType = isObjective ? "Goals" : "Habitudes";
 
   return habitType
 }
@@ -79,16 +79,16 @@ export const removeHabitFromFilteredHabits = (filteredHabits: FilteredHabitsType
   const frequency = habit.frequency
   const updatedFilteredHabits  = {...filteredHabits}
 
-  if(habit.objectifID){
-    if(updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]){
+  if(habit.goalID){
+    if(updatedFilteredHabits[frequency].Goals?.[habit.goalID]){
     
-      delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID][habit.habitID]
+      delete updatedFilteredHabits[frequency].Goals?.[habit.goalID][habit.habitID]
 
-      let objectifArray = updatedFilteredHabits[frequency]?.Objectifs?.[habit.objectifID] ?? {} 
-      const isObjectifEmpty = Object.keys(objectifArray).length === 0
+      let goalArray = updatedFilteredHabits[frequency]?.Goals?.[habit.goalID] ?? {} 
+      const isGoalEmpty = Object.keys(goalArray).length === 0
 
-      if(isObjectifEmpty){
-        delete updatedFilteredHabits[frequency].Objectifs?.[habit.objectifID]  
+      if(isGoalEmpty){
+        delete updatedFilteredHabits[frequency].Goals?.[habit.goalID]  
       }
 
       else delete updatedFilteredHabits[frequency].Habitudes?.[habit.habitID]
@@ -107,9 +107,9 @@ const addPlannedHabitsToFilteredHabits = (filteredHabits: FilteredHabitsType, ha
   const habitType = getHabitType(habit)
   const frequency = habit.frequency
   const habitID = habit.habitID
-  const objectifID = habit.objectifID
+  const goalID = habit.goalID
 
-  if(!objectifID){
+  if(!goalID){
     return {
       ...filteredHabits,
       [frequency]: {
@@ -127,9 +127,9 @@ const addPlannedHabitsToFilteredHabits = (filteredHabits: FilteredHabitsType, ha
     [frequency]: {
       ...filteredHabits[frequency],
       [habitType]: {
-        ...filteredHabits[frequency].Objectifs,
-        [objectifID]: {
-          ...filteredHabits[frequency].Objectifs?.[objectifID],
+        ...filteredHabits[frequency].Goals,
+        [goalID]: {
+          ...filteredHabits[frequency].Goals?.[goalID],
           [habitID]: habit
         }
       }
@@ -288,9 +288,9 @@ export const stringToFrequencyType = (str: string): FrequencyTypes => {
 }
 
 
-export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate: FilteredHabitsType, frequency: FrequencyTypes, objectifID: string | undefined, habitID: string): Habit | undefined => {
-  if(objectifID){
-    return filteredHabitsByDate[frequency].Objectifs?.[objectifID]?.[habitID]
+export const getHabitFromFilteredHabitsMethod = (filteredHabitsByDate: FilteredHabitsType, frequency: FrequencyTypes, goalID: string | undefined, habitID: string): Habit | undefined => {
+  if(goalID){
+    return filteredHabitsByDate[frequency].Goals?.[goalID]?.[habitID]
   }
 
   return filteredHabitsByDate[frequency].Habitudes?.[habitID]
@@ -347,7 +347,7 @@ export const getFirstDayOfHabitOccurenceFromDate = (date: Date, habit: Habit): D
  * Compare deux habitudes ainsi que les valeurs qui sont censées avoir bougées afin de déterminer si elles sont identiques
  */
 
-export const notSameHabit = (newValues: FormStepsHabit, newHabit: SeriazableHabit, oldHabit: SeriazableHabit | FormDetailledObjectifHabit): boolean => {
+export const notSameHabit = (newValues: FormStepsHabit, newHabit: SeriazableHabit, oldHabit: SeriazableHabit | FormDetailledGoalHabit): boolean => {
   for(let oldKey of Object.keys(oldHabit)){
       if(oldKey !== "steps" && (!newHabit.hasOwnProperty(oldKey) || newHabit[oldKey] !== oldHabit[oldKey])){
           return true

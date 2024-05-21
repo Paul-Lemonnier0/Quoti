@@ -24,7 +24,7 @@ interface FeedsProps {
 
 const Feeds: FC<FeedsProps> = ({navigation}) => {
 
-    const {Habits, addHabit, addObjectif} = useContext(HabitsContext);
+    const {Habits, addHabit, addGoal} = useContext(HabitsContext);
     const {user} = useContext(UserContext)
 
     const {theme} = useContext(AppContext)

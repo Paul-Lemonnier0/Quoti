@@ -1,29 +1,29 @@
-import { addObjectifToFirestore, removeObjectifInFirestore, updateObjectifInFirestore } from "../../firebase/Firestore_Objectifs_Primitives"
+import { addGoalToFirestore, removeGoalInFirestore, updateGoalInFirestore } from "../../firebase/Firestore_Goals_Primitives"
 import { auth } from "../../firebase/InitialisationFirebase"
-import { FormDetailledObjectif } from "../../types/FormObjectifTypes"
-import { Habit, Objectif } from "../../types/HabitTypes"
+import { FormDetailledGoal } from "../../types/FormGoalTypes"
+import { Habit, Goal } from "../../types/HabitTypes"
 import { useHabitActions } from "./useHabitActions"
 import { useHabitContext } from "./useHabitContext"
 
 export const useGoalsActions = () => {
 
     const {
-        getHabitsByObjectifID,
-        addObjectifIntern, removeObjectifIntern, updateObjectifIntern
+        getHabitsByGoalID,
+        addGoalIntern, removeGoalIntern, updateGoalIntern
     } = useHabitContext()
 
     const {
         removeHabit, 
-        updateHabitRelationWithObjectif
+        updateHabitRelationWithGoal
     } = useHabitActions()
 
-    const addGoal = async(goal: FormDetailledObjectif): Promise<Objectif | undefined> => {
+    const addGoal = async(goal: FormDetailledGoal): Promise<Goal | undefined> => {
         try{
             if(auth.currentUser && auth.currentUser.email) {
                 const userMail = auth.currentUser.email
 
-                const newGoal = await addObjectifToFirestore(goal, userMail)
-                addObjectifIntern(newGoal)
+                const newGoal = await addGoalToFirestore(goal, userMail)
+                addGoalIntern(newGoal)
         
                 console.log("Goal well added !")
         
@@ -32,25 +32,25 @@ export const useGoalsActions = () => {
         }
   
         catch(e) { 
-            console.log("Error while adding objectif : ", e) 
+            console.log("Error while adding goal : ", e) 
         }
 
         return undefined
     }
 
-    const removeGoal = async(objectifID: string, deletePinnedHabit?: boolean) => {
+    const removeGoal = async(goalID: string, deletePinnedHabit?: boolean) => {
         if(auth.currentUser && auth.currentUser.email) {
             const userMail = auth.currentUser.email
 
-            const habits = getHabitsByObjectifID(objectifID)
-            const promise: Promise<Habit | void>[] = [removeObjectifInFirestore(objectifID, userMail)]
-            removeObjectifIntern(objectifID)
+            const habits = getHabitsByGoalID(goalID)
+            const promise: Promise<Habit | void>[] = [removeGoalInFirestore(goalID, userMail)]
+            removeGoalIntern(goalID)
     
             const updatePromises = habits.map((habit) => {
                 if (deletePinnedHabit) {
                     return removeHabit(habit);
                 } else {
-                    return updateHabitRelationWithObjectif(habit, null);
+                    return updateHabitRelationWithGoal(habit, null);
                 }
             });
     
@@ -58,21 +58,21 @@ export const useGoalsActions = () => {
         }
     }
 
-    const updateGoal = async(oldObjectif: Objectif, newValues: {[key: string]: any}): Promise<Objectif> => {
+    const updateGoal = async(oldGoal: Goal, newValues: {[key: string]: any}): Promise<Goal> => {
         if(auth.currentUser && auth.currentUser.email) {
             const userMail = auth.currentUser.email
 
-            const updatedObjectif: Objectif = {...oldObjectif, ...newValues}
+            const updatedGoal: Goal = {...oldGoal, ...newValues}
         
-            updateObjectifIntern(updatedObjectif)
+            updateGoalIntern(updatedGoal)
       
-            await updateObjectifInFirestore(userMail, oldObjectif, newValues)
+            await updateGoalInFirestore(userMail, oldGoal, newValues)
       
-            console.log("Objectif updated")
-            return updatedObjectif
+            console.log("Goal updated")
+            return updatedGoal
         }
 
-        return oldObjectif
+        return oldGoal
       }
 
     return {

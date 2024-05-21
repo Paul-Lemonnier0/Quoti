@@ -11,13 +11,13 @@ type AddBasicDetailsProps = NativeStackScreenProps<AddScreenStackType, "AddBasic
 
 export const AddBasicDetails: FC<AddBasicDetailsProps> = ({navigation}) => {
 
-    const {Objectifs} = useContext(HabitsContext)    
+    const {Goals} = useContext(HabitsContext)    
 
     const handleGoNext = (values: FormBasicHabit) => {
 
-        if(values.objectifID){
-            const objectif = Objectifs[values.objectifID]
-            navigation.navigate("ChooseIconScreen", {habit: {...values, color: objectif.color}})
+        if(values.goalID){
+            const goal = Goals[values.goalID]
+            navigation.navigate("ChooseIconScreen", {habit: {...values, color: goal.color}})
         }
 
         else{

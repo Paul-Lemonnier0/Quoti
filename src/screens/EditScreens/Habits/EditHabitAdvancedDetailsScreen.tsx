@@ -15,10 +15,10 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
     const {validationAdditionnalMethod} = useContext(EditHabitContext)
 
-    const {newValues, oldHabit, isNewObjectifHabit} = route.params
+    const {newValues, oldHabit, isNewGoalHabit} = route.params
 
     const handleGoNext = async(values: FormDetailledHabitValues) => {
-        if(isNewObjectifHabit) {
+        if(isNewGoalHabit) {
             validationAdditionnalMethod ? validationAdditionnalMethod({...newValues, ...values, habitID: oldHabit.habitID}) : null
             Success_Impact()
             closeModal()
@@ -29,7 +29,7 @@ const EditHabitAdvancedDetailsScreen: FC<EditHabitAdvancedDetailsScreenProps> = 
         <HabitAdvancedDetailsForm
             isForModifyingHabit
             habit={oldHabit}
-            isNewObjectifHabit
+            isNewGoalHabit
             handleGoNext={handleGoNext}
         />
     )

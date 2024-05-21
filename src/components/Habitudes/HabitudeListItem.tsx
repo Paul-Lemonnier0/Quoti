@@ -12,9 +12,9 @@ import Animated, { FadeInDown, useSharedValue, withSpring } from "react-native-r
 import SettingHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsHabitBottomScreen";
 import { Habit } from "../../types/HabitTypes";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { FormDetailledHabit, FormDetailledObjectifHabit } from "../../types/FormHabitTypes";
+import { FormDetailledHabit, FormDetailledGoalHabit } from "../../types/FormHabitTypes";
 import React from "react"
-import SettingNewObjectifHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsNewObjectifHabitBottomScreen";
+import SettingNewGoalHabitBottomScreen from "../../screens/BottomScreens/Habitudes/SettingsNewGoalHabitBottomScreen";
 import HabitStepDetailsBottomScreen from "../../screens/BottomScreens/Habitudes/HabitStepDetailsBottomScreen";
 import { AppContext } from "../../data/AppContext";
 import { HabitsContext } from "../../data/HabitContext";
@@ -27,7 +27,7 @@ export interface HabitudeListItemProps {
     habitude: Habit,
     index: number,
     handleOnPress: (habitude: Habit, 
-    objectifID: string | undefined,
+    goalID: string | undefined,
     currentDateString: string) => void,
     currentDateString: string,
     noAnimation?: boolean
@@ -42,16 +42,16 @@ export const HabitudeListItem: FC<HabitudeListItemProps> = ({
 }) => {
 
     const {theme} = useContext(AppContext)
-    const {Objectifs, Habits} = useContext(HabitsContext)
+    const {Goals, Habits} = useContext(HabitsContext)
     const {user} = useContext(UserContext)
 
-    const color = habitude.objectifID ? Objectifs[habitude.objectifID].color : habitude.color
+    const color = habitude.goalID ? Goals[habitude.goalID].color : habitude.color
 
     const fontGray = useThemeColor(theme, "FontGray")
     const stylesCard = cardStyle()
 
     const handlePress = () => {  
-        handleOnPress(habitude, habitude.objectifID, currentDateString)      
+        handleOnPress(habitude, habitude.goalID, currentDateString)      
     }
 
     const habit = habitude
@@ -150,12 +150,12 @@ export const HabitudeListItem: FC<HabitudeListItemProps> = ({
 
 
 export interface HabitudeListItemPresentation {
-    habitude: Habit | FormDetailledHabit | FormDetailledObjectifHabit,
+    habitude: Habit | FormDetailledHabit | FormDetailledGoalHabit,
     isSelected?: boolean,
     deleteHabit?: () => void,
-    editHabit?: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void,
-    isNotObjectifIDConst?: boolean,
-    isNotNewObjectifHabit?: boolean,
+    editHabit?: (habitID: string, newHabit: (FormDetailledGoalHabit | Habit)) => void,
+    isNotGoalIDConst?: boolean,
+    isNotNewGoalHabit?: boolean,
     onPress?: () => void,
     noAnimation?: boolean,
     owner?: UserDataBase,
@@ -168,18 +168,18 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
     deleteHabit,
     onPress,
     editHabit,
-    isNotObjectifIDConst,
-    isNotNewObjectifHabit,
+    isNotGoalIDConst,
+    isNotNewGoalHabit,
     noAnimation,
     owner,
     isArchived,
     isDone
 }) => {    
     const {theme} = useContext(AppContext)
-    const {Objectifs} = useContext(HabitsContext)
+    const {Goals} = useContext(HabitsContext)
     const {user} = useContext(UserContext)
 
-    const color = habitude.color ?? (habitude.objectifID ? Objectifs[habitude.objectifID].color : habitude.color)
+    const color = habitude.color ?? (habitude.goalID ? Goals[habitude.goalID].color : habitude.color)
 
     const primary = useThemeColor(theme, "Primary")
     const fontGray = useThemeColor(theme, "FontGray")
@@ -294,13 +294,13 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
                             isArchived={isArchived}
                         />
                         :
-                        <SettingNewObjectifHabitBottomScreen 
+                        <SettingNewGoalHabitBottomScreen 
                             bottomSheetModalRef={bottomSheetModalRef} 
-                            habit={habit as FormDetailledObjectifHabit} 
+                            habit={habit as FormDetailledGoalHabit} 
                             deleteHabit={deleteHabit}
                             editHabit={editHabit}
-                            objectifColor={habitude.color}
-                            isNotObjectifIDConst={isNotObjectifIDConst}
+                            goalColor={habitude.color}
+                            isNotGoalIDConst={isNotGoalIDConst}
                         />
                     }
                            
@@ -312,8 +312,8 @@ export const HabitudeListItemPresentation: FC<HabitudeListItemPresentation> =  (
                         color={habitude.color}
                         icon={habitude.icon}
                         habit={habitude} 
-                        isNotObjectifIDConst={isNotObjectifIDConst}
-                        isNotNewObjectifHabit={isNotNewObjectifHabit}
+                        isNotGoalIDConst={isNotGoalIDConst}
+                        isNotNewGoalHabit={isNotNewGoalHabit}
                     />
                 </>
             }

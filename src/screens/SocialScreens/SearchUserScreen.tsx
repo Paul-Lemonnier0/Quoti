@@ -17,7 +17,7 @@ import { useThemeColor } from '../../components/Themed'
 type SearchUserScreenProps = NativeStackScreenProps<SocialScreenStackType, "SearchUserScreen">
 
 const SearchUserScreen: FC<SearchUserScreenProps> = ({navigation}) => {
-    const {addHabit, addObjectif} = useContext(HabitsContext);
+    const {addHabit, addGoal} = useContext(HabitsContext);
     const {theme} = useContext(AppContext)
 
     const primary = useThemeColor(theme, "Primary")

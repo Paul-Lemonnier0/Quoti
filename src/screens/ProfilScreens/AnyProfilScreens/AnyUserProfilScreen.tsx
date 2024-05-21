@@ -7,7 +7,7 @@ import { Database_getUsersInfo, UserDataBase } from "../../../firebase/Database_
 import React from "react"
 import { AppContext } from "../../../data/AppContext"
 import ProfilDetailsForm from "../../../components/Profil/ProfilDetailsForm"
-import { cancelFriendInvitation, getNumberOfHabitsForUser, getNumberOfObjectifsForUser, getUserFriendsID, removeUserFriendFirestore, sendFriendInvitation, VisitInfoUser } from "../../../firebase/Firestore_User_Primitives"
+import { cancelFriendInvitation, getNumberOfHabitsForUser, getNumberOfGoalsForUser, getUserFriendsID, removeUserFriendFirestore, sendFriendInvitation, VisitInfoUser } from "../../../firebase/Firestore_User_Primitives"
 import { BottomScreenOpen_Impact } from "../../../constants/Impacts"
 import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack"
 import { RootStackParamList } from "../../../navigation"
@@ -21,7 +21,7 @@ type AnyUserProfilScreenProps =
 
 const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) => {
 
-    const {Habits, Objectifs, DoneHabits, isDoneHabitsFetched, setIsDoneHabitsFetched} = useContext(HabitsContext)
+    const {Habits, Goals, DoneHabits, isDoneHabitsFetched, setIsDoneHabitsFetched} = useContext(HabitsContext)
     const {user, sendedFriendRequests, addUserFriendRequest, removeUserFriendRequest, removeUserFriend} = useContext(UserContext)
     const {detailledUser} = route.params
     const {theme} = useContext(AppContext)
@@ -41,10 +41,10 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
     const [hasSendedInvitation, setHasSendedInvation] = useState<boolean>(hasAlreadySendedInvation)
 
     const nb_habits = Object.keys(Habits).length
-    const nb_objectifs = Object.keys(Objectifs).length
+    const nb_goals = Object.keys(Goals).length
 
     const [nbHabitsDone, setNbHabitsDone] = useState<number>(0)
-    const [nbObjectifsDone, setNbObjectifsDone] = useState<number>(0)
+    const [nbGoalsDone, setNbGoalsDone] = useState<number>(0)
 
     const handleSeeHabits = () => {
       (navigation as NativeStackNavigationProp<HomeStackParamsList | SocialScreenStackType>).push("AnyUserProfilHabitsScreen", {detailledUser: detailledUser})
@@ -54,12 +54,12 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
       (navigation as NativeStackNavigationProp<HomeStackParamsList | SocialScreenStackType>).push("AnyUserProfilHabitsScreen", {detailledUser: detailledUser})
     }
 
-    const handleSeeObjectifs = () => {
-      (navigation as NativeStackNavigationProp<HomeStackParamsList | SocialScreenStackType>).push("AnyUserProfilObjectifsScreen", {detailledUser: detailledUser})
+    const handleSeeGoals = () => {
+      (navigation as NativeStackNavigationProp<HomeStackParamsList | SocialScreenStackType>).push("AnyUserProfilGoalsScreen", {detailledUser: detailledUser})
     }
 
-    const handleSeeDoneObjectifs = () => {
-      (navigation as NativeStackNavigationProp<HomeStackParamsList | SocialScreenStackType>).push("AnyUserProfilObjectifsScreen", {detailledUser: detailledUser})
+    const handleSeeDoneGoals = () => {
+      (navigation as NativeStackNavigationProp<HomeStackParamsList | SocialScreenStackType>).push("AnyUserProfilGoalsScreen", {detailledUser: detailledUser})
     }
 
     const handleSeeFriends = () => {
@@ -115,8 +115,8 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
             setVisitUserInfo({
               nbHabits: nb_habits,
               nbHabitsFinished: nbHabitsDone,
-              nbObjectifs: nb_objectifs,
-              nbObjectifsFinished: 0,
+              nbGoals: nb_goals,
+              nbGoalsFinished: 0,
               nbSucces: 0,
               friendsID: user.friends ?? [],
               isPrivate: detailledUser.isPrivate ?? true,
@@ -125,18 +125,18 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
           }
 
           else {
-            const [nbHabits, nbHabitsDone, nbObjectifs, friendsID] = await Promise.all([
+            const [nbHabits, nbHabitsDone, nbGoals, friendsID] = await Promise.all([
                 getNumberOfHabitsForUser(detailledUser.email),
                 getNumberOfHabitsForUser(detailledUser.email, HabitState.Done),
-                getNumberOfObjectifsForUser(detailledUser.email),
+                getNumberOfGoalsForUser(detailledUser.email),
                 getUserFriendsID(detailledUser.email)
             ]);
 
             setVisitUserInfo({
               nbHabits: nbHabits,
               nbHabitsFinished: nbHabitsDone,
-              nbObjectifs: nbObjectifs,
-              nbObjectifsFinished: 0,
+              nbGoals: nbGoals,
+              nbGoalsFinished: 0,
               nbSucces: 0,
               friendsID: friendsID,
               isPrivate: detailledUser.isPrivate ?? true,
@@ -173,14 +173,14 @@ const AnyUserProfilScreen: FC<AnyUserProfilScreenProps> = ({navigation, route}) 
             friends={visitUserInfo.friendsID ?? []}
             nb_habits={visitUserInfo.nbHabits ?? 0}
             nb_habits_done={nbHabitsDone}
-            nb_objectifs={visitUserInfo.nbObjectifs ?? 0}
-            nb_objectifs_done={0}
+            nb_goals={visitUserInfo.nbGoals ?? 0}
+            nb_goals_done={0}
             handleAddFriend={handleAddFriend}
             handleSeeHabits={handleSeeHabits}
             handleSeeDoneHabits={handleSeeDoneHabits}
             handleSeeFriends={handleSeeFriends}
-            handleSeeObjectifs={handleSeeObjectifs}
-            handleSeeDoneObjectifs={handleSeeDoneObjectifs}
+            handleSeeGoals={handleSeeGoals}
+            handleSeeDoneGoals={handleSeeDoneGoals}
             handleSeeSucces={() => {}}
             isFriend={isFriend}
             hasSendedInvitation={hasSendedInvitation}

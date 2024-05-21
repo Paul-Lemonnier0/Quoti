@@ -5,7 +5,7 @@ import { StyleSheet, View } from "react-native"
 import { Habit, Step } from "../../../types/HabitTypes"
 import { BottomSheetModal, BottomSheetModalProvider } from "@gorhom/bottom-sheet"
 import React, { FC, RefObject, useCallback, useContext, useRef } from "react"
-import { FormDetailledHabit, FormDetailledObjectifHabit, FormStep } from "../../../types/FormHabitTypes"
+import { FormDetailledHabit, FormDetailledGoalHabit, FormStep } from "../../../types/FormHabitTypes"
 import StepsList from "../../../components/Habitudes/Step/StepsList"
 import { Image } from "react-native"
 import { HugeText, NormalGrayText, SubTitleText, TitleText } from "../../../styles/StyledText"
@@ -25,10 +25,10 @@ export interface HabitStepDetailsBottomScreenProps {
     steps: (Step | FormStep)[],
     color: string,
     icon: string,
-    habit: FormDetailledObjectifHabit | Habit | FormDetailledHabit,
-    editHabit: (habitID: string, newHabit: (FormDetailledObjectifHabit | Habit)) => void,
-    isNotObjectifIDConst?: boolean,
-    isNotNewObjectifHabit?: boolean,
+    habit: FormDetailledGoalHabit | Habit | FormDetailledHabit,
+    editHabit: (habitID: string, newHabit: (FormDetailledGoalHabit | Habit)) => void,
+    isNotGoalIDConst?: boolean,
+    isNotNewGoalHabit?: boolean,
 }
 
 const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
@@ -37,14 +37,14 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
     color,
     habit,
     editHabit,
-    isNotObjectifIDConst,
-    isNotNewObjectifHabit
+    isNotGoalIDConst,
+    isNotNewGoalHabit
 }) => {
 
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
 
-    const handleEdit = (newHabit: (FormDetailledObjectifHabit | Habit)) => {
+    const handleEdit = (newHabit: (FormDetailledGoalHabit | Habit)) => {
         if("habitID" in habit){
             editHabit(habit.habitID, newHabit)
         }
@@ -163,12 +163,12 @@ const HabitStepDetailsBottomScreen: FC<HabitStepDetailsBottomScreenProps> = ({
 
             <EditHabitNav
                 bottomSheetModalRef={bottomSheetModalRef_EditHabit}
-                habit={seriazabledHabit ?? habit as FormDetailledObjectifHabit}
-                objectifColor={habit.color}
-                isNewObjectifHabit={!isNotNewObjectifHabit}
+                habit={seriazabledHabit ?? habit as FormDetailledGoalHabit}
+                goalColor={habit.color}
+                isNewGoalHabit={!isNotNewGoalHabit}
                 validationAdditionnalMethod={() => {}}
                 editHabitCustomMethod={handleEdit}
-                constObjectifID={isNotObjectifIDConst ? undefined : habit.objectifID}
+                constGoalID={isNotGoalIDConst ? undefined : habit.goalID}
             />
             </BottomSheetModalProvider>
         </SimpleFullBottomSheet>

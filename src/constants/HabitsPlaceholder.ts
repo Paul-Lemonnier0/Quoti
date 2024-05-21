@@ -11,7 +11,7 @@ const Habit_Skeleton: FormDetailledHabit ={
     reccurence: 1,
     daysOfWeek: [],
     steps: [],
-    objectifID: undefined,
+    goalID: undefined,
     alertTime: "",
     notificationEnabled: true
 }

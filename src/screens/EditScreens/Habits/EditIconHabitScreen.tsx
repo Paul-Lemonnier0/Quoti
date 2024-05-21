@@ -11,20 +11,20 @@ import { BottomScreenOpen_Impact } from "../../../constants/Impacts";
 type EditIconHabitScreenProps = NativeStackScreenProps<EditHabitStackProps, "EditIconHabitScreen">
 
 const EditIconHabitScreen: FC<EditIconHabitScreenProps> = ({route, navigation}) => {
-    const {newValues, oldHabit, isNewObjectifHabit} = route.params
+    const {newValues, oldHabit, isNewGoalHabit} = route.params
     
     const handleGoNext = (values: FormIconedHabitValues) => {
         BottomScreenOpen_Impact()
         navigation.navigate("EditHabitStepsScreen", {
             newValues: {...newValues, ...values}, 
             oldHabit,
-            isNewObjectifHabit
+            isNewGoalHabit
         })
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(oldHabit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(oldHabit.goalID ?? null, AddHabitScreenType.ChooseIconScreen)
 
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS + (isNewObjectifHabit ? 0 : -1)
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS + (isNewGoalHabit ? 0 : -1)
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     return(

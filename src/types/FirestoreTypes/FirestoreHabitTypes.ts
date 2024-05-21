@@ -25,18 +25,18 @@ interface FirestoreFullStep extends FirestorePlaceholderStep {
 type FirestoreStep = FirestoreFullStep | FirestorePlaceholderStep
 
 
-interface FirestoreObjectif extends FirestoreBaseItem {
+interface FirestoreGoal extends FirestoreBaseItem {
     endingDate: string
 }
 
-interface GlobalFirestoreObjectif extends FirestoreBaseItem {
-    objectifID: string
+interface GlobalFirestoreGoal extends FirestoreBaseItem {
+    goalID: string
 }
 
-interface UserFirestoreObjectif {
+interface UserFirestoreGoal {
     startingDate: string,
     endingDate?: string,
-    objectifID: string
+    goalID: string
 }
 
 export interface MemberType {
@@ -68,7 +68,7 @@ interface UserFirestoreHabit {
     currentStreak: number,
     lastCompletionDate: string,
     notificationEnabled: boolean,
-    objectifID: string | null,
+    goalID: string | null,
     doneDates?: Date[],
     startingDate: string,
 }
@@ -83,7 +83,7 @@ export {
     FirestoreFullStep,
     FirestoreStep,
 
-    FirestoreObjectif,
-    UserFirestoreObjectif,
-    GlobalFirestoreObjectif
+    FirestoreGoal,
+    UserFirestoreGoal,
+    GlobalFirestoreGoal
 }

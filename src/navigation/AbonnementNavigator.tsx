@@ -3,16 +3,16 @@ import SocialScreen from "../screens/SocialScreen";
 import UtilsScreen from "../screens/UtilsScreen";
 import AnyUserProfilScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilScreen";
 import AnyUserProfilHabitsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilHabitsScreen";
-import AnyUserProfilObjectifsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilObjectifsScreen";
+import AnyUserProfilGoalsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilGoalsScreen";
 import AnyUserProfilSuccessScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilSuccessScreen";
 import AnyUserProfilFriendsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilFriendsScreen";
 import PresentationHabitScreen from "../screens/Habitude/PresentationHabitScreen";
-import PresentationObjectifDetailsScreen from "../screens/Objectif/PresentationObjectifDetailsScreen";
+import PresentationGoalDetailsScreen from "../screens/Goal/PresentationGoalDetailsScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SearchUserScreen from "../screens/SocialScreens/SearchUserScreen";
 import InteractionsScreen from "../screens/SocialScreens/InteractionsScreen";
 import AnyUserProfilDoneHabitsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneHabitsScreen";
-import AnyUserProfilDoneObjectifsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneObjectifsScreen";
+import AnyUserProfilDoneGoalsScreen from "../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneGoalsScreen";
 import { AbonnementScreen } from "../screens/AbonnementScreen";
 
 export type AbonnementScreenStackType = {

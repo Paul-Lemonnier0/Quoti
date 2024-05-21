@@ -26,9 +26,9 @@
         lastName: string,
         isPrivate?: boolean,
         nbHabits?: number,
-        nbObjectifs?: number,
+        nbGoals?: number,
         nbHabitsFinished?: number,
-        nbObjectifsFinished?: number,
+        nbGoalsFinished?: number,
         nbSucces?: number,
         blocked?: string[],
     } 

@@ -1,7 +1,7 @@
 import React from 'react'
 import HomeScreen from '../screens/HomeScreen';
 import HabitudeScreen from '../screens/Habitude/HabitudeScreen';
-import ObjectifDetailsScreen from '../screens/Objectif/ObjectifDetailsScreen';
+import GoalDetailsScreen from '../screens/Goal/GoalDetailsScreen';
 import ProfilDetailsScreen from '../screens/ProfilScreens/ProfilDetailsScreen';
 import ProfilNotificationsScreen from '../screens/ProfilScreens/ProfilNotificationsScreen';
 import ProfilSettingsScreen from '../screens/ProfilScreens/ProfilSettingsScreen';
@@ -12,26 +12,26 @@ import SecurityScreen from '../screens/ProfilScreens/ProfilSettingsScreens/Secur
 import SubscriptionScreen from '../screens/ProfilScreens/ProfilSettingsScreens/SubscriptionScreen';
 import AnyUserProfilScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilScreen';
 import PresentationHabitScreen from '../screens/Habitude/PresentationHabitScreen';
-import PresentationObjectifDetailsScreen from '../screens/Objectif/PresentationObjectifDetailsScreen';
+import PresentationGoalDetailsScreen from '../screens/Goal/PresentationGoalDetailsScreen';
 import ProfilHabitsScreen from '../screens/ProfilScreens/ProfilHabitsScreen';
-import ProfilObjectifsScreen from '../screens/ProfilScreens/ProfilObjectifsScreen';
+import ProfilGoalsScreen from '../screens/ProfilScreens/ProfilGoalsScreen';
 import ProfilFriendsScreen from '../screens/ProfilScreens/ProfilFriendsScreen';
 import HabitStreakDetailsScreen from '../screens/Habitude/HabitStreakDetailsScreen';
 import MembersScreen from '../screens/MembersScreen';
-import { FrequencyTypes, Habit, SeriazableHabit, SeriazableObjectif } from '../types/HabitTypes';
+import { FrequencyTypes, Habit, SeriazableHabit, SeriazableGoal } from '../types/HabitTypes';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { UserDataBase } from '../firebase/Database_User_Primitives';
 import AnyUserProfilHabitsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilHabitsScreen';
-import AnyUserProfilObjectifsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilObjectifsScreen';
+import AnyUserProfilGoalsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilGoalsScreen';
 import AnyUserProfilSuccessScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilSuccessScreen';
 import AnyUserProfilFriendsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilFriendsScreen';
 import SharedHabitScreen from '../screens/Habitude/SharedHabitScreen';
 import BlockedAccountsScreen from '../screens/ProfilScreens/ProfilSettingsScreens/BlockedAccountsScreen';
 import ArchivedHabitsScreen from '../screens/Habitude/ArchivedHabitsScreen';
-import ProfilDoneObjectifsScreen from '../screens/ProfilScreens/ProfilDoneObjectifsScreen';
+import ProfilDoneGoalsScreen from '../screens/ProfilScreens/ProfilDoneGoalsScreen';
 import ProfilDoneHabitsScreen from '../screens/ProfilScreens/ProfilDoneHabitsScreen';
 import AnyUserProfilDoneHabitsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneHabitsScreen';
-import AnyUserProfilDoneObjectifsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneObjectifsScreen';
+import AnyUserProfilDoneGoalsScreen from '../screens/ProfilScreens/AnyProfilScreens/AnyUserProfilDoneGoalsScreen';
 
 export type HomeStackParamsList = {
     HomeScreen: undefined,
@@ -39,7 +39,7 @@ export type HomeStackParamsList = {
     HabitudeScreen: {
         habitID: string,
         habitFrequency: FrequencyTypes,
-        objectifID: string | undefined,
+        goalID: string | undefined,
         currentDateString: string,
         noInteractions?: boolean,
         isPresentation?: boolean,
@@ -58,8 +58,8 @@ export type HomeStackParamsList = {
         users: UserDataBase[]
     },
 
-    ObjectifDetailsScreen: {
-        seriazableObjectif: SeriazableObjectif,
+    GoalDetailsScreen: {
+        seriazableGoal: SeriazableGoal,
         frequency?: FrequencyTypes,
         currentDateString?: string,
         noInteractions?: boolean,
@@ -93,11 +93,11 @@ export type HomeStackParamsList = {
         detailledUser: UserDataBase
     },
 
-    AnyUserProfilObjectifsScreen: {
+    AnyUserProfilGoalsScreen: {
         detailledUser: UserDataBase
     },
 
-    AnyUserProfilDoneObjectifsScreen: {
+    AnyUserProfilDoneGoalsScreen: {
         detailledUser: UserDataBase
     },
     
@@ -111,8 +111,8 @@ export type HomeStackParamsList = {
 
     ProfilHabitsScreen: undefined,
     ProfilDoneHabitsScreen: undefined,
-    ProfilObjectifsScreen: undefined,
-    ProfilDoneObjectifsScreen: undefined,
+    ProfilGoalsScreen: undefined,
+    ProfilDoneGoalsScreen: undefined,
 
     ProfilFriendsScreen: {
         userIDs: string[]
@@ -123,8 +123,8 @@ export type HomeStackParamsList = {
         habit: SeriazableHabit
     },
 
-    PresentationObjectifDetailsScreen: {
-        seriazableObjectif: SeriazableObjectif
+    PresentationGoalDetailsScreen: {
+        seriazableGoal: SeriazableGoal
     },
 
     BlockedAccountsScreen: undefined,
@@ -140,7 +140,7 @@ function HomeNavigator() {
             <HomeStack.Screen name="HomeScreen" component={HomeScreen} />
 
             <HomeStack.Screen name="HabitudeScreen" component={HabitudeScreen}/>
-            <HomeStack.Screen name="ObjectifDetailsScreen" component={ObjectifDetailsScreen}/>
+            <HomeStack.Screen name="GoalDetailsScreen" component={GoalDetailsScreen}/>
 
             <HomeStack.Screen name="ProfilDetailsScreen" component={ProfilDetailsScreen}/>
             <HomeStack.Screen name="ProfilNotificationsScreen" component={ProfilNotificationsScreen}/>
@@ -159,16 +159,16 @@ function HomeNavigator() {
             <HomeStack.Screen name="ProfilHabitsScreen" component={ProfilHabitsScreen}/>
             <HomeStack.Screen name="ProfilDoneHabitsScreen" component={ProfilDoneHabitsScreen}/>
 
-            <HomeStack.Screen name="ProfilObjectifsScreen" component={ProfilObjectifsScreen}/>
-            <HomeStack.Screen name="ProfilDoneObjectifsScreen" component={ProfilDoneObjectifsScreen}/>
+            <HomeStack.Screen name="ProfilGoalsScreen" component={ProfilGoalsScreen}/>
+            <HomeStack.Screen name="ProfilDoneGoalsScreen" component={ProfilDoneGoalsScreen}/>
 
             <HomeStack.Screen name="ArchivedHabitsScreen" component={ArchivedHabitsScreen}/>
 
             <HomeStack.Screen name="AnyUserProfilScreen" component={AnyUserProfilScreen}/>
             <HomeStack.Screen name="AnyUserProfilHabitsScreen" component={AnyUserProfilHabitsScreen}/>
             <HomeStack.Screen name="AnyUserProfilDoneHabitsScreen" component={AnyUserProfilDoneHabitsScreen}/>
-            <HomeStack.Screen name="AnyUserProfilObjectifsScreen" component={AnyUserProfilObjectifsScreen}/>
-            <HomeStack.Screen name="AnyUserProfilDoneObjectifsScreen" component={AnyUserProfilDoneObjectifsScreen}/>
+            <HomeStack.Screen name="AnyUserProfilGoalsScreen" component={AnyUserProfilGoalsScreen}/>
+            <HomeStack.Screen name="AnyUserProfilDoneGoalsScreen" component={AnyUserProfilDoneGoalsScreen}/>
             <HomeStack.Screen name="AnyUserProfilSuccessScreen" component={AnyUserProfilSuccessScreen}/>
             <HomeStack.Screen name="AnyUserProfilFriendsScreen" component={AnyUserProfilFriendsScreen}/>
 
@@ -178,7 +178,7 @@ function HomeNavigator() {
             <HomeStack.Screen name="MembersScreen" component={MembersScreen}/>
 
             <HomeStack.Screen name="PresentationHabitScreen" component={PresentationHabitScreen}/>
-            <HomeStack.Screen name="PresentationObjectifDetailsScreen" component={PresentationObjectifDetailsScreen}/>
+            <HomeStack.Screen name="PresentationGoalDetailsScreen" component={PresentationGoalDetailsScreen}/>
         </HomeStack.Navigator>
     );
 }

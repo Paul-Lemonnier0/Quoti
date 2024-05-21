@@ -40,13 +40,13 @@ export const fetchUserHabits = async(userMail: string, habitState = HabitState.C
                 const habitID = archivedHabit.id
                 const data = archivedHabit.data() as UserFirestoreHabit
     
-                const objectifID = data.objectifID
+                const goalID = data.goalID
 
                 if(data.doneDates && data.doneDates.length > 0) {
                     habitsHistory[habitID] = data.doneDates.map((stringDate) => new Date(stringDate))
                 }
     
-                return {...data, habitID, objectifID };
+                return {...data, habitID, goalID };
             })
         )
     
@@ -94,13 +94,13 @@ export const fetchUserHabits = async(userMail: string, habitState = HabitState.C
 
                             const frequency = stringToFrequencyType(data.frequency);
 
-                            const objectifID = userHabit.objectifID ?? undefined;
+                            const goalID = userHabit.goalID ?? undefined;
 
                             const startingDate = new Date(userHabit.startingDate);
 
                             const members = await getUsersDataBaseFromMember(data.members, undefined, userMail);
 
-                            const fullHabit = { ...data, ...userHabit, startingDate, steps, daysOfWeek, frequency, objectifID, members };
+                            const fullHabit = { ...data, ...userHabit, startingDate, steps, daysOfWeek, frequency, goalID, members };
 
                             const newStreakValues: StreakValues = checkIfStreakEndedHabit(fullHabit, today);
            

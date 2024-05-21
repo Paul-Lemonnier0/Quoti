@@ -1,5 +1,5 @@
 import { GlobalFirestoreHabit } from "../types/FirestoreTypes/FirestoreHabitTypes";
-import { FormDetailledObjectifHabit, FormFullStep, FormStep, FormStepsHabitValues } from "../types/FormHabitTypes";
+import { FormDetailledGoalHabit, FormFullStep, FormStep, FormStepsHabitValues } from "../types/FormHabitTypes";
 import { FilteredHabitsType, Habit, PrioritesType, SeriazableHabit, Step, StepList, StreakValues } from "../types/HabitTypes";
 import { toISOStringWithoutTimeZone } from "./BasicsMethods";
 import { getValidHabitsStepsForDate } from "./HabitMethods";
@@ -11,12 +11,12 @@ export const updateHabitStepState = (
 ): FilteredHabitsType => {
     
     const frequency = habit.frequency
-    const objectifID = habit.objectifID
+    const goalID = habit.goalID
     const habitID = habit.habitID
     const habitSteps = habit.steps
     const step = habitSteps[stepID]
     
-    if(!objectifID){
+    if(!goalID){
 
       return {
         ...previousHabits,
@@ -44,13 +44,13 @@ export const updateHabitStepState = (
           ...previousHabits[frequency],
           [habitType]: {
             ...previousHabits[frequency][habitType],
-            [objectifID]: {
-              ...previousHabits[frequency][habitType][objectifID],
+            [goalID]: {
+              ...previousHabits[frequency][habitType][goalID],
               [habitID]: {
-                ...previousHabits[frequency][habitType][objectifID][habitID],
+                ...previousHabits[frequency][habitType][goalID][habitID],
                 ...newStreakValues,
                 steps: {
-                  ...previousHabits[frequency][habitType][objectifID][habitID]["steps"],
+                  ...previousHabits[frequency][habitType][goalID][habitID]["steps"],
                   [stepID]: {...step, isChecked}
                 }
               }
@@ -131,7 +131,7 @@ export const getPriorityDetails = (priority: PrioritesType | undefined): Priorit
   }
 }
 
-export const setNewSteps = (values: FormStepsHabitValues, habit: SeriazableHabit | FormDetailledObjectifHabit) => {
+export const setNewSteps = (values: FormStepsHabitValues, habit: SeriazableHabit | FormDetailledGoalHabit) => {
   let oldStepsArray = Object.values(habit.steps)
 
   //On filtre pour enlever le placeholder

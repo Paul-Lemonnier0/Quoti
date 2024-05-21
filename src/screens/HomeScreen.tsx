@@ -9,9 +9,9 @@ import {  getMonthString, shortDateStringFormat, shortWeekStringFormat } from '.
 import SelectDateBottomScreen from './BottomScreens/SelectDateBottomScreen';
 import { NothingToDoScreen } from '../components/ScreenComponents/HomeScreenComponents/EmptyScreens';
 import { Periodes } from '../components/ScreenComponents/HomeScreenComponents/Periodes';
-import { RenderHabits, RenderObjectifs } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
+import { RenderHabits, RenderGoals } from '../components/ScreenComponents/HomeScreenComponents/NotEmptyScreen';
 import { PeriodeType } from '../types/HomeScreenTypes';
-import { FrequencyTypes, Habit, SeriazableObjectif } from '../types/HabitTypes';
+import { FrequencyTypes, Habit, SeriazableGoal } from '../types/HabitTypes';
 import { BottomSheetModal } from '@gorhom/bottom-sheet';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import ProfilButton from '../components/Profil/ProfilButton';
@@ -31,7 +31,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const [displayedHabits, setDisplayedHabits] = useState<Habit[]>([])
-  const [displayedObjectifs, setDisplayedObjectifs] = useState<string[]>([])
+  const [displayedGoals, setDisplayedGoals] = useState<string[]>([])
   const [selectedPeriode, setSelectedPeriode] = useState<FrequencyTypes>(FrequencyTypes.Quotidien)
   const [selectedDate, setSelectedDate] = useState<Date>(new Date())
 
@@ -47,7 +47,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
     const updatedPeriodes = initialPeriodes.map(initPeriode => {      
       let nbElements = 0;
 
-      for (const [objID, habitList] of Object.entries(filteredHabitsByDate[initPeriode.frequency].Objectifs ?? {})) {
+      for (const [objID, habitList] of Object.entries(filteredHabitsByDate[initPeriode.frequency].Goals ?? {})) {
         nbElements += Object.keys(habitList).length
       }
 
@@ -59,7 +59,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
     setPeriodes(["Calendar", ...updatedPeriodes])
 
     setDisplayedHabits(Object.values(filteredHabitsByDate[selectedPeriode].Habitudes ?? {}))
-    setDisplayedObjectifs(Object.keys(filteredHabitsByDate[selectedPeriode].Objectifs ?? {}))
+    setDisplayedGoals(Object.keys(filteredHabitsByDate[selectedPeriode].Goals ?? {}))
         
   }, [filteredHabitsByDate, selectedDate])
 
@@ -70,7 +70,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
       const data = filteredHabitsByDate[newPeriode.frequency]
 
       setDisplayedHabits(Object.values(data.Habitudes ?? {}))
-      setDisplayedObjectifs(Object.keys(data.Objectifs ?? {}))
+      setDisplayedGoals(Object.keys(data.Goals ?? {}))
     }
 
     setSelectedPeriode(newPeriode.frequency)
@@ -106,12 +106,12 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
         bottomSheetModalRef_Calendar.current?.present();
   }, []);
 
-  const handlePressOnHabit = useCallback((habitude: Habit, objectifID: string | undefined, currentDateString: string) => {
-      navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, objectifID, currentDateString})    
+  const handlePressOnHabit = useCallback((habitude: Habit, goalID: string | undefined, currentDateString: string) => {
+      navigation.navigate("HabitudeScreen", {habitID: habitude.habitID, habitFrequency: habitude.frequency, goalID, currentDateString})    
   }, [])
 
-  const handlePressOnObjectif = (seriazableObjectif: SeriazableObjectif, frequency: FrequencyTypes, currentDateString: string) => {
-      navigation.navigate("ObjectifDetailsScreen", {seriazableObjectif, frequency, currentDateString});
+  const handlePressOnGoal = (seriazableGoal: SeriazableGoal, frequency: FrequencyTypes, currentDateString: string) => {
+      navigation.navigate("GoalDetailsScreen", {seriazableGoal, frequency, currentDateString});
   }
 
   //JSX
@@ -155,7 +155,7 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
           <View style={styles.body}>            
             {
 
-              displayedHabits.length === 0 && displayedObjectifs.length === 0 && isFetched ?
+              displayedHabits.length === 0 && displayedGoals.length === 0 && isFetched ?
 
               <NothingToDoScreen selectedPeriode={selectedPeriode}/>
 
@@ -163,12 +163,12 @@ const HomeScreen: FC<HomeScreenProps> = ({navigation}) => {
               
               <CustomScrollView>
                 <View style={styles.subBody}>
-                  <RenderObjectifs 
-                      objectifs={displayedObjectifs} 
+                  <RenderGoals 
+                      goals={displayedGoals} 
                       selectedPeriode={selectedPeriode} 
                       isLoading={isLoading} 
                       isFetched={isFetched} 
-                      handleOnPress={handlePressOnObjectif} 
+                      handleOnPress={handlePressOnGoal} 
                       currentDateString={selectedDateString}
                   />
                   <RenderHabits 

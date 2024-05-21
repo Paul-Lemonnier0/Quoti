@@ -159,7 +159,7 @@ const PresentationHabitScreen = ({ route, navigation }: PresentationHabitScreenP
                 bottomSheetModalRef={bottomSheetModalRef_Settings} 
                 habit={habit} 
                 deleteAdditionnalMethod={goBack} 
-                attachToObjectifAdditionnalMethod={goBack}
+                attachToGoalAdditionnalMethod={goBack}
                 modifyAdditionnalMethod={goBack}
             />
         </UsualScreen>

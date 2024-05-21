@@ -16,7 +16,7 @@ export interface HabitudesListProps {
   habits: Habit[],
   handleOnPress: (
     habitude: Habit, 
-    objectifID: string | undefined,
+    goalID: string | undefined,
     currentDateString: string) => void,
   currentDateString: string,
   basicAnimation?: boolean,

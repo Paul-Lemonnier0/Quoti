@@ -24,13 +24,13 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
 
     const {updateHabit} = useHabitActions()
     
-    const {newValues, oldHabit, isNewObjectifHabit} = route.params
+    const {newValues, oldHabit, isNewGoalHabit} = route.params
 
     const handleGoNext = async(values: FormStepsHabitValues) => {
         const updatedStepsArray = setNewSteps(values, oldHabit)
         const finalNewValues: FormStepsHabit = {...newValues, steps: updatedStepsArray}
 
-        if(!isNewObjectifHabit) {
+        if(!isNewGoalHabit) {
             const updatedHabit = {...oldHabit, ...values, ...newValues, steps: {}} as SeriazableHabit
 
             if(notSameHabit(finalNewValues, updatedHabit, oldHabit)){
@@ -51,9 +51,9 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
                         }
                     })
 
-                    let objectifID: string | null = null
-                    if("objectifID" in finalNewValues) {
-                        objectifID = finalNewValues.objectifID ?? null
+                    let goalID: string | null = null
+                    if("goalID" in finalNewValues) {
+                        goalID = finalNewValues.goalID ?? null
                     }
 
                     closeModal()
@@ -75,7 +75,7 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
                         ...finalNewValues, 
                         ...values, 
                         startingDate: newStartingDate, 
-                        objectifID, 
+                        goalID, 
                         steps
                     })
 
@@ -113,14 +113,14 @@ const EditHabitStepsScreen: FC<EditHabitStepsScreenProps> = ({route, navigation}
             navigation.navigate("EditHabitAdvancedDetailsScreen", {
                 newValues: finalNewValues, 
                 oldHabit,
-                isNewObjectifHabit
+                isNewGoalHabit
             })
         }
     }
 
     return(
         <HabitStepsForm
-            isNewObjectifHabit={isNewObjectifHabit}
+            isNewGoalHabit={isNewGoalHabit}
             isForModifyingHabit
             habit={{...oldHabit, ...newValues}}
             handleGoNext={handleGoNext}

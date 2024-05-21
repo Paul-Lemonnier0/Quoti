@@ -2,11 +2,11 @@ import React, { createContext, useState, useEffect, useContext, FC, ReactNode, D
 import { HabitState } from "../firebase/Firestore_Habits_Primitives";
 import { filterHabits, getHabitFromFilteredHabitsMethod, getHabitType, getUpdatedStreakOfHabit, removeHabitFromFilteredHabits, removeHabitFromHabits, updateFilteredHabitsWithNewHabit, updateHabitsWithNewHabit } from "../primitives/HabitMethods";
 import { setHabitWithDefaultStep, updateHabitStepState } from "../primitives/StepMethods";
-import { fetchAllObjectifs } from "../firebase/Firestore_Objectifs_Primitives";
+import { fetchAllGoals } from "../firebase/Firestore_Goals_Primitives";
 import { UserContext, UserContextType } from "./UserContext";
-import { EMPTY_FILTERED_HABITS, FilteredHabitsType, FrequencyTypes, Habit, HabitList, Objectif, ObjectifList } from "../types/HabitTypes";
-import { DEFAULT_HABIT, DEFAULT_OBJECTIF } from "../types/DefaultHabit";
-import { removeObjectifFromFilteredHabits, removeObjectifFromObjectifs } from "../primitives/ObjectifMethods";
+import { EMPTY_FILTERED_HABITS, FilteredHabitsType, FrequencyTypes, Habit, HabitList, Goal, GoalList } from "../types/HabitTypes";
+import { DEFAULT_HABIT, DEFAULT_GOAL } from "../types/DefaultHabit";
+import { removeGoalFromFilteredHabits, removeGoalFromGoals } from "../primitives/GoalMethods";
 import { calculateNextScheduledDate, isHabitScheduledForDate } from "../primitives/HabitudesReccurence";
 import { fetchUserHabits } from "../firebase/Firestore_Fetch_Habits_Primitives";
 import { HabitPostFirestore } from "../firebase/Firestore_Posts_Primitives";
@@ -19,8 +19,8 @@ export interface HabitContextType {
   ArchivedHabits: HabitList,
   DoneHabits: HabitList,
   HabitsHistory: {[key: string]: Date[]},
-  Objectifs: ObjectifList,
-  ObjectifsHistory: {[key: string]: Date[]}
+  Goals: GoalList,
+  GoalsHistory: {[key: string]: Date[]}
   filteredHabitsByDate: FilteredHabitsType,
 
   //State
@@ -50,17 +50,17 @@ export interface HabitContextType {
   removeHabitIntern: (habit: Habit) => void,
   updateHabitIntern: (oldHabit: Habit, newHabit: Habit, currentDate: Date) => void,
 
-  //Objectifs intern
-  addObjectifIntern: (objectif: Objectif) => void,
-  removeObjectifIntern: (objectifID: string, deletePinnedHabit?: boolean) => void,
-  updateObjectifIntern: (newObjectif: Objectif) => void,
+  //Goals intern
+  addGoalIntern: (goal: Goal) => void,
+  removeGoalIntern: (goalID: string, deletePinnedHabit?: boolean) => void,
+  updateGoalIntern: (newGoal: Goal) => void,
 
   //Steps intern
   checkHabitStepIntern: (habit: Habit, date: Date, stepID: string, isChecked: boolean) => void,
 
   //Gets
-  getHabitFromFilteredHabits: (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string) => Habit | undefined,
-  getHabitsByObjectifID: (objectifID: string) => Habit[]
+  getHabitFromFilteredHabits: (frequency: FrequencyTypes, goalID: string | undefined, habitID: string) => Habit | undefined,
+  getHabitsByGoalID: (goalID: string) => Habit[]
 }
 
 const defaultHabitContext: HabitContextType = {
@@ -71,8 +71,8 @@ const defaultHabitContext: HabitContextType = {
   ArchivedHabits: {},
   DoneHabits: {},
   HabitsHistory: {},
-  Objectifs: {}, 
-  ObjectifsHistory: {},
+  Goals: {}, 
+  GoalsHistory: {},
   filteredHabitsByDate: EMPTY_FILTERED_HABITS,
 
   //States
@@ -88,17 +88,17 @@ const defaultHabitContext: HabitContextType = {
   removeHabitIntern: () => {},
   updateHabitIntern: () => {},
 
-  //Objectifs intern
-  addObjectifIntern: async () => undefined,
-  removeObjectifIntern: async() => {},
-  updateObjectifIntern: async () => DEFAULT_OBJECTIF,
+  //Goals intern
+  addGoalIntern: async () => undefined,
+  removeGoalIntern: async() => {},
+  updateGoalIntern: async () => DEFAULT_GOAL,
 
   //Step intern
   checkHabitStepIntern: () => {},
 
   //Gets
   getHabitFromFilteredHabits: () => DEFAULT_HABIT,
-  getHabitsByObjectifID: () => [],
+  getHabitsByGoalID: () => [],
 
   //Fetchs
   fetchArchivedHabits: async() => [],
@@ -135,8 +135,8 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
     const [DoneHabits, setDoneHabits] = useState<HabitList>({});
     const [isDoneHabitsFetched, setIsDoneHabitsFetched] = useState<boolean>(false);
 
-    const [Objectifs, setObjectifs] = useState<ObjectifList>({});
-    const [ObjectifsHistory, setObjectifsHistory] = useState<{[key: string]: Date[]}>({});
+    const [Goals, setGoals] = useState<GoalList>({});
+    const [GoalsHistory, setGoalsHistory] = useState<{[key: string]: Date[]}>({});
 
     let selectedDate = new Date()
 
@@ -184,24 +184,24 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       }
     }
 
-    const fetchObjectifs = async () => {
+    const fetchGoals = async () => {
       try{
-        console.log("fetching objectifs...")
+        console.log("fetching goals...")
 
-        const objectifs = await fetchAllObjectifs(userID);
-        setObjectifs(objectifs)
+        const goals = await fetchAllGoals(userID);
+        setGoals(goals)
 
-        console.log("objectifs successfully fetched.")
+        console.log("goals successfully fetched.")
       }
 
       catch(e){
-        console.log("Error while fetching objectifs : ", e)
+        console.log("Error while fetching goals : ", e)
       }
     }
 
     useEffect(() => {
       settupHabits();
-      fetchObjectifs();
+      fetchGoals();
     }, []);
 
     const changeDate = async(date: Date) => {
@@ -261,12 +261,12 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       Get methods
     */
 
-    const getHabitFromFilteredHabits = (frequency: FrequencyTypes, objectifID: string | undefined, habitID: string): Habit | undefined => {
-      return getHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, objectifID, habitID)
+    const getHabitFromFilteredHabits = (frequency: FrequencyTypes, goalID: string | undefined, habitID: string): Habit | undefined => {
+      return getHabitFromFilteredHabitsMethod(filteredHabitsByDate, frequency, goalID, habitID)
     }
 
-    const getHabitsByObjectifID = (objectifID: string): Habit[] => {
-      return Object.values(Habits).filter((habit => habit.objectifID === objectifID))
+    const getHabitsByGoalID = (goalID: string): Habit[] => {
+      return Object.values(Habits).filter((habit => habit.goalID === goalID))
     }
 
     /*
@@ -376,22 +376,22 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
     }
 
     /*
-      Objectifs actions methods
+      Goals actions methods
     */
 
-    const addObjectifIntern = (objectif: Objectif) => {
-      setObjectifs(prevObjs => ({...prevObjs, [objectif.objectifID]: objectif}))
+    const addGoalIntern = (goal: Goal) => {
+      setGoals(prevObjs => ({...prevObjs, [goal.goalID]: goal}))
     }
 
-    const removeObjectifIntern = (objectifID: string) => {
-      setObjectifs(previousObjectifs => removeObjectifFromObjectifs(previousObjectifs, objectifID))
-      setFilteredHabitsByDate(previousFilteredHabits => removeObjectifFromFilteredHabits(previousFilteredHabits, objectifID))
+    const removeGoalIntern = (goalID: string) => {
+      setGoals(previousGoals => removeGoalFromGoals(previousGoals, goalID))
+      setFilteredHabitsByDate(previousFilteredHabits => removeGoalFromFilteredHabits(previousFilteredHabits, goalID))
     }
 
-    const updateObjectifIntern = (updatedObjectif: Objectif)=> {
-      setObjectifs((previousObjectifs) => {
-          previousObjectifs[updatedObjectif.objectifID] = {...updatedObjectif}
-          return {...previousObjectifs}
+    const updateGoalIntern = (updatedGoal: Goal)=> {
+      setGoals((previousGoals) => {
+          previousGoals[updatedGoal.goalID] = {...updatedGoal}
+          return {...previousGoals}
       })
     }
 
@@ -403,8 +403,8 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       DoneHabits,
 
       HabitsHistory,
-      Objectifs,
-      ObjectifsHistory,
+      Goals,
+      GoalsHistory,
 
       filteredHabitsByDate,
 
@@ -422,12 +422,12 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
 
       updateHabitIntern,
 
-      addObjectifIntern,
+      addGoalIntern,
       checkHabitStepIntern,
 
       getHabitFromFilteredHabits,
-      removeObjectifIntern,
-      updateObjectifIntern,
+      removeGoalIntern,
+      updateGoalIntern,
 
       fetchArchivedHabits,
       fetchDoneHabits,
@@ -440,7 +440,7 @@ const HabitsProvider: FC<HabitsProviderProps> = ({ children }) => {
       fetchPosts,
       addDayToHabitHistory,
 
-      getHabitsByObjectifID
+      getHabitsByGoalID
     }
 
     return (

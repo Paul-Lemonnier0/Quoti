@@ -6,12 +6,12 @@ import CreateHabitDetails from "../screens/AddScreen/Habit/CreateHabitDetails"
 import { ChooseIconScreen } from "../screens/AddScreen/Habit/ChooseIconScreen"
 import { ChooseColorScreen } from "../screens/AddScreen/Habit/ChooseColorScreen"
 import ValidationScreenHabit from "../screens/AddScreen/Habit/ValidationScreenHabit"
-import AddBasicDetailsObjectif from "../screens/AddScreen/Objectif/AddBasicDetailsObjectif"
-import AddHabitsToObjectif from "../screens/AddScreen/Objectif/AddHabitsToObjectif"
-import { ChooseColorScreenObjectif } from "../screens/AddScreen/Objectif/ChooseColorScreenObjectif"
-import { ChooseIconScreenObjectif } from "../screens/AddScreen/Objectif/ChooseIconScreenObjectif"
-import ValidationScreenObjectif from "../screens/AddScreen/Objectif/ValidationScreenObjectif"
-import { FormBasicObjectif, FormColoredObjectif, FormDetailledObjectif } from "../types/FormObjectifTypes"
+import AddBasicDetailsGoal from "../screens/AddScreen/Goal/AddBasicDetailsGoal"
+import AddHabitsToGoal from "../screens/AddScreen/Goal/AddHabitsToGoal"
+import { ChooseColorScreenGoal } from "../screens/AddScreen/Goal/ChooseColorScreenGoal"
+import { ChooseIconScreenGoal } from "../screens/AddScreen/Goal/ChooseIconScreenGoal"
+import ValidationScreenGoal from "../screens/AddScreen/Goal/ValidationScreenGoal"
+import { FormBasicGoal, FormColoredGoal, FormDetailledGoal } from "../types/FormGoalTypes"
 import { SeriazableHabit } from "../types/HabitTypes"
 import { FormBasicHabit, FormColoredHabit, FormIconedHabit, FormStepsHabit } from "../types/FormHabitTypes"
 import React from "react"
@@ -39,19 +39,19 @@ export type AddScreenStackType  = {
         habit: SeriazableHabit
     },
 
-    AddBasicDetailsObjectif: undefined,
+    AddBasicDetailsGoal: undefined,
 
-    ChooseColorScreenObjectif: {
-        objectif: FormBasicObjectif
+    ChooseColorScreenGoal: {
+        goal: FormBasicGoal
     },
-    ChooseIconScreenObjectif: {
-        objectif: FormColoredObjectif
+    ChooseIconScreenGoal: {
+        goal: FormColoredGoal
     },
-    AddHabitsToObjectif: {
-        objectif: FormDetailledObjectif
+    AddHabitsToGoal: {
+        goal: FormDetailledGoal
     },
 
-    ValidationScreenObjectif: undefined,
+    ValidationScreenGoal: undefined,
 }
   
 const AddScreenStack = createNativeStackNavigator<AddScreenStackType>();
@@ -69,11 +69,11 @@ function AddScreenNavigator() {
         <AddScreenStack.Screen name="ChooseColorScreen" component={ChooseColorScreen}/>   
         <AddScreenStack.Screen name="ValidationScreenHabit" component={ValidationScreenHabit}/>   
 
-        <AddScreenStack.Screen name="AddBasicDetailsObjectif" component={AddBasicDetailsObjectif}/>   
-        <AddScreenStack.Screen name="AddHabitsToObjectif" component={AddHabitsToObjectif}/>   
-        <AddScreenStack.Screen name="ChooseColorScreenObjectif" component={ChooseColorScreenObjectif}/>   
-        <AddScreenStack.Screen name="ChooseIconScreenObjectif" component={ChooseIconScreenObjectif}/>   
-        <AddScreenStack.Screen name="ValidationScreenObjectif" component={ValidationScreenObjectif}/>   
+        <AddScreenStack.Screen name="AddBasicDetailsGoal" component={AddBasicDetailsGoal}/>   
+        <AddScreenStack.Screen name="AddHabitsToGoal" component={AddHabitsToGoal}/>   
+        <AddScreenStack.Screen name="ChooseColorScreenGoal" component={ChooseColorScreenGoal}/>   
+        <AddScreenStack.Screen name="ChooseIconScreenGoal" component={ChooseIconScreenGoal}/>   
+        <AddScreenStack.Screen name="ValidationScreenGoal" component={ValidationScreenGoal}/>   
 
         </AddScreenStack.Navigator>
     );

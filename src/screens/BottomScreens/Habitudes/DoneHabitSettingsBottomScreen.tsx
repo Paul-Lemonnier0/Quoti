@@ -5,7 +5,7 @@ import { useThemeColor } from "../../../components/Themed";
 import { HabitsContext } from "../../../data/HabitContext";
 import { getHabitType, getSeriazableHabit } from "../../../primitives/HabitMethods";
 import { BottomScreenOpen_Impact, Success_Impact } from "../../../constants/Impacts";
-import PinToObjectifBottomScreen from "./PinToObjectifBottomScreen";
+import PinToGoalBottomScreen from "./PinToGoalBottomScreen";
 import EditHabitNav from "../../EditScreens/Habits/EditHabitNav";
 import { AppContext } from "../../../data/AppContext";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
@@ -29,7 +29,7 @@ export interface DoneHabitSettingBottomScreenProps {
     habit: Habit,
     isDone?: boolean,
     isArchived?: boolean,
-    attachToObjectifAdditionnalMethod?: () => void, 
+    attachToGoalAdditionnalMethod?: () => void, 
     deleteAdditionnalMethod?: () => void, 
     modifyAdditionnalMethod?: () => void,
     additionnalClosedMethod?: () => void
@@ -40,19 +40,19 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
     habit, 
     isDone,
     isArchived,
-    attachToObjectifAdditionnalMethod, 
+    attachToGoalAdditionnalMethod, 
     deleteAdditionnalMethod,
     modifyAdditionnalMethod,
     additionnalClosedMethod
 }) => {
     
     const {setIsLoading, theme} = useContext(AppContext)
-    const { Objectifs } = useContext(HabitsContext)
-    const { updateHabitRelationWithObjectif } = useHabitActions()
+    const { Goals } = useContext(HabitsContext)
+    const { updateHabitRelationWithGoal } = useHabitActions()
 
     const { removeHabit, archiveHabit, markHabitAsDone, getBackHabit } = useHabitActions()
 
-    const displayedObjectifs = Object.values(Objectifs)
+    const displayedGoals = Object.values(Goals)
 
 
     const closeModal = () => {
@@ -60,7 +60,7 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
         // additionnalClosedMethod ? additionnalClosedMethod() : null
     }
 
-    const bottomSheetModalRef_PinObjectifScreen: RefObject<BottomSheetModal> = useRef(null)
+    const bottomSheetModalRef_PinGoalScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_ShareHabitScreen: RefObject<BottomSheetModal> = useRef(null)
     const bottomSheetModalRef_EndHabit: RefObject<BottomSheetModal> = useRef(null)
 
@@ -87,10 +87,10 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
         }, 200)
     }
 
-    const handleMakeObjectifRelation = async(habit: Habit, selectedPinObjectifID: string | null) => 
+    const handleMakeGoalRelation = async(habit: Habit, selectedPinGoalID: string | null) => 
     {
-        attachToObjectifAdditionnalMethod ? attachToObjectifAdditionnalMethod() : null
-        await updateHabitRelationWithObjectif(habit, selectedPinObjectifID)
+        attachToGoalAdditionnalMethod ? attachToGoalAdditionnalMethod() : null
+        await updateHabitRelationWithGoal(habit, selectedPinGoalID)
     }
 
     const error = useThemeColor(theme, "Error")
@@ -183,10 +183,10 @@ const DoneHabitSettingBottomScreen: FC<DoneHabitSettingBottomScreenProps> = ({
                 </View>
             </View>
             
-            <PinToObjectifBottomScreen
-                bottomSheetModalRef={bottomSheetModalRef_PinObjectifScreen}
-                displayedObjectifs={displayedObjectifs}
-                updateHabitRelationWithObjectif={handleMakeObjectifRelation}
+            <PinToGoalBottomScreen
+                bottomSheetModalRef={bottomSheetModalRef_PinGoalScreen}
+                displayedGoals={displayedGoals}
+                updateHabitRelationWithGoal={handleMakeGoalRelation}
                 habit={habit}/>
 
             <EditHabitNav

@@ -17,7 +17,7 @@ import Quoti from "../Other/Quoti";
 import { BottomScreenOpen_Impact } from "../../constants/Impacts";
 
 export interface HabitAdvancedDetailsFormProps {
-    isNewObjectifHabit?: boolean,
+    isNewGoalHabit?: boolean,
     isForModifyingHabit?: boolean,
     habit: FormStepsHabit | SeriazableHabit,
     handleGoNext: (detailledHabit: FormDetailledHabitValues) => void,
@@ -30,7 +30,7 @@ export interface HabitAdvancedDetailsFormProps {
 const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
     isForModifyingHabit,
     habit,
-    isNewObjectifHabit,
+    isNewGoalHabit,
     handleGoNext,
     notFinalStep,
     closeModal,
@@ -112,7 +112,7 @@ const HabitAdvancedDetailsForm: FC<HabitAdvancedDetailsFormProps> = ({
         setReccurence(rec)
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails((isForModifyingHabit && !isNewObjectifHabit) ? null : habit.objectifID ?? null, AddHabitScreenType.CreateHabitDetails)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails((isForModifyingHabit && !isNewGoalHabit) ? null : habit.goalID ?? null, AddHabitScreenType.CreateHabitDetails)
 
     const totalSteps = customTotalStep ?? CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = customCurrentStep ?? CURRENT_STEP_DETAILS.CURRENT_STEP

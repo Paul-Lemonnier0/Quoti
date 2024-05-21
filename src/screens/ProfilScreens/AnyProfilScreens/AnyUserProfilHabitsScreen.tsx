@@ -161,8 +161,8 @@ const AnyUserProfilHabitsScreen: FC<AnyUserProfilHabitsScreenProps> = ({navigati
               <HabitudesSkeletonList/> :
               <PresentationHabitList 
                 owner={detailledUser}
-                isNotNewObjectifHabit 
-                isNotObjectifIDConst 
+                isNotNewGoalHabit 
+                isNotGoalIDConst 
                 habits={habitsToDisplay} 
                 deleteHabit={() => {}} 
                 editHabit={() => {}}

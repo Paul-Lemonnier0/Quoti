@@ -13,32 +13,32 @@ type EditHabitDetailsScreenProps = NativeStackScreenProps<EditHabitStackProps, "
 const EditHabitDetailsScreen: FC<EditHabitDetailsScreenProps> = ({route, navigation}) => {
 
     const {closeModal} = useContext(BottomSheetModalMethodsContext)
-    const {habit, isNewObjectifHabit, objectifColor, constObjectifID} = route.params
+    const {habit, isNewGoalHabit, goalColor, constGoalID} = route.params
 
     const handleGoNext = (values: FormBasicHabit | Habit) => {
         BottomScreenOpen_Impact()
 
-        if(!isNewObjectifHabit) {
-            navigation.navigate("EditColorHabitScreen", {newValues: {...values as FormBasicHabit}, oldHabit: {...habit}, isNewObjectifHabit})
+        if(!isNewGoalHabit) {
+            navigation.navigate("EditColorHabitScreen", {newValues: {...values as FormBasicHabit}, oldHabit: {...habit}, isNewGoalHabit})
         }
 
-        else if (objectifColor) {
-            navigation.navigate("EditIconHabitScreen", {newValues: {...values as FormBasicHabit, color: objectifColor} , oldHabit: {...habit}, isNewObjectifHabit})
+        else if (goalColor) {
+            navigation.navigate("EditIconHabitScreen", {newValues: {...values as FormBasicHabit, color: goalColor} , oldHabit: {...habit}, isNewGoalHabit})
         }
 
-        else console.log("Edit objectif without objectif color")
+        else console.log("Edit goal without goal color")
     }
 
-    console.log(isNewObjectifHabit)
+    console.log(isNewGoalHabit)
 
     return(
         <HabitForm
             isForModifyingHabit
-            isForCreateObjectiveHabit={isNewObjectifHabit}
+            isForCreateObjectiveHabit={isNewGoalHabit}
             baseHabit={habit}
             handleGoNext={handleGoNext}
             closeModal={closeModal}
-            constObjectifID={constObjectifID}
+            constGoalID={constGoalID}
         />
     )
 }

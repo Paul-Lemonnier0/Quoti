@@ -19,7 +19,7 @@ const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
     LogBox.ignoreLogs(['Sending `onAnimatedValueUpdate` with no listeners registered.']);
 
     const {
-      Habits, Objectifs,
+      Habits, Goals,
       isDoneHabitsFetched, DoneHabits
     } = useContext(HabitsContext)
     const {user} = useContext(UserContext)
@@ -30,10 +30,10 @@ const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
     const [userFriends, setUserFriends] = useState<string[]>(user?.friends ?? [])
 
     const nb_habits = Object.keys(Habits).length
-    const nb_objectifs = Object.keys(Objectifs).length
+    const nb_goals = Object.keys(Goals).length
 
     const [nbHabitsDone, setNbHabitsDone] = useState<number>(0)
-    const [nbObjectifsDone, setNbObjectifsDone] = useState<number>(0)
+    const [nbGoalsDone, setNbGoalsDone] = useState<number>(0)
 
     useEffect(() => {
       const handleSetNbHabitsDone = async() => {
@@ -64,15 +64,15 @@ const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
       }    
     }
 
-    const handleSeeObjectifs = () => {
-      if(Object.values(Objectifs).length > 0) {
-        navigation.navigate("ProfilObjectifsScreen")
+    const handleSeeGoals = () => {
+      if(Object.values(Goals).length > 0) {
+        navigation.navigate("ProfilGoalsScreen")
       }
     }
 
-    const handleSeeDoneObjectifs = () => {
-      if(Object.values(Objectifs).length > 0) {
-        navigation.navigate("ProfilDoneObjectifsScreen")
+    const handleSeeDoneGoals = () => {
+      if(Object.values(Goals).length > 0) {
+        navigation.navigate("ProfilDoneGoalsScreen")
       }
     }
 
@@ -106,14 +106,14 @@ const ProfilDetailsScreen: FC<ProfilDetailsScreenProps> = ({navigation}) => {
           friends={userFriends}
           nb_habits={nb_habits}
           nb_habits_done={nbHabitsDone}
-          nb_objectifs={nb_objectifs}
-          nb_objectifs_done={nbObjectifsDone}
+          nb_goals={nb_goals}
+          nb_goals_done={nbGoalsDone}
           handleOpenSettings={handleOpenSettings}
           handleSeeHabits={handleSeeHabits}
           handleSeeDoneHabits={handleSeeDoneHabits}
-          handleSeeDoneObjectifs={handleSeeDoneObjectifs}
+          handleSeeDoneGoals={handleSeeDoneGoals}
           handleSeeFriends={handleSeeFriends}
-          handleSeeObjectifs={handleSeeObjectifs}
+          handleSeeGoals={handleSeeGoals}
           handleSeeSucces={() => {}}
           handlePressOnProfil={handlePressOnProfil}
       />

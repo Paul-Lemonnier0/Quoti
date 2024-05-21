@@ -8,7 +8,7 @@ import { DEFAULT_SKELETON_SIZE } from 'moti/build/skeleton/shared'
 
 export interface Story {
     date: Date,
-    objectif?: boolean,
+    goal?: boolean,
     titre: string,
     description: string,
     icon: string,

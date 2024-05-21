@@ -1,4 +1,4 @@
-import { FrequencyTypes, Habit, Objectif } from "./HabitTypes";
+import { FrequencyTypes, Habit, Goal } from "./HabitTypes";
 
 export const DEFAULT_HABIT: Habit = {
     habitID: "defaut",
@@ -15,12 +15,12 @@ export const DEFAULT_HABIT: Habit = {
     bestStreak: 0,
     currentStreak: 0,
     lastCompletionDate: "none",
-    objectifID: undefined,
+    goalID: undefined,
     members: []
 }
 
-export const DEFAULT_OBJECTIF: Objectif = {
-    objectifID: "defaut",
+export const DEFAULT_GOAL: Goal = {
+    goalID: "defaut",
     titre: "default",
     description: "default",
     startingDate: new Date(),

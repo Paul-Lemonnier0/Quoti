@@ -2,7 +2,7 @@ import { addDays } from "date-fns";
 import StepsList from "../components/Habitudes/Step/StepsList"
 import { generateUniqueID, toISOStringWithoutTimeZone } from "../primitives/BasicsMethods";
 import { FormDetailledHabit } from "../types/FormHabitTypes"
-import { FormDetailledObjectif } from "../types/FormObjectifTypes"
+import { FormDetailledGoal } from "../types/FormGoalTypes"
 import { FrequencyTypes, Habit, PrioritesType, SeriazableHabit, Step, StepList } from "../types/HabitTypes"
 
 const stepPriorities: PrioritesType[] = [PrioritesType.Medium, PrioritesType.High, PrioritesType.Low];
@@ -174,7 +174,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     startingDate: today,
     occurence: 3,
     reccurence: 2,
-    objectifID: undefined,
+    goalID: undefined,
     frequency: FrequencyTypes.Quotidien,
     steps: StepsPlaceholder[0],
     icon: "run",
@@ -190,7 +190,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     startingDate: today,
     occurence: 1,
     reccurence: 1,
-    objectifID: undefined,
+    goalID: undefined,
     frequency: FrequencyTypes.Quotidien,
     steps: StepsPlaceholder[1],
     icon: "meditation",
@@ -209,7 +209,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     frequency: FrequencyTypes.Hebdo,
     steps: StepsPlaceholder[2],
     icon: "pencil",
-    objectifID: undefined,
+    goalID: undefined,
     notificationEnabled: true,
     alertTime: ""
   },
@@ -226,7 +226,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     frequency: FrequencyTypes.Quotidien,
     steps: StepsPlaceholder[3],
     icon: "water",
-    objectifID: undefined,
+    goalID: undefined,
     notificationEnabled: true,
     alertTime: ""
   },
@@ -242,7 +242,7 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     frequency: FrequencyTypes.Quotidien,
     steps: StepsPlaceholder[4],
     icon: "healthy",
-    objectifID: undefined,
+    goalID: undefined,
     notificationEnabled: true,
     alertTime: ""
   },
@@ -258,17 +258,17 @@ export const habitsPlaceholder: FormDetailledHabit[] = [
     frequency: FrequencyTypes.Hebdo,
     steps: StepsPlaceholder[5], 
     icon: "Yarn",
-    objectifID: undefined,
+    goalID: undefined,
     notificationEnabled: true,
     alertTime: ""
   }
 ]
 
-export const ObjectifPlaceholder_SemiMarathon = () => {
-  const objectif: FormDetailledObjectif = {
+export const GoalPlaceholder_SemiMarathon = () => {
+  const goal: FormDetailledGoal = {
     color: "#FFC902",
     titre: "Préparation Semi-Marathon de Paris",
-    description: "Objectif de préparation physique et mentale pour le semi-marathon",
+    description: "Goal de préparation physique et mentale pour le semi-marathon",
     icon: "run",
     startingDate: today,
     endingDate: toISOStringWithoutTimeZone(addDays(new Date(today), 90)),
@@ -314,7 +314,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       icon: "run",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     },
 
     {
@@ -340,7 +340,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       icon: "Zzz",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     },
 
     {
@@ -374,7 +374,7 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       icon: "healthy",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     },
 
     {
@@ -400,18 +400,18 @@ export const ObjectifPlaceholder_SemiMarathon = () => {
       icon: "beer",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     },
   ];
 
-  return { objectif, habits };
+  return { goal, habits };
 };
 
-export const ObjectifPlaceholder_Meditation = () => {
-  const objectif: FormDetailledObjectif = {
+export const GoalPlaceholder_Meditation = () => {
+  const goal: FormDetailledGoal = {
     color: "#FFFFFF",
     titre: "Bien-Être Personnel",
-    description: "Objectif de favoriser le bien-être personnel à travers différentes habitudes",
+    description: "Goal de favoriser le bien-être personnel à travers différentes habitudes",
     icon: "meditation",
     startingDate: today,
     endingDate: toISOStringWithoutTimeZone(addDays(new Date(today), 90)),
@@ -441,7 +441,7 @@ export const ObjectifPlaceholder_Meditation = () => {
       icon: "meditation",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     },
 
     {
@@ -475,7 +475,7 @@ export const ObjectifPlaceholder_Meditation = () => {
       icon: "pencil",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     },
 
     {
@@ -509,9 +509,9 @@ export const ObjectifPlaceholder_Meditation = () => {
       icon: "Yarn",
       notificationEnabled: true,
       alertTime: "",
-      objectifID: undefined
+      goalID: undefined
     }
   ];
 
-  return { objectif, habits };
+  return { goal, habits };
 };

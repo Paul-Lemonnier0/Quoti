@@ -72,7 +72,7 @@ const ProfilDoneHabitsScreen: FC<ProfilDoneHabitsScreenProps> = ({navigation}) =
         navigation.navigate("HabitudeScreen", {
           habitID: habit.habitID,
           habitFrequency: habit.frequency,
-          objectifID: habit.objectifID,
+          goalID: habit.goalID,
           currentDateString: toISOStringWithoutTimeZone(new Date()),
           noInteractions: true,
           isPresentation: true,
@@ -166,8 +166,8 @@ const ProfilDoneHabitsScreen: FC<ProfilDoneHabitsScreenProps> = ({navigation}) =
                     index={index} 
                     deleteHabit={() => {}}
                     editHabit={() => {}}
-                    isNotObjectifIDConst
-                    isNotNewObjectifHabit
+                    isNotGoalIDConst
+                    isNotNewGoalHabit
                     onPress={handlePressOnHabit}
                     noAnimation
                     isDone

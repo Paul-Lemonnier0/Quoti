@@ -12,7 +12,7 @@ import { AppContext } from '../data/AppContext';
 import { BackgroundIconButton, IconButton, IconProvider, NavigationActions, NavigationButton } from '../components/Buttons/IconButtons';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile, User } from 'firebase/auth';
 import React from "react"
-import { habitsPlaceholder, ObjectifPlaceholder_Meditation, ObjectifPlaceholder_SemiMarathon } from '../data/HabitsPlaceholder';
+import { habitsPlaceholder, GoalPlaceholder_Meditation, GoalPlaceholder_SemiMarathon } from '../data/HabitsPlaceholder';
 import { HabitsContext } from '../data/HabitContext';
 import { generateRandomUsers } from '../primitives/UserPrimitives';
 import { auth, db } from '../firebase/InitialisationFirebase';
@@ -34,19 +34,19 @@ const UtilsScreen = () => {
   
         setIsLoading(true)
   
-        const obj_hab_SemiMarathon = ObjectifPlaceholder_SemiMarathon()
-        const obj_hab_BienEtre = ObjectifPlaceholder_Meditation()
+        const obj_hab_SemiMarathon = GoalPlaceholder_SemiMarathon()
+        const obj_hab_BienEtre = GoalPlaceholder_Meditation()
   
-        const objectifWithID_Semi = await addGoal(obj_hab_SemiMarathon["objectif"]) 
-        if(objectifWithID_Semi?.objectifID){
-          const updatedHabitsForObjectif_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, objectifID: objectifWithID_Semi.objectifID}))
-          await Promise.all(updatedHabitsForObjectif_Semi.map(addHabit));
+        const goalWithID_Semi = await addGoal(obj_hab_SemiMarathon["goal"]) 
+        if(goalWithID_Semi?.goalID){
+          const updatedHabitsForGoal_Semi = obj_hab_SemiMarathon["habits"].map(habit => ({...habit, goalID: goalWithID_Semi.goalID}))
+          await Promise.all(updatedHabitsForGoal_Semi.map(addHabit));
         }
   
-        const objectifWithID_BienEtre = await addGoal(obj_hab_BienEtre["objectif"]) 
-        if(objectifWithID_BienEtre?.objectifID){
-          const updatedHabitsForObjectif_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, objectifID: objectifWithID_BienEtre.objectifID}))
-          await Promise.all(updatedHabitsForObjectif_BienEtre.map(addHabit));
+        const goalWithID_BienEtre = await addGoal(obj_hab_BienEtre["goal"]) 
+        if(goalWithID_BienEtre?.goalID){
+          const updatedHabitsForGoal_BienEtre = obj_hab_BienEtre["habits"].map(habit => ({...habit, goalID: goalWithID_BienEtre.goalID}))
+          await Promise.all(updatedHabitsForGoal_BienEtre.map(addHabit));
         }
   
         await Promise.all(habitsPlaceholder.map(addHabit));

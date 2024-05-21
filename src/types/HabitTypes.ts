@@ -34,16 +34,16 @@ interface ItemType {
     icon: string,
 }
 
-interface BaseObjectif extends ItemType {
-    objectifID: string
+interface BaseGoal extends ItemType {
+    goalID: string
 }
 
-interface Objectif extends BaseObjectif {
+interface Goal extends BaseGoal {
     startingDate: Date,
     endingDate?: Date,
 }
 
-interface SeriazableObjectif extends BaseObjectif {
+interface SeriazableGoal extends BaseGoal {
     startingDate: string,
     endingDate?: string,
 }
@@ -56,7 +56,7 @@ interface BaseHabit extends ItemType, StreakValues {
     reccurence: number,
     daysOfWeek: number[],
     notificationEnabled?: boolean,
-    objectifID: string | undefined
+    goalID: string | undefined
     steps: StepList,
     isShared?: boolean,
     members: (UserDataBase | null)[]
@@ -87,44 +87,44 @@ interface HabitList {
     [habitID: string]: Habit
 }
 
-interface ObjectifHabitList {
-    [objectifID: string]: HabitList
+interface GoalHabitList {
+    [goalID: string]: HabitList
 }
 
-interface ObjectifList {
-    [objectifID: string]: Objectif
+interface GoalList {
+    [goalID: string]: Goal
 }
 
 interface StepList {
     [stepID: string]: Step
 }
 
-interface HabitOrObjectif {
+interface HabitOrGoal {
     Habitudes?: HabitList;
-    Objectifs?: ObjectifHabitList;
+    Goals?: GoalHabitList;
 }
 
 interface FilteredHabitsType {
-    [FrequencyTypes.Quotidien]: HabitOrObjectif;
-    [FrequencyTypes.Hebdo]: HabitOrObjectif;
-    [FrequencyTypes.Mensuel]: HabitOrObjectif;
+    [FrequencyTypes.Quotidien]: HabitOrGoal;
+    [FrequencyTypes.Hebdo]: HabitOrGoal;
+    [FrequencyTypes.Mensuel]: HabitOrGoal;
 }
 
 export const EMPTY_FILTERED_HABITS = {
-    Quotidien: {Habitudes: {}, Objectifs: {}}, 
-    Hebdo: {Habitudes: {}, Objectifs: {}}, 
-    Mensuel: {Habitudes: {}, Objectifs: {}}
+    Quotidien: {Habitudes: {}, Goals: {}}, 
+    Hebdo: {Habitudes: {}, Goals: {}}, 
+    Mensuel: {Habitudes: {}, Goals: {}}
 }
 
 
 export {
-    Objectif, 
-    SeriazableObjectif, 
+    Goal, 
+    SeriazableGoal, 
     Habit, 
     SeriazableHabit, 
     Step, 
     HabitList, 
-    ObjectifList, 
+    GoalList, 
     StepList, 
     FilteredHabitsType
 }

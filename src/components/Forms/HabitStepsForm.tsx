@@ -19,13 +19,13 @@ import Quoti from "../Other/Quoti";
 
 export interface HabitStepsForm {
     isForModifyingHabit?: boolean,
-    isNewObjectifHabit?: boolean,
+    isNewGoalHabit?: boolean,
     habit: FormIconedHabit | SeriazableHabit,
     handleGoNext: (coloredHabit: FormStepsHabitValues) => void,
 }
 
 const HabitStepsForm: FC<HabitStepsForm> = ({
-    isNewObjectifHabit,
+    isNewGoalHabit,
     isForModifyingHabit,
     habit,
     handleGoNext,
@@ -70,10 +70,10 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
         handleGoNext(newValues)
     }
 
-    const objID = (isForModifyingHabit && !isNewObjectifHabit) ? null : (habit.objectifID ?? null) 
+    const objID = (isForModifyingHabit && !isNewGoalHabit) ? null : (habit.goalID ?? null) 
     const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(objID, AddHabitScreenType.AddHabitSteps)
 
-    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS + (isNewObjectifHabit ? 0 : (isForModifyingHabit ? -1 : 0))
+    const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS + (isNewGoalHabit ? 0 : (isForModifyingHabit ? -1 : 0))
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP
 
     const handleAddStep = () => {
@@ -122,7 +122,7 @@ const HabitStepsForm: FC<HabitStepsForm> = ({
                         <Quoti/>
                         
                         <NavigationButton noPadding action={
-                                (isForModifyingHabit && !isNewObjectifHabit) ? 
+                                (isForModifyingHabit && !isNewGoalHabit) ? 
                                 NavigationActions.validation :
                                 NavigationActions.goNext
                             } methode={handleValidation}/>

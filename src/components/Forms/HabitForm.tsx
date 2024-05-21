@@ -9,10 +9,10 @@ import { NavigationActions, NavigationButton } from "../Buttons/IconButtons"
 import { StyleSheet } from "react-native"
 import { FC, useCallback, useContext, useRef, useState } from "react"
 import { AddHabitScreenType, getAddHabitStepsDetails } from "../../constants/BasicConstants"
-import ObjectifRadioItem from "../Objectifs/ObjectifRadioItem"
+import GoalRadioItem from "../Goals/GoalRadioItem"
 import { HabitsContext } from "../../data/HabitContext"
-import { Objectif, SeriazableHabit } from "../../types/HabitTypes"
-import { FormBasicHabit, FormDetailledObjectifHabit } from "../../types/FormHabitTypes"
+import { Goal, SeriazableHabit } from "../../types/HabitTypes"
+import { FormBasicHabit, FormDetailledGoalHabit } from "../../types/FormHabitTypes"
 import React from "react"
 import IllustrationsList, { IllustrationsType } from "../../data/IllustrationsList"
 import Quoti from "../Other/Quoti"
@@ -28,10 +28,10 @@ export interface HabitFormProps {
     isForModifyingHabit?: boolean,
     isForCreateObjectiveHabit?: boolean,
     closeModal?: () => void,
-    baseHabit?: (SeriazableHabit | FormDetailledObjectifHabit),
-    handleGoNext: (basicHabit: FormBasicHabit | (SeriazableHabit | FormDetailledObjectifHabit)) => void,
+    baseHabit?: (SeriazableHabit | FormDetailledGoalHabit),
+    handleGoNext: (basicHabit: FormBasicHabit | (SeriazableHabit | FormDetailledGoalHabit)) => void,
     currentStep?: number,
-    constObjectifID?: string
+    constGoalID?: string
 }
 
 const HabitForm: FC<HabitFormProps> = ({
@@ -40,13 +40,13 @@ const HabitForm: FC<HabitFormProps> = ({
     closeModal,
     baseHabit,
     handleGoNext,
-    constObjectifID,
+    constGoalID,
     currentStep = 1,
 }) => {
     const {theme} = useContext(AppContext)
     const fontGray = useThemeColor(theme, "FontGray")
 
-    const {Objectifs} = useContext(HabitsContext)
+    const {Goals} = useContext(HabitsContext)
 
     const titreRef = useRef<CustomTextInputRefType>(null)
     const descriptionRef = useRef<CustomTextInputRefType>(null)
@@ -59,31 +59,31 @@ const HabitForm: FC<HabitFormProps> = ({
     const baseTotalSteps = (baseHabit || isForCreateObjectiveHabit) ? CURRENT_STEP_DETAILS.TOTAL_STEPS - 1 : CURRENT_STEP_DETAILS.TOTAL_STEPS
     const [totalSteps, setTotalSteps] = useState(baseTotalSteps)
 
-    const [displayedObjectifs, setDisplayedObjectifs] = useState<Objectif[]>(Object.values(Objectifs))
+    const [displayedGoals, setDisplayedGoals] = useState<Goal[]>(Object.values(Goals))
 
-    const [selectedObjectif, setSelectedObjectif] = useState<string | undefined>(constObjectifID ?? ((isForModifyingHabit && baseHabit?.objectifID) ? baseHabit.objectifID : undefined))
+    const [selectedGoal, setSelectedGoal] = useState<string | undefined>(constGoalID ?? ((isForModifyingHabit && baseHabit?.goalID) ? baseHabit.goalID : undefined))
 
 
 
-    const RenderObjectif = ({item, index}) => {
+    const RenderGoal = ({item, index}) => {
         const onPress = () => {
             BottomScreenOpen_Impact()
 
             if(!isForModifyingHabit){
-                const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(item.objectifID, AddHabitScreenType.AddBasicDetails)
+                const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(item.goalID, AddHabitScreenType.AddBasicDetails)
                         
                 if(!isForCreateObjectiveHabit){
                     setTotalSteps(CURRENT_STEP_DETAILS.TOTAL_STEPS)
                 }
             }
 
-            setSelectedObjectif(item.objectifID)
+            setSelectedGoal(item.goalID)
         }
 
         return (
-            <ObjectifRadioItem 
-                onPress={onPress} objectif={item} isPressDisabled={constObjectifID !== undefined}
-                isSelected={selectedObjectif === item.objectifID}/>
+            <GoalRadioItem 
+                onPress={onPress} goal={item} isPressDisabled={constGoalID !== undefined}
+                isSelected={selectedGoal === item.goalID}/>
         )
     }
 
@@ -91,7 +91,7 @@ const HabitForm: FC<HabitFormProps> = ({
         const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(null, AddHabitScreenType.AddBasicDetails)
         setTotalSteps(CURRENT_STEP_DETAILS.TOTAL_STEPS)
 
-        setSelectedObjectif(undefined)
+        setSelectedGoal(undefined)
     }
 
     const handleValidation = () => {
@@ -101,7 +101,7 @@ const HabitForm: FC<HabitFormProps> = ({
             const newValues: FormBasicHabit = {
                 titre: titre.trim(), 
                 description: description.trim(),
-                objectifID: selectedObjectif,
+                goalID: selectedGoal,
                 startingDate: toISOStringWithoutTimeZone(startingDate)
             }
 
@@ -119,7 +119,7 @@ const HabitForm: FC<HabitFormProps> = ({
         }
     }
 
-    const NoObjectifScreen = () => {
+    const NoGoalScreen = () => {
         return(
             <View style={{flex: 1, flexGrow: 1, marginBottom: 0}}>
                 <View style={[styles.emptySreenContainer, {justifyContent: "space-evenly"}]}>
@@ -193,15 +193,15 @@ const HabitForm: FC<HabitFormProps> = ({
                                         <Separator/>
                                     </View>
                                     <View style={{ marginLeft: 5, display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
-                                        <SubTitleText text={"Objectif"}/>
-                                        <TextButton isGray text={"Dissocier"} disabled={constObjectifID !== undefined} semiBold noPadding onPress={handleDissocier}/>
+                                        <SubTitleText text={"Goal"}/>
+                                        <TextButton isGray text={"Dissocier"} disabled={constGoalID !== undefined} semiBold noPadding onPress={handleDissocier}/>
                                     </View>
                                 </>
                             }
                             
                             {
-                                displayedObjectifs.length === 0 ?
-                                <NoObjectifScreen/>
+                                displayedGoals.length === 0 ?
+                                <NoGoalScreen/>
                                 
                                 :
 
@@ -210,10 +210,10 @@ const HabitForm: FC<HabitFormProps> = ({
                                     <View style={{display: "flex", flexDirection: "column", gap: 20, flex: 1}}>
                                         <FlatList
                                             scrollEnabled={false}
-                                            data={displayedObjectifs}
+                                            data={displayedGoals}
                                             style={{margin: -20}}
                                             contentContainerStyle={{gap: 10, padding: 20, paddingBottom: 60}}
-                                            renderItem={({item, index}) => <RenderObjectif key={index} item={item} index={index}/>}
+                                            renderItem={({item, index}) => <RenderGoal key={index} item={item} index={index}/>}
                                         />
                                     </View> 
                                 </View>

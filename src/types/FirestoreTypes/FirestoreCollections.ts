@@ -1,7 +1,7 @@
 export enum FirestoreCollections {
     Users = "Users",
     Habits = "Habits",
-    Objectifs = "Objectifs",
+    Goals = "Goals",
     Posts = "Posts"
 }
 
@@ -10,7 +10,7 @@ export enum FirestoreUserSubCollections {
     UserDoneHabits = 'UserDoneHabits',
     UserArchivedHabits = "UserArchivedHabits",
     
-    UserObjectifs = "UserObjectifs",
+    UserGoals = "UserGoals",
     History = "History",
     Social = "Social"
 }
@@ -20,5 +20,5 @@ export enum FirestoreSocialSubCollections {
     Blocked = "Blocked",
     Requests = "Requests",
     HabitsInvitation = "HabitsInvitation",
-    ObjectifsInvitation = "ObjectifsInvitation"
+    GoalsInvitation = "GoalsInvitation"
 }

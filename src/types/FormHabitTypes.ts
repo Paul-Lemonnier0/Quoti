@@ -17,7 +17,7 @@ type FormStep = FormPlaceholderStep | FormFullStep
 interface FormBasicHabit {
     titre: string,
     description: string,
-    objectifID: string | undefined,
+    goalID: string | undefined,
     startingDate?: string
 
 }
@@ -48,7 +48,7 @@ interface FormIconedHabit extends FormColoredHabit, FormIconedHabitValues {}
 interface FormStepsHabit extends FormIconedHabit, FormStepsHabitValues {}
 interface FormDetailledHabit extends FormStepsHabit, FormDetailledHabitValues {}
 
-interface FormDetailledObjectifHabit extends FormDetailledHabit {
+interface FormDetailledGoalHabit extends FormDetailledHabit {
     habitID: string
 }
 
@@ -61,5 +61,5 @@ export {
     FormIconedHabit,
     FormStepsHabit,
     FormDetailledHabit,
-    FormDetailledObjectifHabit
+    FormDetailledGoalHabit
 }

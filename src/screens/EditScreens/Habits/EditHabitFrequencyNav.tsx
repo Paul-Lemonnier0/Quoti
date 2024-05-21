@@ -7,7 +7,7 @@ import { BottomSheetModalMethodsContextProvider } from "../../../data/BottomShee
 import EditHabitFrequencyScreen from "./EditHabitFrequencyScreen";
 import { EditHabitContextProvider } from "./EditHabitContext";
 import { SeriazableHabit } from "../../../types/HabitTypes";
-import { FormDetailledObjectifHabit } from "../../../types/FormHabitTypes";
+import { FormDetailledGoalHabit } from "../../../types/FormHabitTypes";
 import InformationEditFrequencyHabit from "./InformationEditFrequencyHabit";
 
 export type EditHabitFrequencyStackProps = {

@@ -56,7 +56,7 @@ const SharedHabitScreen: FC<SharedHabitScreenProps> = ({navigation, route}) => {
         setIsLoading(true)
         if(user && user.email) {
             if(await acceptHabitInvitation(senderUser.uid, senderUser.email, user.uid, user.email, habit.habitID)) {
-                addHabitIntern(convertBackSeriazableHabit({...habit, objectifID: undefined}))
+                addHabitIntern(convertBackSeriazableHabit({...habit, goalID: undefined}))
                 removeHabitRequest(habit.habitID, senderUser.uid)
 
                 Toast.show({

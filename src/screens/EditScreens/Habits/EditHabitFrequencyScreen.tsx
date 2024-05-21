@@ -49,7 +49,7 @@ const EditHabitFrequencyScreen: FC<EditHabitFrequencyScreenProps> = ({route, nav
             notFinalStep
             isForModifyingHabit
             habit={oldHabit}
-            isNewObjectifHabit
+            isNewGoalHabit
             handleGoNext={handleGoNext}
         />
     )

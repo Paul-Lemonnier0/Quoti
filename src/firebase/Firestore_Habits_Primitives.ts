@@ -17,7 +17,7 @@ import { Database_getUsersInfo, UserDataBase } from "./Database_User_Primitives"
 const setupFirestoreGlobalHabit = (habit: FormDetailledHabit, userMail: string, userID: string, habitStartingDate?: string): GlobalFirestoreHabit => {
     const startingDate = habitStartingDate ?? toISOStringWithoutTimeZone(new Date())
 
-    const { alertTime, notificationEnabled, objectifID, ...habitTemp } = habit;
+    const { alertTime, notificationEnabled, goalID, ...habitTemp } = habit;
 
     const globalHabit: GlobalFirestoreHabit = { 
         ...habitTemp, 
@@ -32,7 +32,7 @@ const setupFirestoreGlobalHabit = (habit: FormDetailledHabit, userMail: string, 
  * [FIRESTORE] Prépare une habitude pour l'envoyer dans la collection privée d'un utilisateur 
  */
 
-const setupFirestoreUserHabit = (habitID: string, habitStartingDate?: string, objectifID: string | null = null, alertTime: string = "", notificationEnabled: boolean = false) => {
+const setupFirestoreUserHabit = (habitID: string, habitStartingDate?: string, goalID: string | null = null, alertTime: string = "", notificationEnabled: boolean = false) => {
     const startingDate = habitStartingDate ?? toISOStringWithoutTimeZone(new Date())
 
     const userHabit: UserFirestoreHabit = { 
@@ -40,7 +40,7 @@ const setupFirestoreUserHabit = (habitID: string, habitStartingDate?: string, ob
         notificationEnabled,
         habitID,
         startingDate,
-        objectifID: objectifID ?? null,
+        goalID: goalID ?? null,
         bestStreak: 0,
         currentStreak: 0, 
         lastCompletionDate: "none",
@@ -68,7 +68,7 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userMail: string, u
         console.log("Habit well added to firestore with id : ", habitID)
     
         //Ajout en spécifique
-        const userHabit = await addRefHabitToFirestore(habitID, userMail, habit.startingDate, habit.objectifID, habit.alertTime, habit.notificationEnabled)
+        const userHabit = await addRefHabitToFirestore(habitID, userMail, habit.startingDate, habit.goalID, habit.alertTime, habit.notificationEnabled)
     
         console.log("Habit well added to user firestore")
     
@@ -92,7 +92,7 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userMail: string, u
         return {
             ...globalHabit, 
             ...userHabit,
-            objectifID: userHabit.objectifID ?? undefined, 
+            goalID: userHabit.goalID ?? undefined, 
             startingDate, 
             habitID, 
             steps, 
@@ -111,10 +111,10 @@ const addHabitToFireStore = async(habit: FormDetailledHabit, userMail: string, u
  * [FIRESTORE] Ajoute une référence, dans la collection de l'utilisateurs, d'une habitude déjà présente dans la collection global
  */
 
-const addRefHabitToFirestore = async (habitID: string, userMail: string, startingDate?: string, objectifID: string | null = null, alertTime: string = "", notificationEnabled: boolean = false): Promise<UserFirestoreHabit> => {
+const addRefHabitToFirestore = async (habitID: string, userMail: string, startingDate?: string, goalID: string | null = null, alertTime: string = "", notificationEnabled: boolean = false): Promise<UserFirestoreHabit> => {
     console.log("Adding ref habit to Firestore...");
 
-    const userHabit = setupFirestoreUserHabit(habitID, startingDate, objectifID, alertTime, notificationEnabled)
+    const userHabit = setupFirestoreUserHabit(habitID, startingDate, goalID, alertTime, notificationEnabled)
 
     try {
         const userDoc = doc(db,  FirestoreCollections.Users, userMail)
@@ -172,7 +172,7 @@ const updateHabitInFirestore = async(userMail: string, oldHabit: Habit, newValue
 
     //Modification des éléments propres à l'utilisateur
 
-    if("objectifID" in newValues || "alertTime" in newValues || "notificationEnabled" in newValues) {
+    if("goalID" in newValues || "alertTime" in newValues || "notificationEnabled" in newValues) {
         const userDoc = doc(db, FirestoreCollections.Users, userMail)
         const docRef = doc(
             collection(userDoc, FirestoreUserSubCollections.UserHabits), 
@@ -181,7 +181,7 @@ const updateHabitInFirestore = async(userMail: string, oldHabit: Habit, newValue
         
         const newValues_temp = {}
 
-        if("objectifID" in newValues) newValues_temp["objectifID"] = newValues.objectifID
+        if("goalID" in newValues) newValues_temp["goalID"] = newValues.goalID
         if("alertTime" in newValues) newValues_temp["alertTime"] = newValues.alertTime
         if("notificationEnabled" in newValues) newValues_temp["notificationEnabled"] = newValues.notificationEnabled
 
@@ -192,7 +192,7 @@ const updateHabitInFirestore = async(userMail: string, oldHabit: Habit, newValue
 
     //Modification des éléments généraux
 
-    const {objectifID, alertTime, notificationEnabled, ...newValues_global} = newValues
+    const {goalID, alertTime, notificationEnabled, ...newValues_global} = newValues
 
     if(Object.keys(newValues_global).length > 0) {
         const habitDoc = doc(db, FirestoreCollections.Habits, oldHabit.habitID)
@@ -294,12 +294,12 @@ const getSpecificHabitForUser = async(userMail: string, habitID: string): Promis
     if(globalHabit) {
         const userHabit = await getUserInfoForSpecificHabit(userMail, habitID)
         if(userHabit) {
-            const objectifID = userHabit.objectifID ?? undefined
+            const goalID = userHabit.goalID ?? undefined
             const startingDate = new Date(userHabit.startingDate)
 
             const members = await getUsersDataBaseFromMember(globalHabit.members, undefined, userMail)
 
-            return {...globalHabit, ...userHabit, objectifID, startingDate, members}
+            return {...globalHabit, ...userHabit, goalID, startingDate, members}
         }
     }
 
@@ -307,10 +307,10 @@ const getSpecificHabitForUser = async(userMail: string, habitID: string): Promis
 }
 
 /**
- * [FIRESTORE] Récupère les habitudes liées à un objectif pour un utilisateur
+ * [FIRESTORE] Récupère les habitudes liées à un goal pour un utilisateur
  */
 
-const getUserHabitsForObjectif = async(userMail: string, objectifID: string): Promise<Habit[]> => {
+const getUserHabitsForGoal = async(userMail: string, goalID: string): Promise<Habit[]> => {
 
     try{
         const habits: Habit[] = []
@@ -318,7 +318,7 @@ const getUserHabitsForObjectif = async(userMail: string, objectifID: string): Pr
         const userDoc = doc(db, FirestoreCollections.Users, userMail)
         const habitCollection = collection(userDoc, FirestoreUserSubCollections.UserHabits); 
 
-        const qry = query(habitCollection, where("objectifID", "==", objectifID))
+        const qry = query(habitCollection, where("goalID", "==", goalID))
 
         const qrySnap = await getDocs(qry)
 
@@ -331,7 +331,7 @@ const getUserHabitsForObjectif = async(userMail: string, objectifID: string): Pr
 
                 const members = await getUsersDataBaseFromMember(globalHabit.members, undefined, userMail)
     
-                habits.push({...globalHabit, ...userHabit, objectifID, startingDate, members})
+                habits.push({...globalHabit, ...userHabit, goalID, startingDate, members})
             }
         }))
 
@@ -339,7 +339,7 @@ const getUserHabitsForObjectif = async(userMail: string, objectifID: string): Pr
     }
 
     catch(e) {
-        console.log("Error while retrieving habits for objectif : ", e)
+        console.log("Error while retrieving habits for goal : ", e)
     }
 
     return []
@@ -461,5 +461,5 @@ export {
     getUserInfoForSpecificHabit,
     getSpecificHabitForUser,
     addRefHabitToFirestore,
-    getUserHabitsForObjectif
+    getUserHabitsForGoal
 }

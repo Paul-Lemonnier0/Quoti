@@ -50,7 +50,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
     const {
         habitID, 
         habitFrequency, 
-        objectifID, 
+        goalID, 
         currentDateString, 
         noInteractions,
         isPresentation,
@@ -69,7 +69,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
         Habits, 
         ArchivedHabits,
         DoneHabits,
-        Objectifs, 
+        Goals, 
         HabitsHistory,
         getHabitFromFilteredHabits, 
     } = useContext(HabitsContext)
@@ -90,10 +90,10 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
             : Habits[habitID])
         )
         :
-        getHabitFromFilteredHabits(habitFrequency, objectifID, habitID) ?? Habits_Skeleton[0]
+        getHabitFromFilteredHabits(habitFrequency, goalID, habitID) ?? Habits_Skeleton[0]
 
-    if(objectifID && habit){
-        habit["color"] = Objectifs[objectifID].color ?? habit.color
+    if(goalID && habit){
+        habit["color"] = Goals[goalID].color ?? habit.color
     }
 
     const [steps, setSteps] = useState<Step[]>(habit ? Object.values(habit.steps) : [])
@@ -332,7 +332,7 @@ const HabitudeScreen = ({ route, navigation }: HabitudeScreenProps) => {
                     bottomSheetModalRef={bottomSheetModalRef_Settings}
                     habit={habit} 
                     deleteAdditionnalMethod={goBack} 
-                    attachToObjectifAdditionnalMethod={goBack}
+                    attachToGoalAdditionnalMethod={goBack}
                     modifyAdditionnalMethod={goBack}
                     handleEditFrequencyAdditionnalMethod={handleEditFrequencyAdditionnalMethod}
                 />

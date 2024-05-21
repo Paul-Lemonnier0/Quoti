@@ -21,7 +21,7 @@ export const ChooseIconScreen: FC<ChooseIconScreenProps> = ({navigation, route})
         BottomScreenOpen_Impact()
     }
 
-    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(habit.objectifID ?? null, AddHabitScreenType.ChooseIconScreen)
+    const CURRENT_STEP_DETAILS = getAddHabitStepsDetails(habit.goalID ?? null, AddHabitScreenType.ChooseIconScreen)
 
     const totalSteps = CURRENT_STEP_DETAILS.TOTAL_STEPS
     const currentStep = CURRENT_STEP_DETAILS.CURRENT_STEP

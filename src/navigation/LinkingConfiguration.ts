@@ -5,11 +5,11 @@ export interface RootStackParamsList {
   HabitudeScreen: {
     habitID: string;
     habitFrequency: string;
-    objectifID: string;
+    goalID: string;
     currentDateString: string;
   };
   SharedHabitScreen: undefined;
-  ObjectifDetailsScreen: undefined;
+  GoalDetailsScreen: undefined;
   ProfilDetailsScreen: undefined;
   ProfilSettingsScreen: undefined;
   DisplayUsersScreen: undefined;
@@ -22,11 +22,11 @@ export interface RootStackParamsList {
   AddHabitSteps: undefined;
   CreateHabitDetails: undefined;
   ValidationScreenHabit: undefined;
-  AddBasicDetailsObjectif: undefined;
-  AddHabitsToObjectif: undefined;
-  ChooseColorScreenObjectif: undefined;
-  ChooseIconScreenObjectif: undefined;
-  ValidationScreenObjectif: undefined;
+  AddBasicDetailsGoal: undefined;
+  AddHabitsToGoal: undefined;
+  ChooseColorScreenGoal: undefined;
+  ChooseIconScreenGoal: undefined;
+  ValidationScreenGoal: undefined;
   AddBasicDetailsDefi: undefined;
   Notifs: undefined;
 }
@@ -38,9 +38,9 @@ const LinkingConfiguration: LinkingOptions<RootStackParamsList> = {
       Home: {
         screens: {
           HomeScreen: 'home',
-          HabitudeScreen: 'habitude/:habitID/:habitFrequency/:objectifID/:currentDateString',
+          HabitudeScreen: 'habitude/:habitID/:habitFrequency/:goalID/:currentDateString',
           SharedHabitScreen: 'shared-habit',
-          ObjectifDetailsScreen: 'objectif-details',
+          GoalDetailsScreen: 'goal-details',
           ProfilDetailsScreen: 'profil-details',
           ProfilSettingsScreen: 'profil-settings',
           DisplayUsersScreen: 'display-users',
@@ -56,11 +56,11 @@ const LinkingConfiguration: LinkingOptions<RootStackParamsList> = {
           AddHabitSteps: 'add-habit-steps',
           CreateHabitDetails: 'create-habit-details',
           ValidationScreenHabit: 'validation-habit',
-          AddBasicDetailsObjectif: 'add-basic-details-objectif',
-          AddHabitsToObjectif: 'add-habits-to-objectif',
-          ChooseColorScreenObjectif: 'choose-color-objectif',
-          ChooseIconScreenObjectif: 'choose-icon-objectif',
-          ValidationScreenObjectif: 'validation-objectif',
+          AddBasicDetailsGoal: 'add-basic-details-goal',
+          AddHabitsToGoal: 'add-habits-to-goal',
+          ChooseColorScreenGoal: 'choose-color-goal',
+          ChooseIconScreenGoal: 'choose-icon-goal',
+          ValidationScreenGoal: 'validation-goal',
           AddBasicDetailsDefi: 'add-basic-details-defi',
         },
       },
